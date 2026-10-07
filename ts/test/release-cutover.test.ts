@@ -190,11 +190,11 @@ const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-
     readonly compatibilityRuntimeSelectable?: boolean;
   };
 };
-assert(contract.schema === "mts-contract/v0.15", "current contract must be v0.14");
-assert(contract.status === "accepted" && contract.accepted === true, "current v0.14 contract must be accepted");
-assert(contract.semanticBase === "mts-contract/v0.14", "v0.14 semantic base must be accepted v0.13");
-assert(contract.observableSemanticDelta === true, "v0.14 must retain its explicit semantic delta");
-assert(contract.acceptanceReady === true, "accepted v0.14 must retain proven readiness");
+assert(contract.schema === "mts-contract/v0.15", "current contract must be v0.15");
+assert(contract.status === "accepted" && contract.accepted === true, "current v0.15 contract must be accepted");
+assert(contract.semanticBase === "mts-contract/v0.14", "v0.15 semantic base must be accepted v0.14");
+assert(contract.observableSemanticDelta === true, "v0.15 must retain its explicit semantic delta");
+assert(contract.acceptanceReady === true, "accepted v0.15 must retain proven readiness");
 assert(contract.implementation?.language === "TypeScript", "current implementation must be TypeScript");
 assert(contract.implementation?.pythonRuntimePresent === false, "current contract must reject Python runtime ownership");
 assert(contract.implementation?.singleLiveSemanticRuntime === true, "accepted runtime must remain single");
@@ -203,15 +203,22 @@ assert(contract.implementation?.compatibilityRuntimeSelectable === false, "compa
 const conformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.15.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.14 conformance must be accepted");
-assert(conformance.acceptanceReady === true, "accepted v0.14 conformance must retain proven readiness");
+assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.15 conformance must be accepted");
+assert(conformance.acceptanceReady === true, "accepted v0.15 conformance must retain proven readiness");
 
 // Keep the immediately previous accepted release independently checkable.
-const previousConformance = JSON.parse(
+const previousAcceptedConformance = JSON.parse(
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.14.json"), "utf8"),
+) as ConformanceBoundary;
+assert(previousAcceptedConformance.status === "accepted" && previousAcceptedConformance.accepted === true, "previous v0.14 conformance must remain accepted evidence");
+assert(previousAcceptedConformance.acceptanceReady === true, "previous v0.14 conformance must retain proven readiness");
+
+// v0.13 remains historical evidence for inherited v013 negative-vector anchors.
+const historicalV013Conformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.13.json"), "utf8"),
 ) as ConformanceBoundary;
-assert(previousConformance.status === "accepted" && previousConformance.accepted === true, "previous v0.13 conformance must remain accepted evidence");
-assert(previousConformance.acceptanceReady === true, "previous v0.13 conformance must retain proven readiness");
+assert(historicalV013Conformance.status === "accepted" && historicalV013Conformance.accepted === true, "historical v0.13 conformance remains accepted evidence");
+assert(historicalV013Conformance.acceptanceReady === true, "historical v0.13 conformance retains proven readiness");
 
 const historicalV012Conformance = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-conformance-v0.12.json"), "utf8"),
@@ -285,23 +292,23 @@ negativeVector("v012-formal-square-bracket-low-level-open-is-not-authority", map
 negativeVector("v012-formal-square-bracket-missing-rule-does-not-open", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-bracket-missing-rule-does-not-open"));
 negativeVector("v012-formal-square-bracket-substituted-q-rule-does-not-open", mappedNegativeVector(historicalV012Conformance, "v012-formal-square-bracket-substituted-q-rule-does-not-open"));
 
-// Previous v0.13 keeps the exact accepted executable boundary.
-assert((previousConformance.requiredExecutableGates ?? []).length === 39, "previous accepted v0.13 keeps all 39 mandatory executable gates");
-negativeVector("v013-flat-relative-glyph-collision-not-canonical", mappedV013NegativeVector(previousConformance, "v013-flat-relative-glyph-collision-not-canonical"));
-negativeVector("v013-noncanonical-pair-188-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-188-rejected"));
-negativeVector("v013-noncanonical-pair-1988-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-1988-rejected"));
-negativeVector("v013-noncanonical-pair-1868-rejected", mappedV013NegativeVector(previousConformance, "v013-noncanonical-pair-1868-rejected"));
-negativeVector("v013-description-does-not-materialize-target", mappedV013NegativeVector(previousConformance, "v013-description-does-not-materialize-target"));
-negativeVector("v013-wrong-structural-rule-writes-zero-target-links", mappedV013NegativeVector(previousConformance, "v013-wrong-structural-rule-writes-zero-target-links"));
-negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", mappedV013NegativeVector(previousConformance, "v013-invalid-physical-opcode-fails-before-representation-writes"));
-negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(previousConformance, "v013-empty-wire-is-not-root"));
-negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(previousConformance, "v013-unrooted-sequence-lookalike-rejected"));
-negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(previousConformance, "v013-unrooted-anum-hierarchy-rejected"));
+// Historical v0.13 keeps its exact accepted executable boundary.
+assert((historicalV013Conformance.requiredExecutableGates ?? []).length === 39, "historical accepted v0.13 keeps all 39 mandatory executable gates");
+negativeVector("v013-flat-relative-glyph-collision-not-canonical", mappedV013NegativeVector(historicalV013Conformance, "v013-flat-relative-glyph-collision-not-canonical"));
+negativeVector("v013-noncanonical-pair-188-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-noncanonical-pair-188-rejected"));
+negativeVector("v013-noncanonical-pair-1988-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-noncanonical-pair-1988-rejected"));
+negativeVector("v013-noncanonical-pair-1868-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-noncanonical-pair-1868-rejected"));
+negativeVector("v013-description-does-not-materialize-target", mappedV013NegativeVector(historicalV013Conformance, "v013-description-does-not-materialize-target"));
+negativeVector("v013-wrong-structural-rule-writes-zero-target-links", mappedV013NegativeVector(historicalV013Conformance, "v013-wrong-structural-rule-writes-zero-target-links"));
+negativeVector("v013-invalid-physical-opcode-fails-before-representation-writes", mappedV013NegativeVector(historicalV013Conformance, "v013-invalid-physical-opcode-fails-before-representation-writes"));
+negativeVector("v013-empty-wire-is-not-root", mappedV013NegativeVector(historicalV013Conformance, "v013-empty-wire-is-not-root"));
+negativeVector("v013-unrooted-sequence-lookalike-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-unrooted-sequence-lookalike-rejected"));
+negativeVector("v013-unrooted-anum-hierarchy-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-unrooted-anum-hierarchy-rejected"));
 negativeVector("v013-nonroot-both-selfclosed-rejected-by-root-uniqueness", rejectsSecondBothSelfClosedSemanticLink());
 negativeVector("v013-foreign-abit-handle-rejected", rejectsForeignAbitHandle());
-negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(previousConformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
-negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-wrong-rule-rejected"));
-negativeVector("v013-formal-root-wrong-theory-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-wrong-theory-rejected"));
-negativeVector("v013-formal-root-malformed-prefix-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-malformed-prefix-rejected"));
-negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", mappedV013NegativeVector(previousConformance, "v013-formal-root-noncanonical-pair-alias-rejected"));
-negativeVector("v013-formal-root-no-host-term-special-case", mappedV013NegativeVector(previousConformance, "v013-formal-root-no-host-term-special-case"));
+negativeVector("v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence", mappedV013NegativeVector(historicalV013Conformance, "v013-current-recursive-proof-rejects-cycle-without-graph-cycle-evidence"));
+negativeVector("v013-formal-root-wrong-rule-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-formal-root-wrong-rule-rejected"));
+negativeVector("v013-formal-root-wrong-theory-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-formal-root-wrong-theory-rejected"));
+negativeVector("v013-formal-root-malformed-prefix-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-formal-root-malformed-prefix-rejected"));
+negativeVector("v013-formal-root-noncanonical-pair-alias-rejected", mappedV013NegativeVector(historicalV013Conformance, "v013-formal-root-noncanonical-pair-alias-rejected"));
+negativeVector("v013-formal-root-no-host-term-special-case", mappedV013NegativeVector(historicalV013Conformance, "v013-formal-root-no-host-term-special-case"));
