@@ -10,7 +10,7 @@ import { THEOREM_CATALOG_PATH } from "./theorem-catalog-markdown.js";
 
 type JsonObject = Record<string, unknown>;
 
-export const MTS_REQUIREMENT_REGISTRY_PATH = "requirements/mts-v0.14.json";
+export const MTS_REQUIREMENT_REGISTRY_PATH = "requirements/mts-v0.15.json";
 
 export interface MtsRequirementProjection {
   readonly id: string;
@@ -215,12 +215,79 @@ function validateDependencyGraph(requirements: readonly MtsRequirementProjection
   for (const id of ids) visit(id);
 }
 
+function loadAcceptedV015SemanticIr(
+  root: string,
+  registryPath: string,
+  registry: JsonObject,
+): MtsSemanticIr {
+  if (registry.status !== "accepted" || registry.accepted !== true) fail("v0.15 registry must be accepted after S22");
+  const contractPath = currentContractPath(root);
+  const contract = readJson(root, contractPath);
+  const contractId = string(contract.schema, contractPath + ".schema");
+  if (contractId !== "mts-contract/v0.15") fail("accepted v0.15 registry requires current v0.15 contract");
+  if (string(registry.contract, registryPath + ".contract") !== contractPath) fail("v0.15 registry contract path mismatch");
+  const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
+  const traceabilityPath = string(registry.traceability, registryPath + ".traceability");
+  const traceability = readJson(root, traceabilityPath);
+  const traces = object(traceability.requirements, traceabilityPath + ".requirements");
+  if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
+
+  const requirements = (registry.requirements as unknown[]).map((raw, index) => {
+    const value = object(raw, registryPath + ".requirements[" + index + "]");
+    const id = string(value.id, "v0.15 requirement id");
+    const evidence = object(value.evidence, id + ".evidence");
+    const traced = object(traces[id], id + " traceability");
+    const statement = string(laws[id], contractPath + ".requiredSemanticLaws." + id);
+    if (string(traced.state, id + " trace state") !== string(value.state, id + " state")) fail(id + " registry/trace state mismatch");
+    return Object.freeze({
+      id,
+      kind: string(value.group, id + ".group"),
+      status: "accepted",
+      classificationPath: "v015/" + string(value.group, id + ".group").toLowerCase().replace(/_/g, "-"),
+      order: index + 1,
+      dependsOn: Object.freeze([...strings(value.dependsOn, id + ".dependsOn")]),
+      statement,
+      statementDigest: createHash("sha256").update(statement, "utf8").digest("hex").slice(0, 16),
+      authorityDocument: contractPath,
+      authorityPointer: "/requiredSemanticLaws/" + id,
+      traceabilityPath,
+      positiveVectorCount: strings(evidence.positiveVectors, id + ".positiveVectors").length,
+      negativeVectorCount: strings(evidence.negativeVectors, id + ".negativeVectors").length,
+      executableGateCount: strings(evidence.requiredExecutableGates, id + ".requiredExecutableGates").length,
+      docPath: "docs/specs/Формальная нотация МТС.md",
+      docAnchor: "mts-v015-" + id.toLowerCase(),
+    });
+  });
+  exactSet("v0.15 requirement id set", requirements.map((item) => item.id), Object.keys(laws));
+  validateDependencyGraph(requirements);
+
+  const legacyPath = "requirements/mts-v0.14.json";
+  const legacy = readJson(root, legacyPath);
+  const legacySurface = object(legacy.documentSurface, legacyPath + ".documentSurface");
+  const legacyModes: Record<string, MarkdownDocumentMode> = {};
+  for (const [path, rawMode] of Object.entries(legacySurface)) {
+    const descriptor = object(rawMode, legacyPath + ".documentSurface." + path);
+    legacyModes[path] = string(descriptor.mode, path + ".mode") as MarkdownDocumentMode;
+  }
+  const repositoryRequirements = loadRepositoryRequirements(root, legacy, legacyPath, legacyModes);
+  return Object.freeze({
+    schema: string(registry.schema, registryPath + ".schema"),
+    contract: contractId,
+    contractPath,
+    requirements: Object.freeze(requirements),
+    repositoryRequirements,
+    documentModes: Object.freeze(legacyModes),
+    projectionState: "MATERIALIZED",
+  });
+}
+
 export function loadMtsSemanticIr(
   root: string,
   registryPath = MTS_REQUIREMENT_REGISTRY_PATH,
 ): MtsSemanticIr {
   const registry = readJson(root, registryPath);
   const schema = string(registry.schema, `${registryPath}.schema`);
+  if (schema === "mts-requirement-registry/v0.3") return loadAcceptedV015SemanticIr(root, registryPath, registry);
   if (schema !== "mts-requirement-registry/v0.1" && schema !== "mts-requirement-registry/v0.2") {
     fail(`unsupported registry schema ${schema}`);
   }
@@ -419,6 +486,7 @@ export function upsertRequirementProjection(
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
   const ir = loadMtsSemanticIr(root);
+  if (ir.schema === "mts-requirement-registry/v0.3") return [];
   if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
     return [];
   }
