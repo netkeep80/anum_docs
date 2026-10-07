@@ -189,6 +189,275 @@ function validateVerticalPromotion(requirement: Json, evidence: Json): void {
 }
 
 validateCandidate(requirements, traceability);
+// Terminology lock: English MTS term is ANet, never Aset.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for terminology");
+  const term = (list as Json[]).find((item) => item.id === "V15-TERM-01");
+  assert(term !== undefined, "V15-TERM-01 is registered");
+  assert(
+    text(term.summary, "V15-TERM-01 summary").includes("ANet"),
+    "V15-TERM-01 names ANet",
+  );
+  assert(
+    text(term.summary, "V15-TERM-01 summary").includes("Aset is not an MTS English term"),
+    "V15-TERM-01 rejects Aset as English MTS term",
+  );
+  const traces = record(traceability.requirements, "trace requirements");
+  assert(
+    Object.prototype.hasOwnProperty.call(traces, "V15-TERM-01"),
+    "traceability contains V15-TERM-01",
+  );
+  const termTrace = record(traces["V15-TERM-01"], "V15-TERM-01 trace");
+  assert(
+    strings(termTrace.evidenceRefs, "V15-TERM-01 evidenceRefs")
+      .includes("#1976 issuecomment-6026373991"),
+    "ANet terminology is bound to the recorded GitHub authority",
+  );
+}
+
+
+
+// Scope-boundary anti-drift: v0.15 execution core must not reacquire v0.16 proof/aprover blockers.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for v0.15/v0.16 scope boundary");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "scope id"), item]));
+  const deferredProofIds = [
+    "V15-DUAL-01",
+    "V15-DUAL-02",
+    "V15-THM-01",
+    "V15-THM-02",
+    "V15-THM-03",
+    "V15-PROOF-01",
+    "V15-PROOF-EXEC-01",
+    "V15-PROOF-EXEC-02",
+    "V15-PROOF-EXEC-03",
+  ];
+  for (const id of deferredProofIds) {
+    assert(!byId.has(id), id + " is v0.16 scope and must not block v0.15");
+  }
+
+  const gamma = byId.get("V15-GAMMA-01");
+  assert(gamma !== undefined, "V15-GAMMA-01 exists");
+  assert(text(gamma.state, "Gamma state") === "COMPONENT_GREEN", "closed #2001 projects to COMPONENT_GREEN");
+  assert(text(gamma.ownerIssue, "Gamma owner") === "#2001", "Gamma owner #2001");
+  assert(!/aprover/i.test(text(gamma.summary, "Gamma summary")), "v0.15 Gamma summary excludes aprover");
+  assert(/meta\/interpreter ANets/i.test(text(gamma.summary, "Gamma summary core")), "Gamma retains self-hosted meta/interpreter scope");
+
+  const ctx = byId.get("V15-CTX-01");
+  assert(ctx !== undefined, "V15-CTX-01 exists");
+  assert(text(ctx.ownerIssue, "CTX owner") === "#1987", "execution authority is owned by #1987");
+  assert(/semantic ANet membership/i.test(text(ctx.summary, "CTX summary")), "execution authority comes from ANet membership");
+  assert(!/launch-manifest authority/i.test(text(ctx.summary, "CTX summary stale host authority")), "launch manifest is not semantic authority");
+
+  const stage = byId.get("V15-STAGE-01");
+  assert(stage !== undefined, "V15-STAGE-01 exists");
+  assert(text(stage.ownerIssue, "STAGE owner") === "#1911", "compiler/metacompiler owns staged compilation boundary");
+
+  const corpus = byId.get("V15-CORPUS-01");
+  assert(corpus !== undefined, "V15-CORPUS-01 exists");
+  assert(/Author-approved v0\.15 executable artifact/i.test(text(corpus.summary, "CORPUS summary")), "frozen harness covers approved executable corpus");
+  assert(!/every semantic item/i.test(text(corpus.summary, "CORPUS stale inventory")), "old A-memory semantic inventory is not v0.15 scope");
+
+  const andBoundary = byId.get("V15-AND-03");
+  assert(andBoundary !== undefined, "V15-AND-03 exists");
+  assert(/one canonical semantic .*AND/i.test(text(andBoundary.summary, "AND semantic authority")), "one canonical AND semantics");
+  assert(/semantics-preserving/i.test(text(andBoundary.summary, "AND lowering boundary")), "optimized/backend lowerings require semantic preservation");
+
+  const review = record(requirements.authorJsonReview, "authorJsonReview scope");
+  const groups = strings(review.applicableGroups, "authorJsonReview applicable groups");
+  assert(!groups.includes("THM") && !groups.includes("PROOF"), "v0.16 proof groups removed from v0.15 Author JSON scope");
+}
+
+// Generated FORMAL specification blocker anti-drift.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for documentation blocker");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "documentation id"), item]));
+
+  const docs = byId.get("V15-DOCS-01");
+  assert(docs !== undefined, "V15-DOCS-01 generated FORMAL specification blocker exists");
+  assert(text(docs.ownerIssue, "V15-DOCS-01 owner") === "#1914", "V15-DOCS-01 owner is #1914");
+  assert(docs.mandatory === true, "V15-DOCS-01 is mandatory");
+  assert(/generated projection/i.test(text(docs.summary, "V15-DOCS-01 summary")), "V15-DOCS-01 requires generated projection");
+  assert(/Формальная нотация МТС\.md/u.test(text(docs.summary, "V15-DOCS-01 target")), "V15-DOCS-01 owns canonical FORMAL document");
+
+  const ready = byId.get("V15-READY-01");
+  assert(ready !== undefined, "V15-READY-01 exists for docs dependency");
+  assert(
+    strings(ready.dependsOn, "V15-READY-01 docs dependsOn").includes("V15-DOCS-01"),
+    "release readiness depends on generated FORMAL specification",
+  );
+
+  const traces = record(traceability.requirements, "trace requirements for documentation blocker");
+  const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
+  assert(text(traced.state, "V15-DOCS-01 trace state") === text(docs.state, "V15-DOCS-01 state"), "V15-DOCS-01 trace state");
+  assert(Number(traced.ownerIssue) === 1914, "V15-DOCS-01 trace owner");
+  assert(
+    strings(record(traces["V15-READY-01"], "READY docs trace").dependsOn, "READY docs trace dependsOn")
+      .includes("V15-DOCS-01"),
+    "traceability readiness depends on V15-DOCS-01",
+  );
+}
+
+// Operational governance blocker anti-drift.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for governance blocker");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "governance id"), item]));
+
+  const gov = byId.get("V15-GOV-04");
+  assert(gov !== undefined, "V15-GOV-04 operational merge-enforcement blocker exists");
+  assert(text(gov.ownerIssue, "V15-GOV-04 owner") === "#1982", "V15-GOV-04 owner is #1982");
+  assert(gov.mandatory === true, "V15-GOV-04 is mandatory");
+  assert(/repo-guard/i.test(text(gov.summary, "V15-GOV-04 summary")), "V15-GOV-04 covers repo-guard");
+  assert(/bypass/i.test(text(gov.summary, "V15-GOV-04 bypass summary")), "V15-GOV-04 covers bypass containment");
+
+  const ready = byId.get("V15-READY-01");
+  assert(ready !== undefined, "V15-READY-01 exists");
+  assert(
+    strings(ready.dependsOn, "V15-READY-01 dependsOn").includes("V15-GOV-04"),
+    "release readiness depends on operational merge enforcement",
+  );
+
+  const traces = record(traceability.requirements, "trace requirements for governance blocker");
+  const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
+  assert(text(traced.state, "V15-GOV-04 trace state") === text(gov.state, "V15-GOV-04 state"), "V15-GOV-04 trace state");
+  assert(Number(traced.ownerIssue) === 1982, "V15-GOV-04 trace owner");
+  assert(
+    strings(record(traces["V15-READY-01"], "READY trace").dependsOn, "READY trace dependsOn")
+      .includes("V15-GOV-04"),
+    "traceability readiness depends on V15-GOV-04",
+  );
+}
+
+// compact Boolean AND approved corpus lock.
+{
+  const corpus = record(traceability.approvedJsonCorpus, "approvedJsonCorpus AND lock");
+  const entries = corpus.entries;
+  assert(Array.isArray(entries), "approved corpus entries for AND lock");
+  const andEntry = (entries as Json[]).find(
+    (entry) => entry.id === "compact-boolean-and",
+  );
+  assert(andEntry !== undefined, "approved compact Boolean AND corpus entry");
+  assert(
+    text(andEntry.canonicalJsonDigest, "compact AND JSON digest") ===
+      "cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941",
+    "compact AND exact approved JSON digest",
+  );
+  assert(
+    text(andEntry.expectedRecursiveDigest, "compact AND recursive digest") ===
+      "37b2c02b927eed6cdd061931b60930d0a31d674a49bc585b075401a5cb5ddcb0",
+    "compact AND exact recursive digest",
+  );
+  const review = record(andEntry.authorJsonReview, "compact AND author review");
+  assert(text(review.state, "compact AND approval state") === "APPROVED", "compact AND explicit Author approval");
+}
+
+// Boolean family Author-approval promotion lock.
+{
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for Boolean family lock");
+  const byId = new Map((list as Json[]).map((item) => [text(item.id, "logic id"), item]));
+  const family = byId.get("V15-AND-04");
+  assert(family !== undefined, "V15-AND-04 exists");
+
+  const corpus = record(traceability.approvedJsonCorpus, "approvedJsonCorpus logic lock");
+  const entries = corpus.entries;
+  assert(Array.isArray(entries), "approved corpus entries for logic lock");
+  const ids = new Set((entries as Json[]).map((entry) => text(entry.id, "corpus id")));
+  const required = [
+    "compact-boolean-not",
+    "compact-boolean-or",
+    "compact-boolean-xor",
+  ];
+  const allApproved = required.every((id) => ids.has(id));
+  const state = text(family.state, "V15-AND-04 state");
+  if (state === "VERTICAL_GREEN") {
+    assert(allApproved, "V15-AND-04 promotion requires approved NOT/OR/XOR corpus");
+  } else {
+    assert(state === "OPEN", "V15-AND-04 is OPEN or VERTICAL_GREEN");
+  }
+}
+
+// S17 integration owner: #2007; version acceptance remains #1876 Author-only.
+// Clean-main S17 convergence guard: every repository path in active trace evidence
+// must exist, obsolete research monoliths must stay absent from authority, and
+// unresolved sequence-carrier/source-provenance remains explicitly unaccepted.
+{
+  const traces = record(traceability.requirements, "trace requirements for S17 clean-main convergence");
+  const repositoryPath = /^(?:\.github|contracts|cutover|docs|formal|profiles|proofs|requirements|traceability|ts|theorems)\//u;
+
+  for (const [id, raw] of Object.entries(traces)) {
+    const traced = record(raw, id + " trace record");
+    for (const field of ["requiredExecutableGates", "evidenceRefs"] as const) {
+      for (const ref of strings(traced[field], id + " " + field)) {
+        if (!repositoryPath.test(ref) || ref.includes("@")) continue;
+        assert(existsSync(join(repoRoot, ref)), id + " stale clean-main path: " + ref);
+      }
+    }
+  }
+
+  const gamma = record(traces["V15-GAMMA-01"], "Gamma trace");
+  const gammaGates = strings(gamma.requiredExecutableGates, "Gamma gates");
+  for (const gate of [
+    "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
+    "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+    "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts",
+  ]) {
+    assert(gammaGates.includes(gate), "Gamma pins split clean-main evidence: " + gate);
+  }
+  assert(
+    !gammaGates.includes("ts/test/v015-structural-aset-one-command-a9.test.ts"),
+    "obsolete A9 monolith is not trace authority",
+  );
+
+  const json2 = record(traces["V15-JSON-02"], "JSON-02 trace");
+  const json2Gates = strings(json2.requiredExecutableGates, "JSON-02 gates");
+  for (const gate of [
+    "ts/test/v015-source-anet-denotation-core-das-a2a.test.ts",
+    "ts/test/v015-direct-json-denotation-das-a2b.test.ts",
+    "ts/test/v015-rule-bundle-denotation-das-a2c.test.ts",
+  ]) {
+    assert(json2Gates.includes(gate), "JSON-02 pins split DAS evidence: " + gate);
+  }
+  assert(
+    !json2Gates.includes("ts/test/v015-native-source-anet-denotation-das-a2.test.ts"),
+    "obsolete DAS A2 monolith is not trace authority",
+  );
+
+  const ctx = record(traces["V15-CTX-01"], "CTX-01 trace");
+  const ctxRefs = strings(ctx.evidenceRefs, "CTX-01 evidenceRefs");
+  assert(ctxRefs.includes("profiles/mts-v015-meta-interpreter-kernel.json"), "CTX uses compact kernel");
+  assert(!ctxRefs.includes("profiles/mts-v015-meta-interpreter-model.json"), "research meta-interpreter monolith excluded");
+
+  const kernel = json(join(repoRoot, "profiles/mts-v015-meta-interpreter-kernel.json"));
+  const semanticAuthority = record(kernel.semanticAuthority, "kernel semanticAuthority");
+  assert(semanticAuthority.versionAccepted === false, "kernel cannot accept v0.15");
+  assert(semanticAuthority.authorAcceptanceRequired === true, "kernel requires explicit Author acceptance");
+  const unresolved = kernel.unresolvedExcludedFromKernel;
+  assert(Array.isArray(unresolved), "kernel unresolved exclusions");
+  const sequence = (unresolved as Json[]).find((item) => item.id === "SEQUENCE_CARRIER_SOURCE_PROVENANCE");
+  assert(sequence !== undefined, "sequence-carrier/source-provenance exclusion exists");
+  assert(
+    text(sequence.status, "sequence-carrier status") === "AUTHOR_REVIEW_REQUIRED",
+    "sequence-carrier/source-provenance remains Author-review-required",
+  );
+
+  const reaction = json(join(repoRoot, "profiles/mts-v015-generalized-reaction-candidate.json"));
+  const boundary = record(reaction.integrationBoundary, "Gamma integration boundary");
+  assert(boundary.soleAcceptanceAuthority === false, "Gamma profile is not sole acceptance authority");
+  const sequenceBoundary = record(reaction.sequenceCarrierBoundary, "Gamma sequence carrier boundary");
+  assert(
+    text(sequenceBoundary.status, "Gamma sequence carrier status") === "AUTHOR_REVIEW_REQUIRED",
+    "Gamma sequence-carrier boundary remains unresolved",
+  );
+
+  const corpus = record(traceability.approvedJsonCorpus, "approved corpus S17");
+  const corpusEntries = corpus.entries;
+  assert(Array.isArray(corpusEntries) && corpusEntries.length === 6, "exact six Author-approved v0.15 executable JSON artifacts");
+}
 
 // Negative: a mere state flip cannot promote an R0 requirement to VERTICAL_GREEN.
 {
@@ -273,4 +542,9 @@ console.log([
   "REAL_AMEMORY_PROFILE_REQUIRED=TRUE",
   "APPROVED_JSON_CORPUS_OWNER=1978",
   "REAL_AMEMORY_REPLAY_OWNER=amemory#482",
+  "ANET_TERMINOLOGY=GREEN",
+  "V016_PROOF_SCOPE_REMOVED=TRUE",
+  "GAMMA_SCOPE_CORE_ONLY=TRUE",
+  "CTX_AUTHORITY_SELF_HOSTED=TRUE",
+  "CANONICAL_AND_BACKEND_LOWERING_BOUNDARY=GREEN",
 ].join(" "));
