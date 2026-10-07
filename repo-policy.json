@@ -86,8 +86,8 @@
         "path": ".github/workflows/branch-hygiene.yml",
         "format": "yaml"
       },
-      "v014-requirements": {
-        "path": "requirements/mts-v0.14.json",
+      "v015-requirements": {
+        "path": "requirements/mts-v0.15.json",
         "format": "json"
       }
     },
@@ -203,20 +203,20 @@
         "value": "Sweep fully merged stale branches"
       },
       {
-        "id": "v014-requirements-status",
+        "id": "v015-requirements-status",
         "kind": "scalar_equals_literal",
         "source": {
-          "document": "v014-requirements",
+          "document": "v015-requirements",
           "pointer": "/status",
           "type": "string"
         },
         "value": "accepted"
       },
       {
-        "id": "v014-requirements-contract",
+        "id": "v015-requirements-contract",
         "kind": "scalar_equal",
         "left": {
-          "document": "v014-requirements",
+          "document": "v015-requirements",
           "pointer": "/contract",
           "type": "string"
         },
@@ -265,6 +265,11 @@
             "kind": "regex",
             "glob": "ts/test/v014-release-cutover-a75.test.ts",
             "pattern": "negativeVector\\(\\\"([^\\\"]+)\\\""
+          },
+          {
+            "kind": "regex",
+            "glob": "ts/test/v015-requirements-traceability-r0.test.ts",
+            "pattern": "negativeVector\\\\(\\\"([^\\\"]+)\\\""
           }
         ]
       },
@@ -305,8 +310,8 @@
         "sources": [
           {
             "kind": "regex",
-            "glob": "requirements/mts-v0.14.json",
-            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V14-L[0-9]+)\\\""
+            "glob": "requirements/mts-v0.15.json",
+            "pattern": "\\\\\\\"id\\\\\\\"\\\\s*:\\\\s*\\\\\\\"(V15-[A-Z0-9-]+)\\\\\\\""
           }
         ]
       }
