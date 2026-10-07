@@ -425,8 +425,8 @@ function staticGuards(): void {
 
   same(
     kernel.status,
-    "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
-    "kernel remains pre-acceptance",
+    "ACCEPTED_EXECUTION_AUTHORITY",
+    "kernel accepted after S22",
   );
   same(kernel.context.directGaugeBoundary, "C", "direct-gauge execution boundary");
   same(
@@ -445,11 +445,11 @@ function staticGuards(): void {
     true,
     "C boundary remains chirality/gauge relative",
   );
-  same(kernel.context.versionAcceptance, false, "Context design does not accept v0.15");
-  same(kernel.semanticAuthority.versionAccepted, false, "kernel does not accept v0.15");
+  same(kernel.context.versionAcceptance, true, "Context design participates in accepted v0.15");
+  same(kernel.semanticAuthority.versionAccepted, true, "kernel accepts v0.15");
   same(
     kernel.semanticAuthority.authorAcceptanceRequired,
-    true,
+    false,
     "explicit Author acceptance remains required",
   );
 
