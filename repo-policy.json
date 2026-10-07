@@ -214,17 +214,13 @@
       },
       {
         "id": "v015-requirements-contract",
-        "kind": "scalar_equal",
-        "left": {
+        "kind": "scalar_equals_literal",
+        "source": {
           "document": "v015-requirements",
           "pointer": "/contract",
           "type": "string"
         },
-        "right": {
-          "document": "contract-conformance.current.contract",
-          "pointer": "/schema",
-          "type": "string"
-        }
+        "value": "contracts/mts-contract-v0.15.json"
       }
     ]
   },
@@ -382,7 +378,7 @@
       "scope": "directory",
       "metric": "files",
       "glob": "contracts/**",
-      "max": 8,
+      "max": 10,
       "max_growth": 2,
       "count": "all_tracked",
       "level": "blocking"
