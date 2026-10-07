@@ -19,7 +19,7 @@ same(model.versionComparison.available, false, "single compiled registry does no
 assert(model.versionComparison.reason?.includes("реестра требований") === true, "missing previous registry is explicit");
 assert(model.kinds.length > 0, "kind filters are derived");
 assert(model.statuses.includes("accepted"), "status filters are derived");
-assert(model.layers.includes("representation"), "top-level classification layers are derived");
+assert(model.layers.includes("v015"), "top-level v0.15 classification layer is derived");
 
 const byId = new Map(model.entries.map((item) => [item.id, item] as const));
 for (const item of model.entries) {
