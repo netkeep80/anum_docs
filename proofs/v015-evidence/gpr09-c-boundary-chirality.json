@@ -63,7 +63,7 @@
     "ciRun": 37477112802
   },
   "executableWitnesses": [
-    "ts/test/v015-gpr09-chirality-covariance.test.ts",
+    "ts/test/v015-context-authority-closure-c1.test.ts",
     "ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts",
     "ts/test/v015-context-theory-self-contained-a6.test.ts"
   ],
