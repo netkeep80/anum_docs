@@ -27,9 +27,9 @@ const report = buildMarkdownCoverageAudit(root);
 const again = buildMarkdownCoverageAudit(root);
 
 same(report.schema, "mts-markdown-coverage/v0.1", "coverage schema");
-same(report.contract, "mts-contract/v0.14", "coverage targets accepted current contract");
-same(report.projectionState, "MATERIALIZED", "projection state");
-same(report.proseMaterializationPending, false, "v0.14 prose materialization complete");
+same(report.contract, "mts-contract/v0.15", "coverage targets accepted current contract");
+same(report.projectionState, "V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951", "projection state");
+same(report.proseMaterializationPending, false, "legacy Markdown compatibility projection remains materialized");
 same(report.summary.documentCount, 12, "registered Markdown surface");
 assert(report.summary.headingCount > 0, "visible headings are inventoried");
 assert(report.summary.stableAnchorCount >= 14, "stable anchors include all accepted owners");
@@ -107,5 +107,5 @@ throws(
 );
 
 console.log(
-  `Markdown coverage D20: GREEN accepted=${report.summary.requirementCount} materialized=${report.summary.requirementBackedSectionCount} research=${report.summary.researchHistoricalSectionCount}`,
+  `Markdown coverage D20: GREEN compatibility=${report.summary.requirementCount} materialized=${report.summary.requirementBackedSectionCount} current=v0.15 research=${report.summary.researchHistoricalSectionCount}`,
 );
