@@ -4,8 +4,9 @@ MTS v0.15 EXTERNAL PROOF PROJECTION — GPR-07/06/08/01 CORE
 This file is a verifier-side projection only. Rocq's Type/list/Prop vocabulary
 is verifier machinery, not MTS ontology and carries no semantic authority.
 
-The theorem bodies below are copied from the frozen #1989 research checkpoint;
-only this split-module header differs.
+The theorem bodies below are copied from the frozen #1989 research checkpoint
+(source blob b89a0dddb3a800629d7f234bd81b06c6f0d3f0b9); only this split-module
+header differs.
 *)
 
 From Coq Require Import List.
