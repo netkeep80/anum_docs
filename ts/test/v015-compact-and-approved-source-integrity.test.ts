@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 // Integration provenance: pins already Author-approved compact AND artifacts from #1980/#1989; no new JSON approval is introduced.
+// Approval boundary: changed/new compact AND JSON still requires explicit Author confirmation; this gate validates only the pinned approved artifact.
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 compact AND approved source integrity: " + message);
 }
