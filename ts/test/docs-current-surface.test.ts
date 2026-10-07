@@ -18,15 +18,15 @@ function same<T>(actual: T, expected: T, message: string): void {
 
 const root = resolve(process.cwd(), "..");
 const acceptance = JSON.parse(
-  readFileSync(join(root, "cutover/typescript-c1-acceptance-v0.7.json"), "utf8"),
+  readFileSync(join(root, "cutover/typescript-c1-acceptance-v0.8.json"), "utf8"),
 ) as any;
 assert(
-  acceptance.current?.contract === "contracts/mts-contract-v0.14.json",
-  "accepted release pointer is v0.14",
+  acceptance.current?.contract === "contracts/mts-contract-v0.15.json",
+  "accepted release pointer is v0.15",
 );
 assert(
-  acceptance.acceptance?.proseDocumentationReconstructionPendingIssue === 1585,
-  "v0.14 prose reconstruction is governed by #1585",
+  Array.isArray(acceptance.postAcceptanceWork) && acceptance.postAcceptanceWork.some((item: unknown) => typeof item === "string" && item.includes("#1951")),
+  "post-acceptance FORMAL formula migration is governed by #1951",
 );
 
 const policy = JSON.parse(
@@ -61,9 +61,9 @@ same(current.length, 10, "current reader-facing documentation surface cardinalit
 const obsoleteCurrentMarkerPattern = /mts-doc-version:\s*v0\.(?:9|10|11|12|13)\b/gi;
 const versionedNamePattern = /(?:^|[\s._-])v?\d+\.\d+(?:$|[\s._-])/i;
 const visibleVersionLabels = Object.freeze([
-  "> **Версия МТС: v0.14**",
-  "> **Документ относится к МТС v0.14**",
-  "> **Текущая МТС: v0.14.",
+  "> **Версия МТС: v0.15**",
+  "> **Документ относится к МТС v0.15**",
+  "> **Текущая МТС: v0.15.",
 ]);
 
 for (const relativePath of current) {
@@ -74,17 +74,17 @@ for (const relativePath of current) {
   assert(source.startsWith("# "), `${relativePath}: H1 must be the first line`);
 
   same(
-    source.split("mts-doc-version: v0.14").length - 1,
+    source.split("mts-doc-version: v0.15").length - 1,
     1,
-    `${relativePath}: exactly one v0.14 machine marker`,
+    `${relativePath}: exactly one v0.15 machine marker`,
   );
   assert(
-    source.indexOf("mts-doc-version: v0.14") < 300,
+    source.indexOf("mts-doc-version: v0.15") < 300,
     `${relativePath}: version marker must be near the title`,
   );
   assert(
     visibleVersionLabels.some((label) => source.includes(label)),
-    `${relativePath}: visible v0.14 label is required`,
+    `${relativePath}: visible v0.15 label is required`,
   );
 
   const obsoleteMarkers = [...source.matchAll(obsoleteCurrentMarkerPattern)]
@@ -128,12 +128,12 @@ assert(
 assert(existsSync(glossary), "glossary exists");
 
 console.log([
-  "MTS v0.14 current documentation surface: GREEN",
+  "MTS v0.15 current documentation surface: GREEN",
   `CURRENT_DOCS=${current.length}`,
   "VERSION_MARKER=EXACTLY_ONE_PER_DOC",
   "VISIBLE_VERSION_LABEL=REQUIRED",
   "OBSOLETE_CURRENT_VERSION_MARKERS=0",
   "VERSIONED_CURRENT_FILENAMES=0",
   "OBSOLETE_BUNDLE_PATH=ABSENT",
-  "CURRENT_VERSION=v0.14",
+  "CURRENT_VERSION=v0.15",
 ].join(" "));
