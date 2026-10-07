@@ -190,17 +190,19 @@ try {
   copy("repo-policy.json");
   copy("contracts/mts-contract-v0.14.json");
   copy("contracts/mts-conformance-v0.14.json");
-  copy("contracts/mts-contract-v0.13.json");
-  copy("contracts/mts-conformance-v0.13.json");
+  copy("contracts/mts-contract-v0.15.json");
+  copy("contracts/mts-conformance-v0.15.json");
+  copy("traceability/mts-v0.15.json");
+  copy("requirements/mts-v0.15.json");
   copy("traceability/mts-v0.14.json");
   copy("requirements/mts-v0.14.json");
-  copy("cutover/typescript-c1-acceptance-v0.7.json");
+  copy("cutover/typescript-c1-acceptance-v0.8.json");
   for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
   for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
-  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.14", "mts-contract/v0.X"), "utf8");
+  writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
   assert.deepEqual(syncRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "синхронизация должна исправлять только устаревший файл");
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
