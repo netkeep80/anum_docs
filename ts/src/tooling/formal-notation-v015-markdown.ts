@@ -150,8 +150,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
   if (semanticAuthority.authorAcceptanceRequired !== true) {
     fail("compact execution kernel must require explicit Author acceptance");
   }
-  if (!Array.isArray(kernel.unresolved)) fail("kernel unresolved exclusions missing");
-  const sequenceCarrier = (kernel.unresolved as JsonObject[]).find(
+  if (!Array.isArray(kernel.unresolvedExcludedFromKernel)) fail("kernel unresolved exclusions missing");
+  const sequenceCarrier = (kernel.unresolvedExcludedFromKernel as JsonObject[]).find(
     (item) => item.id === "SEQUENCE_CARRIER_SOURCE_PROVENANCE",
   );
   if (
