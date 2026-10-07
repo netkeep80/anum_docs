@@ -269,3 +269,5 @@ theorem FRM_08_structural_aspect_denotation
   · rfl
 
 end MTS.V015.FormalExternal
+
+/- integration synchronize marker; removed in next commit -/
