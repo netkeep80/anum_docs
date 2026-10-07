@@ -40,6 +40,7 @@ import {
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 
 // Integration provenance: validates already Author-approved two-role artifacts from #1188/#1989; it introduces no new JSON or semantic authority.
+// Approval boundary: this gate validates pinned artifacts only; any changed/new JSON still requires explicit Author approval.
 
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 two-role approved recursive: " + message);
