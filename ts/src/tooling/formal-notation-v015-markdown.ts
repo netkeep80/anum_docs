@@ -7,6 +7,7 @@ import {
 
 type JsonObject = Record<string, unknown>;
 
+// S18 clean-main generated projection owner: #2007 / #1914.
 export const FORMAL_NOTATION_V015_MODEL_PATH =
   "profiles/mts-v015-formal-notation-projection.json";
 export const FORMAL_NOTATION_V015_TARGET_PATH =
