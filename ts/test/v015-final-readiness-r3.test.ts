@@ -52,7 +52,7 @@ const ready2 = byId.get("V15-READY-02");
 const ready3 = byId.get("V15-READY-03");
 assert(ready1 !== undefined && text(ready1.state, "READY-01") === "RELEASE_READY", "READY-01 release-ready");
 assert(ready2 !== undefined && text(ready2.state, "READY-02") === "RELEASE_READY", "READY-02 release-ready");
-assert(ready3 !== undefined && text(ready3.state, "READY-03") === "OPEN", "READY-03 stays Author-only OPEN");
+assert(ready3 !== undefined && text(ready3.state, "READY-03") === "ACCEPTED", "READY-03 accepted by explicit Author decision");
 
 const counts = mandatory.reduce<Record<string, number>>((out, item) => {
   const state = text(item.state, "state");
@@ -62,10 +62,11 @@ const counts = mandatory.reduce<Record<string, number>>((out, item) => {
 assert(counts.COMPONENT_GREEN === 41, "41 component-green");
 assert(counts.VERTICAL_GREEN === 4, "4 vertical-green");
 assert(counts.RELEASE_READY === 2, "2 release-ready");
-assert(counts.OPEN === 1, "only one OPEN");
+assert(counts.ACCEPTED === 1, "one accepted Author gate");
+assert((counts.OPEN ?? 0) === 0, "no OPEN requirements after S22");
 assert(
-  mandatory.filter((item) => item.state === "OPEN").every((item) => item.id === "V15-READY-03"),
-  "only Author decision remains OPEN",
+  mandatory.filter((item) => item.state === "OPEN").length === 0,
+  "no Author-decision requirement remains OPEN after S22",
 );
 
 const traced = record(traceability.requirements, "trace requirements");
