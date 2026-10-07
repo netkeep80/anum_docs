@@ -2,12 +2,12 @@
   "schema": "mts-v015-meta-interpreter-kernel/v0.1",
   "id": "mts-v015-meta-interpreter-kernel",
   "versionTarget": "MTS v0.15",
-  "status": "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
-  "acceptedBaseline": "MTS v0.14",
+  "status": "ACCEPTED_EXECUTION_AUTHORITY",
+  "acceptedBaseline": "MTS v0.15",
   "semanticAuthority": {
     "scope": "V0.15_EXECUTION_KERNEL_ONLY",
-    "versionAccepted": false,
-    "authorAcceptanceRequired": true,
+    "versionAccepted": true,
+    "authorAcceptanceRequired": false,
     "excludes": [
       "unresolved sequence-carrier research",
       "historical alternatives and research ledger",
@@ -65,11 +65,11 @@
   "context": {
     "directGaugeBoundary": "C",
     "rootRelation": "C = END(R)",
-    "authorDecision": "APPROVED_FOR_V015_DESIGN",
-    "versionAcceptance": false,
+    "authorDecision": "APPROVED_FOR_V015_ACCEPTED",
+    "versionAcceptance": true,
     "freezeResumeWithoutSerializedContextHandle": true,
     "foreignTheoryIsolation": true,
-    "designAcceptanceScope": "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+    "designAcceptanceScope": "V0.15_ACCEPTED_EXECUTION_CONTEXT",
     "foundationGlobalPrivilege": false,
     "chiralityCovariantMirrorRequired": true
   },
