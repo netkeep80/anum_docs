@@ -1,0 +1,9 @@
+{
+  V0 : {},
+  GroundAntecedent : GA,
+  GroundOutput : GB,
+  GroundImage : [GroundOutput],
+  GroundBody : GroundAntecedent->GroundImage,
+  GroundRule : V0->GroundBody,
+  Theory->GroundRule
+}
