@@ -1,3 +1,4 @@
+// Clean-main corrective generated projection slice / #2007.
 import type {
   TheoremProjectionEvidence,
   TheoremProjectionEvidenceLane,
