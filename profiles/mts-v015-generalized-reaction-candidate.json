@@ -2,6 +2,12 @@
   "id": "mts-v015-generalized-reaction-candidate",
   "version": "0.1.0-development",
   "status": "AUTHOR_APPROVED_DESIGN_PROOF_GREEN",
+  "integrationBoundary": {
+    "classification": "ARCHITECTURE_DESIGN_EVIDENCE",
+    "soleAcceptanceAuthority": false,
+    "unresolvedSectionsRemainExplicit": true,
+    "note": "This profile records the selected Gamma design and proof closure. It does not promote unresolved research subsections; sequenceCarrierBoundary remains AUTHOR_REVIEW_REQUIRED until separately resolved."
+  },
   "owners": {
     "architectureIssue": 1987,
     "mpNecessityIssue": 1988,
@@ -207,7 +213,11 @@
       "status": "AUTHOR_APPROVED_PROOF_GREEN",
       "result": "Selected v0.15 profile: S1+S2 are internal phases of the single structural-unary generalized reaction over semantic ANet membership; there is no separate pre-grounder command.",
       "causalBoundary": "S1 complete read-only plan precedes S2 construction/publication; new Theory admissions are visible next reaction only.",
-      "evidence": "ts/test/v015-structural-aset-one-command-a9.test.ts",
+      "evidence": "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
+      "cleanMainEvidence": [
+        "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+        "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts"
+      ],
       "doesNotProve": [
         "that this stronger command is necessary rather than merely sufficient",
         "that cross-member join is needed",
