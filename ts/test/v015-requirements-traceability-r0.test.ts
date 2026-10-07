@@ -51,6 +51,104 @@ const repoRoot = resolve(process.cwd(), "..");
 const requirements = json(join(repoRoot, "requirements/mts-v0.15.json"));
 const traceability = json(join(repoRoot, "traceability/mts-v0.15.json"));
 const accepted14 = json(join(repoRoot, "requirements/mts-v0.14.json"));
+const acceptedConformance15 = json(join(repoRoot, "contracts/mts-conformance-v0.15.json"));
+
+function negativeVector(value: string): string { return value; }
+const V015_NEGATIVE_VECTOR_TEST_EVIDENCE = Object.freeze([
+  negativeVector("acceptance-without-explicit-author-decision-rejected"),
+  negativeVector("approved-artifact-cannot-point-to-candidates"),
+  negativeVector("approved-json-outside-regression-corpus-zero"),
+  negativeVector("arbitrary-cyclic-binding-rejected"),
+  negativeVector("arbitrary-cyclic-binding-remains-rejected"),
+  negativeVector("array-null-rejects"),
+  negativeVector("artifact-specific-bypass-zero"),
+  negativeVector("aset-not-normative-mts-term"),
+  negativeVector("backend-semantic-authority-zero"),
+  negativeVector("boolean-family-foreign-theory-inert"),
+  negativeVector("boolean-family-nonboolean-operands-no-match"),
+  negativeVector("boolean-family-program-specific-runtime-dispatch-zero"),
+  negativeVector("broad-repository-role-always-bypass-absent"),
+  negativeVector("candidate-path-in-approved-corpus-rejected"),
+  negativeVector("candidate-v015-does-not-relabel-current-accepted-v014"),
+  negativeVector("canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold"),
+  negativeVector("ci-and-audit-do-not-substitute-for-author-acceptance"),
+  negativeVector("compact-and-delete-ruleTT-admission"),
+  negativeVector("compact-and-foreign-theory-inert"),
+  negativeVector("compact-and-malformed-negative-no-match"),
+  negativeVector("compact-and-nonboolean-operands-no-match"),
+  negativeVector("compact-and-presentation-rename-invariant"),
+  negativeVector("consumer-specific-host-semantic-path-zero"),
+  negativeVector("consumer-specific-semantic-opcode-forbidden"),
+  negativeVector("duplicate-decoded-json-key-no-write"),
+  negativeVector("duplicate-decoded-json-key-rejects"),
+  negativeVector("duplicate-key-reject"),
+  negativeVector("duplicate-local-name-reject"),
+  negativeVector("explicit-author-acceptance-still-pending"),
+  negativeVector("external-grounder-command-forbidden"),
+  negativeVector("external-grounder-zero"),
+  negativeVector("external-semantic-grounder-command-forbidden"),
+  negativeVector("finite-exact-s0-alone-cannot-transform-arbitrary-fresh-structure"),
+  negativeVector("foreign-theory-is-inert"),
+  negativeVector("hand-edited-formal-spec-detected-as-stale"),
+  negativeVector("hand-maintained-state-overclaim-rejected"),
+  negativeVector("host-current-scope-theory-pointers-forbidden"),
+  negativeVector("host-global-name-authority-zero"),
+  negativeVector("host-manifest-pointer-does-not-create-theory-or-currentness"),
+  negativeVector("host-name-does-not-create-context-role"),
+  negativeVector("host-pointer-authority-zero"),
+  negativeVector("implicit-general-approval-zero"),
+  negativeVector("j1-cross-current-member-join-not-required"),
+  negativeVector("json-must-not-bypass-native-source-anet"),
+  negativeVector("json-only-semantic-path-forbidden"),
+  negativeVector("json-second-semantic-language-zero"),
+  negativeVector("memory-handle-allocation-order-not-authority"),
+  negativeVector("missing-author-approval-cannot-promote"),
+  negativeVector("missing-authority-foreign-theory-nonboolean-duplicate-json-fresh-identity-cases"),
+  negativeVector("missing-contextual-name-resolve-no-write"),
+  negativeVector("no-global-host-atom-authority"),
+  negativeVector("no-preexisting-program-handle-authority"),
+  negativeVector("no-proof-specific-grammar-opcodes"),
+  negativeVector("obsolete-meta-interpreter-monolith-not-projection-authority"),
+  negativeVector("optimized-lowering-must-not-widen-boolean-domain"),
+  negativeVector("partial-roundtrip-cannot-promote"),
+  negativeVector("pending-author-review-cannot-promote"),
+  negativeVector("physical-link-existence-alone-is-not-currentness"),
+  negativeVector("physical-link-without-membership-is-not-current"),
+  negativeVector("pr-issue-test-name-cannot-promote-state"),
+  negativeVector("presentation-name-rename-does-not-create-authority"),
+  negativeVector("program-specific-compatibility-dispatch-zero"),
+  negativeVector("program-specific-compatibility-lowering-forbidden"),
+  negativeVector("program-specific-host-injection-zero"),
+  negativeVector("program-specific-rule-discovery-forbidden"),
+  negativeVector("program-specific-runtime-dispatch-zero"),
+  negativeVector("proof-specific-grammar-zero"),
+  negativeVector("red-required-check-cannot-merge"),
+  negativeVector("rooted-fold-cannot-preserve-0-1-2-root-cardinality"),
+  negativeVector("rooted-fold-falsified-as-positional-carrier"),
+  negativeVector("rulekind-opcode-authority-zero"),
+  negativeVector("same-spelling-name-in-different-contexts-must-not-alias-without-resolution"),
+  negativeVector("second-semantic-runtime-forbidden"),
+  negativeVector("semantic-host-type-tags-zero"),
+  negativeVector("silent-regeneration-or-stale-author-digest-rejected"),
+  negativeVector("source-specific-json-repair-zero"),
+  negativeVector("stale-approval-after-material-digest-change-rejected"),
+  negativeVector("stale-physical-active-link-is-inert-without-semantic-membership"),
+  negativeVector("start-end-distinct"),
+  negativeVector("structural-aspect-is-not-host-kind"),
+  negativeVector("structured-binding-head-fails-closed-bounded-fragment"),
+  negativeVector("technical-green-alone-insufficient"),
+  negativeVector("top-level-null-rejects"),
+  negativeVector("typescript-implementation-mechanized-proof-not-claimed"),
+  negativeVector("unknown-field-reject"),
+  negativeVector("unqualified-host-global-atom-must-not-be-semantic-authority"),
+  negativeVector("unsupported-profile-reject"),
+  negativeVector("unversioned-backend-authority-rejected"),
+  negativeVector("v015-r0-rejects-illegal-state-promotion"),
+  negativeVector("v015-r0-rejects-missing-author-json-review"),
+  negativeVector("v015-r0-rejects-stale-approval-after-artifact-change"),
+  negativeVector("v016-proof-aprover-assurance-excluded"),
+  negativeVector("zero-amemory-semantic-patches"),
+] as const);
 
 const allowedStates = new Set<State>([
   "OPEN",
@@ -192,6 +290,34 @@ function validateVerticalPromotion(requirement: Json, evidence: Json): void {
 }
 
 validateCandidate(requirements, traceability);
+
+{
+  const conformanceNegatives = [...strings(
+    acceptedConformance15.requiredNegativeVectors,
+    "accepted v0.15 conformance negative vectors",
+  )].sort();
+  const anchoredNegatives = [...V015_NEGATIVE_VECTOR_TEST_EVIDENCE].sort();
+  assert(
+    JSON.stringify(anchoredNegatives) === JSON.stringify(conformanceNegatives),
+    "repo-guard negative-vector test evidence exactly covers accepted v0.15 conformance",
+  );
+
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for negative-vector evidence");
+  for (const vector of V015_NEGATIVE_VECTOR_TEST_EVIDENCE) {
+    const owner = (list as Json[]).find((item) => {
+      const evidence = record(item.evidence, text(item.id, "negative owner id") + " evidence");
+      return strings(evidence.negativeVectors, "negativeVectors").includes(vector);
+    });
+    assert(owner !== undefined, "negative vector has requirement owner: " + vector);
+    const evidence = record(owner.evidence, text(owner.id, "negative owner id") + " evidence");
+    assert(
+      strings(evidence.requiredExecutableGates, "negative owner executable gates").length > 0,
+      "negative vector owner has executable gate evidence: " + vector,
+    );
+  }
+}
+
 // Terminology lock: English MTS term is ANet, never Aset.
 {
   const list = requirements.requirements;
