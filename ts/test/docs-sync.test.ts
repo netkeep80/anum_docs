@@ -20,6 +20,8 @@ import {
 } from "../src/tooling/docs-sync.js";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import { loadRepositoryTheoremProjectionSources } from "../src/tooling/theorem-projection-model.js";
+import { FORMAL_NOTATION_V015_SOURCE_PATHS } from "../src/tooling/formal-notation-v015-markdown.js";
+// S18 fixture must carry every generated FORMAL authority input.
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
   assert.throws(action, pattern);
@@ -194,6 +196,7 @@ try {
   copy("requirements/mts-v0.14.json");
   copy("cutover/typescript-c1-acceptance-v0.7.json");
   for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
+  for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
