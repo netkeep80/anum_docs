@@ -1,0 +1,182 @@
+{
+  "schema": "mts-v015-formal-proof-assurance/v0.1",
+  "status": "EXECUTION_CORE_PROOF_GREEN",
+  "ownerIssue": "#2004",
+  "authority": "external-cross-check-only",
+  "allowedGlobalAxioms": {
+    "lean4": [],
+    "rocq": []
+  },
+  "targets": [
+    {
+      "id": "FRM-01",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "does not yet prove the production parser implementation",
+        "does not introduce a host-global atom namespace"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_01_absolute_contextual_name"
+      ],
+      "rocq": [
+        "FRM_01_absolute_contextual_name"
+      ]
+    },
+    {
+      "id": "FRM-02",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "bootstrap slice covers bare, binding and explicit empty-bundle membership roles",
+        "non-empty recursive bundle refinement remains a later production-refinement obligation"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_02_root_source_role_separation",
+        "MTS.V015.FormalExternal.FRM_02_nested_source_role_membership"
+      ],
+      "rocq": [
+        "FRM_02_root_source_role_separation",
+        "FRM_02_nested_source_role_membership"
+      ]
+    },
+    {
+      "id": "FRM-03",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL",
+      "premises": [],
+      "exclusions": [
+        "proves Direct Sequential Association for the three-term bootstrap case",
+        "does not assert algebraic associativity"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_03_direct_sequential_association_three"
+      ],
+      "rocq": [
+        "FRM_03_direct_sequential_association_three"
+      ]
+    },
+    {
+      "id": "FRM-04",
+      "classification": "PROVED_UNDER_EXACT_SEQUENCE_INJECTIVITY",
+      "premises": [
+        "ExactSequence encoding is injective over positional Link lists",
+        "ExactSequence([]) equals the declared root"
+      ],
+      "exclusions": [
+        "does not prove the production ExactSequence encoder satisfies injectivity; that is a refinement obligation"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_04_empty_exact_sequence_is_root",
+        "MTS.V015.FormalExternal.FRM_04_single_root_distinct_from_empty",
+        "MTS.V015.FormalExternal.FRM_04_two_roots_distinct_from_one"
+      ],
+      "rocq": [
+        "FRM_04_empty_exact_sequence_is_root",
+        "FRM_04_single_root_distinct_from_empty",
+        "FRM_04_two_roots_distinct_from_one"
+      ]
+    },
+    {
+      "id": "FRM-05",
+      "classification": "PROVED_UNDER_SHARED_NATIVE_SOURCE_PREMISE",
+      "premises": [
+        "FORMAL and canonical JSON reconstruct the same native source ANet"
+      ],
+      "exclusions": [
+        "production decoder equality is executable/refinement evidence, not assumed globally"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_05_shared_source_implies_shared_denotation"
+      ],
+      "rocq": [
+        "FRM_05_shared_source_implies_shared_denotation"
+      ]
+    },
+    {
+      "id": "FRM-06",
+      "classification": "PROVED_UNDER_METACOMPILER_ROUNDTRIP_PREMISE",
+      "premises": [
+        "decode(compile(semantic)) = semantic for the declared recursive profile"
+      ],
+      "exclusions": [
+        "production metacompiler refinement to this law remains open",
+        "does not claim every arbitrary recursive byte string is valid"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_06_metacompiler_preserves_semantics"
+      ],
+      "rocq": [
+        "FRM_06_metacompiler_preserves_semantics"
+      ]
+    },
+    {
+      "id": "FRM-07",
+      "classification": "PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES",
+      "premises": [
+        "production FORMAL and canonical JSON reconstruct the same native source ANet for the approved artifact",
+        "production recursive codec is a semantic left inverse on every selected semantic member",
+        "production ExactSequence read(materialize(values))=values on its declared canonical domain"
+      ],
+      "exclusions": [
+        "does not mechanically verify TypeScript source code inside Lean/Rocq",
+        "concrete production premises must be carried by executable regression evidence",
+        "general parser/resolver completeness outside the declared supported fragment remains separate"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_07_approved_artifact_refinement",
+        "MTS.V015.FormalExternal.FRM_07_exact_sequence_injective_from_left_inverse"
+      ],
+      "rocq": [
+        "FRM_07_approved_artifact_refinement",
+        "FRM_07_exact_sequence_injective_from_left_inverse"
+      ]
+    },
+    {
+      "id": "FRM-08",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS",
+      "premises": [],
+      "exclusions": [
+        "does not enable arbitrary recursive/cyclic FORMAL bindings",
+        "production parser/lowering refinement is executable evidence and must remain separately tracked",
+        "structural aspects are Link forms, not proof-specific opcodes"
+      ],
+      "lean4": [
+        "MTS.V015.FormalExternal.FRM_08_structural_aspect_denotation"
+      ],
+      "rocq": [
+        "FRM_08_structural_aspect_denotation"
+      ]
+    }
+  ],
+  "scope": {
+    "v015": "universal FORMAL/JSON execution core",
+    "includes": [
+      "contextual names",
+      "source role separation",
+      "Direct Sequential Association",
+      "ExactSequence",
+      "FORMAL/JSON shared native source ANet premise",
+      "metacompiler semantic preservation under explicit roundtrip premise",
+      "approved production refinement witnesses",
+      "ROOT/START/END/PAIR structural aspects"
+    ],
+    "excludes": [
+      "v0.16 proof metamodel",
+      "canonical proof/aprover JSON",
+      "native aprover replay",
+      "proof-source-specific assurance"
+    ]
+  },
+  "productionRefinement": {
+    "status": "GREEN_FOR_DECLARED_V015_EXECUTION_FRAGMENT",
+    "witnesses": [
+      "ts/test/v015-formal-production-refinement-f1.test.ts",
+      "ts/test/v015-direct-structural-aspects-s1.test.ts",
+      "ts/test/v015-metacompiler-corpus-closure-c0.test.ts",
+      "formal/v0.15/regression/grounded-zero-role.evidence.json",
+      "formal/v0.15/regression/two-role-meta-rule.evidence.json",
+      "traceability/mts-v0.15.json#approvedJsonCorpus"
+    ],
+    "note": "External theorem lanes prove the mathematical laws under explicit premises; production TypeScript/corpus tests witness those premises and refinements. This does not claim a mechanized proof of the TypeScript implementation itself."
+  }
+}
