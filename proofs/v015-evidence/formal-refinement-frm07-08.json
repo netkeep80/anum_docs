@@ -1,0 +1,54 @@
+{
+  "schema": "mts-v015-formal-proof-evidence/v0.1",
+  "id": "FORMAL-REFINEMENT-FRM-07-08",
+  "ownerIssue": 2004,
+  "status": "PAIRED_REFINEMENT_GREEN_REMAINING_FORMAL_OBLIGATIONS_OPEN",
+  "exactHead": "69e95f26d1709d70c8a70670fd34cceeb52a8994",
+  "externalCrossCheck": {
+    "workflow": "CI",
+    "ciRun": 37375026656,
+    "lean4": "SUCCESS",
+    "rocq": "SUCCESS",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    }
+  },
+  "regressions": {
+    "contractObservatoryPagesRun": 37375026713,
+    "contractObservatoryPages": "SUCCESS",
+    "frozenAmemoryWorkflowRun": 37375026577,
+    "frozenAmemory": "SUCCESS",
+    "frozenAmemoryCommit": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "frozenAmemoryVersion": "0.175.0"
+  },
+  "sources": {
+    "lean4": "proofs/lean4/MtsV015Formal.lean",
+    "rocq": "proofs/coq/MtsV015Formal.v",
+    "assurance": "proofs/v015-formal-proof-assurance.json",
+    "proofGuard": "ts/test/v015-formal-proof-assurance-f0.test.ts",
+    "productionRefinementWitness": "ts/test/v015-formal-production-refinement-f1.test.ts",
+    "structuralAspectWitness": "ts/test/v015-direct-structural-aspects-s1.test.ts"
+  },
+  "targets": [
+    {
+      "id": "FRM-07",
+      "classification": "PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES"
+    },
+    {
+      "id": "FRM-08",
+      "classification": "PROVED_IN_SELECTED_MATHEMATICAL_MODEL_WITH_PRODUCTION_WITNESS"
+    }
+  ],
+  "approvedArtifactWitnesses": [
+    "formal/v0.15/regression/grounded-zero-role.evidence.json",
+    "formal/v0.15/regression/two-role-meta-rule.evidence.json"
+  ],
+  "explicitNonClaims": [
+    "Lean4/Rocq do not mechanically verify the TypeScript implementation source code",
+    "FORMAL v0.15 as a whole is not externally proved or accepted by this evidence",
+    "arbitrary cyclic FORMAL bindings remain rejected",
+    "the proof-source/aprover-source refinement boundary remains open under #2004",
+    "native aprover execution remains separately owned by #2003"
+  ]
+}
