@@ -1,0 +1,89 @@
+{
+  "schema": "mts-v015-final-readiness/v0.1",
+  "ownerIssue": "#1876",
+  "integrationOwner": "#2007",
+  "auditBasis": "75076ba241c28bc3327647d2a1c4cbf7611ad51b",
+  "status": "RELEASE_READY_AWAITING_AUTHOR_DECISION",
+  "conclusion": {
+    "semanticExecutionCore": "GREEN",
+    "formalJsonCompiler": "GREEN",
+    "externalAssurance": "GREEN",
+    "approvedExecutableCorpus": "GREEN",
+    "generatedFormalSpecification": "GREEN",
+    "activeTraceIntegrity": "GREEN",
+    "operationalMergeGovernance": "GREEN",
+    "crossRepositoryFreeze": "GREEN",
+    "releaseReady": true,
+    "authorAcceptanceReady": true,
+    "accepted": false
+  },
+  "requirementSnapshot": {
+    "mandatoryCount": 48,
+    "componentGreenCount": 41,
+    "verticalGreenCount": 4,
+    "releaseReadyCount": 2,
+    "open": [
+      "V15-READY-03"
+    ]
+  },
+  "governance": {
+    "evidence": "formal/v0.15/evidence/governance-merge-enforcement-g1.json",
+    "issue": "#1982",
+    "issueState": "CLOSED_COMPLETED",
+    "bypassActors": [],
+    "currentUserCanBypass": "never",
+    "redRequiredCheckMerge": "BLOCKED_HTTP_405",
+    "greenRestore": "MERGEABLE_CLEAN"
+  },
+  "crossRepository": {
+    "amemory": {
+      "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+      "version": "0.175.0",
+      "frozenForV015": true,
+      "openDraftPrs": [
+        486,
+        489
+      ]
+    },
+    "aprover": {
+      "main": "98e0152d21d9b492d79aa5017e86a4114d3e5c51",
+      "openPrCount": 0,
+      "nativeRuntimeDeferredToV016": true
+    }
+  },
+  "approvedExecutableCorpusCount": 6,
+  "externalAssurance": {
+    "gamma": "GPR-01..09 PAIRED LEAN4/ROCQ GREEN",
+    "formal": "FRM-01..08 PAIRED LEAN4/ROCQ GREEN"
+  },
+  "unresolvedExcludedResearch": {
+    "sequenceCarrierSourceProvenance": {
+      "status": "AUTHOR_REVIEW_REQUIRED",
+      "disposition": "EXCLUDED_FROM_COMPACT_V015_EXECUTION_KERNEL",
+      "silentlyAccepted": false,
+      "releaseBlocking": false
+    }
+  },
+  "researchProvenance": {
+    "aggregatePr": 1989,
+    "frozenHead": "43691ce44b190b8d5316122be095c8a6e4d483ed",
+    "wholeAggregateMergePermitted": false
+  },
+  "finalAuthorGate": {
+    "requirement": "V15-READY-03",
+    "required": true,
+    "acceptedCurrentBeforeDecision": "v0.14",
+    "candidate": "v0.15",
+    "decision": "PENDING",
+    "validDecisions": [
+      "ACCEPT MTS v0.15",
+      "REJECT MTS v0.15"
+    ]
+  },
+  "explicitNonClaims": [
+    "This artifact does not accept MTS v0.15.",
+    "CI, proofs, generated documentation and release readiness do not substitute for explicit Author acceptance.",
+    "Sequence-carrier/source-provenance is not accepted; it remains excluded from the compact v0.15 execution kernel.",
+    "A-memory remains frozen until explicit Author acceptance is recorded."
+  ]
+}
