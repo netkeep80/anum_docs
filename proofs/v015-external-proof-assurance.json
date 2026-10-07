@@ -1,0 +1,252 @@
+{
+  "schema": "mts-v015-external-proof-assurance/v0.1",
+  "status": "research-proof-active",
+  "ownerIssue": "#2001",
+  "authority": "external-cross-check-only",
+  "allowedGlobalAxioms": {
+    "lean4": [],
+    "rocq": []
+  },
+  "targets": [
+    {
+      "id": "GPR-01",
+      "classification": "PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+      "premises": [
+        "analysis is a pure function of the reaction-start state",
+        "synthesis consumes only the analysis result",
+        "publication is a deterministic function of the reaction-start state and staged result"
+      ],
+      "exclusions": [
+        "does not yet prove no-read-your-own-writes across a concrete implementation; that is GPR-03",
+        "does not prove partition or scheduler independence; that is GPR-04",
+        "analysis and staging values are verifier/refinement objects, not additional MTS machine states"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_01_decomposition_iff_single_gamma_step",
+        "MTS.V015.External.GPR_01_gamma_successor_unique",
+        "MTS.V015.External.GPR_01_same_analysis_same_staging"
+      ],
+      "rocq": [
+        "GPR_01_decomposition_iff_single_gamma_step",
+        "GPR_01_gamma_successor_unique",
+        "GPR_01_same_analysis_same_staging"
+      ]
+    },
+    {
+      "id": "GPR-02",
+      "classification": "PROVED_FOR_CANONICAL_ANET_MEMBERSHIP_CONVERGENCE_WITH_SEPARATE_PROVENANCE_AND_EXACTSEQUENCE_MULTIPLICITY",
+      "premises": [
+        "semantic ANet state is extensional Link membership, so deriving the same canonical Link more than once does not create multiple semantic memberships",
+        "order of independent Link contributions is nonsemantic at the ANet membership projection",
+        "provenance/evidence occurrences are represented separately from semantic ANet membership",
+        "ExactSequence is a positional recursive Link carrier whose multiplicity is semantically significant"
+      ],
+      "exclusions": [
+        "does not erase or deduplicate provenance/evidence events that derive the same Link",
+        "does not introduce a separate runtime deduplication command; the result is a membership law",
+        "does not collapse ExactSequence multiplicity such as [X,X] to [X]",
+        "does not claim provenance ordering is semantic ANet membership",
+        "does not alter accepted v0.14 theorem inventory"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_02_duplicate_membership_idempotent",
+        "MTS.V015.External.GPR_02_membership_contribution_commutes",
+        "MTS.V015.External.GPR_02_duplicate_provenance_events_are_preserved",
+        "MTS.V015.External.GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ],
+      "rocq": [
+        "GPR_02_duplicate_membership_idempotent",
+        "GPR_02_membership_contribution_commutes",
+        "GPR_02_duplicate_provenance_events_are_preserved",
+        "GPR_02_exact_sequence_multiplicity_not_collapsed"
+      ]
+    },
+    {
+      "id": "GPR-03",
+      "classification": "PROVED_UNDER_REACTION_START_SNAPSHOT_SEMANTICS_WITH_READ_YOUR_OWN_WRITES_FALSIFIER",
+      "premises": [
+        "one Gamma generation analyzes the immutable reaction-start state M_t",
+        "staged synthesis effects are not semantic current/admitted input before publication",
+        "only the published successor M_(t+1) may become the reaction-start state of the next Gamma generation"
+      ],
+      "exclusions": [
+        "does not prove a concrete CPU/GPU implementation memory fence or storage protocol; that remains a refinement obligation",
+        "does not prove rule/current partition or scheduler independence; that is GPR-04",
+        "does not forbid causal chains across multiple generations; it requires a publication boundary between them",
+        "the A->B->C witness state is verifier machinery, not MTS ontology"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_03_prepublication_current_is_reaction_start",
+        "MTS.V015.External.GPR_03_analysis_ignores_staged_candidate",
+        "MTS.V015.External.GPR_03_one_generation_stops_at_B",
+        "MTS.V015.External.GPR_03_read_your_own_writes_is_not_one_generation"
+      ],
+      "rocq": [
+        "GPR_03_prepublication_current_is_reaction_start",
+        "GPR_03_analysis_ignores_staged_candidate",
+        "GPR_03_one_generation_stops_at_B",
+        "GPR_03_read_your_own_writes_is_not_one_generation"
+      ]
+    },
+    {
+      "id": "GPR-04",
+      "classification": "PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+      "premises": [
+        "all shard contributions analyze the same immutable reaction-start snapshot established by GPR-03",
+        "global reduction combines matched truth by logical OR and output semantic membership extensionally",
+        "duplicate canonical Link contributions converge by the GPR-02 semantic ANet membership law",
+        "the complete global reduction result is available before the single publication boundary of GPR-01/GPR-03"
+      ],
+      "exclusions": [
+        "does not introduce a runtime UNION opcode or second semantic command",
+        "does not prove concrete CPU/WASM/WebGPU synchronization, memory fences or scheduler implementation",
+        "does not permit a shard-local NO_MATCH to publish global preserve-current without the global match reduction",
+        "does not claim provenance-event ordering is nonsemantic where provenance is separately modeled",
+        "does not require J1 cross-current-member join"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_04_merge_associative_observation",
+        "MTS.V015.External.GPR_04_merge_commutative_observation",
+        "MTS.V015.External.GPR_04_merge_idempotent_observation",
+        "MTS.V015.External.GPR_04_two_dimensional_partition_refinement",
+        "MTS.V015.External.GPR_04_local_no_match_cannot_publish_global_no_match"
+      ],
+      "rocq": [
+        "GPR_04_merge_associative_observation",
+        "GPR_04_merge_commutative_observation",
+        "GPR_04_merge_idempotent_observation",
+        "GPR_04_two_dimensional_partition_refinement",
+        "GPR_04_local_no_match_cannot_publish_global_no_match"
+      ]
+    },
+    {
+      "id": "GPR-05",
+      "classification": "PROVED_UNDER_FINITE_MATERIALIZATION_AND_LOCAL_TERMINATION_WITHOUT_FINITE_AMBIENT_LINK_CARRIER",
+      "premises": [
+        "one concrete reaction exposes finite materialized/current/admission collections",
+        "each admitted Rule has a finite explicit image for the reaction",
+        "each local current×Rule match terminates with a finite Nat-valued work cost",
+        "staging counts raw finite image occurrences before canonical ANet membership convergence"
+      ],
+      "exclusions": [
+        "does not add a finite ambient Link-carrier or finite-universe axiom",
+        "does not claim every possible semantic ANet or denotational reaction is finite",
+        "does not derive atomic publication from finiteness; publication remains a separate Gamma law",
+        "does not prove a concrete CPU/GPU/ASIC has enough physical resources for an arbitrary chosen finite slice",
+        "does not change accepted v0.14 infinite ambient-carrier requirements"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_05_current_rule_comparison_product",
+        "MTS.V015.External.GPR_05_raw_staging_budget",
+        "MTS.V015.External.GPR_05_finite_generation_budget",
+        "MTS.V015.External.GPR_05_no_finite_ambient_carrier_required"
+      ],
+      "rocq": [
+        "GPR_05_current_rule_comparison_product",
+        "GPR_05_raw_staging_budget",
+        "GPR_05_finite_generation_budget",
+        "GPR_05_no_finite_ambient_carrier_required"
+      ]
+    },
+    {
+      "id": "GPR-06",
+      "classification": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
+      "premises": [
+        "finite fixed exact support contains every pre-authored exact consequence available to the S0 machine",
+        "the opaque current input identity may be preserved",
+        "each exact-only generation preserves closure: every emitted Link is either the opaque input identity or belongs to the fixed exact support",
+        "no structural reflection/decomposition or fresh structural constructor can escape that closure"
+      ],
+      "exclusions": [
+        "does not prove one particular S1/S2 API or implementation is uniquely necessary",
+        "does not introduce or require J1 cross-current-member join",
+        "does not claim the concrete frozen A-memory implementation satisfies the closure law without separate refinement evidence",
+        "does not forbid carrying the opaque whole input identity"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_06_finite_exact_closure",
+        "MTS.V015.External.GPR_06_fresh_structural_target_unreachable",
+        "MTS.V015.External.GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ],
+      "rocq": [
+        "GPR_06_finite_exact_closure",
+        "GPR_06_fresh_structural_target_unreachable",
+        "GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ]
+    },
+    {
+      "id": "GPR-07",
+      "classification": "PROVED_UNDER_EXPLICIT_GENERIC_KERNEL_LAWS",
+      "premises": [
+        "empty role bundle: generic matcher succeeds iff antecedent identity holds and substitution is empty",
+        "empty substitution instantiation is identity"
+      ],
+      "exclusions": [
+        "does not grant structural binding power to classical grounded MP",
+        "does not prove the generic matcher laws from MTS Foundation alone",
+        "does not introduce RuleKind or a second execution path"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_07_grounded_zero_role_refinement",
+        "MTS.V015.External.GPR_07_zero_role_has_empty_substitution"
+      ],
+      "rocq": [
+        "GPR_07_grounded_zero_role_refinement",
+        "GPR_07_zero_role_has_empty_substitution"
+      ]
+    },
+    {
+      "id": "GPR-08",
+      "classification": "PROVED_FOR_FINITE_EXACTSEQUENCE_J0_REPRESENTATION_AND_SEMANTIC_ROLE_AUTHORITY",
+      "premises": [
+        "finite correlated/order-sensitive values are represented by recursive ExactSequence-style Link packing",
+        "role authority is semantic ANet membership selected for the Rule, not physical Link existence"
+      ],
+      "exclusions": [
+        "does not prove that J1 can never be useful for any future MTS extension",
+        "does not prove the complete v0.15 executable corpus requires no J1 before the remaining corpus audit closes",
+        "does not turn ExactSequence into a separate ontology; it is Link topology",
+        "does not grant role authority from physical materialization alone"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_08_exact_sequence_packing_injective",
+        "MTS.V015.External.GPR_08_finite_arity_has_one_endpoint",
+        "MTS.V015.External.GPR_08_physical_nonmember_has_no_role_authority"
+      ],
+      "rocq": [
+        "GPR_08_exact_sequence_packing_injective",
+        "GPR_08_finite_arity_has_one_endpoint",
+        "GPR_08_physical_nonmember_has_no_role_authority"
+      ]
+    },
+    {
+      "id": "GPR-09",
+      "classification": "PROVED_AS_COMPOSITIONAL_GAMMA_COVARIANCE_UNDER_EXPLICIT_PHASE_COVARIANCE_AND_ACCEPTED_CTX03_MIRROR_TRANSPORT",
+      "premises": [
+        "accepted v0.14 CTX-03 supplies Link-native mirror transport for the one-sided START/END structural classes and preserves relative chirality under simultaneous inversion",
+        "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
+        "analysis, synthesis and publication of the same Gamma operation each commute with the selected structural mirror transport",
+        "mirror transport is involutive for semantic state and boundary observations"
+      ],
+      "exclusions": [
+        "does not introduce a host reverse-direction flag, reverse executor or second Gamma command",
+        "does not make C or END a Foundation-global preferred orientation; C is a direct-gauge execution-space choice",
+        "does not derive concrete implementation phase covariance from CPU/WASM/WebGPU code; that remains a refinement obligation",
+        "State/Plan/Stage/Boundary types in the proof are verifier machinery, not additional MTS ontology",
+        "does not require J1 cross-current-member join"
+      ],
+      "lean4": [
+        "MTS.V015.External.GPR_09_gamma_chirality_covariant",
+        "MTS.V015.External.GPR_09_direct_end_boundary_mirrors_to_start",
+        "MTS.V015.External.GPR_09_direct_gauge_mirror_equivalence",
+        "MTS.V015.External.GPR_09_boundary_mirror_roundtrip"
+      ],
+      "rocq": [
+        "GPR_09_gamma_chirality_covariant",
+        "GPR_09_direct_end_boundary_mirrors_to_start",
+        "GPR_09_direct_gauge_mirror_equivalence",
+        "GPR_09_boundary_mirror_roundtrip"
+      ]
+    }
+  ]
+}
