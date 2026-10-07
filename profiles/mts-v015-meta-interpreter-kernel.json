@@ -1,0 +1,139 @@
+{
+  "schema": "mts-v015-meta-interpreter-kernel/v0.1",
+  "id": "mts-v015-meta-interpreter-kernel",
+  "versionTarget": "MTS v0.15",
+  "status": "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
+  "acceptedBaseline": "MTS v0.14",
+  "semanticAuthority": {
+    "scope": "V0.15_EXECUTION_KERNEL_ONLY",
+    "versionAccepted": false,
+    "authorAcceptanceRequired": true,
+    "excludes": [
+      "unresolved sequence-carrier research",
+      "historical alternatives and research ledger",
+      "Aprover/v0.16 proof execution",
+      "production A-memory implementation refinement"
+    ]
+  },
+  "owners": {
+    "integration": "#2007",
+    "architecture": "#1987",
+    "generalizedReaction": "#1988",
+    "proofClosure": "#2001",
+    "crossRepoBoundary": "#2006"
+  },
+  "command": {
+    "name": "GAMMA_STRUCTURAL_ASET",
+    "repeatedCommandCount": 1,
+    "localReaction": "STRUCTURAL_UNARY_J0",
+    "scalarPositiveLaw": "MP0_RETAINED",
+    "jointAntecedentArity": "ONE_CURRENT_ENDPOINT",
+    "imageArity": "ZERO_ONE_MANY",
+    "scopeLift": "POINTWISE_N_CURRENT_MEMBERS_DERIVED",
+    "crossMemberJoin": "J1_NOT_REQUIRED",
+    "externalSemanticGrounderAllowed": false,
+    "programSpecificDispatchAllowed": false
+  },
+  "phases": {
+    "analysis": {
+      "id": "S1",
+      "role": "STRUCTURAL_MATCH_BIND",
+      "readOnly": true,
+      "completePlanBeforeSynthesis": true
+    },
+    "synthesis": {
+      "id": "S2",
+      "role": "CANONICAL_SUBSTITUTION_AND_LINK_CONSTRUCTION",
+      "startsAfterCompleteAnalysisPlan": true
+    },
+    "publication": {
+      "role": "ATOMIC_SEMANTIC_ASET_MEMBERSHIP_REWRITE",
+      "completeSuccessorBeforePublication": true,
+      "sameGenerationReadOwnWrites": false
+    }
+  },
+  "authority": {
+    "currentness": "POSITIVE_SEMANTIC_ANET_MEMBERSHIP",
+    "theory": "LINK_STRUCTURE_AND_REACTION_START_SEMANTIC_MEMBERSHIP_SNAPSHOT",
+    "physicalLinkExistenceAlone": false,
+    "hostNameAuthority": false,
+    "externalCurrentPointer": false,
+    "externalScopePointer": false,
+    "externalSelectedTheoryPointer": false,
+    "externalProgramCounter": false
+  },
+  "context": {
+    "directGaugeBoundary": "C",
+    "rootRelation": "C = END(R)",
+    "authorDecision": "APPROVED_FOR_V015_DESIGN",
+    "versionAcceptance": false,
+    "freezeResumeWithoutSerializedContextHandle": true,
+    "foreignTheoryIsolation": true,
+    "designAcceptanceScope": "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+    "foundationGlobalPrivilege": false,
+    "chiralityCovariantMirrorRequired": true
+  },
+  "causalLaws": {
+    "newTheoryAdmissionVisibleSameReaction": false,
+    "newTheoryAdmissionVisibleNextReaction": true,
+    "noMatchPreservesCurrentMembership": true,
+    "matchedEmptyProducesZeroSuccessorContribution": true,
+    "duplicateSuccessorsConvergeByCanonicalLinkIdentity": true,
+    "entryCreationOrderSemantic": false,
+    "freezeResumeBetweenGenerationsSemantic": false
+  },
+  "bootstrapBoundary": {
+    "sourceCompilerOwner": "#2006",
+    "bootstrapFormalJsonMetacompilerMayBeHostImplemented": true,
+    "bootstrapCompilerIsRuntimeSemanticGrounder": false,
+    "bootstrapCompilerIsSecondAMemoryCommand": false
+  },
+  "frozenBackend": {
+    "repository": "netkeep80/amemory",
+    "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "role": "COMPATIBILITY_CONFORMANCE_ONLY",
+    "semanticAuthority": false
+  },
+  "resolvedDecisions": [
+    {
+      "id": "MI-D01",
+      "decision": "AUTHOR_APPROVED_FOR_V015"
+    },
+    {
+      "id": "MI-D02",
+      "decision": "POSITIVE_SEMANTIC_ANET_MEMBERSHIP"
+    },
+    {
+      "id": "MI-D03",
+      "decision": "LINK_STRUCTURE_AND_SEMANTIC_MEMBERSHIP_AUTHORITY"
+    },
+    {
+      "id": "MI-D04",
+      "decision": "AUTHOR_APPROVED_GAMMA_GPR01_09_PROOF_GREEN"
+    },
+    {
+      "id": "MI-D05",
+      "decision": "STRUCTURAL_UNARY_GAMMA_S1_S2_INTERNAL_NO_EXTERNAL_GROUNDER"
+    }
+  ],
+  "cleanMainExecutableEvidence": [
+    "ts/test/v015-positive-aset-currentness-a8.test.ts",
+    "ts/test/v015-context-theory-self-contained-a6.test.ts",
+    "ts/test/v015-variadic-grounding-m5.test.ts",
+    "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
+    "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+    "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts",
+    ".github/workflows/amemory-v015-regression.yml"
+  ],
+  "architectureEvidence": [
+    "profiles/mts-v015-generalized-reaction-candidate.json"
+  ],
+  "unresolvedExcludedFromKernel": [
+    {
+      "id": "SEQUENCE_CARRIER_SOURCE_PROVENANCE",
+      "status": "AUTHOR_REVIEW_REQUIRED",
+      "note": "Not needed to define the selected execution kernel; remains separately reviewable."
+    }
+  ]
+}
