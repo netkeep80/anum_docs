@@ -171,22 +171,25 @@ export function auditMarkdownDocument(args: {
 }
 
 export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit {
-  const ir = loadMtsSemanticIr(root);
+  const currentIr = loadMtsSemanticIr(root);
+  const projectionIr = currentIr.schema === "mts-requirement-registry/v0.3"
+    ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
+    : currentIr;
   const proseMaterializationPending =
-    ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
-  const documents = Object.keys(ir.documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
+    projectionIr.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
+  const documents = Object.keys(projectionIr.documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     const requirements = proseMaterializationPending
       ? []
       : [
-          ...ir.requirements
+          ...projectionIr.requirements
             .filter((item) => item.docPath === path)
             .map((item) => Object.freeze({
               id: item.id,
               docAnchor: item.docAnchor,
               canonicalNodeRequired: true,
             })),
-          ...ir.repositoryRequirements
+          ...projectionIr.repositoryRequirements
             .filter((item) => item.docPath === path)
             .map((item) => Object.freeze({
               id: item.id,
@@ -196,7 +199,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
         ];
     return auditMarkdownDocument({
       path,
-      mode: ir.documentModes[path]!,
+      mode: projectionIr.documentModes[path]!,
       source,
       requirements,
       allowUnprojectedOwnedBlocks: proseMaterializationPending,
@@ -210,7 +213,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     stableAnchorCount: documents.reduce((sum, document) => sum + document.stableAnchorCount, 0),
     canonicalNodeCount: documents.reduce((sum, document) => sum + document.canonicalNodeCount, 0),
     nonCanonicalAnchorCount: documents.reduce((sum, document) => sum + document.nonCanonicalAnchorIds.length, 0),
-    requirementCount: ir.requirements.length + ir.repositoryRequirements.length,
+    requirementCount: projectionIr.requirements.length + projectionIr.repositoryRequirements.length,
     requirementBackedSectionCount: sections.filter((section) => section.knowledgeClass === "requirements-backed").length,
     ownedBlockCount: documents.reduce((sum, document) => sum + document.ownedBlockCount, 0),
     unanchoredHeadingCount: sections.filter((section) => section.anchorId === null).length,
@@ -220,8 +223,10 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
 
   return Object.freeze({
     schema: "mts-markdown-coverage/v0.1",
-    contract: ir.contract,
-    projectionState: ir.projectionState,
+    contract: currentIr.contract,
+    projectionState: currentIr.schema === "mts-requirement-registry/v0.3"
+      ? "V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951"
+      : projectionIr.projectionState,
     proseMaterializationPending,
     documents: Object.freeze(documents),
     summary,
