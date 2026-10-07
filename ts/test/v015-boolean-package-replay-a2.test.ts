@@ -4,6 +4,7 @@
 // Canonical Boolean AND/NOT/OR/XOR package/replay gate.
 // All source artifacts are the Author-approved regression/* corpus.
 // Generated compatibility topology has no MTS semantic authority.
+// Integration boundary: canonical source comes exclusively from regression/*; candidate copies are historical research only.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
