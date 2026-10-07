@@ -48,8 +48,8 @@ function main(): void {
   const glossary = readFileSync(glossaryPath, "utf8");
 
   assert(
-    glossary.split("mts-doc-version: v0.14").length - 1 === 1,
-    "exactly one v0.14 document marker is required",
+    glossary.split("mts-doc-version: v0.15").length - 1 === 1,
+    "exactly one v0.15 document marker is required",
   );
   assert(
     !/v0\.(?:9|10|11|12)\b/i.test(glossary),
@@ -101,7 +101,7 @@ function main(): void {
   );
 
   console.log(
-    `MTS v0.14 glossary links: GREEN terms=${entries.length} links=${detailLinks}`,
+    `MTS v0.15 glossary links: GREEN terms=${entries.length} links=${detailLinks}`,
   );
 }
 
