@@ -29,6 +29,8 @@ import {
 } from "../src/v013-hierarchical-carrier.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 
+// Integration provenance: structural-aspect witness copied from GREEN #1989 checkpoint; production semantics are unchanged.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 direct structural FORMAL: " + message);
 }
