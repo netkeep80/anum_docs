@@ -1,0 +1,45 @@
+{
+  "schema": "mts-v015-governance-merge-enforcement/v0.1",
+  "ownerIssue": "#1982",
+  "integrationOwner": "#2007",
+  "baseMain": "ff2b8e0b6a3ddad3bd992a2230164bf08738cb48",
+  "ruleset": {
+    "id": 24087274,
+    "name": "Protect main",
+    "enforcement": "active",
+    "bypassActors": [],
+    "currentUserCanBypass": "never",
+    "requiredChecks": [
+      "typescript",
+      "protect-readonly-files",
+      "validate-structure",
+      "repo-guard blocking check"
+    ]
+  },
+  "falsifier": {
+    "phase": "RED_BLOCKED_CONFIRMED_GREEN_RESTORED",
+    "expected": "repo-guard RED must make normal merge mechanically impossible",
+    "redMergeAttempt": {
+      "head": "2ac94d78e89106e1774f00641f26a306dc21d635",
+      "result": "BLOCKED",
+      "httpStatus": 405,
+      "reason": "Required status check \"repo-guard blocking check\" is failing.",
+      "mainUnchanged": "ff2b8e0b6a3ddad3bd992a2230164bf08738cb48"
+    },
+    "restoredGreen": {
+      "head": "d4f22cf31c915535949c2283318b9560616a26bf",
+      "repoGuardRun": 37668200515,
+      "repoGuard": "SUCCESS",
+      "ciRun": 37668200567,
+      "ci": "SUCCESS",
+      "mergeable": true,
+      "mergeableState": "clean"
+    },
+    "repoGuardRedObserved": true,
+    "repoGuardRun": 37667697020
+  },
+  "acceptance": {
+    "governanceSatisfied": true,
+    "mtsV015Accepted": false
+  }
+}
