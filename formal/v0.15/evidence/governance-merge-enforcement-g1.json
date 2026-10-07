@@ -1,0 +1,29 @@
+{
+  "schema": "mts-v015-governance-merge-enforcement/v0.1",
+  "ownerIssue": "#1982",
+  "integrationOwner": "#2007",
+  "baseMain": "ff2b8e0b6a3ddad3bd992a2230164bf08738cb48",
+  "ruleset": {
+    "id": 24087274,
+    "name": "Protect main",
+    "enforcement": "active",
+    "bypassActors": [],
+    "currentUserCanBypass": "never",
+    "requiredChecks": [
+      "typescript",
+      "protect-readonly-files",
+      "validate-structure",
+      "repo-guard blocking check"
+    ]
+  },
+  "falsifier": {
+    "phase": "INTENTIONAL_RED_PENDING",
+    "expected": "repo-guard RED must make normal merge mechanically impossible",
+    "redMergeAttempt": null,
+    "restoredGreen": null
+  },
+  "acceptance": {
+    "governanceSatisfied": false,
+    "mtsV015Accepted": false
+  }
+}
