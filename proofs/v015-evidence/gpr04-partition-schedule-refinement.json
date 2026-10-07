@@ -1,0 +1,75 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-04",
+  "title": "Partition and schedule refinement under snapshot extensional reduction",
+  "status": "PROVED_AS_PARTITION_AND_SCHEDULE_REFINEMENT_UNDER_SNAPSHOT_EXTENTIONAL_REDUCTION",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "Merging independent reduction contributions is observationally associative, commutative and idempotent at matched-bit plus semantic-output-membership level.",
+    "Two-dimensional current-by-rule repartitioning preserves the same extensional reduction observation.",
+    "A shard-local NO_MATCH cannot justify global preserve-current when another shard matches."
+  ],
+  "explicitPremises": [
+    "all shard contributions analyze the same immutable reaction-start snapshot established by GPR-03",
+    "global reduction combines matched truth by logical OR and output semantic membership extensionally",
+    "duplicate canonical Link contributions converge by the GPR-02 semantic ANet membership law",
+    "the complete global reduction result is available before the single publication boundary of GPR-01/GPR-03"
+  ],
+  "exclusions": [
+    "The proof models extensional reduction observations, not a runtime UNION operation.",
+    "Concrete hardware synchronization and memory-order implementation remain separate refinement obligations.",
+    "Complete reduction before publication is an explicit Gamma publication premise supplied by GPR-01/GPR-03, not newly derived from the partition algebra.",
+    "Provenance/event ordering is outside this membership-level theorem unless separately modeled.",
+    "No J1 cross-current-member join is introduced."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "e7fa15a91c446d723386e730de0bdc2d8172cf6e",
+      "symbols": [
+        "MTS.V015.External.GPR_04_merge_associative_observation",
+        "MTS.V015.External.GPR_04_merge_commutative_observation",
+        "MTS.V015.External.GPR_04_merge_idempotent_observation",
+        "MTS.V015.External.GPR_04_two_dimensional_partition_refinement",
+        "MTS.V015.External.GPR_04_local_no_match_cannot_publish_global_no_match"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "80b0aac97c40bf25cb60e38e1c16ce3f312d28d7",
+      "symbols": [
+        "GPR_04_merge_associative_observation",
+        "GPR_04_merge_commutative_observation",
+        "GPR_04_merge_idempotent_observation",
+        "GPR_04_two_dimensional_partition_refinement",
+        "GPR_04_local_no_match_cannot_publish_global_no_match"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "d30bd1958d560921a32f11bd0cefb0805cbd64ed",
+    "ciRun": 37463212259
+  },
+  "executableWitnesses": [
+    "ts/test/v015-parallel-reaction-reduction-a11.test.ts"
+  ],
+  "architecturalConsequence": {
+    "shardMergeOrderChangesSemanticReduction": false,
+    "duplicateContributionCreatesSemanticMultiplicity": false,
+    "twoDimensionalPartitionChangesSemanticReduction": false,
+    "localNoMatchMayPublishGlobalPreserveCurrent": false,
+    "runtimeUnionCommandRequired": false,
+    "concreteHardwareSynchronizationProved": false
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}

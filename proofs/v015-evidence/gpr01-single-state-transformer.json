@@ -1,0 +1,65 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-01",
+  "title": "Generalized reaction is one semantic state transformer with internal analysis/synthesis/publication refinement",
+  "status": "PROVED_AS_PURE_SINGLE_STATE_TRANSFORMER_REFINEMENT",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "Gamma denotes exactly one transition from reaction-start state to one successor state.",
+    "Analysis, synthesis and publication are an internal refinement decomposition of that one transition, not separate semantic machine commands.",
+    "Synthesis depends only on the analysis result; publication receives the original reaction-start state plus staged result.",
+    "For one reaction-start state the Gamma successor is unique."
+  ],
+  "explicitPremises": [
+    "Analysis is modeled as a pure function of the reaction-start state.",
+    "Synthesis is modeled as a pure function of the analysis value.",
+    "Publication is modeled as a deterministic function of the reaction-start state and staged value."
+  ],
+  "exclusions": [
+    "This does not yet prove a concrete implementation cannot expose staged writes to analysis; generation isolation is GPR-03.",
+    "This does not yet prove partition/scheduler independence; that is GPR-04.",
+    "Analysis/staging objects are external proof/refinement machinery, not MTS ontology or semantic states."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "d4473d8aebdd3c9819554433598b414a1be6a017",
+      "symbols": [
+        "MTS.V015.External.GPR_01_decomposition_iff_single_gamma_step",
+        "MTS.V015.External.GPR_01_gamma_successor_unique",
+        "MTS.V015.External.GPR_01_same_analysis_same_staging"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "660c67f8ea628a6306e256fd9eb070b84c9a7c22",
+      "symbols": [
+        "GPR_01_decomposition_iff_single_gamma_step",
+        "GPR_01_gamma_successor_unique",
+        "GPR_01_same_analysis_same_staging"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "5d5b08c3fbdab5a9cfebd86c77cbe7aced37826b",
+    "ciRun": 37453206274
+  },
+  "architecturalConsequence": {
+    "semanticCommandsPerReaction": 1,
+    "analysisIsSeparateSemanticCommand": false,
+    "synthesisIsSeparateSemanticCommand": false,
+    "publicationIsSeparateSemanticCommand": false,
+    "successorDeterministicGivenDecomposition": true
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}
