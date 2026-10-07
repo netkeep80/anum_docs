@@ -16,6 +16,8 @@ import {
   type V015SourceAnetProfile,
 } from "../src/v015-source-anet.js";
 
+// Integration split provenance: exact semantic subset of GREEN #1989 DAS-A2 core; no production semantics are changed.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 DAS-A2 native source ANet: " + message);
 }
