@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 
 // Integration provenance: pins already Author-approved compact XOR artifacts from #1980/#1989; no new JSON approval is introduced.
 // Approval boundary: changed/new compact XOR JSON still requires explicit Author confirmation; this gate validates only the pinned approved artifact.
+// Canonical integration source is regression/* only; candidate copies are intentionally excluded from main.
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 compact XOR approved source integrity: " + message);
 }
