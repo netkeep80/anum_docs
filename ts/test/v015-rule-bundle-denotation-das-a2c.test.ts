@@ -20,6 +20,8 @@ import {
 } from "../src/v015-source-anet.js";
 import { compileV015DirectJsonSourceAnet } from "../src/v015-direct-json-source.js";
 
+// Integration split provenance: Rule/bundle execution subset of GREEN #1989 DAS-A2; generic production semantics are unchanged.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 DAS-A2 native source ANet: " + message);
 }
