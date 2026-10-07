@@ -5,6 +5,7 @@ import {
 } from "../src/memory.js";
 
 // Integration provenance: mandatory V15-GAMMA-01 partition/reduction witness copied from GREEN #1989; GREEN_RESEARCH classification is intentionally preserved.
+// Clean-main boundary: A11 is a refinement witness under explicit snapshot/publication premises, not a new semantic command.
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
