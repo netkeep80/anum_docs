@@ -26,9 +26,19 @@ same(contract.acceptedCurrent?.contract, "mts-contract/v0.13", "historical accep
 same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.13", "historical acceptance current conformance");
 
 same(
+  policy.packs["contract-conformance"].current.contract.path,
+  "contracts/mts-contract-v0.15.json",
+  "v0.15 is current accepted release after S22",
+);
+same(
   policy.packs["contract-conformance"].previous.contract.path,
-  "contracts/mts-contract-v0.13.json",
-  "v0.13 is previous accepted release after A75",
+  "contracts/mts-contract-v0.14.json",
+  "v0.14 is previous accepted release after S22",
+);
+assert(
+  policy.packs["contract-conformance"].current.contract.path !== "contracts/mts-contract-v0.13.json"
+    && policy.packs["contract-conformance"].previous.contract.path !== "contracts/mts-contract-v0.13.json",
+  "v0.13 remains historical rather than current/previous selector authority",
 );
 same(
   acceptance13.current.contract,
@@ -73,5 +83,5 @@ for (const law of laws) {
 }
 
 console.log(
-  "MTS v0.13 historical documentation ownership: immutable owner map L1-L13 retained; current Markdown is free to represent accepted v0.14: GREEN.",
+  "MTS v0.13 historical documentation ownership: immutable owner map L1-L13 retained; current Markdown is free to represent accepted v0.15: GREEN.",
 );
