@@ -32,6 +32,8 @@ import {
 } from "../src/v013-hierarchical-carrier.js";
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 
+// Integration provenance: validates already Author-approved grounded artifacts from #2023/#1989; it introduces no new JSON or semantic authority.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 grounded approved recursive: " + message);
 }
