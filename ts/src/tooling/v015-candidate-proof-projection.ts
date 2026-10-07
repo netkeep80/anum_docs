@@ -1,3 +1,4 @@
+// Clean-main corrective projection slice / #2007; external assurance only.
 import {
   THEOREM_CATALOG_INTEGRATION_CONTRACT,
 } from "./theorem-projection-contract.js";
