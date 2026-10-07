@@ -57,7 +57,8 @@
     "ciRun": 37454497074
   },
   "regressionBinding": [
-    "ts/test/v015-gpr07-proof-assurance-r5.test.ts"
+    "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+    "ts/test/v015-formal-exact-sequence-b7.test.ts"
   ],
   "architecturalConsequence": {
     "duplicateCanonicalDerivationCreatesMultipleSemanticMemberships": false,

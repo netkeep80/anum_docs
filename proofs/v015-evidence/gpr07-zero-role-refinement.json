@@ -49,9 +49,10 @@
     "ciRun": 37335710302
   },
   "executableWitnesses": [
-    "formal/v0.15/regression/grounded-zero-role.evidence.json",
-    "formal/v0.15/regression/two-role-meta-rule.evidence.json",
-    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts"
+    "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+    "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+    "ts/test/v015-rule-bundle-denotation-das-a2c.test.ts",
+    "ts/test/v015-structural-aset-role-bundle-a9b.test.ts"
   ],
   "frozenAmemory": {
     "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",

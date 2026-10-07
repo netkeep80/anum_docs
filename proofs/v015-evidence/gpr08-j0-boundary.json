@@ -52,9 +52,10 @@
     "ciJob": 112229249735
   },
   "executableWitnesses": [
-    "formal/v0.15/regression/two-role-meta-rule.evidence.json",
-    "ts/test/v015-native-source-anet-denotation-das-a2.test.ts",
-    "ts/test/v015-execution-image-carrier-a4.test.ts"
+    "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+    "ts/test/v015-formal-exact-sequence-b7.test.ts",
+    "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+    "ts/test/v015-context-authority-closure-c1.test.ts"
   ],
   "architecturalConsequence": {
     "finiteArityImpliesJ1": false,
