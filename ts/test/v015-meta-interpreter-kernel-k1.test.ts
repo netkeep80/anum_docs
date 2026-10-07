@@ -47,6 +47,9 @@ const profile = JSON.parse(readFileSync(profilePath, "utf8")) as {
     rootRelation: string;
     authorDecision: string;
     versionAcceptance: boolean;
+    designAcceptanceScope: string;
+    foundationGlobalPrivilege: boolean;
+    chiralityCovariantMirrorRequired: boolean;
   };
   resolvedDecisions: readonly { id: string; decision: string }[];
   cleanMainExecutableEvidence: readonly string[];
@@ -85,8 +88,16 @@ same(profile.context.directGaugeBoundary, "C", "direct-gauge Context boundary");
 same(profile.context.rootRelation, "C = END(R)", "Context boundary root relation");
 same(profile.context.authorDecision, "APPROVED_FOR_V015_DESIGN", "Context design decision");
 same(profile.context.versionAcceptance, false, "Context design decision is not version acceptance");
+same(
+  profile.context.designAcceptanceScope,
+  "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+  "Context design acceptance scope",
+);
+same(profile.context.foundationGlobalPrivilege, false, "C is not Foundation-global privilege");
+same(profile.context.chiralityCovariantMirrorRequired, true, "chirality-covariant mirror equivalence remains required");
 
 const decisionById = new Map(profile.resolvedDecisions.map((item) => [item.id, item.decision]));
+same(decisionById.get("MI-D01"), "AUTHOR_APPROVED_FOR_V015", "MI-D01");
 same(decisionById.get("MI-D02"), "POSITIVE_SEMANTIC_ANET_MEMBERSHIP", "MI-D02");
 same(decisionById.get("MI-D03"), "LINK_STRUCTURE_AND_SEMANTIC_MEMBERSHIP_AUTHORITY", "MI-D03");
 same(decisionById.get("MI-D04"), "AUTHOR_APPROVED_GAMMA_GPR01_09_PROOF_GREEN", "MI-D04");
@@ -127,5 +138,7 @@ console.log([
   "EXTERNAL_GROUNDER=0",
   "PROGRAM_SPECIFIC_DISPATCH=0",
   "J1_REQUIRED=FALSE",
+  "CONTEXT_GAUGE_PRIVILEGE=RELATIVE_NOT_GLOBAL",
+  "CHIRALITY_COVARIANT_MIRROR=REQUIRED",
   "UNRESOLVED_SEQUENCE_CARRIER=EXCLUDED",
 ].join(" "));
