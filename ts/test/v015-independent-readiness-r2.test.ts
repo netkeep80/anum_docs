@@ -39,7 +39,7 @@ assert(text(audit.status, "audit status") === "AUDIT_COMPLETE_BLOCKED_BY_GOVERNA
 
 assert(requirements.status === "candidate", "v0.15 remains candidate");
 assert(requirements.accepted === false, "v0.15 not accepted");
-assert(requirements.acceptanceReady === false, "v0.15 not acceptance-ready");
+assert(requirements.acceptanceReady === true, "current candidate progressed to S21 acceptance-ready state");
 assert(
   text(record(requirements.currentAccepted, "currentAccepted").mtsVersion, "current accepted version") === "v0.14",
   "v0.14 remains current",
@@ -58,11 +58,12 @@ const auditOpen = ["V15-GOV-04", "V15-READY-01", "V15-READY-02", "V15-READY-03"]
 const readinessIds = new Set(["V15-READY-01", "V15-READY-02", "V15-READY-03"]);
 assert(open.every((id) => readinessIds.has(id)), "after S20 only readiness requirements may remain OPEN");
 
-const allowedGreen = new Set(["COMPONENT_GREEN", "VERTICAL_GREEN"]);
+const allowedCompleted = new Set(["COMPONENT_GREEN", "VERTICAL_GREEN"]);
 for (const item of mandatory) {
   const id = text(item.id, "id");
-  if (readinessIds.has(id) && text(item.state, id + " readiness state") === "OPEN") continue;
-  assert(allowedGreen.has(text(item.state, id + " state")), id + " completed requirement is green");
+  const state = text(item.state, id + " state");
+  if (readinessIds.has(id) && (state === "OPEN" || state === "RELEASE_READY")) continue;
+  assert(allowedCompleted.has(state), id + " completed requirement is green");
 }
 const currentGov = mandatory.find((item) => item.id === "V15-GOV-04");
 assert(currentGov !== undefined, "current GOV-04 exists");
