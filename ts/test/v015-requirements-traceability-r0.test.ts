@@ -346,6 +346,20 @@ validateCandidate(requirements, traceability);
   assert(gov.mandatory === true, "V15-GOV-04 is mandatory");
   assert(/repo-guard/i.test(text(gov.summary, "V15-GOV-04 summary")), "V15-GOV-04 covers repo-guard");
   assert(/bypass/i.test(text(gov.summary, "V15-GOV-04 bypass summary")), "V15-GOV-04 covers bypass containment");
+  assert(text(gov.state, "V15-GOV-04 state") === "COMPONENT_GREEN", "S20 operational merge governance is component-green");
+  const govEvidencePath = join(repoRoot, "formal/v0.15/evidence/governance-merge-enforcement-g1.json");
+  assert(existsSync(govEvidencePath), "S20 governance falsifier evidence exists");
+  const govEvidence = JSON.parse(readFileSync(govEvidencePath, "utf8")) as Json;
+  const govAcceptance = record(govEvidence.acceptance, "S20 governance acceptance evidence");
+  assert(govAcceptance.governanceSatisfied === true, "S20 governance evidence is satisfied");
+  assert(govAcceptance.mtsV015Accepted === false, "governance closure does not accept MTS v0.15");
+  const falsifier = record(govEvidence.falsifier, "S20 governance falsifier");
+  const redMerge = record(falsifier.redMergeAttempt, "S20 RED merge attempt");
+  assert(text(redMerge.result, "S20 RED merge result") === "BLOCKED", "RED required check was mechanically blocked");
+  assert(Number(redMerge.httpStatus) === 405, "RED merge block returned HTTP 405");
+  const restored = record(falsifier.restoredGreen, "S20 restored GREEN");
+  assert(text(restored.repoGuard, "S20 restored repo-guard") === "SUCCESS", "repo-guard restored GREEN");
+  assert(restored.mergeable === true && text(restored.mergeableState, "S20 restored merge state") === "clean", "GREEN restore became normally mergeable");
 
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists");
@@ -353,6 +367,12 @@ validateCandidate(requirements, traceability);
     strings(ready.dependsOn, "V15-READY-01 dependsOn").includes("V15-GOV-04"),
     "release readiness depends on operational merge enforcement",
   );
+  assert(
+    !strings(record(ready.evidence, "V15-READY-01 governance evidence").negativeVectors, "V15-READY-01 governance negatives")
+      .includes("v15-gov04-ruleset-bypass-open"),
+    "resolved S20 governance blocker cannot remain in readiness negatives",
+  );
+  assert(text(ready.state, "V15-READY-01 post-S20 state") === "OPEN", "final readiness remains open until S21");
 
   const traces = record(traceability.requirements, "trace requirements for governance blocker");
   const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
