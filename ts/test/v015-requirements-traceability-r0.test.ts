@@ -282,6 +282,33 @@ validateCandidate(requirements, traceability);
   assert(docs.mandatory === true, "V15-DOCS-01 is mandatory");
   assert(/generated projection/i.test(text(docs.summary, "V15-DOCS-01 summary")), "V15-DOCS-01 requires generated projection");
   assert(/Формальная нотация МТС\.md/u.test(text(docs.summary, "V15-DOCS-01 target")), "V15-DOCS-01 owns canonical FORMAL document");
+  assert(text(docs.state, "V15-DOCS-01 state") === "COMPONENT_GREEN", "S18 generated FORMAL specification is component-green");
+  const docsEvidence = record(docs.evidence, "V15-DOCS-01 evidence");
+  assert(
+    strings(docsEvidence.positiveVectors, "V15-DOCS-01 positive vectors")
+      .includes("generated-formal-spec-component-green") === false,
+    "component state is evidenced by concrete generation vectors, not a self-referential readiness label",
+  );
+  for (const path of [
+    "profiles/mts-v015-formal-notation-projection.json",
+    "ts/src/tooling/formal-notation-v015-markdown.ts",
+    "docs/specs/Формальная нотация МТС.md",
+  ]) {
+    assert(existsSync(join(repoRoot, path)), "S18 generated FORMAL evidence exists: " + path);
+  }
+  const generatedFormal = readFileSync(join(repoRoot, "docs/specs/Формальная нотация МТС.md"), "utf8");
+  assert(
+    generatedFormal.includes("mts-generated-formal-notation"),
+    "FORMAL specification carries generated-projection marker",
+  );
+  assert(
+    generatedFormal.includes("profiles/mts-v015-meta-interpreter-kernel.json"),
+    "generated FORMAL projection uses compact kernel authority",
+  );
+  assert(
+    !generatedFormal.includes("profiles/mts-v015-meta-interpreter-model.json"),
+    "obsolete meta-interpreter research monolith is not documentation authority",
+  );
 
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists for docs dependency");
@@ -289,6 +316,12 @@ validateCandidate(requirements, traceability);
     strings(ready.dependsOn, "V15-READY-01 docs dependsOn").includes("V15-DOCS-01"),
     "release readiness depends on generated FORMAL specification",
   );
+  assert(
+    strings(record(ready.evidence, "V15-READY-01 evidence").negativeVectors, "V15-READY-01 negatives")
+      .includes("generated-v015-formal-spec-refresh-pending-s18") === false,
+    "S18 docs-pending blocker is removed after generated projection closure",
+  );
+  assert(text(ready.state, "V15-READY-01 state") === "OPEN", "readiness remains open after S18");
 
   const traces = record(traceability.requirements, "trace requirements for documentation blocker");
   const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
