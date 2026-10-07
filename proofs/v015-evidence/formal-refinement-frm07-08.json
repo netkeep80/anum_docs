@@ -41,8 +41,9 @@
     }
   ],
   "approvedArtifactWitnesses": [
-    "formal/v0.15/regression/grounded-zero-role.evidence.json",
-    "formal/v0.15/regression/two-role-meta-rule.evidence.json"
+    "formal/v0.15/regression/grounded-zero-role.amemory-evidence.json",
+    "formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json",
+    "ts/test/v015-frozen-replay-artifact-integrity.test.ts"
   ],
   "explicitNonClaims": [
     "Lean4/Rocq do not mechanically verify the TypeScript implementation source code",
