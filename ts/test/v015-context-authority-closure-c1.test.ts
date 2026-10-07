@@ -276,7 +276,7 @@ assert(
   text(grounding.status, "meta-grounding status") === "RESOLVED_STRUCTURAL_UNARY_GAMMA",
   "meta-grounding boundary resolved",
 );
-assert(gammaProfile.runtimeExternalGrounderCommandAllowed === false, "runtime external grounder forbidden");
+assert(grounding.runtimeExternalGrounderCommandAllowed === false, "runtime external grounder forbidden");
 const selectedGamma = record(grounding.structuralAsetOneCommand, "selected one-Gamma evidence");
 assert(
   text(selectedGamma.evidence, "one-Gamma core evidence") ===
