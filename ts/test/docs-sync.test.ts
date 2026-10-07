@@ -47,9 +47,9 @@ expectThrow(
 
 const repositoryRoot = findRepositoryRoot();
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.14");
-assert.equal(projection.previousContract, "mts-contract/v0.13");
-assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.7.json");
+assert.equal(projection.currentContract, "mts-contract/v0.15");
+assert.equal(projection.previousContract, "mts-contract/v0.14");
+assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json");
 assert.deepEqual(CANONICAL_DOCS, ["README.md"], "generated current projection must have exactly one owner");
 assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
   "docs/CONTRIBUTING.md",
@@ -58,10 +58,10 @@ assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
 ]);
 
 const rendered = renderCurrentProjection(projection);
-assert.ok(rendered.includes("mts-contract/v0.14"));
-assert.ok(!rendered.includes("mts-contract/v0.13"), "current README projection must not expose previous MTS versions");
+assert.ok(rendered.includes("mts-contract/v0.15"));
+assert.ok(!rendered.includes("mts-contract/v0.14"), "current README projection must not expose previous MTS versions");
 assert.ok(!rendered.includes("Предыдущ"), "current README projection must not contain previous-release prose");
-assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.7.json"));
+assert.ok(rendered.includes("cutover/typescript-c1-acceptance-v0.8.json"));
 assert.ok(!rendered.includes("Корневой базис:"), "release projection must not duplicate theory");
 assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
@@ -69,13 +69,13 @@ assert.ok(rendered.includes(PROJECTION_END));
 
 const readmeSource = readFileSync(resolve(repositoryRoot, "README.md"), "utf8");
 assert.equal(
-  readmeSource.split("mts-doc-version: v0.14").length - 1,
+  readmeSource.split("mts-doc-version: v0.15").length - 1,
   1,
-  "README must contain exactly one v0.14 document marker",
+  "README must contain exactly one v0.15 document marker",
 );
 assert.ok(
-  readmeSource.includes("> **Версия МТС: v0.14**"),
-  "README must expose the v0.14 version to readers",
+  readmeSource.includes("> **Версия МТС: v0.15**"),
+  "README must expose the v0.15 version to readers",
 );
 assert.ok(
   !readmeSource.includes("mts-contract/v0.13"),
