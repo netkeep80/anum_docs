@@ -17,12 +17,18 @@
     ]
   },
   "falsifier": {
-    "phase": "INTENTIONAL_RED_OBSERVED",
+    "phase": "RED_BLOCKED_CONFIRMED_GREEN_REPAIR_PENDING",
     "expected": "repo-guard RED must make normal merge mechanically impossible",
-    "redMergeAttempt": null,
+    "redMergeAttempt": {
+      "head": "2ac94d78e89106e1774f00641f26a306dc21d635",
+      "result": "BLOCKED",
+      "httpStatus": 405,
+      "reason": "Required status check \"repo-guard blocking check\" is failing.",
+      "mainUnchanged": "ff2b8e0b6a3ddad3bd992a2230164bf08738cb48"
+    },
     "restoredGreen": null,
     "repoGuardRedObserved": true,
-    "repoGuardRun": 37667622587
+    "repoGuardRun": 37667697020
   },
   "acceptance": {
     "governanceSatisfied": false,
