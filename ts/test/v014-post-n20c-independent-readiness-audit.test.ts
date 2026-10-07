@@ -206,11 +206,13 @@ same(conformance.readinessAudit.candidateSemanticReady,true,"semantic readiness"
 same(conformance.readinessAudit.accepted,true,"readiness consumed by accepted lifecycle");
 same(traceability.readinessAudit.issue,1679,"traceability readiness issue");
 
-// Current accepted release remains immutable/current.
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.14.json","policy current contract");
-same(policy.packs["contract-conformance"].current.conformance.path,"contracts/mts-conformance-v0.14.json","policy current conformance");
-same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","accepted current contract");
-same(acceptance14.current.conformance,"contracts/mts-conformance-v0.14.json","accepted current conformance");
+// v0.14 remains immutable as the immediately previous accepted release after S22.
+same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.15.json","live policy current contract");
+same(policy.packs["contract-conformance"].current.conformance.path,"contracts/mts-conformance-v0.15.json","live policy current conformance");
+same(policy.packs["contract-conformance"].previous.contract.path,"contracts/mts-contract-v0.14.json","live policy previous contract");
+same(policy.packs["contract-conformance"].previous.conformance.path,"contracts/mts-conformance-v0.14.json","live policy previous conformance");
+same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","historical v0.14 cutover contract");
+same(acceptance14.current.conformance,"contracts/mts-conformance-v0.14.json","historical v0.14 cutover conformance");
 
 console.log([
   "MTS v0.14 N21: POST_N20C_INDEPENDENT_READINESS=GREEN",
