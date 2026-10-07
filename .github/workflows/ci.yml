@@ -140,9 +140,10 @@ jobs:
           cp proofs/lean4/MtsV015GeneralizedReaction.lean /tmp/mts-v015-lean-assurance/
           (
             cd /tmp/mts-v015-lean-assurance
-            /tmp/mts-lean/bin/lean MtsV015GeneralizedReactionCore.lean
-            /tmp/mts-lean/bin/lean MtsV015GeneralizedReactionRefinement.lean
-            /tmp/mts-lean/bin/lean MtsV015GeneralizedReaction.lean
+            export LEAN_PATH=/tmp/mts-v015-lean-assurance
+            /tmp/mts-lean/bin/lean -o MtsV015GeneralizedReactionCore.olean MtsV015GeneralizedReactionCore.lean
+            /tmp/mts-lean/bin/lean -o MtsV015GeneralizedReactionRefinement.olean MtsV015GeneralizedReactionRefinement.lean
+            /tmp/mts-lean/bin/lean -o MtsV015GeneralizedReaction.olean MtsV015GeneralizedReaction.lean
           )
           node <<'NODE'
           const fs = require("node:fs");
@@ -159,6 +160,7 @@ jobs:
           NODE
           (
             cd /tmp/mts-v015-lean-assurance
+            export LEAN_PATH=/tmp/mts-v015-lean-assurance
             /tmp/mts-lean/bin/lean MtsV015GeneralizedReactionAssurance.lean
           ) 2>&1 | tee /tmp/mts-v015-lean-assurance.log
           node <<'NODE'
