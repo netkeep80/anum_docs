@@ -222,7 +222,7 @@ const decisionById = new Map(
   (kernel.resolvedDecisions as Json[]).map((item) => [
     text(item.id, "decision id"),
     text(item.decision, "decision value"),
-  ]),
+  ] as const),
 );
 assert(decisionById.get("MI-D02") === "POSITIVE_SEMANTIC_ANET_MEMBERSHIP", "MI-D02");
 assert(decisionById.get("MI-D03") === "LINK_STRUCTURE_AND_SEMANTIC_MEMBERSHIP_AUTHORITY", "MI-D03");
@@ -276,7 +276,7 @@ assert(
   text(grounding.status, "meta-grounding status") === "RESOLVED_STRUCTURAL_UNARY_GAMMA",
   "meta-grounding boundary resolved",
 );
-assert(grounding.runtimeExternalGrounderCommandAllowed === false, "runtime external grounder forbidden");
+assert(gammaProfile.runtimeExternalGrounderCommandAllowed === false, "runtime external grounder forbidden");
 const selectedGamma = record(grounding.structuralAsetOneCommand, "selected one-Gamma evidence");
 assert(
   text(selectedGamma.evidence, "one-Gamma core evidence") ===
