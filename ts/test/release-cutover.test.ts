@@ -176,7 +176,7 @@ assert(
   "package root must expose matching declaration and runtime outputs",
 );
 
-const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.14.json"), "utf8")) as {
+const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-v0.15.json"), "utf8")) as {
   readonly schema?: string;
   readonly status?: string;
   readonly accepted?: boolean;
@@ -190,9 +190,9 @@ const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/mts-contract-
     readonly compatibilityRuntimeSelectable?: boolean;
   };
 };
-assert(contract.schema === "mts-contract/v0.14", "current contract must be v0.14");
+assert(contract.schema === "mts-contract/v0.15", "current contract must be v0.14");
 assert(contract.status === "accepted" && contract.accepted === true, "current v0.14 contract must be accepted");
-assert(contract.semanticBase === "mts-contract/v0.13", "v0.14 semantic base must be accepted v0.13");
+assert(contract.semanticBase === "mts-contract/v0.14", "v0.14 semantic base must be accepted v0.13");
 assert(contract.observableSemanticDelta === true, "v0.14 must retain its explicit semantic delta");
 assert(contract.acceptanceReady === true, "accepted v0.14 must retain proven readiness");
 assert(contract.implementation?.language === "TypeScript", "current implementation must be TypeScript");
@@ -201,7 +201,7 @@ assert(contract.implementation?.singleLiveSemanticRuntime === true, "accepted ru
 assert(contract.implementation?.compatibilityRuntimeSelectable === false, "compatibility runtime must remain unavailable");
 
 const conformance = JSON.parse(
-  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.14.json"), "utf8"),
+  readFileSync(join(repoRoot, "contracts/mts-conformance-v0.15.json"), "utf8"),
 ) as ConformanceBoundary;
 assert(conformance.status === "accepted" && conformance.accepted === true, "current v0.14 conformance must be accepted");
 assert(conformance.acceptanceReady === true, "accepted v0.14 conformance must retain proven readiness");
