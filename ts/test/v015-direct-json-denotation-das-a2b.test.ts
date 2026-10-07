@@ -155,6 +155,7 @@ function compileDirectJsonToNativeSourceAnet(text: string): LinkHandle {
     sourceAnetProfileRoot,
     new TextEncoder().encode(text),
   ).sourceAset;
+}
 
 const directJson = [
   "{",
