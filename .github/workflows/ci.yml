@@ -130,6 +130,7 @@ jobs:
           console.log("KERNEL_ASSUMPTIONS_LEAN=CHECKED targets=" + symbols.length);
           NODE
 
+          # S14 clean-main integration: #2007 / proof owner #2001.
           # v0.15 generalized-reaction proofs are a separate candidate assurance
           # set and must compile through the clean-main Core/Refinement split.
           rm -rf /tmp/mts-v015-lean-assurance
