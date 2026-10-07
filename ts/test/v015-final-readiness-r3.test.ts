@@ -30,10 +30,10 @@ assert(text(readiness.schema, "schema") === "mts-v015-final-readiness/v0.1", "fi
 assert(text(readiness.status, "status") === "RELEASE_READY_AWAITING_AUTHOR_DECISION", "release-ready status");
 assert(text(readiness.auditBasis, "audit basis") === "75076ba241c28bc3327647d2a1c4cbf7611ad51b", "exact post-S20 audit basis");
 
-assert(requirements.status === "candidate", "requirements remain candidate");
+assert(requirements.status === "accepted", "requirements accepted by S22");
 assert(requirements.accepted === true, "requirements accepted by S22");
 assert(requirements.acceptanceReady === true, "requirements are acceptance-ready");
-assert(traceability.status === "candidate", "trace remains candidate");
+assert(traceability.status === "accepted", "trace accepted by S22");
 assert(traceability.accepted === true, "trace accepted by S22");
 assert(traceability.acceptanceReady === true, "trace is acceptance-ready");
 assert(text(traceability.releaseState, "releaseState") === "ACCEPTED", "trace release state");
