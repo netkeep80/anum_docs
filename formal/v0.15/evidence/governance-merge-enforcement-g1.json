@@ -17,10 +17,12 @@
     ]
   },
   "falsifier": {
-    "phase": "INTENTIONAL_RED_PENDING",
+    "phase": "INTENTIONAL_RED_OBSERVED",
     "expected": "repo-guard RED must make normal merge mechanically impossible",
     "redMergeAttempt": null,
-    "restoredGreen": null
+    "restoredGreen": null,
+    "repoGuardRedObserved": true,
+    "repoGuardRun": 37667622587
   },
   "acceptance": {
     "governanceSatisfied": false,
