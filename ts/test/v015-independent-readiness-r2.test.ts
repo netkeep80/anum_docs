@@ -37,12 +37,12 @@ assert(text(audit.integrationOwner, "integration owner") === "#2007", "integrati
 assert(text(audit.auditBasis, "audit basis") === "653c9cff87c8a73c2853a2b17349d87003a2d48a", "exact post-S18 audit basis");
 assert(text(audit.status, "audit status") === "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE", "audit blocked by governance");
 
-assert(requirements.status === "candidate", "v0.15 remains candidate");
-assert(requirements.accepted === false, "v0.15 not accepted");
+assert(requirements.status === "accepted", "v0.15 accepted after S22");
+assert(requirements.accepted === true, "v0.15 accepted");
 assert(requirements.acceptanceReady === true, "current candidate progressed to S21 acceptance-ready state");
 assert(
-  text(record(requirements.currentAccepted, "currentAccepted").mtsVersion, "current accepted version") === "v0.14",
-  "v0.14 remains current",
+  text(record(requirements.currentAccepted, "currentAccepted").mtsVersion, "current accepted version") === "v0.15",
+  "v0.15 is current",
 );
 
 const list = requirements.requirements;
@@ -62,7 +62,7 @@ const allowedCompleted = new Set(["COMPONENT_GREEN", "VERTICAL_GREEN"]);
 for (const item of mandatory) {
   const id = text(item.id, "id");
   const state = text(item.state, id + " state");
-  if (readinessIds.has(id) && (state === "OPEN" || state === "RELEASE_READY")) continue;
+  if (readinessIds.has(id) && (state === "OPEN" || state === "RELEASE_READY" || state === "ACCEPTED")) continue;
   assert(allowedCompleted.has(state), id + " completed requirement is green");
 }
 const currentGov = mandatory.find((item) => item.id === "V15-GOV-04");
@@ -131,10 +131,10 @@ assert(!generatedFormal.includes("profiles/mts-v015-meta-interpreter-model.json"
 const kernel = JSON.parse(
   readFileSync(join(root, "profiles/mts-v015-meta-interpreter-kernel.json"), "utf8"),
 ) as Json;
-assert(text(kernel.status, "kernel status") === "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE", "kernel remains pre-acceptance");
+assert(text(kernel.status, "kernel status") === "ACCEPTED_EXECUTION_AUTHORITY", "kernel accepted after S22");
 const authority = record(kernel.semanticAuthority, "kernel authority");
-assert(authority.versionAccepted === false, "kernel cannot accept v0.15");
-assert(authority.authorAcceptanceRequired === true, "kernel requires explicit Author acceptance");
+assert(authority.versionAccepted === true, "kernel accepts v0.15");
+assert(authority.authorAcceptanceRequired === false, "Author acceptance is satisfied");
 assert(Array.isArray(kernel.unresolvedExcludedFromKernel), "kernel unresolved exclusions explicit");
 const sequenceCarrier = (kernel.unresolvedExcludedFromKernel as Json[])
   .find((item) => item.id === "SEQUENCE_CARRIER_SOURCE_PROVENANCE");
@@ -195,5 +195,5 @@ console.log(
   "SEMANTIC_CORE=GREEN FORMAL_JSON_COMPILER=GREEN EXTERNAL_ASSURANCE=GREEN " +
   "APPROVED_EXECUTABLE_CORPUS=6_GREEN GENERATED_FORMAL=GREEN ACTIVE_TRACE=GREEN " +
   "CROSS_REPOSITORY_FREEZE=GREEN NON_READINESS_BLOCKERS=V15-GOV-04 " +
-  "RULESET_BYPASS=BLOCKING RELEASE_READY=FALSE AUTHOR_ACCEPTANCE=NOT_REQUESTED CURRENT_ACCEPTED=v0.14",
+  "RULESET_BYPASS=BLOCKING RELEASE_READY=FALSE AUTHOR_ACCEPTANCE=NOT_REQUESTED CURRENT_ACCEPTED=v0.15",
 );
