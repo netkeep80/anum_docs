@@ -30,16 +30,16 @@ assert(text(readiness.schema, "schema") === "mts-v015-final-readiness/v0.1", "fi
 assert(text(readiness.status, "status") === "RELEASE_READY_AWAITING_AUTHOR_DECISION", "release-ready status");
 assert(text(readiness.auditBasis, "audit basis") === "75076ba241c28bc3327647d2a1c4cbf7611ad51b", "exact post-S20 audit basis");
 
-assert(requirements.status === "candidate", "requirements remain candidate");
-assert(requirements.accepted === false, "requirements remain unaccepted");
+assert(requirements.status === "accepted", "requirements accepted by S22");
+assert(requirements.accepted === true, "requirements accepted by S22");
 assert(requirements.acceptanceReady === true, "requirements are acceptance-ready");
-assert(traceability.status === "candidate", "trace remains candidate");
-assert(traceability.accepted === false, "trace remains unaccepted");
+assert(traceability.status === "accepted", "trace accepted by S22");
+assert(traceability.accepted === true, "trace accepted by S22");
 assert(traceability.acceptanceReady === true, "trace is acceptance-ready");
-assert(text(traceability.releaseState, "releaseState") === "RELEASE_READY", "trace release state");
+assert(text(traceability.releaseState, "releaseState") === "ACCEPTED", "trace release state");
 
 const current = record(requirements.currentAccepted, "current accepted");
-assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains current before Author decision");
+assert(text(current.mtsVersion, "current accepted version") === "v0.15", "v0.15 current after Author decision");
 
 const list = requirements.requirements;
 assert(Array.isArray(list), "requirements list");
@@ -52,7 +52,7 @@ const ready2 = byId.get("V15-READY-02");
 const ready3 = byId.get("V15-READY-03");
 assert(ready1 !== undefined && text(ready1.state, "READY-01") === "RELEASE_READY", "READY-01 release-ready");
 assert(ready2 !== undefined && text(ready2.state, "READY-02") === "RELEASE_READY", "READY-02 release-ready");
-assert(ready3 !== undefined && text(ready3.state, "READY-03") === "OPEN", "READY-03 stays Author-only OPEN");
+assert(ready3 !== undefined && text(ready3.state, "READY-03") === "ACCEPTED", "READY-03 accepted by explicit Author decision");
 
 const counts = mandatory.reduce<Record<string, number>>((out, item) => {
   const state = text(item.state, "state");
@@ -62,10 +62,11 @@ const counts = mandatory.reduce<Record<string, number>>((out, item) => {
 assert(counts.COMPONENT_GREEN === 41, "41 component-green");
 assert(counts.VERTICAL_GREEN === 4, "4 vertical-green");
 assert(counts.RELEASE_READY === 2, "2 release-ready");
-assert(counts.OPEN === 1, "only one OPEN");
+assert(counts.ACCEPTED === 1, "one accepted Author gate");
+assert((counts.OPEN ?? 0) === 0, "no OPEN requirements after S22");
 assert(
-  mandatory.filter((item) => item.state === "OPEN").every((item) => item.id === "V15-READY-03"),
-  "only Author decision remains OPEN",
+  mandatory.filter((item) => item.state === "OPEN").length === 0,
+  "no Author-decision requirement remains OPEN after S22",
 );
 
 const traced = record(traceability.requirements, "trace requirements");
@@ -127,10 +128,10 @@ const generated = readFileSync(join(root, "docs/specs/Формальная но�
 assert(generated.includes("COMPONENT_GREEN        = 41"), "generated FORMAL component count");
 assert(generated.includes("VERTICAL_GREEN         = 4"), "generated FORMAL vertical count");
 assert(generated.includes("RELEASE_READY          = 2"), "generated FORMAL release-ready count");
-assert(generated.includes("OPEN                   = 1"), "generated FORMAL open count");
+assert(generated.includes("OPEN                   = 0"), "generated FORMAL open count");
 assert(generated.includes("acceptance ready       = true"), "generated FORMAL acceptance-ready flag");
-assert(generated.includes("accepted               = false"), "generated FORMAL still unaccepted");
-assert(generated.includes("current accepted       = v0.14"), "generated FORMAL current accepted version");
+assert(generated.includes("accepted               = true"), "generated FORMAL accepted");
+assert(generated.includes("current accepted       = v0.15"), "generated FORMAL current accepted version");
 
 const gate = record(readiness.finalAuthorGate, "final Author gate");
 assert(gate.required === true && text(gate.decision, "Author decision") === "PENDING", "explicit Author decision remains pending");

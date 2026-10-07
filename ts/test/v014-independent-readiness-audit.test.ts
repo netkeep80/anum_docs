@@ -65,8 +65,9 @@ same(contract.acceptanceBoundary.documentationReconstructionUnblocked,true,"#158
 same(contract.implementation.acceptedRuntime,"mts-contract/v0.14","accepted runtime is v0.14");
 same(contract.implementation.candidateRuntimeSelectable,false,"candidate not selectable");
 same(contract.implementation.productionBehaviorChanged,false,"no production behavior delta");
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.14.json","policy current is v0.14");
-same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","cutover current is v0.14");
+same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.15.json","live policy current is v0.15 after S22");
+same(policy.packs["contract-conformance"].previous.contract.path,"contracts/mts-contract-v0.14.json","live policy previous is v0.14 after S22");
+same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","historical v0.14 cutover remains bound to v0.14");
 assert(existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"v0.14 cutover exists");
 
 console.log([

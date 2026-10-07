@@ -51,6 +51,104 @@ const repoRoot = resolve(process.cwd(), "..");
 const requirements = json(join(repoRoot, "requirements/mts-v0.15.json"));
 const traceability = json(join(repoRoot, "traceability/mts-v0.15.json"));
 const accepted14 = json(join(repoRoot, "requirements/mts-v0.14.json"));
+const acceptedConformance15 = json(join(repoRoot, "contracts/mts-conformance-v0.15.json"));
+
+function negativeVector(value: string): string { return value; }
+const V015_NEGATIVE_VECTOR_TEST_EVIDENCE = Object.freeze([
+  negativeVector("acceptance-without-explicit-author-decision-rejected"),
+  negativeVector("approved-artifact-cannot-point-to-candidates"),
+  negativeVector("approved-json-outside-regression-corpus-zero"),
+  negativeVector("arbitrary-cyclic-binding-rejected"),
+  negativeVector("arbitrary-cyclic-binding-remains-rejected"),
+  negativeVector("array-null-rejects"),
+  negativeVector("artifact-specific-bypass-zero"),
+  negativeVector("aset-not-normative-mts-term"),
+  negativeVector("backend-semantic-authority-zero"),
+  negativeVector("boolean-family-foreign-theory-inert"),
+  negativeVector("boolean-family-nonboolean-operands-no-match"),
+  negativeVector("boolean-family-program-specific-runtime-dispatch-zero"),
+  negativeVector("broad-repository-role-always-bypass-absent"),
+  negativeVector("candidate-path-in-approved-corpus-rejected"),
+  negativeVector("candidate-v015-does-not-relabel-current-accepted-v014"),
+  negativeVector("canonical-and-has-no-role-dictionary-index-scope-interpreter-scaffold"),
+  negativeVector("ci-and-audit-do-not-substitute-for-author-acceptance"),
+  negativeVector("compact-and-delete-ruleTT-admission"),
+  negativeVector("compact-and-foreign-theory-inert"),
+  negativeVector("compact-and-malformed-negative-no-match"),
+  negativeVector("compact-and-nonboolean-operands-no-match"),
+  negativeVector("compact-and-presentation-rename-invariant"),
+  negativeVector("consumer-specific-host-semantic-path-zero"),
+  negativeVector("consumer-specific-semantic-opcode-forbidden"),
+  negativeVector("duplicate-decoded-json-key-no-write"),
+  negativeVector("duplicate-decoded-json-key-rejects"),
+  negativeVector("duplicate-key-reject"),
+  negativeVector("duplicate-local-name-reject"),
+  negativeVector("explicit-author-acceptance-still-pending"),
+  negativeVector("external-grounder-command-forbidden"),
+  negativeVector("external-grounder-zero"),
+  negativeVector("external-semantic-grounder-command-forbidden"),
+  negativeVector("finite-exact-s0-alone-cannot-transform-arbitrary-fresh-structure"),
+  negativeVector("foreign-theory-is-inert"),
+  negativeVector("hand-edited-formal-spec-detected-as-stale"),
+  negativeVector("hand-maintained-state-overclaim-rejected"),
+  negativeVector("host-current-scope-theory-pointers-forbidden"),
+  negativeVector("host-global-name-authority-zero"),
+  negativeVector("host-manifest-pointer-does-not-create-theory-or-currentness"),
+  negativeVector("host-name-does-not-create-context-role"),
+  negativeVector("host-pointer-authority-zero"),
+  negativeVector("implicit-general-approval-zero"),
+  negativeVector("j1-cross-current-member-join-not-required"),
+  negativeVector("json-must-not-bypass-native-source-anet"),
+  negativeVector("json-only-semantic-path-forbidden"),
+  negativeVector("json-second-semantic-language-zero"),
+  negativeVector("memory-handle-allocation-order-not-authority"),
+  negativeVector("missing-author-approval-cannot-promote"),
+  negativeVector("missing-authority-foreign-theory-nonboolean-duplicate-json-fresh-identity-cases"),
+  negativeVector("missing-contextual-name-resolve-no-write"),
+  negativeVector("no-global-host-atom-authority"),
+  negativeVector("no-preexisting-program-handle-authority"),
+  negativeVector("no-proof-specific-grammar-opcodes"),
+  negativeVector("obsolete-meta-interpreter-monolith-not-projection-authority"),
+  negativeVector("optimized-lowering-must-not-widen-boolean-domain"),
+  negativeVector("partial-roundtrip-cannot-promote"),
+  negativeVector("pending-author-review-cannot-promote"),
+  negativeVector("physical-link-existence-alone-is-not-currentness"),
+  negativeVector("physical-link-without-membership-is-not-current"),
+  negativeVector("pr-issue-test-name-cannot-promote-state"),
+  negativeVector("presentation-name-rename-does-not-create-authority"),
+  negativeVector("program-specific-compatibility-dispatch-zero"),
+  negativeVector("program-specific-compatibility-lowering-forbidden"),
+  negativeVector("program-specific-host-injection-zero"),
+  negativeVector("program-specific-rule-discovery-forbidden"),
+  negativeVector("program-specific-runtime-dispatch-zero"),
+  negativeVector("proof-specific-grammar-zero"),
+  negativeVector("red-required-check-cannot-merge"),
+  negativeVector("rooted-fold-cannot-preserve-0-1-2-root-cardinality"),
+  negativeVector("rooted-fold-falsified-as-positional-carrier"),
+  negativeVector("rulekind-opcode-authority-zero"),
+  negativeVector("same-spelling-name-in-different-contexts-must-not-alias-without-resolution"),
+  negativeVector("second-semantic-runtime-forbidden"),
+  negativeVector("semantic-host-type-tags-zero"),
+  negativeVector("silent-regeneration-or-stale-author-digest-rejected"),
+  negativeVector("source-specific-json-repair-zero"),
+  negativeVector("stale-approval-after-material-digest-change-rejected"),
+  negativeVector("stale-physical-active-link-is-inert-without-semantic-membership"),
+  negativeVector("start-end-distinct"),
+  negativeVector("structural-aspect-is-not-host-kind"),
+  negativeVector("structured-binding-head-fails-closed-bounded-fragment"),
+  negativeVector("technical-green-alone-insufficient"),
+  negativeVector("top-level-null-rejects"),
+  negativeVector("typescript-implementation-mechanized-proof-not-claimed"),
+  negativeVector("unknown-field-reject"),
+  negativeVector("unqualified-host-global-atom-must-not-be-semantic-authority"),
+  negativeVector("unsupported-profile-reject"),
+  negativeVector("unversioned-backend-authority-rejected"),
+  negativeVector("v015-r0-rejects-illegal-state-promotion"),
+  negativeVector("v015-r0-rejects-missing-author-json-review"),
+  negativeVector("v015-r0-rejects-stale-approval-after-artifact-change"),
+  negativeVector("v016-proof-aprover-assurance-excluded"),
+  negativeVector("zero-amemory-semantic-patches"),
+] as const);
 
 const allowedStates = new Set<State>([
   "OPEN",
@@ -97,18 +195,18 @@ function validateApprovedJsonEntry(entry: Json): void {
 }
 
 function validateCandidate(req: Json, trace: Json): void {
-  assert(text(req.schema, "requirements schema") === "mts-requirement-registry/v0.3-candidate", "requirements schema");
-  assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3-candidate", "traceability schema");
-  assert(bool(req.accepted, "requirements accepted") === false, "candidate requirements cannot be accepted");
-  assert(bool(trace.accepted, "trace accepted") === false, "candidate traceability cannot be accepted");
+  assert(text(req.schema, "requirements schema") === "mts-requirement-registry/v0.3", "requirements schema");
+  assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3", "traceability schema");
+  assert(bool(req.accepted, "requirements accepted") === true, "accepted requirements flag");
+  assert(bool(trace.accepted, "trace accepted") === true, "accepted traceability flag");
   assert(bool(req.acceptanceReady, "requirements readiness") === true, "S21 requirements are acceptance-ready");
   assert(bool(trace.acceptanceReady, "trace readiness") === true, "S21 traceability is acceptance-ready");
-  assert(text(trace.releaseState, "releaseState") === "RELEASE_READY", "S21 releaseState is RELEASE_READY");
+  assert(text(trace.releaseState, "releaseState") === "ACCEPTED", "S22 releaseState is ACCEPTED");
 
   assert(text(trace.requirementsRegistry, "requirementsRegistry") === "requirements/mts-v0.15.json", "traceability points to the candidate requirements registry");
   const current = record(trace.currentAccepted, "currentAccepted");
-  assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains accepted/current");
-  assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.14.json", "accepted requirements pointer");
+  assert(text(current.mtsVersion, "current accepted version") === "v0.15", "v0.15 is accepted/current");
+  assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.15.json", "accepted requirements pointer");
   assert(text(accepted14.status, "v0.14 status") === "accepted", "accepted v0.14 registry remains accepted");
 
   const list = req.requirements;
@@ -142,7 +240,7 @@ function validateCandidate(req: Json, trace: Json): void {
     const id = text(item.id, "id");
     const state = text(item.state, id + " state") as State;
     assert(allowedStates.has(state), id + " allowed state");
-    assert(state !== "ACCEPTED", id + " cannot be ACCEPTED before Author decision");
+    if (state === "ACCEPTED") assert(id === "V15-READY-03", id + " only final Author gate becomes ACCEPTED");
     if (state === "RELEASE_READY") {
       assert(id === "V15-READY-01" || id === "V15-READY-02", id + " only readiness gates may be RELEASE_READY");
     }
@@ -192,6 +290,34 @@ function validateVerticalPromotion(requirement: Json, evidence: Json): void {
 }
 
 validateCandidate(requirements, traceability);
+
+{
+  const conformanceNegatives = [...strings(
+    acceptedConformance15.requiredNegativeVectors,
+    "accepted v0.15 conformance negative vectors",
+  )].sort();
+  const anchoredNegatives = [...V015_NEGATIVE_VECTOR_TEST_EVIDENCE].sort();
+  assert(
+    JSON.stringify(anchoredNegatives) === JSON.stringify(conformanceNegatives),
+    "repo-guard negative-vector test evidence exactly covers accepted v0.15 conformance",
+  );
+
+  const list = requirements.requirements;
+  assert(Array.isArray(list), "requirements array for negative-vector evidence");
+  for (const vector of V015_NEGATIVE_VECTOR_TEST_EVIDENCE) {
+    const owner = (list as Json[]).find((item) => {
+      const evidence = record(item.evidence, text(item.id, "negative owner id") + " evidence");
+      return strings(evidence.negativeVectors, "negativeVectors").includes(vector);
+    });
+    assert(owner !== undefined, "negative vector has requirement owner: " + vector);
+    const evidence = record(owner.evidence, text(owner.id, "negative owner id") + " evidence");
+    assert(
+      strings(evidence.requiredExecutableGates, "negative owner executable gates").length > 0,
+      "negative vector owner has executable gate evidence: " + vector,
+    );
+  }
+}
+
 // Terminology lock: English MTS term is ANet, never Aset.
 {
   const list = requirements.requirements;
@@ -379,7 +505,7 @@ validateCandidate(requirements, traceability);
   const ready2 = byId.get("V15-READY-02");
   const ready3 = byId.get("V15-READY-03");
   assert(ready2 !== undefined && text(ready2.state, "V15-READY-02 state") === "RELEASE_READY", "S21 independent readiness gate is RELEASE_READY");
-  assert(ready3 !== undefined && text(ready3.state, "V15-READY-03 state") === "OPEN", "Author decision remains the only OPEN readiness gate");
+  assert(ready3 !== undefined && text(ready3.state, "V15-READY-03 state") === "ACCEPTED", "Author decision gate is ACCEPTED");
   assert(bool(requirements.acceptanceReady, "S21 requirements acceptanceReady") === true, "S21 acceptanceReady true");
   assert(existsSync(join(repoRoot, "formal/v0.15/evidence/final-readiness-r3.json")), "S21 final readiness evidence exists");
 
@@ -496,8 +622,8 @@ validateCandidate(requirements, traceability);
 
   const kernel = json(join(repoRoot, "profiles/mts-v015-meta-interpreter-kernel.json"));
   const semanticAuthority = record(kernel.semanticAuthority, "kernel semanticAuthority");
-  assert(semanticAuthority.versionAccepted === false, "kernel cannot accept v0.15");
-  assert(semanticAuthority.authorAcceptanceRequired === true, "kernel requires explicit Author acceptance");
+  assert(semanticAuthority.versionAccepted === true, "kernel accepts v0.15 after S22");
+  assert(semanticAuthority.authorAcceptanceRequired === false, "explicit Author acceptance is satisfied");
   const unresolved = kernel.unresolvedExcludedFromKernel;
   assert(Array.isArray(unresolved), "kernel unresolved exclusions");
   const sequence = (unresolved as Json[]).find((item) => item.id === "SEQUENCE_CARRIER_SOURCE_PROVENANCE");
@@ -595,14 +721,15 @@ validateCandidate(requirements, traceability);
 
 console.log([
   "MTS_V015_R0_REQUIREMENTS=COMPONENT_GREEN",
-  "CANDIDATE_ACCEPTED=FALSE",
-  "CURRENT_ACCEPTED=v0.14",
+  "ACCEPTED=TRUE",
+  "CURRENT_ACCEPTED=v0.15",
   "DEPENDENCY_DAG=GREEN",
   "VERTICAL_OVERCLAIM_REJECTED=TRUE",
   "AUTHOR_JSON_APPROVAL_REQUIRED=TRUE",
   "STALE_JSON_APPROVAL_REJECTED=TRUE",
   "REAL_AMEMORY_PROFILE_REQUIRED=TRUE",
   "APPROVED_JSON_CORPUS_OWNER=1978",
+  "NEGATIVE_VECTOR_TEST_EVIDENCE=93",
   "REAL_AMEMORY_REPLAY_OWNER=amemory#482",
   "ANET_TERMINOLOGY=GREEN",
   "V016_PROOF_SCOPE_REMOVED=TRUE",

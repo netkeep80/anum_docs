@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// This gate validates only pre-acceptance execution-kernel authority; final MTS v0.15 acceptance remains an explicit Author decision.
+// This gate validates the accepted v0.15 execution-kernel authority after the explicit Author decision.
 // repo-guard boundary: this executable gate and the compact profile form one atomic clean-main kernel slice.
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 meta-interpreter kernel: " + message);
@@ -57,9 +57,9 @@ const profile = JSON.parse(readFileSync(profilePath, "utf8")) as {
   unresolvedExcludedFromKernel: readonly { id: string; status: string }[];
 };
 
-same(profile.status, "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE", "pre-acceptance status");
-same(profile.semanticAuthority.versionAccepted, false, "kernel cannot accept version");
-same(profile.semanticAuthority.authorAcceptanceRequired, true, "explicit Author acceptance remains required");
+same(profile.status, "ACCEPTED_EXECUTION_AUTHORITY", "accepted status");
+same(profile.semanticAuthority.versionAccepted, true, "kernel accepts version");
+same(profile.semanticAuthority.authorAcceptanceRequired, false, "explicit Author acceptance satisfied");
 
 same(profile.command.name, "GAMMA_STRUCTURAL_ASET", "one Gamma command");
 same(profile.command.repeatedCommandCount, 1, "exactly one repeated semantic command");
@@ -87,12 +87,12 @@ same(profile.authority.externalProgramCounter, false, "no external program count
 
 same(profile.context.directGaugeBoundary, "C", "direct-gauge Context boundary");
 same(profile.context.rootRelation, "C = END(R)", "Context boundary root relation");
-same(profile.context.authorDecision, "APPROVED_FOR_V015_DESIGN", "Context design decision");
-same(profile.context.versionAcceptance, false, "Context design decision is not version acceptance");
+same(profile.context.authorDecision, "APPROVED_FOR_V015_ACCEPTED", "Context accepted decision");
+same(profile.context.versionAcceptance, true, "Context participates in accepted v0.15");
 same(
   profile.context.designAcceptanceScope,
-  "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
-  "Context design acceptance scope",
+  "V0.15_ACCEPTED_EXECUTION_CONTEXT",
+  "Context accepted scope",
 );
 same(profile.context.foundationGlobalPrivilege, false, "C is not Foundation-global privilege");
 same(profile.context.chiralityCovariantMirrorRequired, true, "chirality-covariant mirror equivalence remains required");
@@ -128,8 +128,8 @@ for (const forbidden of [
 
 console.log([
   "MTS_V015_META_INTERPRETER_KERNEL=GREEN",
-  "VERSION_ACCEPTED=FALSE",
-  "AUTHOR_ACCEPTANCE_REQUIRED=TRUE",
+  "VERSION_ACCEPTED=TRUE",
+  "AUTHOR_ACCEPTANCE_REQUIRED=FALSE",
   "COMMAND=ONE_GAMMA_STRUCTURAL_J0",
   "S1=READ_ONLY_COMPLETE_PLAN",
   "S2=AFTER_S1",

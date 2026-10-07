@@ -143,8 +143,11 @@ assert(gateAuthority.has("ts/test/v014-post-n20c-independent-readiness-audit.tes
 
 const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
 const currentPair = record(current.current, "current pair");
-assert(text(record(currentPair.contract, "current contract").path, "current contract path") === "contracts/mts-contract-v0.14.json", "repo-policy current is v0.14");
-assert(text(record(currentPair.conformance, "current conformance").path, "current conformance path") === "contracts/mts-conformance-v0.14.json", "repo-policy conformance is v0.14");
+assert(text(record(currentPair.contract, "current contract").path, "current contract path") === "contracts/mts-contract-v0.15.json", "repo-policy current is v0.15 after S22");
+assert(text(record(currentPair.conformance, "current conformance").path, "current conformance path") === "contracts/mts-conformance-v0.15.json", "repo-policy current conformance is v0.15 after S22");
+const previousPair = record(current.previous, "previous pair");
+assert(text(record(previousPair.contract, "previous contract").path, "previous contract path") === "contracts/mts-contract-v0.14.json", "repo-policy previous is v0.14 after S22");
+assert(text(record(previousPair.conformance, "previous conformance").path, "previous conformance path") === "contracts/mts-conformance-v0.14.json", "repo-policy previous conformance is v0.14 after S22");
 
 const acceptedCurrent = record(acceptance14.current, "accepted current");
 assert(text(acceptedCurrent.contract, "accepted contract") === "contracts/mts-contract-v0.14.json", "cutover current contract is v0.14");
@@ -166,8 +169,8 @@ assert(JSON.stringify(staleCurrentAccepted) === JSON.stringify(observed), "immut
 const authoritative = record(correction.authoritativeCurrent, "authoritative current selection");
 assert(text(authoritative.policy, "erratum policy") === "repo-policy.json", "repo-policy is current selection authority");
 assert(text(authoritative.acceptance, "erratum acceptance") === "cutover/typescript-c1-acceptance-v0.7.json", "acceptance manifest is v0.7");
-assert(text(authoritative.contract, "erratum contract") === text(record(currentPair.contract, "current contract").path, "current contract path"), "erratum contract matches repo-policy current");
-assert(text(authoritative.conformance, "erratum conformance") === text(record(currentPair.conformance, "current conformance").path, "current conformance path"), "erratum conformance matches repo-policy current");
+assert(text(authoritative.contract, "erratum contract") === text(acceptedCurrent.contract, "historical accepted contract"), "erratum remains bound to historical v0.14 cutover");
+assert(text(authoritative.conformance, "erratum conformance") === text(acceptedCurrent.conformance, "historical accepted conformance"), "erratum conformance remains bound to historical v0.14 cutover");
 assert(text(authoritative.contract, "erratum contract") === text(acceptedCurrent.contract, "accepted contract"), "erratum contract matches accepted cutover");
 assert(text(authoritative.conformance, "erratum conformance") === text(acceptedCurrent.conformance, "accepted conformance"), "erratum conformance matches accepted cutover");
 

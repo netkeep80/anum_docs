@@ -1,0 +1,66 @@
+{
+  "schema": "typescript-c1-acceptance/v0.8",
+  "issue": 1876,
+  "decision": "ACCEPT_MTS_V0_15",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.14",
+    "acceptedVersion": "mts-contract/v0.15",
+    "semanticBase": "mts-contract/v0.14",
+    "observableSemanticDelta": true,
+    "reason": "MTS v0.15 completed the universal FORMAL/JSON native-source ANet model, shared denotation, accepted Gamma execution kernel, six Author-approved executable artifacts, paired GPR/FRM Lean4+Rocq assurance, frozen A-memory compatibility replay, generated documentation, governance falsifier and final independent clean-main audit; the Author then explicitly issued ACCEPT MTS v0.15 in #1876 comment 6046228475."
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.15.json",
+    "conformance": "contracts/mts-conformance-v0.15.json",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.14.json",
+    "conformance": "contracts/mts-conformance-v0.14.json",
+    "acceptance": "cutover/typescript-c1-acceptance-v0.7.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "candidateLifecycleIssue": 1876,
+    "integrationIssue": 2007,
+    "governanceIssue": 1982,
+    "authorDecisionIssue": 1876,
+    "authorDecisionComment": 6046228475,
+    "preAcceptanceReadyMainSha": "c7f1f098af6f76813c4739d8d0e2281bad0dac55",
+    "finalReadiness": "formal/v0.15/evidence/final-readiness-r3.json",
+    "requirements": "requirements/mts-v0.15.json",
+    "traceability": "traceability/mts-v0.15.json",
+    "executionKernel": "profiles/mts-v015-meta-interpreter-kernel.json",
+    "mandatoryRequirementCount": 48,
+    "approvedExecutableCorpusCount": 6,
+    "gprTargetCount": 9,
+    "frmTargetCount": 8,
+    "migrationHistoryInGitOnly": true
+  },
+  "acceptance": {
+    "typeScriptAccepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "acceptanceReadyWasProvenBeforeCutover": true,
+    "explicitAuthorDecisionRecordedBeforeCutover": true,
+    "canonicalExecutableJsonChanged": false,
+    "amemorySemanticPatchUsed": false,
+    "repositoryBypassUsed": false
+  },
+  "postAcceptanceWork": [
+    "thaw and migrate A-memory under netkeep80/amemory#455",
+    "continue native Aprover/proof runtime under v0.16 owners #1912/#2003",
+    "migrate active documentation formulas to accepted FORMAL notation under #1951"
+  ],
+  "veto": {
+    "secondSemanticRuntime": false,
+    "jsonSpecificSemanticAuthority": false,
+    "programSpecificLogicalOpcode": false,
+    "hiddenCurrentScopePointer": false,
+    "externalSelectedTheoryPointer": false,
+    "mergeWholeResearchAggregate1989": false
+  }
+}

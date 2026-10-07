@@ -253,7 +253,9 @@ function findTraceabilityManifest(
   for (const name of readdirSync(directory).filter((entry) => entry.endsWith(".json")).sort()) {
     const path = `traceability/${name}`;
     const value = readJson(join(repoRoot, path));
-    if (value.schema !== "mts-traceability/v0.1" && value.schema !== "mts-traceability/v0.2") continue;
+    if (value.schema !== "mts-traceability/v0.1"
+      && value.schema !== "mts-traceability/v0.2"
+      && value.schema !== "mts-traceability/v0.3") continue;
     if (value.contract === summary.contractPath && value.conformance === summary.conformancePath) {
       matches.push(Object.freeze({ path, value }));
     }
@@ -271,6 +273,79 @@ function projectSemanticInvariants(
   manifest: TraceabilityManifestSelection,
 ): SemanticInvariant[] {
   const schema = requireString(manifest.value.schema, `${manifest.path}#/schema`);
+
+  if (schema === "mts-traceability/v0.3") {
+    if (summary.accepted) {
+      const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
+      const contractAcceptance = requireRecord(contract.acceptance, `${summary.contractPath}#/acceptance`);
+      const versionAcceptancePath = requireString(
+        contractAcceptance.cutoverManifest,
+        `${summary.contractPath}#/acceptance/cutoverManifest`,
+      );
+      if (acceptancePath !== versionAcceptancePath) {
+        throw new Error(`Contract Observatory V4d: traceability acceptance mismatch: ${manifest.path}`);
+      }
+    } else if (manifest.value.acceptance !== undefined && manifest.value.acceptance !== null) {
+      throw new Error(`Contract Observatory V4d: candidate traceability must not claim acceptance: ${manifest.path}`);
+    }
+
+    const requirements = requireRecord(manifest.value.requirements, `${manifest.path}#/requirements`);
+    const laws = requireRecord(contract.requiredSemanticLaws, `${summary.contractPath}#/requiredSemanticLaws`);
+    const requirementIds = Object.keys(requirements).sort((a, b) => a.localeCompare(b));
+    const lawIds = Object.keys(laws).sort((a, b) => a.localeCompare(b));
+    if (requirementIds.join("\u0000") !== lawIds.join("\u0000")) {
+      throw new Error(`Contract Observatory V4d: traceability requirement identity mismatch: ${manifest.path}`);
+    }
+
+    const allowedGates = uniqueSorted([
+      ...stringArray(conformance.requiredExecutableGates),
+      ...stringArray(conformance.requiredNonKernelAcceptanceGates),
+      ...stringArray(conformance.requiredExternalExecutableGates),
+    ]);
+
+    return requirementIds.map((id) => {
+      const source = requireRecord(requirements[id], `${manifest.path}#/requirements/${id}`);
+      const positiveVectors = validatedSubset(
+        source.positiveVectors,
+        conformance.requiredPositiveVectors,
+        `${manifest.path}#/requirements/${id}/positiveVectors`,
+      );
+      const requiredNegativeVectors = validatedSubset(
+        source.negativeVectors,
+        conformance.requiredNegativeVectors,
+        `${manifest.path}#/requirements/${id}/negativeVectors`,
+      );
+      const requiredExecutableGates = validatedSubset(
+        source.requiredExecutableGates,
+        allowedGates,
+        `${manifest.path}#/requirements/${id}/requiredExecutableGates`,
+      );
+      const contractPointer = `/requiredSemanticLaws/${id.replaceAll("~", "~0").replaceAll("/", "~1")}`;
+      const contractValue = requireString(laws[id], `${summary.contractPath}#${contractPointer}`);
+      return Object.freeze({
+        authority: "semantic-invariant" as const,
+        id,
+        traceabilitySourcePath: manifest.path,
+        contractPointer,
+        contractValue,
+        positive: Object.freeze({
+          requiredGenesisVectors: Object.freeze([]),
+          requiredMeaningVectors: Object.freeze([]),
+          requiredC2ClassificationVectors: Object.freeze([]),
+          requiredCompatibilityVectors: Object.freeze([]),
+        }),
+        positiveGroups: Object.freeze([
+          Object.freeze({
+            sourceSet: "requiredPositiveVectors",
+            vectorIds: positiveVectors,
+          }),
+        ]),
+        negative: Object.freeze({ requiredNegativeVectors }),
+        requiredExecutableGates,
+      });
+    });
+  }
+
   if (summary.accepted) {
     const acceptancePath = requireString(manifest.value.acceptance, `${manifest.path}#/acceptance`);
     const versionAcceptancePath = requireString(contract.currentPointer, `${summary.contractPath}#/currentPointer`);

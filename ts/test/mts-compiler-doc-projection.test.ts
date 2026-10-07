@@ -246,13 +246,12 @@ assert.ok(surface.includes("docs/research/Исходные мысли МТС.md"
 assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"));
 
 const ir = loadMtsSemanticIr(root);
-assert.equal(ir.schema, "mts-requirement-registry/v0.2");
-assert.equal(ir.contract, "mts-contract/v0.14");
+assert.equal(ir.schema, "mts-requirement-registry/v0.3");
+assert.equal(ir.contract, "mts-contract/v0.15");
 assert.equal(ir.projectionState, "MATERIALIZED");
-assert.deepEqual(ir.requirements.map((x) => x.id), [
-  "V14-L1", "V14-L2", "V14-L3", "V14-L4", "V14-L5", "V14-L6", "V14-L7",
-  "V14-L8", "V14-L9", "V14-L10", "V14-L11", "V14-L12", "V14-L13", "V14-L14",
-]);
+assert.equal(ir.requirements.length, 48, "accepted v0.15 requirement count");
+assert.ok(ir.requirements.some((x) => x.id === "V15-AUTH-01"));
+assert.ok(ir.requirements.some((x) => x.id === "V15-READY-03"));
 assert.ok(ir.requirements.every((x) => x.status === "accepted"));
 assert.deepEqual(ir.repositoryRequirements.map((x) => x.id), [
   "README-AUTHORS",
@@ -269,7 +268,11 @@ assert.match(
 );
 assert.equal(Object.values(ir.documentModes).includes("generated"), false);
 
-const a4 = ir.requirements.find((x) => x.id === "V14-L12");
+const legacyIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
+assert.equal(legacyIr.schema, "mts-requirement-registry/v0.2");
+assert.equal(legacyIr.contract, "mts-contract/v0.14");
+assert.equal(legacyIr.requirements.length, 14, "legacy Markdown compatibility requirement count");
+const a4 = legacyIr.requirements.find((x) => x.id === "V14-L12");
 assert.ok(a4);
 assert.equal(a4.classificationPath, "theory/foundation/context-relative-chiral-gauge");
 assert.match(a4.statementDigest, /^[0-9a-f]{16}$/);
@@ -308,15 +311,23 @@ const writeRegistry = (value: unknown): void =>
 try {
   for (const path of [
     "repo-policy.json",
+    "contracts/mts-contract-v0.15.json",
+    "contracts/mts-conformance-v0.15.json",
+    "requirements/mts-v0.15.json",
+    "traceability/mts-v0.15.json",
     "contracts/mts-contract-v0.14.json",
+    "contracts/mts-conformance-v0.14.json",
     "traceability/mts-v0.14.json",
     registryPath,
     ...surface,
   ]) copy(path);
 
   const tempIr = loadMtsSemanticIr(tempRoot);
-  assert.equal(tempIr.requirements.length, 14);
-  assert.equal(tempIr.repositoryRequirements.length, 2);
+  assert.equal(tempIr.requirements.length, 48);
+  assert.equal(tempIr.contract, "mts-contract/v0.15");
+  const tempLegacyIr = loadMtsSemanticIr(tempRoot, registryPath);
+  assert.equal(tempLegacyIr.requirements.length, 14);
+  assert.equal(tempLegacyIr.repositoryRequirements.length, 2);
   assert.deepEqual(compileRequirementDocuments(tempRoot, false), []);
   assert.deepEqual(compileRequirementDocuments(tempRoot, true), []);
 
@@ -360,13 +371,13 @@ try {
     const registry = readRegistry();
     mutate(registry);
     writeRegistry(registry);
-    expect(() => loadMtsSemanticIr(tempRoot), pattern);
+    expect(() => loadMtsSemanticIr(tempRoot, registryPath), pattern);
     writeFileSync(resolve(tempRoot, registryPath), registrySource, "utf8");
   }
 
   const rogue = resolve(tempRoot, "docs/Новый неизвестный документ.md");
   writeFileSync(rogue, "# Новый документ\n", "utf8");
-  expect(() => loadMtsSemanticIr(tempRoot), /Markdown document surface differs/);
+  expect(() => loadMtsSemanticIr(tempRoot, registryPath), /Markdown document surface differs/);
   rmSync(rogue);
 
   const a4OwnerPath = resolve(tempRoot, "docs/theory/Система аксиом МТС.md");
@@ -385,4 +396,4 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log("MTS Compiler D20: GREEN REQUIREMENTS=14 REPOSITORY_REQUIREMENTS=2 REGISTRY=v0.2 PROSE_MATERIALIZATION=MATERIALIZED");
+console.log("MTS Compiler D20: GREEN CURRENT_REQUIREMENTS=48 CURRENT_REGISTRY=v0.3 MARKDOWN_COMPATIBILITY_REQUIREMENTS=14 LEGACY_REGISTRY=v0.2");

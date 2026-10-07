@@ -8,21 +8,21 @@
     "contract-conformance": {
       "current": {
         "contract": {
-          "path": "contracts/mts-contract-v0.14.json",
+          "path": "contracts/mts-contract-v0.15.json",
           "format": "json"
         },
         "conformance": {
-          "path": "contracts/mts-conformance-v0.14.json",
+          "path": "contracts/mts-conformance-v0.15.json",
           "format": "json"
         }
       },
       "previous": {
         "contract": {
-          "path": "contracts/mts-contract-v0.13.json",
+          "path": "contracts/mts-contract-v0.14.json",
           "format": "json"
         },
         "conformance": {
-          "path": "contracts/mts-conformance-v0.13.json",
+          "path": "contracts/mts-conformance-v0.14.json",
           "format": "json"
         }
       },
@@ -41,7 +41,7 @@
       },
       "acceptance": {
         "document": {
-          "path": "cutover/typescript-c1-acceptance-v0.7.json",
+          "path": "cutover/typescript-c1-acceptance-v0.8.json",
           "format": "json"
         },
         "current_contract_path": "/current/contract",
@@ -86,8 +86,8 @@
         "path": ".github/workflows/branch-hygiene.yml",
         "format": "yaml"
       },
-      "v014-requirements": {
-        "path": "requirements/mts-v0.14.json",
+      "v015-requirements": {
+        "path": "requirements/mts-v0.15.json",
         "format": "json"
       }
     },
@@ -150,7 +150,7 @@
           "pointer": "/jobs/policy-check/steps/1/uses",
           "type": "string"
         },
-        "value": "netkeep80/repo-guard@e4bb412bbe32d6275ea66ca1317c40311cffb7c5"
+        "value": "netkeep80/repo-guard@cd8ea38938444dc65d09601e350468768c7f7f0f"
       },
       {
         "id": "branch-hygiene-permission-contents-write",
@@ -203,28 +203,24 @@
         "value": "Sweep fully merged stale branches"
       },
       {
-        "id": "v014-requirements-status",
+        "id": "v015-requirements-status",
         "kind": "scalar_equals_literal",
         "source": {
-          "document": "v014-requirements",
+          "document": "v015-requirements",
           "pointer": "/status",
           "type": "string"
         },
         "value": "accepted"
       },
       {
-        "id": "v014-requirements-contract",
-        "kind": "scalar_equal",
-        "left": {
-          "document": "v014-requirements",
+        "id": "v015-requirements-contract",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "v015-requirements",
           "pointer": "/contract",
           "type": "string"
         },
-        "right": {
-          "document": "contract-conformance.current.contract",
-          "pointer": "/schema",
-          "type": "string"
-        }
+        "value": "contracts/mts-contract-v0.15.json"
       }
     ]
   },
@@ -265,6 +261,11 @@
             "kind": "regex",
             "glob": "ts/test/v014-release-cutover-a75.test.ts",
             "pattern": "negativeVector\\(\\\"([^\\\"]+)\\\""
+          },
+          {
+            "kind": "regex",
+            "glob": "ts/test/v015-requirements-traceability-r0.test.ts",
+            "pattern": "negativeVector\\(\"([^\"]+)\""
           }
         ]
       },
@@ -305,8 +306,8 @@
         "sources": [
           {
             "kind": "regex",
-            "glob": "requirements/mts-v0.14.json",
-            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V14-L[0-9]+)\\\""
+            "glob": "requirements/mts-v0.15.json",
+            "pattern": "\\\"id\\\"\\s*:\\s*\\\"(V15-[A-Z0-9-]+)\\\""
           }
         ]
       }
@@ -377,7 +378,7 @@
       "scope": "directory",
       "metric": "files",
       "glob": "contracts/**",
-      "max": 8,
+      "max": 10,
       "max_growth": 2,
       "count": "all_tracked",
       "level": "blocking"
@@ -576,4 +577,3 @@
     }
   }
 }
-

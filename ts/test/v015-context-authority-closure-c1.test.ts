@@ -70,13 +70,13 @@ const dasA2c = read(root, "ts/test/v015-rule-bundle-denotation-das-a2c.test.ts")
 
 includesAll(a5, [
   "DIRECT_GAUGE_CONTEXT_BOUNDARY=C_DERIVED_FROM_ROOT_TO_END_SELF_CLOSURE",
-  "DIRECT_GAUGE_C_AUTHOR_DECISION=APPROVED_FOR_V015",
+  "DIRECT_GAUGE_C_AUTHOR_DECISION=APPROVED_FOR_V015_ACCEPTED",
   "EXTERNAL_CURRENT_CONTEXT_POINTER=0",
   "EXTERNAL_CURRENT_SCOPE_POINTER=0",
   "EXTERNAL_PROGRAM_COUNTER=0",
   "WHOLE_MEMORY_CANONICAL_FREEZE_TRANSFER_RESTORE=GREEN",
   "RESUME_WITHOUT_SERIALIZED_CONTEXT_HANDLE=GREEN",
-  "ACCEPTED_V014_UNCHANGED",
+  "VERSION_ACCEPTED=V0_15",
 ], "A5");
 
 includesAll(a6, [
@@ -171,12 +171,12 @@ includesAll(dasA2c, [
 
 const kernel = json(root, "profiles/mts-v015-meta-interpreter-kernel.json");
 assert(
-  text(kernel.status, "kernel status") === "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
-  "kernel remains pre-acceptance",
+  text(kernel.status, "kernel status") === "ACCEPTED_EXECUTION_AUTHORITY",
+  "kernel is accepted execution authority",
 );
 const semanticAuthority = record(kernel.semanticAuthority, "kernel semanticAuthority");
-assert(semanticAuthority.versionAccepted === false, "kernel does not accept v0.15");
-assert(semanticAuthority.authorAcceptanceRequired === true, "explicit Author acceptance required");
+assert(semanticAuthority.versionAccepted === true, "kernel accepts v0.15");
+assert(semanticAuthority.authorAcceptanceRequired === false, "explicit Author acceptance satisfied");
 assert(
   strings(semanticAuthority.excludes, "kernel semantic exclusions").includes("unresolved sequence-carrier research"),
   "sequence-carrier research excluded from kernel authority",
@@ -214,7 +214,7 @@ for (const key of [
 const context = record(kernel.context, "kernel context");
 assert(text(context.directGaugeBoundary, "context boundary") === "C", "direct-gauge C boundary");
 assert(text(context.rootRelation, "context root relation") === "C = END(R)", "C=END(R)");
-assert(context.versionAcceptance === false, "Context design does not accept v0.15");
+assert(context.versionAcceptance === true, "Context design participates in accepted v0.15");
 assert(context.foundationGlobalPrivilege === false, "C is not Foundation-global privilege");
 assert(context.chiralityCovariantMirrorRequired === true, "chirality covariance required");
 

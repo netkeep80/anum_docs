@@ -425,19 +425,19 @@ function staticGuards(): void {
 
   same(
     kernel.status,
-    "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
-    "kernel remains pre-acceptance",
+    "ACCEPTED_EXECUTION_AUTHORITY",
+    "kernel accepted after S22",
   );
   same(kernel.context.directGaugeBoundary, "C", "direct-gauge execution boundary");
   same(
     kernel.context.authorDecision,
-    "APPROVED_FOR_V015_DESIGN",
-    "Author design decision for C boundary",
+    "APPROVED_FOR_V015_ACCEPTED",
+    "Author accepted decision for C boundary",
   );
   same(
     kernel.context.designAcceptanceScope,
-    "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
-    "C approval scope",
+    "V0.15_ACCEPTED_EXECUTION_CONTEXT",
+    "C accepted execution scope",
   );
   same(kernel.context.foundationGlobalPrivilege, false, "C is not Foundation-global privilege");
   same(
@@ -445,12 +445,12 @@ function staticGuards(): void {
     true,
     "C boundary remains chirality/gauge relative",
   );
-  same(kernel.context.versionAcceptance, false, "Context design does not accept v0.15");
-  same(kernel.semanticAuthority.versionAccepted, false, "kernel does not accept v0.15");
+  same(kernel.context.versionAcceptance, true, "Context design participates in accepted v0.15");
+  same(kernel.semanticAuthority.versionAccepted, true, "kernel accepts v0.15");
   same(
     kernel.semanticAuthority.authorAcceptanceRequired,
-    true,
-    "explicit Author acceptance remains required",
+    false,
+    "explicit Author acceptance is satisfied",
   );
 
   const d1 = kernel.resolvedDecisions.find((entry) => entry.id === "MI-D01");
@@ -466,7 +466,7 @@ function main(): void {
   console.log([
     "MTS v0.15 A5: SELF_CONTAINED_CONTEXT_FREEZE_RESUME=GREEN_RESEARCH",
     "DIRECT_GAUGE_CONTEXT_BOUNDARY=C_DERIVED_FROM_ROOT_TO_END_SELF_CLOSURE",
-    "DIRECT_GAUGE_C_AUTHOR_DECISION=APPROVED_FOR_V015",
+    "DIRECT_GAUGE_C_AUTHOR_DECISION=APPROVED_FOR_V015_ACCEPTED",
     "EXTERNAL_CURRENT_CONTEXT_POINTER=0",
     "EXTERNAL_CURRENT_SCOPE_POINTER=0",
     "EXTERNAL_PROGRAM_COUNTER=0",
@@ -480,7 +480,7 @@ function main(): void {
     "HOST_FRONTIER_TRAVERSAL=RESIDUAL_READ_ONLY_ORACLE",
     "NEGATIVE_ABSENCE_TESTS=RESIDUAL",
     "FULL_SELF_HOSTED_GENERALIZED_REACTION=NOT_YET_PROVEN",
-    "ACCEPTED_V014_UNCHANGED",
+    "VERSION_ACCEPTED=V0_15",
   ].join(" "));
 }
 

@@ -25,6 +25,9 @@ export const FORMAL_NOTATION_V015_SOURCE_PATHS = Object.freeze([
   "traceability/mts-v0.14.json",
   "contracts/mts-contract-v0.14.json",
   "contracts/mts-conformance-v0.14.json",
+  "contracts/mts-contract-v0.15.json",
+  "contracts/mts-conformance-v0.15.json",
+  "cutover/typescript-c1-acceptance-v0.8.json",
   "repo-policy.json",
 ] as const);
 
@@ -116,13 +119,13 @@ export function renderFormalNotationV015Markdown(root: string): string {
   }
 
   const requirements = readJson(root, "requirements/mts-v0.15.json");
-  if (string(requirements.mtsVersion, "MTS version") !== "v0.15-candidate") {
-    fail("requirements version must be v0.15-candidate");
+  if (string(requirements.mtsVersion, "MTS version") !== "v0.15") {
+    fail("requirements version must be accepted v0.15");
   }
-  if (requirements.accepted !== false) fail("generated candidate spec cannot claim accepted v0.15");
+  if (requirements.accepted !== true) fail("generated spec requires accepted v0.15");
   const currentAccepted = object(requirements.currentAccepted, "currentAccepted");
-  if (string(currentAccepted.mtsVersion, "current accepted version") !== "v0.14") {
-    fail("v0.14 must remain current before Author cutover");
+  if (string(currentAccepted.mtsVersion, "current accepted version") !== "v0.15") {
+    fail("v0.15 must be current after Author cutover");
   }
 
   const byId = requirementMap(requirements);
@@ -139,16 +142,16 @@ export function renderFormalNotationV015Markdown(root: string): string {
   const gamma = readJson(root, "profiles/mts-v015-generalized-reaction-candidate.json");
   if (
     string(kernel.status, "kernel status") !==
-    "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE"
+    "ACCEPTED_EXECUTION_AUTHORITY"
   ) {
-    fail("compact execution kernel must remain pre-acceptance candidate");
+    fail("compact execution kernel must be accepted after S22");
   }
   const semanticAuthority = object(kernel.semanticAuthority, "semanticAuthority");
-  if (semanticAuthority.versionAccepted !== false) {
-    fail("compact execution kernel cannot accept v0.15");
+  if (semanticAuthority.versionAccepted !== true) {
+    fail("compact execution kernel must accept v0.15 after S22");
   }
-  if (semanticAuthority.authorAcceptanceRequired !== true) {
-    fail("compact execution kernel must require explicit Author acceptance");
+  if (semanticAuthority.authorAcceptanceRequired !== false) {
+    fail("Author acceptance must already be satisfied");
   }
   if (!Array.isArray(kernel.unresolvedExcludedFromKernel)) fail("kernel unresolved exclusions missing");
   const sequenceCarrier = (kernel.unresolvedExcludedFromKernel as JsonObject[]).find(
@@ -187,8 +190,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
   );
   const counts = stateCounts(mandatory);
 
-  const acceptedIr = loadMtsSemanticIr(root);
-  const historical = acceptedIr.requirements.find((item) => item.id === "V14-L2");
+  const historicalIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
+  const historical = historicalIr.requirements.find((item) => item.id === "V14-L2");
   if (historical === undefined) fail("historical V14-L2 projection missing");
 
   const stableAnchors = strings(model.stableAnchors, "stableAnchors");
@@ -198,10 +201,10 @@ export function renderFormalNotationV015Markdown(root: string): string {
   const lines = [
     "# Формальная нотация МТС",
     "<!-- проекция МТС; mts-generated-formal-notation: " + q + FORMAL_NOTATION_V015_MODEL_PATH + q + " -->",
-    "<!-- версия документа МТС; mts-doc-version: v0.14 -->",
-    "<!-- версия кандидата МТС; mts-formal-candidate-version: v0.15 -->",
-    "> **Версия МТС: v0.14**",
-    "> **Кандидат " + q + "FORMAL" + q + ": v0.15.** Ниже показана автоматически сгенерированная кандидатная проекция; она не меняет текущий принятый выпуск до отдельного решения Автора о переходе.",
+    "<!-- версия документа МТС; mts-doc-version: v0.15 -->",
+    "<!-- принятый выпуск МТС; mts-formal-accepted-version: v0.15 -->",
+    "> **Версия МТС: v0.15**",
+    "> **Принятый " + q + "FORMAL" + q + ": v0.15.** Ниже показана автоматически сгенерированная проекция принятого выпуска после явного решения Автора.",
     "> Этот файл полностью строится командой " + q + "npm --prefix ts run docs:sync" + q + ". Ручная правка семантики здесь не является authority.",
     "",
     "## 1. Назначение",
@@ -295,7 +298,7 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "",
     "Глобальные списки разрешённых аксиом для этих линий пусты. Эти доказательства являются внешней проверкой, а не отдельным исполнителем МТС.",
     "",
-    "## 9. Машинный статус кандидата",
+    "## 9. Машинный статус принятого выпуска",
     "",
     fence + "text",
     "mandatory requirements = " + mandatory.length,
@@ -304,11 +307,12 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "RELEASE_READY          = " + String(counts.RELEASE_READY ?? 0),
     "OPEN                   = " + String(counts.OPEN ?? 0),
     "acceptance ready       = " + String(requirements.acceptanceReady === true),
-    "accepted               = false",
-    "current accepted       = v0.14",
+    "ACCEPTED               = " + String(counts.ACCEPTED ?? 0),
+    "accepted               = true",
+    "current accepted       = v0.15",
     fence,
     "",
-    "Текущий документ описывает кандидат v0.15 и не заменяет отдельное финальное решение Автора о принятии версии.",
+    "Текущий документ описывает принятый выпуск v0.15; решение Автора зафиксировано в " + q + "#1876 issuecomment-6046228475" + q + ".",
     "",
     "## 10. Отложено в v0.16",
     "",
@@ -318,7 +322,7 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "",
     "## 11. Историческая совместимость v0.14",
     "",
-    "Следующие якоря сохраняются для существующих ссылок на принятую документацию v0.14; они не являются текущим источником семантики кандидата v0.15.",
+    "Следующие якоря сохраняются для существующих ссылок на принятую документацию v0.14; они не являются текущим источником семантики принятого выпуска v0.15.",
     "",
     ...stableAnchors.map((anchor) => '<a id="' + anchor + '"></a> <!-- исторический стабильный якорь -->'),
     "",
