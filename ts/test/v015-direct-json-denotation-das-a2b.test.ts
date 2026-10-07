@@ -20,6 +20,8 @@ import {
   compileV015DirectJsonSourceAnet,
 } from "../src/v015-direct-json-source.js";
 
+// Integration split provenance: direct-JSON/denotation subset of GREEN #1989 DAS-A2; no production semantics are changed.
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 DAS-A2 native source ANet: " + message);
 }
