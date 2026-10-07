@@ -57,9 +57,9 @@ const profile = JSON.parse(readFileSync(profilePath, "utf8")) as {
   unresolvedExcludedFromKernel: readonly { id: string; status: string }[];
 };
 
-same(profile.status, "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE", "pre-acceptance status");
-same(profile.semanticAuthority.versionAccepted, false, "kernel cannot accept version");
-same(profile.semanticAuthority.authorAcceptanceRequired, true, "explicit Author acceptance remains required");
+same(profile.status, "ACCEPTED_EXECUTION_AUTHORITY", "accepted status");
+same(profile.semanticAuthority.versionAccepted, true, "kernel accepts version");
+same(profile.semanticAuthority.authorAcceptanceRequired, false, "explicit Author acceptance satisfied");
 
 same(profile.command.name, "GAMMA_STRUCTURAL_ASET", "one Gamma command");
 same(profile.command.repeatedCommandCount, 1, "exactly one repeated semantic command");
