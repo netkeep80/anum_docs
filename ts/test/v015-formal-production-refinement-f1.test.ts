@@ -285,5 +285,3 @@ console.log([
   "FRM07_PRODUCTION_PREMISES=EXECUTABLE_WITNESS_GREEN",
   "GENERAL_TYPESCRIPT_CORRECTNESS_PROOF=NOT_CLAIMED",
 ].join(" "));
-
-// integration synchronize marker; removed in next commit
