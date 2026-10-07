@@ -97,18 +97,18 @@ function validateApprovedJsonEntry(entry: Json): void {
 }
 
 function validateCandidate(req: Json, trace: Json): void {
-  assert(text(req.schema, "requirements schema") === "mts-requirement-registry/v0.3-candidate", "requirements schema");
-  assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3-candidate", "traceability schema");
-  assert(bool(req.accepted, "requirements accepted") === false, "candidate requirements cannot be accepted");
-  assert(bool(trace.accepted, "trace accepted") === false, "candidate traceability cannot be accepted");
+  assert(text(req.schema, "requirements schema") === "mts-requirement-registry/v0.3", "requirements schema");
+  assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3", "traceability schema");
+  assert(bool(req.accepted, "requirements accepted") === true, "accepted requirements flag");
+  assert(bool(trace.accepted, "trace accepted") === true, "accepted traceability flag");
   assert(bool(req.acceptanceReady, "requirements readiness") === true, "S21 requirements are acceptance-ready");
   assert(bool(trace.acceptanceReady, "trace readiness") === true, "S21 traceability is acceptance-ready");
-  assert(text(trace.releaseState, "releaseState") === "RELEASE_READY", "S21 releaseState is RELEASE_READY");
+  assert(text(trace.releaseState, "releaseState") === "ACCEPTED", "S22 releaseState is ACCEPTED");
 
   assert(text(trace.requirementsRegistry, "requirementsRegistry") === "requirements/mts-v0.15.json", "traceability points to the candidate requirements registry");
   const current = record(trace.currentAccepted, "currentAccepted");
-  assert(text(current.mtsVersion, "current accepted version") === "v0.14", "v0.14 remains accepted/current");
-  assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.14.json", "accepted requirements pointer");
+  assert(text(current.mtsVersion, "current accepted version") === "v0.15", "v0.15 is accepted/current");
+  assert(text(current.requirements, "current accepted requirements") === "requirements/mts-v0.15.json", "accepted requirements pointer");
   assert(text(accepted14.status, "v0.14 status") === "accepted", "accepted v0.14 registry remains accepted");
 
   const list = req.requirements;
@@ -142,7 +142,7 @@ function validateCandidate(req: Json, trace: Json): void {
     const id = text(item.id, "id");
     const state = text(item.state, id + " state") as State;
     assert(allowedStates.has(state), id + " allowed state");
-    assert(state !== "ACCEPTED", id + " cannot be ACCEPTED before Author decision");
+    if (state === "ACCEPTED") assert(id === "V15-READY-03", id + " only final Author gate becomes ACCEPTED");
     if (state === "RELEASE_READY") {
       assert(id === "V15-READY-01" || id === "V15-READY-02", id + " only readiness gates may be RELEASE_READY");
     }
@@ -379,7 +379,7 @@ validateCandidate(requirements, traceability);
   const ready2 = byId.get("V15-READY-02");
   const ready3 = byId.get("V15-READY-03");
   assert(ready2 !== undefined && text(ready2.state, "V15-READY-02 state") === "RELEASE_READY", "S21 independent readiness gate is RELEASE_READY");
-  assert(ready3 !== undefined && text(ready3.state, "V15-READY-03 state") === "OPEN", "Author decision remains the only OPEN readiness gate");
+  assert(ready3 !== undefined && text(ready3.state, "V15-READY-03 state") === "ACCEPTED", "Author decision gate is ACCEPTED");
   assert(bool(requirements.acceptanceReady, "S21 requirements acceptanceReady") === true, "S21 acceptanceReady true");
   assert(existsSync(join(repoRoot, "formal/v0.15/evidence/final-readiness-r3.json")), "S21 final readiness evidence exists");
 
@@ -496,8 +496,8 @@ validateCandidate(requirements, traceability);
 
   const kernel = json(join(repoRoot, "profiles/mts-v015-meta-interpreter-kernel.json"));
   const semanticAuthority = record(kernel.semanticAuthority, "kernel semanticAuthority");
-  assert(semanticAuthority.versionAccepted === false, "kernel cannot accept v0.15");
-  assert(semanticAuthority.authorAcceptanceRequired === true, "kernel requires explicit Author acceptance");
+  assert(semanticAuthority.versionAccepted === true, "kernel accepts v0.15 after S22");
+  assert(semanticAuthority.authorAcceptanceRequired === false, "explicit Author acceptance is satisfied");
   const unresolved = kernel.unresolvedExcludedFromKernel;
   assert(Array.isArray(unresolved), "kernel unresolved exclusions");
   const sequence = (unresolved as Json[]).find((item) => item.id === "SEQUENCE_CARRIER_SOURCE_PROVENANCE");
