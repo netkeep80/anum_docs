@@ -1,6 +1,6 @@
 # Метатеория связей (МТС)
-<!-- версия документа МТС; mts-doc-version: v0.14 -->
-> **Версия МТС: v0.14**
+<!-- версия документа МТС; mts-doc-version: v0.15 -->
+> **Версия МТС: v0.15**
 
 ![anum_docs — Метатеория Связей](docs/assets/anum_docs-banner.jpg)
 
@@ -104,11 +104,11 @@ K ⟼ {B}
 `A-memory` `execution` `profile` управляется отдельно от 14-`law` `contract` МТС и не превращает `backend` `scheduling`/`storage` в семантику.
 
 <!-- мтс-текущая-проекция:начало -->
-> **Текущий принятый выпуск МТС: v0.14.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
+> **Текущий принятый выпуск МТС: v0.15.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.
 >
-> - Контракт: `mts-contract/v0.14` — [файл контракта](contracts/mts-contract-v0.14.json).
-> - Корпус соответствия: `mts-conformance/v0.14` — [файл корпуса](contracts/mts-conformance-v0.14.json).
-> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.7.json).
+> - Контракт: `mts-contract/v0.15` — [файл контракта](contracts/mts-contract-v0.15.json).
+> - Корпус соответствия: `mts-conformance/v0.15` — [файл корпуса](contracts/mts-conformance-v0.15.json).
+> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.8.json).
 <!-- мтс-текущая-проекция:конец -->
 
 ## Что принято в v0.14
