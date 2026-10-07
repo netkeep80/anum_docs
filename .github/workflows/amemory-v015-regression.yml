@@ -1,5 +1,7 @@
 name: Frozen A-memory v0.15 regression
 
+# Integration scope: MTS v0.15 execution/replay only; Aprover/P1/P2 research remains v0.16 history.
+
 on:
   pull_request:
     branches: ["**"]
