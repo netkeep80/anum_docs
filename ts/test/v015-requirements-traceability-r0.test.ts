@@ -381,6 +381,7 @@ validateCandidate(requirements, traceability);
   }
 }
 
+// S17 integration owner: #2007; version acceptance remains #1876 Author-only.
 // Clean-main S17 convergence guard: every repository path in active trace evidence
 // must exist, obsolete research monoliths must stay absent from authority, and
 // unresolved sequence-carrier/source-provenance remains explicitly unaccepted.
