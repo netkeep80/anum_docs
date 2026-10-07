@@ -17,8 +17,8 @@ assert.equal(baseline.codePoints, CURRENT_DOC_SIZE_BUDGET.baselineCodePoints, "e
 assert.equal(baseline.lines, CURRENT_DOC_SIZE_BUDGET.baselineLines, "exact current line baseline");
 assert.equal(baseline.words, CURRENT_DOC_SIZE_BUDGET.baselineWords, "exact current word baseline");
 assert.equal(CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints, 116951, "D20 +5% hard ceiling is pinned");
-assert.ok(currentDocumentationSizeWithinBudget(baseline), "current compact v0.14 baseline is below hard ceiling");
-assert.ok(baseline.codePoints < 162787, "v0.14 reconstruction remains smaller than the previous reader baseline");
+assert.ok(currentDocumentationSizeWithinBudget(baseline), "current compact v0.15 baseline is below hard ceiling");
+assert.ok(baseline.codePoints < 162787, "v0.15 accepted current surface remains smaller than the previous reader baseline");
 
 assert.ok(!CURRENT_DOC_SIZE_SURFACE.some((path) => path.startsWith("docs/research/")), "protected research is outside anti-bloat budget");
 assert.ok(!CURRENT_DOC_SIZE_SURFACE.includes("PORTFOLIO.md" as never), "portfolio is outside current-reader documentation budget");
