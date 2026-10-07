@@ -214,7 +214,7 @@ for (const key of [
 const context = record(kernel.context, "kernel context");
 assert(text(context.directGaugeBoundary, "context boundary") === "C", "direct-gauge C boundary");
 assert(text(context.rootRelation, "context root relation") === "C = END(R)", "C=END(R)");
-assert(context.versionAcceptance === false, "Context design does not accept v0.15");
+assert(context.versionAcceptance === true, "Context design participates in accepted v0.15");
 assert(context.foundationGlobalPrivilege === false, "C is not Foundation-global privilege");
 assert(context.chiralityCovariantMirrorRequired === true, "chirality covariance required");
 
