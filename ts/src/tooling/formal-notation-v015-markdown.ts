@@ -190,8 +190,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
   );
   const counts = stateCounts(mandatory);
 
-  const acceptedIr = loadMtsSemanticIr(root);
-  const historical = acceptedIr.requirements.find((item) => item.id === "V14-L2");
+  const historicalIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
+  const historical = historicalIr.requirements.find((item) => item.id === "V14-L2");
   if (historical === undefined) fail("historical V14-L2 projection missing");
 
   const stableAnchors = strings(model.stableAnchors, "stableAnchors");
@@ -322,7 +322,7 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "",
     "## 11. Историческая совместимость v0.14",
     "",
-    "Следующие якоря сохраняются для существующих ссылок на принятую документацию v0.14; они не являются текущим источником семантики кандидата v0.15.",
+    "Следующие якоря сохраняются для существующих ссылок на принятую документацию v0.14; они не являются текущим источником семантики принятого выпуска v0.15.",
     "",
     ...stableAnchors.map((anchor) => '<a id="' + anchor + '"></a> <!-- исторический стабильный якорь -->'),
     "",
