@@ -101,9 +101,9 @@ function validateCandidate(req: Json, trace: Json): void {
   assert(text(trace.schema, "traceability schema") === "mts-traceability/v0.3-candidate", "traceability schema");
   assert(bool(req.accepted, "requirements accepted") === false, "candidate requirements cannot be accepted");
   assert(bool(trace.accepted, "trace accepted") === false, "candidate traceability cannot be accepted");
-  assert(bool(req.acceptanceReady, "requirements readiness") === false, "R0 cannot claim release readiness");
-  assert(bool(trace.acceptanceReady, "trace readiness") === false, "R0 trace cannot claim release readiness");
-  assert(text(trace.releaseState, "releaseState") === "OPEN", "R0 releaseState remains OPEN");
+  assert(bool(req.acceptanceReady, "requirements readiness") === true, "S21 requirements are acceptance-ready");
+  assert(bool(trace.acceptanceReady, "trace readiness") === true, "S21 traceability is acceptance-ready");
+  assert(text(trace.releaseState, "releaseState") === "RELEASE_READY", "S21 releaseState is RELEASE_READY");
 
   assert(text(trace.requirementsRegistry, "requirementsRegistry") === "requirements/mts-v0.15.json", "traceability points to the candidate requirements registry");
   const current = record(trace.currentAccepted, "currentAccepted");
@@ -142,7 +142,10 @@ function validateCandidate(req: Json, trace: Json): void {
     const id = text(item.id, "id");
     const state = text(item.state, id + " state") as State;
     assert(allowedStates.has(state), id + " allowed state");
-    assert(state !== "ACCEPTED" && state !== "RELEASE_READY", id + " cannot be accepted/release-ready in R0");
+    assert(state !== "ACCEPTED", id + " cannot be ACCEPTED before Author decision");
+    if (state === "RELEASE_READY") {
+      assert(id === "V15-READY-01" || id === "V15-READY-02", id + " only readiness gates may be RELEASE_READY");
+    }
     const evidence = record(item.evidence, id + " evidence");
     strings(evidence.positiveVectors, id + " positiveVectors");
     strings(evidence.negativeVectors, id + " negativeVectors");
@@ -321,7 +324,7 @@ validateCandidate(requirements, traceability);
       .includes("generated-v015-formal-spec-refresh-pending-s18") === false,
     "S18 docs-pending blocker is removed after generated projection closure",
   );
-  assert(text(ready.state, "V15-READY-01 state") === "OPEN", "readiness remains open after S18");
+  assert(text(ready.state, "V15-READY-01 state") === "RELEASE_READY", "S21 final readiness promotes READY-01");
 
   const traces = record(traceability.requirements, "trace requirements for documentation blocker");
   const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
@@ -372,7 +375,13 @@ validateCandidate(requirements, traceability);
       .includes("v15-gov04-ruleset-bypass-open"),
     "resolved S20 governance blocker cannot remain in readiness negatives",
   );
-  assert(text(ready.state, "V15-READY-01 post-S20 state") === "OPEN", "final readiness remains open until S21");
+  assert(text(ready.state, "V15-READY-01 post-S20 state") === "RELEASE_READY", "S21 final readiness is reached");
+  const ready2 = byId.get("V15-READY-02");
+  const ready3 = byId.get("V15-READY-03");
+  assert(ready2 !== undefined && text(ready2.state, "V15-READY-02 state") === "RELEASE_READY", "S21 independent readiness gate is RELEASE_READY");
+  assert(ready3 !== undefined && text(ready3.state, "V15-READY-03 state") === "OPEN", "Author decision remains the only OPEN readiness gate");
+  assert(bool(requirements.acceptanceReady, "S21 requirements acceptanceReady") === true, "S21 acceptanceReady true");
+  assert(existsSync(join(repoRoot, "formal/v0.15/evidence/final-readiness-r3.json")), "S21 final readiness evidence exists");
 
   const traces = record(traceability.requirements, "trace requirements for governance blocker");
   const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
