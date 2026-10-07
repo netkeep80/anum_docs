@@ -68,7 +68,10 @@
     "authorDecision": "APPROVED_FOR_V015_DESIGN",
     "versionAcceptance": false,
     "freezeResumeWithoutSerializedContextHandle": true,
-    "foreignTheoryIsolation": true
+    "foreignTheoryIsolation": true,
+    "designAcceptanceScope": "V0.15_DESIGN_DECISION_NOT_FULL_VERSION_ACCEPTANCE",
+    "foundationGlobalPrivilege": false,
+    "chiralityCovariantMirrorRequired": true
   },
   "causalLaws": {
     "newTheoryAdmissionVisibleSameReaction": false,
@@ -93,6 +96,10 @@
     "semanticAuthority": false
   },
   "resolvedDecisions": [
+    {
+      "id": "MI-D01",
+      "decision": "AUTHOR_APPROVED_FOR_V015"
+    },
     {
       "id": "MI-D02",
       "decision": "POSITIVE_SEMANTIC_ANET_MEMBERSHIP"
