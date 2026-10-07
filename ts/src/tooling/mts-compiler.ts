@@ -292,15 +292,18 @@ export function loadMtsSemanticIr(
     fail(`unsupported registry schema ${schema}`);
   }
 
-  const contractPath = currentContractPath(root);
+  const source = object(registry.semanticSource, `${registryPath}.semanticSource`);
+  const declaredContractPath = string(source.path, `${registryPath}.semanticSource.path`);
+  const contractPath = registryPath === MTS_REQUIREMENT_REGISTRY_PATH
+    ? currentContractPath(root)
+    : declaredContractPath;
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, `${contractPath}.schema`);
   if (string(registry.contract, `${registryPath}.contract`) !== contractId) {
-    fail(`${registryPath} does not target current contract ${contractId}`);
+    fail(`${registryPath} does not target contract ${contractId}`);
   }
 
-  const source = object(registry.semanticSource, `${registryPath}.semanticSource`);
-  if (string(source.path, `${registryPath}.semanticSource.path`) !== contractPath) {
+  if (declaredContractPath !== contractPath) {
     fail(`semantic source must be current contract ${contractPath}`);
   }
   if (string(source.pointer, `${registryPath}.semanticSource.pointer`) !== "/requiredSemanticLaws") {
