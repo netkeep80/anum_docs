@@ -385,7 +385,7 @@ validateCandidate(requirements, traceability);
 // unresolved sequence-carrier/source-provenance remains explicitly unaccepted.
 {
   const traces = record(traceability.requirements, "trace requirements for S17 clean-main convergence");
-  const repositoryPath = /^(?:\\.github|contracts|cutover|docs|formal|profiles|proofs|requirements|traceability|ts|theorems)\\//u;
+  const repositoryPath = /^(?:\.github|contracts|cutover|docs|formal|profiles|proofs|requirements|traceability|ts|theorems)\//u;
 
   for (const [id, raw] of Object.entries(traces)) {
     const traced = record(raw, id + " trace record");
