@@ -1,3 +1,4 @@
+// Corrective slice A / #2007: active v0.15 proof-evidence referential integrity.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
