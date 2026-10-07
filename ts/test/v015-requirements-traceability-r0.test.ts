@@ -51,7 +51,6 @@ const repoRoot = resolve(process.cwd(), "..");
 const requirements = json(join(repoRoot, "requirements/mts-v0.15.json"));
 const traceability = json(join(repoRoot, "traceability/mts-v0.15.json"));
 const accepted14 = json(join(repoRoot, "requirements/mts-v0.14.json"));
-const glossary = readFileSync(join(repoRoot, "docs/Словарь терминов МТС.md"), "utf8");
 
 const allowedStates = new Set<State>([
   "OPEN",
@@ -201,17 +200,19 @@ validateCandidate(requirements, traceability);
     "V15-TERM-01 names ANet",
   );
   assert(
-    glossary.includes("### Асеть (`ANet`)"),
-    "glossary defines Асеть (ANet)",
-  );
-  assert(
-    glossary.includes("Aset` не является английским термином МТС"),
-    "glossary rejects Aset as English MTS term",
+    text(term.summary, "V15-TERM-01 summary").includes("Aset is not an MTS English term"),
+    "V15-TERM-01 rejects Aset as English MTS term",
   );
   const traces = record(traceability.requirements, "trace requirements");
   assert(
     Object.prototype.hasOwnProperty.call(traces, "V15-TERM-01"),
     "traceability contains V15-TERM-01",
+  );
+  const termTrace = record(traces["V15-TERM-01"], "V15-TERM-01 trace");
+  assert(
+    strings(termTrace.evidenceRefs, "V15-TERM-01 evidenceRefs")
+      .includes("#1976 issuecomment-6026373991"),
+    "ANet terminology is bound to the recorded GitHub authority",
   );
 }
 
