@@ -1,0 +1,73 @@
+{
+  "schema": "mts-v015-proof-evidence/v0.1",
+  "id": "GPR-06",
+  "title": "Finite multi-generation exact-S0 closure cannot realize arbitrary fresh structure-sensitive output",
+  "status": "PROVED_UNDER_EXPLICIT_EXACT_S0_CLOSURE_LAW",
+  "ownerIssue": "#2001",
+  "mtsVersion": "v0.15-candidate",
+  "semanticClaim": [
+    "A finite exact-only S0 machine whose every generation preserves the closure {opaque input identity} union fixed exact support remains inside that closure for any finite number of generations.",
+    "Therefore a required structure-sensitive result that differs from the opaque input and is not pre-authored in fixed exact support is unreachable under that execution boundary.",
+    "This closes the loophole that repeated pure exact-identity reactions could recover generic fresh structural transformation without any structure-sensitive observation/construction capability."
+  ],
+  "explicitPremises": [
+    "Fixed finite exact support contains every pre-authored exact consequence available to the S0 machine.",
+    "The opaque whole current input identity may be preserved.",
+    "Every S0 generation preserves closure: emitted Links are only the opaque input identity or members of fixed exact support.",
+    "No structural START/END reflection or decomposition is available inside S0.",
+    "No fresh structural constructor can emit a Link outside the closure."
+  ],
+  "exclusions": [
+    "This does not prove one particular S1/S2 API or implementation is uniquely necessary.",
+    "This does not require J1 cross-current-member join.",
+    "This does not claim the frozen A-memory implementation satisfies the exact-S0 closure law without separate refinement evidence.",
+    "This does not forbid preserving the opaque whole current Link identity."
+  ],
+  "externalCrossCheck": {
+    "authority": "external-only",
+    "allowedGlobalAxioms": {
+      "lean4": [],
+      "rocq": []
+    },
+    "manifest": "proofs/v015-external-proof-assurance.json",
+    "lean4": {
+      "path": "proofs/lean4/MtsV015GeneralizedReaction.lean",
+      "gitBlob": "a452a9edb02824a0e5f1da4cc0e90c250f7d3383",
+      "symbols": [
+        "MTS.V015.External.GPR_06_finite_exact_closure",
+        "MTS.V015.External.GPR_06_fresh_structural_target_unreachable",
+        "MTS.V015.External.GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ],
+      "result": "SUCCESS"
+    },
+    "rocq": {
+      "path": "proofs/coq/MtsV015GeneralizedReaction.v",
+      "gitBlob": "8a3fefd1b8c06a3159c0f0ccd008b8f96539a719",
+      "symbols": [
+        "GPR_06_finite_exact_closure",
+        "GPR_06_fresh_structural_target_unreachable",
+        "GPR_06_structure_sensitive_function_requires_more_than_exact_S0"
+      ],
+      "result": "SUCCESS"
+    },
+    "exactHead": "68a5104f50291c114f068799d0d3e30fcf910d50",
+    "ciRun": 37450135025,
+    "ciJob": 112224435419
+  },
+  "researchLineage": [
+    "A10 finite exact-support necessity pressure",
+    "M6B exact-only structural opacity",
+    "A9 structural-unary sufficiency candidate"
+  ],
+  "architecturalConsequence": {
+    "pureExactS0SelfHosting": "FALSIFIED_UNDER_EXPLICIT_CLOSURE_LAW",
+    "structureSensitiveCapabilitySomewhereRequired": true,
+    "selectedV015Location": "inside one self-hosted generalized reaction Gamma as structural match/bind plus canonical construction",
+    "j1CrossCurrentJoinRequired": false,
+    "externalSemanticGrounderRequired": false
+  },
+  "theoremProjection": {
+    "currentV014InventoryUnchanged": true,
+    "generatedTheoremCatalogIntegration": "PENDING #1963/#1861"
+  }
+}
