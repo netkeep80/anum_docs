@@ -7,6 +7,7 @@ import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
 import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
 import { loadRepositoryTheoremProjectionModel } from "./theorem-projection-model.js";
+import { FORMAL_NOTATION_V015_TARGET_PATH, renderFormalNotationV015Markdown } from "./formal-notation-v015-markdown.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
 export const PROJECTION_END = "<!-- мтс-текущая-проекция:конец -->";
@@ -460,6 +461,7 @@ export function currentDocumentationSizeWithinBudget(
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
   const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
+  const formalNotationV015 = renderFormalNotationV015Markdown(root);
   const stale = CANONICAL_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return !checkProjectionText(source, projection);
@@ -469,17 +471,23 @@ export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
     readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8") !== theoremCatalog
       ? [THEOREM_CATALOG_PATH]
       : [];
+  const formalNotationV015Stale =
+    !existsSync(resolve(root, FORMAL_NOTATION_V015_TARGET_PATH)) ||
+    readFileSync(resolve(root, FORMAL_NOTATION_V015_TARGET_PATH), "utf8") !== formalNotationV015
+      ? [FORMAL_NOTATION_V015_TARGET_PATH]
+      : [];
   const duplicated = PROJECTION_FORBIDDEN_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     return source.includes(PROJECTION_START) || source.includes(PROJECTION_END);
   });
   const compiledRequirements = compileRequirementDocuments(root, false);
-  return [...new Set([...stale, ...theoremCatalogStale, ...duplicated, ...compiledRequirements])].sort();
+  return [...new Set([...stale, ...theoremCatalogStale, ...formalNotationV015Stale, ...duplicated, ...compiledRequirements])].sort();
 }
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
   const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
+  const formalNotationV015 = renderFormalNotationV015Markdown(root);
   const changed: string[] = [];
   for (const path of CANONICAL_DOCS) {
     const fullPath = resolve(root, path);
@@ -496,6 +504,14 @@ export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   ) {
     writeFileSync(theoremCatalogFullPath, theoremCatalog, "utf8");
     changed.push(THEOREM_CATALOG_PATH);
+  }
+  const formalNotationV015FullPath = resolve(root, FORMAL_NOTATION_V015_TARGET_PATH);
+  if (
+    !existsSync(formalNotationV015FullPath) ||
+    readFileSync(formalNotationV015FullPath, "utf8") !== formalNotationV015
+  ) {
+    writeFileSync(formalNotationV015FullPath, formalNotationV015, "utf8");
+    changed.push(FORMAL_NOTATION_V015_TARGET_PATH);
   }
   for (const path of compileRequirementDocuments(root, true)) {
     if (!changed.includes(path)) changed.push(path);
