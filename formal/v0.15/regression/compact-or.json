@@ -1,0 +1,41 @@
+{
+  "O": "♂∞",
+  "C": "∞♀",
+  "L": "O->C",
+  "U": "C->O",
+  "T": "L",
+  "F": "U",
+  "OR_SEED": "R->U",
+  "OR": "OR_SEED->O",
+  "V0": {},
+  "ArgsFF": [
+    "F",
+    "F"
+  ],
+  "ArgsFT": [
+    "F",
+    "T"
+  ],
+  "ArgsTF": [
+    "T",
+    "F"
+  ],
+  "ArgsTT": [
+    "T",
+    "T"
+  ],
+  "ImageF": [
+    "F"
+  ],
+  "ImageT": [
+    "T"
+  ],
+  "RuleFF": "V0->((OR->ArgsFF)->ImageF)",
+  "RuleFT": "V0->((OR->ArgsFT)->ImageT)",
+  "RuleTF": "V0->((OR->ArgsTF)->ImageT)",
+  "RuleTT": "V0->((OR->ArgsTT)->ImageT)",
+  "Theory->RuleFF": null,
+  "Theory->RuleFT": null,
+  "Theory->RuleTF": null,
+  "Theory->RuleTT": null
+}
