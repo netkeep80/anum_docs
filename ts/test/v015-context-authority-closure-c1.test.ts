@@ -171,12 +171,12 @@ includesAll(dasA2c, [
 
 const kernel = json(root, "profiles/mts-v015-meta-interpreter-kernel.json");
 assert(
-  text(kernel.status, "kernel status") === "PRE_ACCEPTANCE_EXECUTION_AUTHORITY_CANDIDATE",
-  "kernel remains pre-acceptance",
+  text(kernel.status, "kernel status") === "ACCEPTED_EXECUTION_AUTHORITY",
+  "kernel is accepted execution authority",
 );
 const semanticAuthority = record(kernel.semanticAuthority, "kernel semanticAuthority");
-assert(semanticAuthority.versionAccepted === false, "kernel does not accept v0.15");
-assert(semanticAuthority.authorAcceptanceRequired === true, "explicit Author acceptance required");
+assert(semanticAuthority.versionAccepted === true, "kernel accepts v0.15");
+assert(semanticAuthority.authorAcceptanceRequired === false, "explicit Author acceptance satisfied");
 assert(
   strings(semanticAuthority.excludes, "kernel semantic exclusions").includes("unresolved sequence-carrier research"),
   "sequence-carrier research excluded from kernel authority",
