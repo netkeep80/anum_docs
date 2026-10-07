@@ -45,6 +45,48 @@ function main(): void {
   assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
   assert.equal(first.formalCandidateVersion, "v0.15-candidate");
   assert.equal(first.theorems.length, 21);
+  assert.equal(first.candidateProofs.length, 17);
+  assert.deepEqual(
+    first.candidateProofs.map((proof) => proof.id),
+    [
+      "GPR-01", "GPR-02", "GPR-03", "GPR-04", "GPR-05", "GPR-06",
+      "GPR-07", "GPR-08", "GPR-09",
+      "FRM-01", "FRM-02", "FRM-03", "FRM-04", "FRM-05", "FRM-06",
+      "FRM-07", "FRM-08",
+    ],
+    "candidate proof ordering follows assurance manifests without mutating v0.14",
+  );
+  assert(
+    first.candidateProofs.every(
+      (proof) => proof.authority === "external-cross-check-only",
+    ),
+    "candidate proof projection never upgrades external assurance authority",
+  );
+  const gpr09Candidate = first.candidateProofs.find(
+    (proof) => proof.id === "GPR-09",
+  );
+  assert.ok(gpr09Candidate);
+  assert.equal(gpr09Candidate.projectionStatus, "CONDITIONAL");
+  assert.equal(gpr09Candidate.ownerIssue, "#2001");
+  assert.equal(
+    gpr09Candidate.exactHead,
+    "184c00fd9bfd46c86051fe585a8a35ba91567251",
+  );
+  assert.equal(gpr09Candidate.ciRun, 37477112802);
+  assert.equal(
+    gpr09Candidate.evidencePath,
+    "proofs/v015-evidence/gpr09-c-boundary-chirality.json",
+  );
+  const frm07Candidate = first.candidateProofs.find(
+    (proof) => proof.id === "FRM-07",
+  );
+  assert.ok(frm07Candidate);
+  assert.equal(frm07Candidate.projectionStatus, "CONDITIONAL");
+  assert.equal(frm07Candidate.ownerIssue, "#2004");
+  assert.equal(
+    frm07Candidate.evidencePath,
+    "proofs/v015-evidence/formal-refinement-frm07-08.json",
+  );
   const sourceIds = sources.currentIndex.theorems.map((theorem: any) => theorem.id);
   assert.deepEqual(
     first.theorems.map((theorem) => theorem.id),

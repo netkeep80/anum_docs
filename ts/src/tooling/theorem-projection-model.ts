@@ -7,6 +7,10 @@ import {
   THEOREM_CATALOG_INTEGRATION_CONTRACT,
   collectCurrentTheoremEvidenceRecordPaths,
 } from "./theorem-projection-contract.js";
+import {
+  buildV015CandidateProofProjection,
+  type V015CandidateProofProjection,
+} from "./v015-candidate-proof-projection.js";
 export type TheoremProjectionEvidenceLane =
   | "typescript"
   | "lean4"
@@ -126,6 +130,7 @@ export interface TheoremProjectionModel {
   };
   lanes: Record<TheoremProjectionEvidenceLane, TheoremProjectionLaneAuthority>;
   theorems: TheoremProjectionTheorem[];
+  candidateProofs: V015CandidateProofProjection[];
 }
 export interface TheoremProjectionSources {
   currentIndex: any;
@@ -135,6 +140,8 @@ export interface TheoremProjectionSources {
   nativeAssurance: any;
   semanticLawInventory: any;
   evidenceRecords: Record<string, any>;
+  candidateAssurance: Record<string, any>;
+  candidateEvidence: Record<string, any>;
   availablePaths: string[];
 }
 const LANES: readonly TheoremProjectionEvidenceLane[] =
@@ -372,7 +379,12 @@ function collectRepositoryPaths(
   nativeAssurance: any,
   evidenceRecords: Record<string, any>,
 ): string[] {
-  const paths = new Set<string>(THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources);
+  const paths = new Set<string>([
+    ...THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
+    ...THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(
+      (family) => [family.assurancePath, ...family.evidencePaths],
+    ),
+  ]);
   const theorems = Array.isArray(currentIndex.theorems)
     ? currentIndex.theorems
     : fail("current theorem index must contain theorems[]");
@@ -433,6 +445,14 @@ export function loadRepositoryTheoremProjectionSources(
   for (const path of collectCurrentTheoremEvidenceRecordPaths(currentIndex)) {
     evidenceRecords[path] = readJson(root, path);
   }
+  const candidateAssurance: Record<string, any> = {};
+  const candidateEvidence: Record<string, any> = {};
+  for (const family of THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies) {
+    candidateAssurance[family.assurancePath] = readJson(root, family.assurancePath);
+    for (const path of family.evidencePaths) {
+      candidateEvidence[path] = readJson(root, path);
+    }
+  }
   return {
     currentIndex,
     formalOverlay,
@@ -441,6 +461,8 @@ export function loadRepositoryTheoremProjectionSources(
     nativeAssurance,
     semanticLawInventory,
     evidenceRecords,
+    candidateAssurance,
+    candidateEvidence,
     availablePaths: collectRepositoryPaths(
       root,
       currentIndex,
@@ -602,6 +624,10 @@ export function buildTheoremProjectionModel(
   for (const id of nativeTargets.keys()) {
     if (!theoremIdSet.has(id)) fail(`native assurance has non-current theorem ${id}`);
   }
+  const candidateProofs = buildV015CandidateProofProjection(
+    sources.candidateAssurance,
+    sources.candidateEvidence,
+  );
   const theorems = theoremSources.map((source): TheoremProjectionTheorem => {
     const id = text(source.id, "theorem.id");
     const lawRefs = strings(source.lawRefs, `${id}.lawRefs`);
@@ -829,6 +855,7 @@ export function buildTheoremProjectionModel(
     }),
     lanes: authorities,
     theorems: Object.freeze(theorems) as TheoremProjectionTheorem[],
+    candidateProofs,
   });
 }
 export function loadRepositoryTheoremProjectionModel(

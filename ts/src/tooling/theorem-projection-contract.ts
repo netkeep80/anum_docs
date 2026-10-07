@@ -13,6 +13,31 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
     "proofs/native-proof-assurance.json",
     "contracts/mts-contract-v0.14.json",
   ]),
+  candidateProofFamilies: Object.freeze([
+    Object.freeze({
+      id: "GPR" as const,
+      assurancePath: "proofs/v015-external-proof-assurance.json",
+      evidencePaths: Object.freeze([
+        "proofs/v015-evidence/gpr01-single-state-transformer.json",
+        "proofs/v015-evidence/gpr02-canonical-anet-convergence.json",
+        "proofs/v015-evidence/gpr03-generation-isolation.json",
+        "proofs/v015-evidence/gpr04-partition-schedule-refinement.json",
+        "proofs/v015-evidence/gpr05-finite-completion-boundary.json",
+        "proofs/v015-evidence/gpr06-exact-s0-opacity.json",
+        "proofs/v015-evidence/gpr07-zero-role-refinement.json",
+        "proofs/v015-evidence/gpr08-j0-boundary.json",
+        "proofs/v015-evidence/gpr09-c-boundary-chirality.json",
+      ]),
+    }),
+    Object.freeze({
+      id: "FRM" as const,
+      assurancePath: "proofs/v015-formal-proof-assurance.json",
+      evidencePaths: Object.freeze([
+        "proofs/v015-evidence/formal-bootstrap-frm01-06.json",
+        "proofs/v015-evidence/formal-refinement-frm07-08.json",
+      ]),
+    }),
+  ]),
   evidenceSelection: "current-index-referenced-proofs/evidence-json" as const,
   targetPath: "docs/theory/Теоремы МТС.md",
   targetOwnership: "generated" as const,
@@ -145,6 +170,9 @@ export function buildTheoremCatalogProjectionDeclaration(
 ): TheoremCatalogProjectionDeclaration {
   const paths = [
     ...THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
+    ...THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(
+      (family) => [family.assurancePath, ...family.evidencePaths],
+    ),
     ...collectCurrentTheoremEvidenceRecordPaths(current),
   ].sort();
 
