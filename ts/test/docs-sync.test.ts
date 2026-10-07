@@ -21,6 +21,7 @@ import {
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import { loadRepositoryTheoremProjectionSources } from "../src/tooling/theorem-projection-model.js";
 import { FORMAL_NOTATION_V015_SOURCE_PATHS } from "../src/tooling/formal-notation-v015-markdown.js";
+// S18 fixture must carry every generated FORMAL authority input.
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
   assert.throws(action, pattern);
