@@ -2,6 +2,7 @@
 // owner: #1980
 //
 // Integration provenance: semantic AND falsifier gate copied from GREEN #1989 checkpoint; canonical artifacts are the Author-approved regression files already in main.
+// Approval boundary: this gate validates the pinned approved compact AND artifacts; changed/new JSON requires explicit Author confirmation.
 //
 // Author-approved exact Boolean AND regression artifact. This test binds
 // execution semantics to the immutable regression FORMAL/JSON digests.
