@@ -246,13 +246,12 @@ assert.ok(surface.includes("docs/research/Исходные мысли МТС.md"
 assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"));
 
 const ir = loadMtsSemanticIr(root);
-assert.equal(ir.schema, "mts-requirement-registry/v0.2");
-assert.equal(ir.contract, "mts-contract/v0.14");
+assert.equal(ir.schema, "mts-requirement-registry/v0.3");
+assert.equal(ir.contract, "mts-contract/v0.15");
 assert.equal(ir.projectionState, "MATERIALIZED");
-assert.deepEqual(ir.requirements.map((x) => x.id), [
-  "V14-L1", "V14-L2", "V14-L3", "V14-L4", "V14-L5", "V14-L6", "V14-L7",
-  "V14-L8", "V14-L9", "V14-L10", "V14-L11", "V14-L12", "V14-L13", "V14-L14",
-]);
+assert.equal(ir.requirements.length, 48, "accepted v0.15 requirement count");
+assert.ok(ir.requirements.some((x) => x.id === "V15-AUTH-01"));
+assert.ok(ir.requirements.some((x) => x.id === "V15-READY-03"));
 assert.ok(ir.requirements.every((x) => x.status === "accepted"));
 assert.deepEqual(ir.repositoryRequirements.map((x) => x.id), [
   "README-AUTHORS",
