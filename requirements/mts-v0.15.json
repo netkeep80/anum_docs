@@ -10,6 +10,7 @@
   "approvedJsonRegressionOwner": 1978,
   "currentAccepted": {"mtsVersion":"v0.15","requirements":"requirements/mts-v0.15.json","traceability":"traceability/mts-v0.15.json","contract":"contracts/mts-contract-v0.15.json","conformance":"contracts/mts-conformance-v0.15.json"},
   "contract": "contracts/mts-contract-v0.15.json",
+  "traceability": "traceability/mts-v0.15.json",
   "conformance": "contracts/mts-conformance-v0.15.json",
   "acceptance": "cutover/typescript-c1-acceptance-v0.8.json",
   "stateVocabulary": ["OPEN","EXPERIMENT_GREEN","COMPONENT_GREEN","AUTHOR_REVIEW_PENDING","VERTICAL_GREEN","RELEASE_READY","ACCEPTED","REJECTED"],
