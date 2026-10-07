@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 // This gate validates only pre-acceptance execution-kernel authority; final MTS v0.15 acceptance remains an explicit Author decision.
+// repo-guard boundary: this executable gate and the compact profile form one atomic clean-main kernel slice.
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error("v0.15 meta-interpreter kernel: " + message);
 }
