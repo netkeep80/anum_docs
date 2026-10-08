@@ -529,6 +529,27 @@ export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   return changed.sort();
 }
 
+/**
+ * Guard the current release policy against reverting to a pre-acceptance
+ * release label. This is a deliberately narrow D1 gate; full FORMAL formula
+ * conformance and v0.15 normative projection coverage are tracked by #1951.
+ */
+export function checkCurrentReleasePolicy(root: string): readonly string[] {
+  const path = "docs/CONTRIBUTING.md";
+  const source = readFileSync(resolve(root, path), "utf8");
+  const issues: string[] = [];
+  if (!source.includes("mts-doc-version: v0.15")) {
+    issues.push(path + ": missing current v0.15 marker");
+  }
+  if (!source.includes("## 6. Текущая документация описывает принятую МТС v0.15")) {
+    issues.push(path + ": current-documentation authority not v0.15");
+  }
+  if (/v0\\.14/.test(source)) {
+    issues.push(path + ": v0.14 found in current contribution policy");
+  }
+  return issues;
+}
+
 function main(): void {
   const root = findRepositoryRoot();
   const mode = process.argv[2] ?? "--check";
@@ -538,6 +559,8 @@ function main(): void {
     return;
   }
   if (mode !== "--check") fail(`unknown mode ${mode}; expected --check or --write`);
+  const policyIssues = checkCurrentReleasePolicy(root);
+  if (policyIssues.length) fail(`current release policy mismatch: ${policyIssues.join("; ")}`);
   const stale = checkRepositoryDocs(root);
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
