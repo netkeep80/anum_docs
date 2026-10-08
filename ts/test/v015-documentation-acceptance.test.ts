@@ -23,7 +23,7 @@ assert.equal(report.prose.observations, 21, "broader prose-lexical observations 
 assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
-assert.equal(report.lexical.unreviewed, 466, "reviewed non-FORMAL rows leave the remaining wide-scan lexemes pending");
+assert.equal(report.lexical.unreviewed, 456, "reviewed non-FORMAL rows leave the remaining wide-scan lexemes pending");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
