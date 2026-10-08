@@ -20,7 +20,7 @@ assert.equal(report.theorems.formal + report.theorems.missing.length, report.the
 assert.equal(report.formulas.total, 202);
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
-assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
+assert.equal(report.prose.unreviewed, 7, "exact-source crosswalk leaves only source-like/mixed prose observations pending");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
 assert.equal(report.lexical.unreviewed, 48, "lexical triage stops at the expression-bearing/mixed/FORMAL evidence boundary");
