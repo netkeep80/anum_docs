@@ -27,6 +27,39 @@ function read(root: string, path: string): Obj {
   return record(JSON.parse(readFileSync(resolve(root, path), "utf8")) as unknown, path);
 }
 
+export const FORMAL_V015_ROLES = new Set([
+  "FORMAL_V015_THEOREM_STATEMENT",
+  "FORMAL_V015_NOTATION_SPECIMEN",
+  "FORMAL_V015_SEMANTIC_METAMODEL",
+] as const);
+export const NON_FORMAL_V015_ROLES = new Set([
+  "NON_FORMAL_FOUNDATION_EXPLANATORY_DIAGRAM",
+  "NON_FORMAL_METALINGUISTIC_OPERATOR_MENTION",
+  "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+  "NON_FORMAL_GOVERNANCE_VOCABULARY",
+  "NON_FORMAL_PROCESS_DIAGRAM",
+  "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+  "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+  "NON_FORMAL_HISTORICAL_PSEUDOCODE_MENTION",
+  "NON_FORMAL_STRUCTURAL_GLYPH_LEGEND",
+  "NON_FORMAL_HISTORICAL_EVIDENCE_FLAG",
+  "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+  "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+  "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+  "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+  "NON_FORMAL_RELEASE_STATUS",
+  "NON_FORMAL_REPRESENTATION_META_NOTATION",
+  "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+  "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+  "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+] as const);
+export function isV015FormalRole(role: string): boolean {
+  return (FORMAL_V015_ROLES as ReadonlySet<string>).has(role);
+}
+export function isV015NonFormalRole(role: string): boolean {
+  return (NON_FORMAL_V015_ROLES as ReadonlySet<string>).has(role);
+}
+
 export interface V015DocumentationAcceptanceReport {
   readonly schema: "mts-v015-current-documentation-acceptance/v0.1";
   readonly acceptedRelease: boolean;
@@ -213,11 +246,14 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   }
   const pending = candidates.filter((item) =>
     field(item, "role") === "UNCLASSIFIED" || field(item, "denotation") === "NOT_VERIFIED");
-  const reviewedNonFormal = candidates.filter((item) => field(item, "role").startsWith("NON_FORMAL_") &&
-    field(item, "denotation").startsWith("NOT_APPLICABLE_") &&
+  const reviewedNonFormal = candidates.filter((item) => isV015NonFormalRole(field(item, "role")) &&
+    field(item, "denotation") === "NOT_APPLICABLE_FORMAL_SOURCE" &&
+    typeof item.reviewBasis === "string" && item.reviewBasis.length > 0 ||
+    isV015NonFormalRole(field(item, "role")) &&
+    field(item, "denotation") === "NOT_APPLICABLE_PROCESS_DOCUMENTATION" &&
     typeof item.reviewBasis === "string" && item.reviewBasis.length > 0);
   const verified = candidates.filter((item) =>
-    field(item, "role").startsWith("FORMAL_V015_") &&
+    isV015FormalRole(field(item, "role")) &&
     item.denotation === "VERIFIED_AGAINST_ACCEPTED_V015");
   const other = candidates.length - pending.length - reviewedNonFormal.length - verified.length;
   // Cross-check current FORMAL classification against independently stored
@@ -246,7 +282,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
          ["docs/specs/Пучки связей.md",
           "docs/specs/Апамять и управление сетью связей.md",
           "docs/theory/Основания МТС.md"].includes(path))) {
-      if (!field(candidate, "role").startsWith("FORMAL_V015_")) {
+      if (!isV015FormalRole(field(candidate, "role"))) {
         sourceClassificationIssues.push("current FORMAL example improperly exempted: " + path);
       }
     }
