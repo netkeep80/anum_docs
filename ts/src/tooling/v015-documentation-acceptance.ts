@@ -95,6 +95,43 @@ export function inspectV015SecondaryLedgerRow(
     candidate.path === entry.path &&
     typeof candidate.startLine === "number" && typeof candidate.endLine === "number" &&
     candidate.startLine <= (entry.line as number) && candidate.endLine >= (entry.line as number));
+  if (role === "MIXED_FORMAL_NON_FORMAL_SPANS") {
+    const formalIds = Array.isArray(entry.primaryFormalCandidateIds)
+      ? entry.primaryFormalCandidateIds : [];
+    const nonFormalIds = Array.isArray(entry.primaryNonFormalCandidateIds)
+      ? entry.primaryNonFormalCandidateIds : [];
+    const review = entry.reviewBasis;
+    const reference = entry.reviewReference;
+    if (status !== "REVIEWED_MIXED_WITH_VERIFIED_FORMAL" ||
+        formalIds.length === 0 || nonFormalIds.length === 0 ||
+        formalIds.some((id) => typeof id !== "string") ||
+        nonFormalIds.some((id) => typeof id !== "string") ||
+        new Set(formalIds).size !== formalIds.length ||
+        new Set(nonFormalIds).size !== nonFormalIds.length ||
+        formalIds.some((id) => nonFormalIds.includes(id)) ||
+        typeof review !== "string" || review.trim().length < 40 ||
+        typeof reference !== "string" ||
+        !/^https:\/\/github\.com\/netkeep80\/anum_docs\/(?:issues|pull)\/\d+#issuecomment-\d+$/.test(reference) ||
+        entry.reviewSourceSha256 !== sourceHash) {
+      return { pending: true, defect: label + ": mixed span review lacks exact source-bound FORMAL/NON_FORMAL evidence" };
+    }
+    const overlappingFormal = overlapping.filter((candidate) =>
+      isV015FormalRole(String(candidate.role)));
+    const overlappingNonFormal = overlapping.filter((candidate) =>
+      isV015NonFormalRole(String(candidate.role)));
+    const formalCoverage = overlappingFormal.length === formalIds.length &&
+      overlappingFormal.every((candidate) =>
+        formalIds.includes(String(candidate.id)) && verifiedPrimary.includes(candidate));
+    const nonFormalCoverage = overlappingNonFormal.length === nonFormalIds.length &&
+      overlappingNonFormal.every((candidate) =>
+        nonFormalIds.includes(String(candidate.id)) &&
+        candidate.denotation === "NOT_APPLICABLE_FORMAL_SOURCE");
+    if (!formalCoverage || !nonFormalCoverage ||
+        overlapping.length !== overlappingFormal.length + overlappingNonFormal.length) {
+      return { pending: true, defect: label + ": mixed span review does not exactly cover verified FORMAL and reviewed NON_FORMAL primaries" };
+    }
+    return { pending: false };
+  }
   if (isV015NonFormalRole(role)) {
     const review = entry.reviewBasis;
     const reference = entry.reviewReference;

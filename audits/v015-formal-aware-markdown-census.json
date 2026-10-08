@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 9,
+    "unreviewed": 7,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -1638,9 +1638,18 @@
         "EXACT_SEQUENCE",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "MIXED_FORMAL_NON_FORMAL_SPANS",
+      "verification": "REVIEWED_MIXED_WITH_VERIFIED_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryFormalCandidateIds": [
+        "F0152"
+      ],
+      "primaryNonFormalCandidateIds": [
+        "F0151"
+      ],
+      "reviewBasis": "The line intentionally contrasts current verified A:{} FORMAL notation with historical admitted A -> [] profile pseudocode; both spans are independently indexed.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068491714",
+      "reviewSourceSha256": "e3d58d7acc84e8b982dd9dbd192897aac6f4f0024c075ada45b99485535b5f43"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -5502,9 +5511,18 @@
         "CONTEXT_NAME_OR_BINDING",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "MIXED_FORMAL_NON_FORMAL_SPANS",
+      "verification": "REVIEWED_MIXED_WITH_VERIFIED_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryFormalCandidateIds": [
+        "F0036"
+      ],
+      "primaryNonFormalCandidateIds": [
+        "F0037"
+      ],
+      "reviewBasis": "The line intentionally contrasts current verified A:{} FORMAL notation with historical A -> {} zero-result pseudocode; both spans are independently indexed.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068491714",
+      "reviewSourceSha256": "53be11e997d32ad099fe5bc5a0801445cd5ed1519ae836135f61b5204adc0504"
     },
     {
       "path": "docs/theory/Основания МТС.md",

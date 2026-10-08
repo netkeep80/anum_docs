@@ -25,7 +25,7 @@ assert.equal(report.prose.observations, 21, "broader prose-lexical observations 
 assert.equal(report.prose.unreviewed, 0, "all 21 prose observations are now source-bound reviewed or verified");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
-assert.equal(report.lexical.unreviewed, 9, "only seven theorem FORMAL rows plus two mixed current/historical rows remain pending");
+assert.equal(report.lexical.unreviewed, 7, "only the seven unresolved theorem FORMAL rows remain pending");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
@@ -229,6 +229,46 @@ assert.equal(inspectV015SecondaryLedgerRow(
   [primaryWitness, secondPrimaryWitness, historicalPrimaryWitness],
   [primaryWitness, secondPrimaryWitness],
 ).pending, true, "mixed FORMAL/NON_FORMAL lines require span-level adjudication and cannot be flattened");
+
+const reviewedHistoricalPrimaryWitness = {
+  ...historicalPrimaryWitness,
+  denotation: "NOT_APPLICABLE_FORMAL_SOURCE",
+};
+const mixedReview = {
+  ...lexicalProbe,
+  classification: "MIXED_FORMAL_NON_FORMAL_SPANS",
+  verification: "REVIEWED_MIXED_WITH_VERIFIED_FORMAL",
+  primaryFormalCandidateIds: ["F-PINNED", "F-PINNED-2"],
+  primaryNonFormalCandidateIds: ["NF-PINNED"],
+  reviewBasis: "This exact Markdown line contains separately indexed verified FORMAL spans and historical pseudocode spans.",
+  reviewReference: "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-123456",
+  reviewSourceSha256: secondarySourceHash,
+};
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", mixedReview,
+  [primaryWitness, secondPrimaryWitness, reviewedHistoricalPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, false, "mixed rows pass only with complete verified FORMAL and reviewed historical span coverage");
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", { ...mixedReview, primaryFormalCandidateIds: ["F-PINNED"] },
+  [primaryWitness, secondPrimaryWitness, reviewedHistoricalPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, true, "mixed review cannot omit a FORMAL span");
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", { ...mixedReview, primaryNonFormalCandidateIds: [] },
+  [primaryWitness, secondPrimaryWitness, reviewedHistoricalPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, true, "mixed review cannot omit the historical span set");
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", mixedReview,
+  [primaryWitness, secondPrimaryWitness, reviewedHistoricalPrimaryWitness],
+  [primaryWitness],
+).pending, true, "mixed review cannot reuse an unverified FORMAL span");
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", { ...mixedReview, reviewSourceSha256: "0".repeat(64) },
+  [primaryWitness, secondPrimaryWitness, reviewedHistoricalPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, true, "mixed review is bound to the exact whole source line");
 
 console.log("MTS v0.15 documentation acceptance: release=ACCEPTED normative=48/48 strict=NOT_GREEN " +
   "theoremPending=" + report.theorems.missing.length + " formulaPending=" + report.formulas.pending);
