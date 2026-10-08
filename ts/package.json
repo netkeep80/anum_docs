@@ -39,6 +39,8 @@
     "docs:sync": "npm run build --silent && node dist/src/tooling/docs-sync.js --write",
     "docs:check": "npm run build --silent && node dist/src/tooling/docs-sync.js --check",
     "docs:coverage": "npm run build --silent && node dist/src/tooling/docs-coverage.js",
+    "docs:v015:status": "npm run build --silent && node dist/src/tooling/v015-documentation-acceptance.js --status",
+    "docs:v015:accept": "npm run build --silent && node dist/src/tooling/v015-documentation-acceptance.js --check",
     "check": "npm run check:full",
     "test:current": "npm run build && npm run package:check && node dist/src/tooling/test-runner.js --tier=current",
     "test:full": "npm run build && npm run package:check && node dist/src/tooling/test-runner.js --tier=full",
