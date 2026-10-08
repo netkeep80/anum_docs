@@ -385,6 +385,18 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       }
       // Recompute the receipt through a single reviewed native verifier.
       // Hand-editing this JSON cannot turn a failed semantic check into PASS.
+      const pinnedRunnerSource = resolve(root, "ts/src/tooling/v015-native-evidence-verifier.ts");
+      try {
+        const trustedSource = readFileSync(pinnedRunnerSource, "utf8");
+        const trustedSha = createHash("sha256").update(trustedSource, "utf8").digest("hex");
+        if (trustedSha !== rr.runnerSourceSha256) {
+          evidenceDefects.push(id + ": native verifier source differs from pinned revision");
+          continue;
+        }
+      } catch {
+        evidenceDefects.push(id + ": independently reviewed native verifier source unavailable");
+        continue;
+      }
       const runner = resolve(root, "ts/dist/src/tooling/v015-native-evidence-verifier.js");
       const input = JSON.stringify({
         id, role, source: field(item, "source"), formalSourceSha256: sourceDigest,
