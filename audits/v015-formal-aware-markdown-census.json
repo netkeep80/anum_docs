@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 41,
+    "unreviewed": 33,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -1383,9 +1383,12 @@
         "EXACT_SEQUENCE",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This prose explicitly marks the arrow snippets as historical execution-profile notation and refers current Γ semantics to the accepted v0.15 specification.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "0cd2ff65fbed5891fad7802e0861045ebd9660fe68d938cb98c0cbb2f92aa46a"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -4702,9 +4705,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generated V15-NAME-01 requirement-summary prose; :A/R:A are explanatory mentions, while normative authority remains the accepted requirement model.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "ab11b25a19ea8cdf8560ffeff1051cff92ed1f78cc52996a3ea6331763bfd78e"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4730,9 +4736,12 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generated V15-AND-04 requirement-summary prose; Theory->Rule is explanatory vocabulary, not parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "b4a07200e5ada9a0dcdcf11e34e4027afb2cc7d34c8004651f5c6e99e1f6801f"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4758,9 +4767,12 @@
         "LINK_IDENTITY_OR_META_EQUALITY",
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generated V15-JSON-04 requirement-summary prose; []=R is compact explanatory metanotation, not a standalone FORMAL source occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "050ba78f4a7bf22dcb702bc5774be16f17d05f810b9762d75d3018790b1b0f94"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -5335,9 +5347,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Reader table label for the ZERO semantic case; ExactSequence([]) is explanatory notation, not a FORMAL program.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "0ddfc89eefc62c001d3d726629d257f0cc9d7406ad5ab78a3b42ca2c0d1ca0f9"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5599,9 +5614,12 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Post-acceptance provenance for the historical 1→0 case and evidence flags; not current FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "168f0fea17dd1dea799c40cd7d59f7a12684e09c476c78162ea9129159889227"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5753,9 +5771,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Natural-language explanation of why historical positive-pair notation does not encode the 1→0 cardinality case.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "4881debc8f5c76bf0287472da8246a0e951030d8cf63bf389e9ca736662b3837"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -7969,9 +7990,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Glossary natural-language definition of Theory admission/availability; the arrow glyph is relational explanation, not standalone FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "bd40a2eb42283df6a94e28d314848aab61f7aea112c3217322be1c6f2a17b126"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
