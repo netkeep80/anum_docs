@@ -397,7 +397,17 @@
       "source": "R : R->R\nO : O->R\nC : R->C\nL : O->C\nU : C->O",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Canonical root-basis bindings also used in v015-formal-identity-equality-b10 native compiler test; full context/domain denotation audit remains pending."
+      "reviewBasis": "Canonical root-basis bindings also used in v015-formal-identity-equality-b10 native compiler test; full context/domain denotation audit remains pending.",
+      "nativeEvidence": {
+        "kind": "NATIVE_FORMAL_ROOT_BASIS_WIRE",
+        "testPath": "ts/test/v015-formal-identity-equality-b10.test.ts",
+        "testBlobSha": "8b881691f5c914cbd7aa26bbe30bf5ad425659df",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Documented R/O/C/L/U source included in existing native FORMAL compile; all five 8/9/6/1 recursive wires checked.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0029",
@@ -488,7 +498,17 @@
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Explicit named empty-bundle source form accepted in current FORMAL; parser/denotation witness for this occurrence not yet attached."
+      "reviewBasis": "Explicit named empty-bundle source form accepted in current FORMAL; parser/denotation witness for this occurrence not yet attached.",
+      "nativeEvidence": {
+        "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
+        "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
+        "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0037",
@@ -1855,7 +1875,17 @@
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Current FORMAL explicitly defines A:{} as empty named bundle, not deletion; source occurrence not independently compiled."
+      "reviewBasis": "Current FORMAL explicitly defines A:{} as empty named bundle, not deletion; source occurrence not independently compiled.",
+      "nativeEvidence": {
+        "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
+        "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
+        "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0153",
@@ -2183,7 +2213,17 @@
       "source": "{ A }",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "nativeEvidence": {
+        "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
+        "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
+        "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0181",
@@ -2194,7 +2234,17 @@
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "nativeEvidence": {
+        "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
+        "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
+        "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0182",
@@ -2229,7 +2279,17 @@
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
       "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "nativeEvidence": {
+        "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
+        "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
+        "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
+        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
+        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
+        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+      }
     },
     {
       "id": "F0185",
