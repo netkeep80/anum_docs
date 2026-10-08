@@ -497,17 +497,55 @@
       "kind": "inline-code",
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Explicit named empty-bundle source form accepted in current FORMAL; parser/denotation witness for this occurrence not yet attached.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact B20 occurrence verified by bounded native FORMAL/JSON source-ANet parity and semantic Link-denotation receipt; scope excludes reaction replay and theorem proof.",
       "nativeEvidence": {
         "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
         "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
         "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
         "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37820849894",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
         "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "limitation": "Bounded B20 notation receipt only; no A-memory reaction replay, theorem proof, generic FORMAL support or F0128 block-level verification."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-native-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is a declaration/bundle notation specimen, not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-native-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0036",
+          "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+          "semanticAnetSha256": "c7973bfbb44d4d3cbb21b413e1eeb3ef413daa1a48727d840188fff806c9004a",
+          "runnerSourceSha256": "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720",
+          "evidenceCommit": "89614d94e479d21550de5522e1f5168be0decb48",
+          "ciRun": "37820849894",
+          "ciJob": "113461627151"
+        }
       }
     },
     {
@@ -1874,17 +1912,55 @@
       "kind": "inline-code",
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Current FORMAL explicitly defines A:{} as empty named bundle, not deletion; source occurrence not independently compiled.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact B20 occurrence verified by bounded native FORMAL/JSON source-ANet parity and semantic Link-denotation receipt; scope excludes reaction replay and theorem proof.",
       "nativeEvidence": {
         "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
         "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
         "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
         "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37820849894",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
         "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "limitation": "Bounded B20 notation receipt only; no A-memory reaction replay, theorem proof, generic FORMAL support or F0128 block-level verification."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-native-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is a declaration/bundle notation specimen, not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-native-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0152",
+          "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+          "semanticAnetSha256": "c7973bfbb44d4d3cbb21b413e1eeb3ef413daa1a48727d840188fff806c9004a",
+          "runnerSourceSha256": "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720",
+          "evidenceCommit": "89614d94e479d21550de5522e1f5168be0decb48",
+          "ciRun": "37820849894",
+          "ciJob": "113461627151"
+        }
       }
     },
     {
@@ -2212,17 +2288,55 @@
       "kind": "inline-code",
       "source": "{ A }",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact B20 occurrence verified by bounded native FORMAL/JSON source-ANet parity and semantic Link-denotation receipt; scope excludes reaction replay and theorem proof.",
       "nativeEvidence": {
         "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
         "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
         "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
         "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37820849894",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
         "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "limitation": "Bounded B20 notation receipt only; no A-memory reaction replay, theorem proof, generic FORMAL support or F0128 block-level verification."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-native-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c72070dee0bb1c1ba234511d101ebb704b11fe525c35c297ae89cfe86033ad70",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is a declaration/bundle notation specimen, not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-native-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0180",
+          "formalSourceSha256": "c72070dee0bb1c1ba234511d101ebb704b11fe525c35c297ae89cfe86033ad70",
+          "semanticAnetSha256": "13faf682c52318ced6ed39472eb1fb3be9b9825c4ad399d5e9bae34c3143e761",
+          "runnerSourceSha256": "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720",
+          "evidenceCommit": "89614d94e479d21550de5522e1f5168be0decb48",
+          "ciRun": "37820849894",
+          "ciJob": "113461627151"
+        }
       }
     },
     {
@@ -2233,17 +2347,55 @@
       "kind": "inline-code",
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact B20 occurrence verified by bounded native FORMAL/JSON source-ANet parity and semantic Link-denotation receipt; scope excludes reaction replay and theorem proof.",
       "nativeEvidence": {
         "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
         "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
         "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
         "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37820849894",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
         "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "limitation": "Bounded B20 notation receipt only; no A-memory reaction replay, theorem proof, generic FORMAL support or F0128 block-level verification."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-native-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is a declaration/bundle notation specimen, not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-native-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0181",
+          "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+          "semanticAnetSha256": "c7973bfbb44d4d3cbb21b413e1eeb3ef413daa1a48727d840188fff806c9004a",
+          "runnerSourceSha256": "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720",
+          "evidenceCommit": "89614d94e479d21550de5522e1f5168be0decb48",
+          "ciRun": "37820849894",
+          "ciJob": "113461627151"
+        }
       }
     },
     {
@@ -2278,17 +2430,55 @@
       "kind": "inline-code",
       "source": "A:{}",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact B20 occurrence verified by bounded native FORMAL/JSON source-ANet parity and semantic Link-denotation receipt; scope excludes reaction replay and theorem proof.",
       "nativeEvidence": {
         "kind": "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION",
         "testPath": "ts/test/v015-direct-formal-source-b20.test.ts",
         "testBlobSha": "8ec47db43f71f246cfe51ea1878202ad68fd0a1c",
         "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37820849894",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
         "scope": "Current A:{} / { A } declaration roles are compiled within { A : {} } / { A } rooted FORMAL and canonical JSON parity; empty-bundle denotation has zero semantic members.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "limitation": "Bounded B20 notation receipt only; no A-memory reaction replay, theorem proof, generic FORMAL support or F0128 block-level verification."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-native-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is a declaration/bundle notation specimen, not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-native-evidence-verifier.test.ts",
+          "gitBlobSha": "59ebaa3313e4e1619199de39a6332e26b77fdb73",
+          "testCase": "B20_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-native-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0184",
+          "formalSourceSha256": "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9",
+          "semanticAnetSha256": "c7973bfbb44d4d3cbb21b413e1eeb3ef413daa1a48727d840188fff806c9004a",
+          "runnerSourceSha256": "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720",
+          "evidenceCommit": "89614d94e479d21550de5522e1f5168be0decb48",
+          "ciRun": "37820849894",
+          "ciJob": "113461627151"
+        }
       }
     },
     {
