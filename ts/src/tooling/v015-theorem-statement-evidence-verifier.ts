@@ -34,104 +34,48 @@ interface CaseSpec {
   readonly formalArtifactKind: string;
   readonly outputMarkers: readonly string[];
 }
+interface CaseRecord extends CaseSpec {
+  readonly id: string;
+}
+export interface V015TheoremStatementEvidenceCase {
+  readonly id: string;
+  readonly source: string;
+}
+const CASE_MANIFEST_PATH = "audits/v015-theorem-statement-evidence-cases.json";
 
-const CASES: Readonly<Record<string, CaseSpec>> = Object.freeze({
-  "F0063": {
-    "theoremId": "FND-01",
-    "source": "FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION",
-    "formalSourcePath": "ts/test/v015-fnd01-formal-statement-b18.test.ts",
-    "testBlobSha": "c8c4057c2016c09b8537cdf1ac752280ce6a184a",
-    "proofClosure": "NO_PROOF_ARTIFACT",
-    "formalArtifactKind": "STATEMENT_ONLY",
-    "outputMarkers": [
-      "MTS v0.15 B18 FND-01 FORMAL statement:",
-      "JSON_J1=EXACT",
-      "NATIVE_PROOF=NOT_CLAIMED",
-      "APROVER_ACCEPT=NOT_CLAIMED"
-    ]
-  },
-  "F0067": {
-    "theoremId": "FND-02",
-    "source": "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
-    "formalSourcePath": "ts/test/v015-formal-bound-link-role-b12.test.ts",
-    "testBlobSha": "31d89067ce1508bb2786f4453e7b33964be7a187",
-    "proofClosure": "N_A_FOR_KERNEL_REALIZATION",
-    "formalArtifactKind": "KERNEL_REALIZATION",
-    "outputMarkers": [
-      "FND02_BOUNDARY=A1_FORALL_LINK_FULLSELF_IMPLIES_ROOT",
-      "KERNEL_CLASSIFICATION=KERNEL_REALIZED_NOT_INDEPENDENT",
-      "UNIVERSAL_PROOF=NOT_CLAIMED"
-    ]
-  },
-  "F0071": {
-    "theoremId": "FND-13",
-    "source": "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
-    "formalSourcePath": "ts/test/v015-formal-bound-link-role-b12.test.ts",
-    "testBlobSha": "31d89067ce1508bb2786f4453e7b33964be7a187",
-    "proofClosure": "N_A_FOR_KERNEL_REALIZATION",
-    "formalArtifactKind": "KERNEL_REALIZATION",
-    "outputMarkers": [
-      "FND13_BOUNDARY=GROUNDED_ORDERED_POLE_IDENTITY",
-      "FND13_KERNEL_CLASSIFICATION=KERNEL_REALIZED_NOT_INDEPENDENT",
-      "FND13_REPLAY_READ_ONLY=GREEN"
-    ]
-  },
-  "F0084": {
-    "theoremId": "FND-07",
-    "source": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
-    "formalSourcePath": "ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts",
-    "testBlobSha": "f826c4d38ab6d7b09502c870efe7ad2f46bf58bb",
-    "proofClosure": "CLOSED",
-    "formalArtifactKind": "CLOSED_PROOF",
-    "outputMarkers": [
-      "TRACKED_FND07_ARTIFACT=BYTE_EXACT",
-      "JSON_J1_PROOF_SOURCE=BYTE_EXACT",
-      "PROOF_AUTHORITY=GENERIC_REPLAY_ONLY"
-    ]
-  },
-  "F0090": {
-    "theoremId": "FND-08",
-    "source": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
-    "formalSourcePath": "ts/test/v015-fnd08-open-formal-b14b1.test.ts",
-    "testBlobSha": "0e5216073c0e05d2cbb4c9666e1b6ab017447825",
-    "proofClosure": "OPEN_CONDITIONAL",
-    "formalArtifactKind": "OPEN_PROOF",
-    "outputMarkers": [
-      "FND08_SELECTED_THEORY_SEMANTICS=EXPLICIT_OPEN_PREMISE",
-      "JSON_J1_OPEN_PROOF=EXACT",
-      "INDEPENDENT_CLOSED_NATIVE_PROOF=NOT_CLAIMED",
-      "APROVER_ACCEPT=NOT_CLAIMED"
-    ]
-  },
-  "F0094": {
-    "theoremId": "FND-09",
-    "source": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
-    "formalSourcePath": "ts/test/v015-fnd09-open-formal-b14b2.test.ts",
-    "testBlobSha": "9a0a6b2abc98b5692e236c5a4955d62f40f18ca2",
-    "proofClosure": "OPEN_CONDITIONAL",
-    "formalArtifactKind": "OPEN_PROOF",
-    "outputMarkers": [
-      "SELECTED_THEORY_REACTION_SEMANTICS=ONLY_OPEN_PREMISE",
-      "JSON_J1_OPEN_PROOF=EXACT",
-      "INDEPENDENT_CLOSED_NATIVE_PROOF=NOT_CLAIMED",
-      "APROVER_ACCEPT=NOT_CLAIMED"
-    ]
-  },
-  "F0116": {
-    "theoremId": "EXE-02",
-    "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
-    "formalSourcePath": "ts/test/v015-exe02-formal-statement-b17.test.ts",
-    "testBlobSha": "3cfc5ea70978814f01ba03f4379cbad7833d7afe",
-    "proofClosure": "NO_PROOF_ARTIFACT",
-    "formalArtifactKind": "STATEMENT_ONLY",
-    "outputMarkers": [
-      "MTS v0.15 B17 EXE-02 FORMAL statement:",
-      "JSON_J1=EXACT",
-      "NATIVE_PROOF=NOT_CLAIMED",
-      "APROVER_ACCEPT=NOT_CLAIMED"
-    ]
-  }
-});
+function scalar(value: unknown, label: string): string {
+  if (typeof value !== "string" || value.length === 0) return fail(label + " must be a non-empty string");
+  return value;
+}
+function caseRecords(): readonly CaseRecord[] {
+  const raw = obj(
+    JSON.parse(readFileSync(resolve(findRepositoryRoot(), CASE_MANIFEST_PATH), "utf8")) as unknown,
+    CASE_MANIFEST_PATH,
+  );
+  assertFact(raw.schema === "mts-v015-theorem-statement-evidence-cases/v0.1",
+    "unexpected theorem statement case-manifest schema");
+  const seen = new Set<string>();
+  const result = arr(raw.cases, "theorem statement case manifest").map((value, index) => {
+    const row = obj(value, "theorem statement case " + index);
+    const id = scalar(row.id, "theorem statement case id");
+    assertFact(!seen.has(id), "duplicate theorem statement occurrence case " + id);
+    seen.add(id);
+    return Object.freeze({
+      id,
+      theoremId: scalar(row.theoremId, id + ".theoremId"),
+      source: scalar(row.source, id + ".source"),
+      formalSourcePath: scalar(row.formalSourcePath, id + ".formalSourcePath"),
+      testBlobSha: scalar(row.testBlobSha, id + ".testBlobSha"),
+      proofClosure: scalar(row.proofClosure, id + ".proofClosure"),
+      formalArtifactKind: scalar(row.formalArtifactKind, id + ".formalArtifactKind"),
+      outputMarkers: Object.freeze(strings(row.outputMarkers, id + ".outputMarkers")),
+    });
+  });
+  return Object.freeze(result);
+}
+export function listV015TheoremStatementEvidenceCases(): readonly V015TheoremStatementEvidenceCase[] {
+  return Object.freeze(caseRecords().map((item) => Object.freeze({ id: item.id, source: item.source })));
+}
 const STAGES = ["grammar", "denotation", "semanticLinks", "theoremMapping"] as const;
 
 function fail(message: string): never {
@@ -162,7 +106,7 @@ function gitBlobSha1(source: string): string {
     .update(source, "utf8").digest("hex");
 }
 function spec(id: string): CaseSpec {
-  const value = CASES[id];
+  const value = caseRecords().find((item) => item.id === id);
   if (value === undefined) return fail("unsupported theorem documentation occurrence " + id);
   return value;
 }

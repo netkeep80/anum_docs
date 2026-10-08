@@ -1019,22 +1019,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1043,7 +1043,7 @@
           "caseId": "F0063",
           "formalSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
           "semanticAnetSha256": "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1107,22 +1107,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1131,7 +1131,7 @@
           "caseId": "F0067",
           "formalSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
           "semanticAnetSha256": "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1195,22 +1195,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1219,7 +1219,7 @@
           "caseId": "F0071",
           "formalSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
           "semanticAnetSha256": "94dd33cc30f2a55bb1f7b187c89990c3f050309f0e1d3069c20d506f04bd8cbf",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1385,22 +1385,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1409,7 +1409,7 @@
           "caseId": "F0084",
           "formalSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
           "semanticAnetSha256": "4e367ad2c0657f4374721225ce0aeb82939f6021da76236740a27f29d39c759e",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1495,22 +1495,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1519,7 +1519,7 @@
           "caseId": "F0090",
           "formalSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
           "semanticAnetSha256": "fb610912423b26659fd29795d5bb9311f040755a3f89bd590ae4aa2e4fc3cf29",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1581,22 +1581,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1605,7 +1605,7 @@
           "caseId": "F0094",
           "formalSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
           "semanticAnetSha256": "5ae0ddc9fb7c387afd9c68382a83c67ba1d379bcd129d7295c2fdebc8d7ef359",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"
@@ -1873,22 +1873,22 @@
         "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
         "grammar": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_GRAMMAR"
         },
         "denotation": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_DENOTATION"
         },
         "semanticLinks": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
         },
         "theoremMapping": {
           "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "4e024d487f681dccf5107a46ba119e25ff1d3293",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
           "testCase": "THEOREM_STAGE_MAPPING"
         },
         "machineReceipt": {
@@ -1897,7 +1897,7 @@
           "caseId": "F0116",
           "formalSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
           "semanticAnetSha256": "d6d9114f7acab454b2f607ee419623b4acf3ab98c9da16b46c1593af1d15566a",
-          "runnerSourceSha256": "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
           "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
           "ciRun": "37840620817",
           "ciJob": "113528751647"

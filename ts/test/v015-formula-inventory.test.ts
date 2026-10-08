@@ -206,7 +206,7 @@ for (const entry of actualFormalStatements) {
   })) {
     const stageEvidence = semantic![stage] as { path: string; gitBlobSha: string; testCase: string };
     assert.equal(stageEvidence.path, "ts/test/v015-theorem-statement-evidence-verifier.test.ts");
-    assert.equal(stageEvidence.gitBlobSha, "4e024d487f681dccf5107a46ba119e25ff1d3293");
+    assert.equal(stageEvidence.gitBlobSha, "c59d29a1127c854fed3eb484fa390d50bd350ba5");
     assert.equal(stageEvidence.testCase, marker);
   }
   const receipt = semantic!.machineReceipt as Record<string, string>;
@@ -216,7 +216,7 @@ for (const entry of actualFormalStatements) {
   assert.equal(receipt.formalSourceSha256, expected![1]);
   assert.equal(receipt.semanticAnetSha256, expected![2]);
   assert.equal(receipt.runnerSourceSha256,
-    "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26");
+    "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b");
   assert.equal(receipt.evidenceCommit, "71d272fefc28ed02e1f62594c6e1d0f3a12a3695");
   assert.equal(receipt.ciRun, "37840620817");
   assert.equal(receipt.ciJob, "113528751647");
