@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { findRepositoryRoot } from "./docs-sync.js";
+import { scanV015MarkdownProse } from "./v015-markdown-prose-audit.js";
 
 type Obj = Record<string, unknown>;
 function record(value: unknown, name: string): Obj {
@@ -32,6 +33,7 @@ export interface V015DocumentationAcceptanceReport {
   readonly normative: Readonly<{ expected: number; projected: number }>;
   readonly theorems: Readonly<{ historical: number; formal: number; missing: readonly string[] }>;
   readonly formulas: Readonly<{ total: number; pending: number; reviewedNonFormal: number; verified: number }>;
+  readonly prose: Readonly<{ files: number; observations: number; unreviewed: number }>;
   readonly blockers: readonly string[];
   readonly ready: boolean;
 }
@@ -45,6 +47,7 @@ export interface V015CompletionSignals {
   readonly verifiedFormalIds: readonly string[];
   readonly invalidOverlayIds: readonly string[];
   readonly pendingCount: number;
+  readonly prosePendingCount: number;
   readonly unexpectedFormulaCount: number;
   readonly evidenceDefects: readonly string[];
   readonly inventoryIntegrityIssues: readonly string[];
@@ -67,6 +70,7 @@ export function evaluateV015DocumentationCompletion(facts: V015CompletionSignals
   const missing = facts.historicalIds.filter((id) => !facts.verifiedFormalIds.includes(id));
   if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
   if (facts.pendingCount > 0) blockers.push("unverified current documentation formula candidates: " + facts.pendingCount);
+  if (facts.prosePendingCount > 0) blockers.push("unreviewed plain Markdown formula candidates: " + facts.prosePendingCount);
   if (facts.unexpectedFormulaCount > 0) blockers.push("unreviewed/unrecognized formula classification: " + facts.unexpectedFormulaCount);
   if (facts.evidenceDefects.length > 0) blockers.push("FORMAL machine evidence incomplete: " + facts.evidenceDefects.join("; "));
   if (facts.inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + facts.inventoryIntegrityIssues.join("; "));
@@ -298,6 +302,30 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       }
     }
   }
+  // Broad second pass covers prose and Markdown tables outside fenced/inline code;
+  // the current-doc universe is discovered from the repository, not a fixed list.
+  const prose = scanV015MarkdownProse(root);
+  const proseManifest = read(root, "audits/v015-markdown-prose-lexical-inventory.json");
+  const indexedProse = list(proseManifest.observations, "prose observations");
+  const proseFiles = list(proseManifest.files, "prose source files");
+  const proseIntegrity: string[] = [...prose.unregistered.map((path) => "unregistered current Markdown file: " + path)];
+  if (proseFiles.length !== prose.files.length || indexedProse.length !== prose.observations.length)
+    proseIntegrity.push("prose Markdown reader scope or observation count drift");
+  for (let i = 0; i < Math.min(proseFiles.length, prose.files.length); i++) {
+    const expected = proseFiles[i]!;
+    const actual = prose.files[i]!;
+    if (expected.path !== actual.path || expected.blobSha !== actual.blobSha ||
+        expected.lineCount !== actual.lineCount) proseIntegrity.push("prose source drift: " + actual.path);
+  }
+  for (let i = 0; i < Math.min(indexedProse.length, prose.observations.length); i++) {
+    const expected = indexedProse[i]!;
+    const actual = prose.observations[i]!;
+    if (expected.path !== actual.path || expected.line !== actual.line || expected.source !== actual.source)
+      proseIntegrity.push("prose occurrence drift: index " + i);
+  }
+  const prosePending = indexedProse.filter((entry) =>
+    entry.classification === "UNREVIEWED" || entry.status === "NOT_VERIFIED");
+  if (proseIntegrity.length > 0) inventoryIntegrityIssues.push(...proseIntegrity);
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
   const blockers = evaluateV015DocumentationCompletion({
     acceptedRelease,
@@ -308,6 +336,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     verifiedFormalIds: formalIds,
     invalidOverlayIds,
     pendingCount: pending.length,
+    prosePendingCount: prosePending.length,
     unexpectedFormulaCount: other,
     evidenceDefects,
     inventoryIntegrityIssues,
@@ -321,6 +350,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     normative: Object.freeze({ expected: normativeExpected, projected: normativeProjected }),
     theorems: Object.freeze({ historical: historical.length, formal: formalIds.length, missing: Object.freeze(missing) }),
     formulas: Object.freeze({ total: candidates.length, pending: pending.length, reviewedNonFormal: reviewedNonFormal.length, verified: verified.length }),
+    prose: Object.freeze({ files: prose.files.length, observations: prose.observations.length, unreviewed: prosePending.length }),
     blockers: Object.freeze(blockers),
     ready: blockers.length === 0,
   });
