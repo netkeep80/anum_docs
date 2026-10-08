@@ -22,10 +22,10 @@ assert.equal(report.formulas.verified, 10, "five B20 + root-basis F0028 + four s
 assert.equal(report.formulas.pending, 7, "only theorem FORMAL statements remain pending machine evidence");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
-assert.equal(report.prose.unreviewed, 2, "only prose rows embedding unresolved semantic-metamodel FORMAL remain pending");
+assert.equal(report.prose.unreviewed, 0, "all 21 prose observations are now source-bound reviewed or verified");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
-assert.equal(report.lexical.unreviewed, 21, "generator-owned metanotation/legend rows are reviewed; genuine FORMAL/mixed rows remain pending");
+assert.equal(report.lexical.unreviewed, 9, "only seven theorem FORMAL rows plus two mixed current/historical rows remain pending");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {

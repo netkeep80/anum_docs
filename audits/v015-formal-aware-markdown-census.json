@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 21,
+    "unreviewed": 9,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -409,9 +409,15 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0005"
+      ],
+      "reviewSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "README.md",
@@ -422,9 +428,15 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0005"
+      ],
+      "reviewSourceSha256": "c136cd5024538518cda9e122028f7d6238dc62807c63632e94ce8cca2694479a",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "README.md",
@@ -435,9 +447,15 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0005"
+      ],
+      "reviewSourceSha256": "870c57c309adf9fe36520060dd3e7797fc5c0171ad4b2f539abe235f8978c9b0",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "README.md",
@@ -4429,9 +4447,15 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4442,9 +4466,15 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "c136cd5024538518cda9e122028f7d6238dc62807c63632e94ce8cca2694479a",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4454,9 +4484,15 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "a29307b171c1cc284d37a6c95b30625a5b0ab81802c95d6e5abb63675cb9dfef",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4467,9 +4503,15 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "870c57c309adf9fe36520060dd3e7797fc5c0171ad4b2f539abe235f8978c9b0",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4479,9 +4521,15 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "6a7e035f796a1a5cd97ce584d86dae451798a6a5374672a5030f9512d291c1a1",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4491,9 +4539,15 @@
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "85be978af07f6d2ba1eaaefb1391f41bb5d12f67d01caf20f71917312962c0c1",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4503,9 +4557,15 @@
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0130"
+      ],
+      "reviewSourceSha256": "82430a7aae67e5046debd93b9f9ce305584e6854f0681e74f89851c56e9e5d11",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -5187,9 +5247,15 @@
         "LINK_IDENTITY_OR_META_EQUALITY",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0031"
+      ],
+      "reviewSourceSha256": "41069d1a03492561dbe57d04dd8b374365a0c36db22357c830e97d56409bf747",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5795,9 +5861,15 @@
         "EXACT_SEQUENCE",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0048"
+      ],
+      "reviewSourceSha256": "595445609c37b25db6e5c342da81d8f184164876f57dd0e91a6f4e58589aaf9d",
+      "reviewBasis": "Exact line/span coverage by independently recomputed verified primary FORMAL receipt(s); no overlapping NON_FORMAL primary occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",

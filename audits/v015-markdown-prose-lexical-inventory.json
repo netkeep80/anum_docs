@@ -63,7 +63,7 @@
   "counts": {
     "files": 11,
     "observations": 21,
-    "unreviewed": 2
+    "unreviewed": 0
   },
   "observations": [
     {
@@ -178,9 +178,15 @@
       "path": "docs/theory/Основания МТС.md",
       "line": 133,
       "source": "Историческая доказательная линия обобщённой реакции сформирована в **v0.13** и сохранена v0.14. **В текущей принятой FORMAL v0.15 исполнение определяется одной структурной реакцией Γ** и правилом `Rule = V -> (Antecedent -> ExactSequence(Image...))`; запись ниже — не самостоятельная грамматика текущей FORMAL.",
-      "classification": "UNREVIEWED",
-      "status": "NOT_VERIFIED",
-      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "status": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "primaryCandidateIds": [
+        "F0031"
+      ],
+      "reviewSourceSha256": "41069d1a03492561dbe57d04dd8b374365a0c36db22357c830e97d56409bf747",
+      "reviewBasis": "Exact prose occurrence is covered by an independently verified semantic-metamodel primary receipt; surrounding prose introduces no competing primary source span.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -222,9 +228,15 @@
       "path": "docs/theory/Система аксиом МТС.md",
       "line": 201,
       "source": "В текущей v0.15 аналогичная исполнительная роль описывается `Rule = V -> (Antecedent -> ExactSequence(Image...))` и одной реакцией Γ, с пустым результатом `ExactSequence([])`. Эта ссылка не переносит старый синтаксис фигурных скобок в принятую грамматику FORMAL. Историческая краткая запись **не должна отождествлять отсутствие образа с отсутствием допущенного перехода**. Для полного закона реакции сохраняется различие, закреплённое V14-L4:",
-      "classification": "UNREVIEWED",
-      "status": "NOT_VERIFIED",
-      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance."
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "status": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "primaryCandidateIds": [
+        "F0048"
+      ],
+      "reviewSourceSha256": "595445609c37b25db6e5c342da81d8f184164876f57dd0e91a6f4e58589aaf9d",
+      "reviewBasis": "Exact prose occurrence is covered by an independently verified semantic-metamodel primary receipt; surrounding prose introduces no competing primary source span.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",

@@ -57,8 +57,8 @@
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
       "evidence": "Broad lexer originally found 968 line candidates. Markdown wrapper normalization removed 264 pure-markup false positives; HTML anchor/comment stripping plus prose-colon disambiguation removed 226 more, leaving 478 exact-source FORMAL-aware rows across :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram. The 19 known primary FORMAL candidates remain covered.",
-      "state": "478_TOTAL_450_REVIEWED_NON_FORMAL_7_VERIFIED_FORMAL_LINES_21_PENDING",
-      "remediation": "Inventory role correction removed two impossible fake-parser obligations: F0127 is accepted semantic/parsing metanotation and F0128 is a schematic FORMAL syntax legend. Remaining 21 lexical rows consist only of 19 rows backed by 11 unresolved semantic-metamodel/theorem primary FORMAL candidates plus 2 mixed current-FORMAL/historical lines requiring span-level review."
+      "state": "478_TOTAL_450_REVIEWED_NON_FORMAL_19_VERIFIED_FORMAL_LINES_9_PENDING",
+      "remediation": "Secondary-ledger synchronization is complete through the 10 verified primary FORMAL receipts. Remaining 9 lexical rows are exactly 7 unresolved theorem FORMAL statements plus 2 mixed current-FORMAL/historical lines requiring span-level adjudication. No further prose/status relabeling is allowed."
     },
     {
       "id": "DOC15-006",
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "478_BROAD_LEXICAL_ROWS:450_REVIEWED_NON_FORMAL+7_VERIFIED_FORMAL_LINES+21_PENDING; ONLY_FORMAL_OR_MIXED_REMAINS",
+    "D1": "478_BROAD_LEXICAL_ROWS:450_REVIEWED_NON_FORMAL+19_VERIFIED_FORMAL_LINES+9_PENDING; THEOREM_OR_MIXED_ONLY",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "PRIMARY_FORMAL_6_VERIFIED_11_PENDING+2_ROLE_CORRECTIONS; 14_THEOREM_MIGRATIONS_OPEN; 2_PROSE+21_LEXICAL_PENDING",
+    "D3": "PRIMARY_FORMAL_10_VERIFIED_7_PENDING+2_ROLE_CORRECTIONS; 14_THEOREM_MIGRATIONS_OPEN; PROSE_0_PENDING; LEXICAL_9_PENDING",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
-    "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_NATIVE_RECEIPTS_5_PASS; ROOT_BASIS_F0028_RECEIPT_PASS; UNSUPPORTED_FORMAL_FAILS_CLOSED",
-    "D6": "NOT_READY_11_PRIMARY_FORMAL_21_LEXICAL_2_PROSE_14_THEOREMS",
+    "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; UNSUPPORTED_THEOREM_FORMAL_FAILS_CLOSED",
+    "D6": "NOT_READY_7_PRIMARY_THEOREM_FORMAL_9_LEXICAL_14_THEOREM_MIGRATIONS",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
@@ -108,18 +108,18 @@
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "Broad census: 478 total = 450 reviewed NON_FORMAL + 7 clean FORMAL lines linked to bounded receipts + 21 pending. Primary inventory now distinguishes executable source from documentation metanotation: F0127 is accepted semantic/parsing metanotation and F0128 a schematic FORMAL syntax legend; neither is parser input. Remaining primary FORMAL: 6 verified, 11 pending. Prose: 19/21 reviewed, 2 pending. No theorem migration status was promoted.",
+    "notes": "Broad census: 478 total = 450 reviewed NON_FORMAL + 19 clean FORMAL lines linked to bounded receipts + 9 pending. Primary FORMAL is 10 verified / 7 pending after B20, root-basis and semantic-metamodel bounded profiles. Prose ledger is fully resolved: 19 reviewed NON_FORMAL + 2 verified FORMAL, 0 pending. Remaining lexical rows are 7 theorem statements plus 2 mixed current-FORMAL/historical lines. No theorem migration status was promoted.",
     "lexicalReviewedNonFormal": 450,
-    "lexicalPending": 21,
+    "lexicalPending": 9,
     "pendingBreakdown": {
-      "unresolvedPrimaryFormalOverlap": 19,
+      "unresolvedTheoremFormalOverlap": 7,
       "mixedFormalHistorical": 2
     },
-    "lexicalVerifiedFormalLines": 7,
+    "lexicalVerifiedFormalLines": 19,
     "proseReviewedNonFormal": 19,
-    "prosePending": 2,
-    "primaryFormalVerified": 6,
-    "primaryFormalPending": 11,
+    "prosePending": 0,
+    "primaryFormalVerified": 10,
+    "primaryFormalPending": 7,
     "primaryRoleCorrections": {
       "acceptedSemanticMetanotation": [
         "F0127"
@@ -127,6 +127,7 @@
       "formalSyntaxLegend": [
         "F0128"
       ]
-    }
+    },
+    "proseVerifiedFormal": 2
   }
 }
