@@ -9,6 +9,7 @@ import {
   PROJECTION_START,
   SEMANTIC_LAW_OWNER_BY_ID,
   checkProjectionText,
+  checkCurrentReleasePolicy,
   checkRepositoryDocs,
   checkRepositorySemanticLawDocumentation,
   findRepositoryRoot,
@@ -46,6 +47,8 @@ expectThrow(
 );
 
 const repositoryRoot = findRepositoryRoot();
+assert.deepEqual(checkCurrentReleasePolicy(repositoryRoot), [], "v0.15 current contribution policy must be internally consistent");
+
 const projection = loadCurrentProjection(repositoryRoot);
 assert.equal(projection.currentContract, "mts-contract/v0.15");
 assert.equal(projection.previousContract, "mts-contract/v0.14");
@@ -187,6 +190,7 @@ try {
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
+  copy("docs/CONTRIBUTING.md");
   copy("repo-policy.json");
   copy("contracts/mts-contract-v0.14.json");
   copy("contracts/mts-conformance-v0.14.json");
@@ -201,6 +205,20 @@ try {
   for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
 
+  const contributingPath = resolve(tempRoot, "docs/CONTRIBUTING.md");
+  const currentPolicy = readFileSync(contributingPath, "utf8");
+  assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  writeFileSync(contributingPath, currentPolicy.replace(
+    "## 6. Текущая документация описывает принятую МТС v0.15",
+    "## 6. Текущая документация описывает `current` `MTS` v0.14",
+  ), "utf8");
+  assert.ok(
+    checkCurrentReleasePolicy(tempRoot).length > 0,
+    "D1 negative: outdated v0.14 current policy must fail closed",
+  );
+  writeFileSync(contributingPath, currentPolicy, "utf8");
+  assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
