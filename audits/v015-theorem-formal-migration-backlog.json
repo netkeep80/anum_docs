@@ -45,7 +45,15 @@
       "formalSemanticsEvidence": null,
       "independentProofStatus": "UNCHANGED_HISTORICAL",
       "migrationStatus": "BLOCKED_NOT_MIGRATED",
-      "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT"
+      "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT",
+      "existingPartialEvidence": {
+        "kind": "FORMAL_ROOT_BASIS_BINDING_WITNESS_ONLY",
+        "formalSourceFragment": "U : C->O",
+        "sourcePath": "ts/test/v015-formal-identity-equality-b10.test.ts",
+        "sourceBlobSha": "529b73eec09c3e912f64c45abdfd0ced94da245f",
+        "support": "Existing v0.15 native compiler test declares root-basis U via C->O; corroborates representation of the structural pair, not the full theorem proposition, proof closure, or aprover authority.",
+        "limitation": "Do not set FORMAL_MIGRATED until theorem statement, domain/claims, compile/denotation equality and Author approval are independently established."
+      }
     },
     {
       "id": "FND-05",
