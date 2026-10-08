@@ -103,19 +103,33 @@ assert.ok(axiom.includes("**Историческая метасхема v0.14**"
 assert.ok(foundation.includes("`A:{}` в принятой FORMAL v0.15 означает"));
 assert.ok(!foundation.includes("A -> {}      успешный пустой образ"),
   "old pseudo ZERO cannot masquerade as current FORMAL example");
+const queryMeta = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_DERIVED_QUERY_METANOTATION");
+assert.equal(queryMeta.length, 20, "derived ValueBundle query syntax must not be passed off as native FORMAL source");
+assert.ok(queryMeta.every((entry) =>
+  entry.path === "docs/specs/Пучки связей.md" &&
+  entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
+  typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"));
+const bundleDoc = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
+assert.ok(bundleDoc.includes("равенство значений производного поискового API, **не** оператор идентичности Link в FORMAL v0.15"));
+const acceptedBundleSource = inventory.candidates.filter((entry) =>
+  entry.path === "docs/specs/Пучки связей.md" && entry.role === "FORMAL_V015_NOTATION_SPECIMEN");
+assert.equal(acceptedBundleSource.length, 3);
+assert.deepEqual(acceptedBundleSource.map((entry) => entry.source).sort(), ["A:{}", "A:{}", "{ A }"].sort());
+assert.ok(acceptedBundleSource.every((entry) => entry.denotation === "NOT_VERIFIED"),
+  "do not fake v0.15 FORMAL denotation while classifying syntax specimens");
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 148, "remaining UNCLASSIFIED formula backlog stays explicit");
+assert.equal(pending.length, 125, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 9,
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 12,
   "classified FORMAL explanatory specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 157, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 137, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; legacy MP and ZERO scoped; 157 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical MP/ValueBundle query scoped; 137 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
