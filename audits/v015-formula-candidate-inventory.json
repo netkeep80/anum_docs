@@ -396,17 +396,55 @@
       "language": "text",
       "source": "R : R->R\nO : O->R\nC : R->C\nL : O->C\nU : C->O",
       "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Canonical root-basis bindings also used in v015-formal-identity-equality-b10 native compiler test; full context/domain denotation audit remains pending.",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact five-definition root-basis source verified by the dedicated bounded native root-basis adapter: exact R/O/C/L/U Link denotation, accepted recursive wires, and J1 same-source-ANet canonical round-trip.",
       "nativeEvidence": {
         "kind": "NATIVE_FORMAL_ROOT_BASIS_WIRE",
         "testPath": "ts/test/v015-formal-identity-equality-b10.test.ts",
         "testBlobSha": "8b881691f5c914cbd7aa26bbe30bf5ad425659df",
-        "verifiedOnCommit": "3348e490b1751b4a68b24159fddc8c820200abb5",
-        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37749386834",
-        "status": "PARTIAL_NATIVE_WITNESS_GREEN",
-        "scope": "Documented R/O/C/L/U source included in existing native FORMAL compile; all five 8/9/6/1 recursive wires checked.",
-        "limitation": "Full current-documentation FORMAL acceptance remains NOT_VERIFIED pending complete source/denotation/replay and theorem migration."
+        "verifiedOnCommit": "a98e455f8dbd7ec3c8cc0d35c1a7c56ecae8a927",
+        "ciRun": "https://github.com/netkeep80/anum_docs/actions/runs/37832996634",
+        "status": "BOUNDED_NATIVE_RECEIPT_VERIFIED",
+        "scope": "Exact documented R/O/C/L/U source: native Link denotation, 8/9/6/1 recursive wires and J1 same-source-ANet round-trip.",
+        "limitation": "Bounded F0028 root-basis documentation receipt only; no theorem proof, generic FORMAL support, new JSON logical element or A-memory reaction replay."
+      },
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-root-basis-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "4a13d9722fcafe057f92caaece82445fee38b33d33fdfd5dc5b32f531611a705",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This exact root-basis source defines accepted structural Links; it is not an executable reaction requiring A-memory replay.",
+        "grammar": {
+          "path": "ts/test/v015-root-basis-evidence-verifier.test.ts",
+          "gitBlobSha": "ac2d20bb9f8290e13528a687d466146bca13c3fa",
+          "testCase": "ROOT_BASIS_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-root-basis-evidence-verifier.test.ts",
+          "gitBlobSha": "ac2d20bb9f8290e13528a687d466146bca13c3fa",
+          "testCase": "ROOT_BASIS_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-root-basis-evidence-verifier.test.ts",
+          "gitBlobSha": "ac2d20bb9f8290e13528a687d466146bca13c3fa",
+          "testCase": "ROOT_BASIS_STAGE_SEMANTIC_LINKS"
+        },
+        "jsonParity": {
+          "path": "ts/test/v015-root-basis-evidence-verifier.test.ts",
+          "gitBlobSha": "ac2d20bb9f8290e13528a687d466146bca13c3fa",
+          "testCase": "ROOT_BASIS_STAGE_JSON_PARITY"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-root-basis-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0028",
+          "formalSourceSha256": "4a13d9722fcafe057f92caaece82445fee38b33d33fdfd5dc5b32f531611a705",
+          "semanticAnetSha256": "b1e89aa3b63820179bdbef36a409f6fcf10e75ff909de127c45c7b9db1082a07",
+          "runnerSourceSha256": "a3f89ec2410b13d53340cf94dc8d1f509edf7813dfc03d2e0fe900a197800fe6",
+          "evidenceCommit": "a98e455f8dbd7ec3c8cc0d35c1a7c56ecae8a927",
+          "ciRun": "37832996634",
+          "ciJob": "113502835860"
+        }
       }
     },
     {
