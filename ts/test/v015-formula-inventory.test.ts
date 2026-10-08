@@ -117,19 +117,53 @@ assert.equal(acceptedBundleSource.length, 3);
 assert.deepEqual(acceptedBundleSource.map((entry) => entry.source).sort(), ["A:{}", "A:{}", "{ A }"].sort());
 assert.ok(acceptedBundleSource.every((entry) => entry.denotation === "NOT_VERIFIED"),
   "do not fake v0.15 FORMAL denotation while classifying syntax specimens");
+const historicalTheorems = JSON.parse(readFileSync(resolve(root, "theorems/current-v0.14.json"), "utf8")) as {
+  theorems: { id: string; statement: string }[];
+};
+const formalOverlay = JSON.parse(readFileSync(resolve(root, "theorems/formal-v0.15.json"), "utf8")) as {
+  entries: { id: string; formalStatement: string }[];
+};
+const historicalStatements = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT") as Array<typeof inventory.candidates[number] & {
+    sourceArtifact: string; sourceTheoremId: string }>;
+assert.equal(historicalStatements.length, 16, "generated source formula text is provenance, not FORMAL parser input");
+for (const entry of historicalStatements) {
+  assert.equal(entry.path, "docs/theory/Теоремы МТС.md");
+  assert.equal(entry.denotation, "NOT_APPLICABLE_FORMAL_SOURCE");
+  assert.equal(entry.sourceArtifact, "theorems/current-v0.14.json");
+  assert.equal(historicalTheorems.theorems.find((theorem) => theorem.id === entry.sourceTheoremId)?.statement,
+    entry.source, entry.id + " exact historical theorem source statement");
+}
+const actualFormalStatements = inventory.candidates.filter((entry) =>
+  entry.role === "FORMAL_V015_THEOREM_STATEMENT") as typeof historicalStatements;
+assert.equal(actualFormalStatements.length, 7, "current FORMAL overlay instances tracked individually");
+for (const entry of actualFormalStatements) {
+  assert.equal(entry.sourceArtifact, "theorems/formal-v0.15.json");
+  assert.equal(entry.denotation, "NOT_VERIFIED", "a FORMAL syntactic overlay does not prove denotation or proof closure");
+  assert.equal(formalOverlay.entries.find((theorem) => theorem.id === entry.sourceTheoremId)?.formalStatement,
+    entry.source, entry.id + " exact theorem FORMAL statement source");
+}
+const toolchainPins = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY");
+assert.equal(toolchainPins.length, 42, "Lean/Rocq digests must never count as semantic Link equations");
+assert.ok(toolchainPins.every((entry) => entry.path === "docs/theory/Теоремы МТС.md" &&
+  /linux-sha256=|;docker=/.test(entry.source) && entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE"));
+const externalProofCommentary = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY");
+assert.equal(externalProofCommentary.length, 7);
+assert.ok(externalProofCommentary.every((entry) => entry.path === "docs/theory/Теоремы МТС.md"));
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 125, "remaining UNCLASSIFIED formula backlog stays explicit");
+assert.equal(pending.length, 53, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 12,
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 19,
   "classified FORMAL explanatory specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 137, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 72, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical MP/ValueBundle query scoped; 137 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical theorem statements/provenance scoped; 72 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
