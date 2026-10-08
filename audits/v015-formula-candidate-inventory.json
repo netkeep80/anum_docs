@@ -132,8 +132,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\nM_t -> Γ(M_t) -> M_(t+1)",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "README reproduces accepted Rule/Γ schematic, but its denotation still needs explicit FORMAL-source mapping."
     },
     {
       "id": "F0007",
@@ -152,8 +153,9 @@
       "endLine": 137,
       "kind": "inline-code",
       "source": "DEFERRED != REJECTED",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "DEFERRED != REJECTED: explicitly names issue governance states, not equality/Link identity."
     },
     {
       "id": "F0009",
@@ -163,8 +165,9 @@
       "kind": "fence",
       "language": "text",
       "source": "new semantic claim\n-> explicit issue / scope\n-> falsifier / executable witness\n-> contract / traceability\n-> one documentation owner\n-> independent readiness\n-> author acceptance",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Research-to-issue-to-evidence workflow, not anet semantics or executable FORMAL."
     },
     {
       "id": "F0010",
@@ -1366,8 +1369,9 @@
       "kind": "fence",
       "language": "text",
       "source": ":A ≡ R:A\nA->B->C = (A->B)->C\nDen([]) = ExactSequence([]) = R\nDen([e1,...,en]) = ExactSequence([Den(e1),...,Den(en)])\n∞      = ROOT\n♂S     = START(S)\nS♀     = END(S)\nA->B   = PAIR(A,B)",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Exact block emitted by accepted formal-notation-v015-markdown generator from locked semantic source; mixed explanatory Den/≡ equations and FORMAL tokens require differentiated denotation evidence."
     },
     {
       "id": "F0124",
@@ -1377,8 +1381,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{ A }        — объявление без локальной правой части\nA:{}         — явно пустой именованный пучок\nA:X          — связывание имени с выражением\n[A,B,...]    — только ExactSequence; порядок и кратность сохраняются",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Exact source-shape examples from canonical FORMAL projection; parser/denotation evidence is not yet attached per row."
     },
     {
       "id": "F0125",
@@ -1388,8 +1393,9 @@
       "kind": "fence",
       "language": "text",
       "source": "FORMAL text ----\\\n                  -> native source ANet\ncanonical JSON --/          |\n                             v\n                       common denotation\n                             |\n                             v\n                       semantic ANet",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative two-syntax compiler/denotation pipeline, not source FORMAL."
     },
     {
       "id": "F0126",
@@ -1399,8 +1405,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\n|roles(V,M_t)| = 0  -> grounded exact refinement\n\nM_t -> Γ(M_t) -> M_(t+1)\nsnapshot -> S1 match/bind -> S2 construct -> 0/1/N image -> atomic publication\nJ0 = selected\nJ1 = NOT_REQUIRED",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Rule/Γ descriptive schematic emitted by accepted generator; metatheoretic notation is not itself a parseable FORMAL program."
     },
     {
       "id": "F0127",
@@ -1410,8 +1417,9 @@
       "kind": "fence",
       "language": "text",
       "source": "anum_docs = MTS + FORMAL/JSON + bootstrap metacompiler\namemory   = generic execution / Γ\naprover   = proofs over the same FORMAL/ANet model",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Repository responsibilities diagram, not native FORMAL/ANet."
     },
     {
       "id": "F0128",
@@ -1421,8 +1429,9 @@
       "kind": "fence",
       "language": "text",
       "source": "mandatory requirements = 48\nCOMPONENT_GREEN        = 41\nVERTICAL_GREEN         = 4\nRELEASE_READY          = 2\nOPEN                   = 0\nacceptance ready       = true\nACCEPTED               = 1\naccepted               = true\ncurrent accepted       = v0.15",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_RELEASE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Count/status readout generated from accepted requirement registry, not Link equality or FORMAL source."
     },
     {
       "id": "F0129",
@@ -2149,12 +2158,15 @@
     }
   ],
   "classification": {
-    "policy": "Only explicitly reviewed process/lifecycle or codec/representation explanations are exempt from FORMAL parsing. No native FORMAL denotation is claimed for other expressions.",
+    "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 14,
-    "unclassifiedCount": 170,
+    "unclassifiedCount": 161,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
-    "nonFormalGovernanceCount": 1
+    "nonFormalGovernanceCount": 1,
+    "reviewedNonFormalCount": 29,
+    "unverifiedDenotationCount": 165,
+    "verifiedFormalCount": 0
   }
 }
