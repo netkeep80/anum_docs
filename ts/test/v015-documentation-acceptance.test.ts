@@ -202,5 +202,31 @@ assert.equal(inspectV015SecondaryLedgerRow("lexical", {
 }, [primaryWitness], [primaryWitness]).pending, true,
   "verified native evidence cannot be reused for another source occurrence");
 
+const secondPrimaryWitness = {
+  ...primaryWitness, id: "F-PINNED-2", source: "{ A }",
+};
+const multiFormalReview = {
+  ...formalReview, primaryCandidateIds: ["F-PINNED", "F-PINNED-2"],
+};
+delete (multiFormalReview as { primaryCandidateId?: string }).primaryCandidateId;
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", multiFormalReview,
+  [primaryWitness, secondPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, false, "one lexical line may be accepted only after every overlapping FORMAL occurrence is verified");
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", { ...multiFormalReview, primaryCandidateIds: ["F-PINNED"] },
+  [primaryWitness, secondPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, true, "one receipt cannot hide a second FORMAL occurrence on the same line");
+const historicalPrimaryWitness = {
+  ...primaryWitness, id: "NF-PINNED", role: "NON_FORMAL_HISTORICAL_PSEUDOCODE_MENTION",
+};
+assert.equal(inspectV015SecondaryLedgerRow(
+  "lexical", multiFormalReview,
+  [primaryWitness, secondPrimaryWitness, historicalPrimaryWitness],
+  [primaryWitness, secondPrimaryWitness],
+).pending, true, "mixed FORMAL/NON_FORMAL lines require span-level adjudication and cannot be flattened");
+
 console.log("MTS v0.15 documentation acceptance: release=ACCEPTED normative=48/48 strict=NOT_GREEN " +
   "theoremPending=" + report.theorems.missing.length + " formulaPending=" + report.formulas.pending);
