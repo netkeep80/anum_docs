@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 66,
+    "unreviewed": 48,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -4659,9 +4659,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "f6b907f8973b19534527ac9838455c6dc973d618f74178fd377cbb7c5469e3cb"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4671,9 +4674,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "8c6a308198de8acc1d5dba93006070d89b812c8288255f23ff335457186011ad"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4695,9 +4701,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "7b1c1076b9aeef6b69e1511b5f6ddb53980c4e13cf0340edc2684e9084f8524c"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4720,9 +4729,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "63b97b1213a103e84f699c04c9d18544de95d552924a8a176993d72a21b38693"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4745,9 +4757,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "431b535c1867070ba51842b29f180f52a12dba0a50e1c6ff4213fb09881b68e2"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5187,9 +5202,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "f9514d5e164062e2143c6421325d24f31245011f8c9bdf8488e286ea12ce6f4d"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5199,9 +5217,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "f05961cc917e2c09f072e7ee762a60b8a1e2bacd979f72d3d1921495ffbe25d3"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5211,9 +5232,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "117bc42d73ba35d5ed2cf3b7cb855fd9e920ca283ec0904f4456eba076afd117"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5223,9 +5247,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "3dbe9c27aa5f65be504d0e5b26fcbe4d1ec65ad6d767eacc835465f1627875e6"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5235,9 +5262,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "356f28884f6b314b2f2c00bba2a9b30ea1a59716fc877e2f8545d6aeac1fc240"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5247,9 +5277,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This reaction/cardinality notation is inherited v0.14 relational metanotation used for explanation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "f48b0b0b0c76561e8fdac9c495f3714f3c0a2082e329a6df611f1e010733e30f"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5425,9 +5458,12 @@
         "ROOT_ASPECT",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This is a natural-language structural theorem/law restatement in the axioms reader, not the separately tracked canonical FORMAL theorem source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "4119ce8ad33fdf00f5abf09c21e514fd218fa058dea641b49128280803df117a"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5452,9 +5488,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The N⟼L successor expression is inherited v0.14 mathematical Nat metanotation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "3bdaf3c2c7ab9cdbcf899758b6786eacff2c9ba8569e52dfdd735555b620d257"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5501,9 +5540,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row records proof/provenance witness chains and reaction-case coverage; it is evidence commentary, not a FORMAL program.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "8f49d0a04f7dfdb3b2612896dcdaf85d272b5fd69dd2375c545c3954c77a047b"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5526,9 +5568,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row records proof/provenance witness chains and reaction-case coverage; it is evidence commentary, not a FORMAL program.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "aa377c4dc3143dc940fe07562c884463df90d58d6cf5b9c795522891d3bece9b"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5695,9 +5740,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This A→A / 1→N style notation describes inherited relational/cardinality semantics in prose, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "7a4c412dc0cb4639302103b4cb57a62c0c49bffed633fad30e41f79e5c71b83b"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5707,9 +5755,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This A→A / 1→N style notation describes inherited relational/cardinality semantics in prose, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "1d646a3f80f91bc67678fbeb7de8d3886c1e5b19bf1986189e314ebd6b5fcada"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5721,9 +5772,12 @@
         "SEMANTIC_METAMODEL",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This chirality/orientation formula is inherited v0.14 mathematical metanotation used to explain the accepted structure, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169",
+      "reviewSourceSha256": "150845af612cf74e5858864e7871050848869eb3c6497fdc80f6da4d85f7930a"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
