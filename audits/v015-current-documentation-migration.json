@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "193 operator-bearing candidates from exact Git blobs: 33 reviewed non-FORMAL (including operator glyph mentions), 155 UNCLASSIFIED plus five native FORMAL specimens/metamodel blocks still without per-expression complete denotation verification. Five old codec/root-basis equality fences removed or replaced with canonical FORMAL source and codec tables.",
-      "state": "160_SEMANTIC_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
-      "remediation": "Check remaining 160 unverified candidates with accepted FORMAL Grammar/metacompiler/denotation and relevant A-memory replay, then migrate remaining 14 theorem overlays under author/proof boundary."
+      "evidence": "Full 10-document exact-Git-blob audit: 202 operator-bearing text candidates = 183 documented NON_FORMAL historical/provenance/codec/query/profile/proof-metadata cases and 19 genuine v0.15 FORMAL examples, metamodel schematics or registered theorem statements. Zero UNCLASSIFIED; all 19 native FORMAL/semantic specimens stay NOT_VERIFIED. Generated 21-theorem inventory remains exactly 7 registered FORMAL and 14 missing; no proof authority promotion.",
+      "state": "ALL_202_TEXT_CANDIDATES_ROLE_CLASSIFIED_19_FORMAL_DENOTATIONS_PENDING",
+      "remediation": "Independently verify 19 current FORMAL source/metamodel specimens using accepted grammar, semantic denotation and executable witnesses where applicable. Complete 14 theorem FORMAL migrations with explicit author acceptance, then strict gate and global docs conformance."
     },
     {
       "id": "DOC15-006",
@@ -89,14 +89,14 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "193_CURRENT_OPERATOR_CANDIDATES_5_OBSOLETE_EQUALS_FENCES_REMOVED_OR_REPLACED",
+    "D1": "ALL_202_OPERATOR_BEARING_OCCURRENCES_IDENTIFIED_AND_ROLE_CLASSIFIED_ZERO_UNCLASSIFIED",
     "D2": "48_ACCEPTED_REQUIREMENTS_PLUS_CANONICAL_ROOT_BASIS_FORMAL_SOURCE",
-    "D3": "OPEN_160_UNVERIFIED_CANDIDATES_14_THEOREM_MIGRATIONS",
+    "D3": "OPEN_19_NOT_VERIFIED_V015_FORMAL_SPECIMENS_PLUS_14_MISSING_THEOREM_MIGRATIONS",
     "D4": "FORMAL_AND_THEOREM_GENERATORS_UPDATED_AND_TARGETS_REGENERATED",
-    "D5": "V015_48_OF_48_NORMATIVE_ROWS_REQUIRED_BY_DOCS_CHECK_V14_PROVENANCE_SEPARATE",
+    "D5": "CURRENT_NORMATIVE_48_OF_48_PLUS_FAIL_CLOSED_19_FORMAL_DENOTATION_GATE",
     "D6": "NOT_READY_WAIT_FOR_DENOTATION_AND_THEOREM_MIGRATION",
     "issue1951": "OPEN",
-    "ci": "PENDING_FINAL_HEAD",
+    "ci": "PENDING_LAST_COMMIT",
     "acceptedArtifactsModified": false
   }
 }
