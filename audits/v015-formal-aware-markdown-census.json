@@ -3,7 +3,7 @@
   "ownerIssue": 1951,
   "currentVersion": "v0.15",
   "status": "P0_DISCOVERY_BROAD_LEXICAL_CENSUS_NOT_YET_REVIEWED",
-  "scope": "All 11 current Markdown including PORTFOLIO.md, all table/fenced/inline/prose/diagram source lines; immutable research originals excluded; lexical candidates are not semantic proof. Independent original 202-fence census and 21-prose scan remain separate references. Markdown link/image wrappers are normalized before lexical token classification, preserving visible label text and diagram detection; 264 pure-markup false positives excluded.",
+  "scope": "All 11 current Markdown including PORTFOLIO.md, all table/fenced/inline/prose/diagram source lines; immutable research originals excluded; lexical candidates are not semantic proof. Independent original 202-fence census and 21-prose scan remain separate references. Markdown link/image destinations, inline HTML anchors/comments, and ordinary prose colon punctuation are normalized before lexical token classification; visible formula text and diagram detection remain. 264 pure Markdown wrapper false positives plus 226 HTML/prose-punctuation false positives are excluded from the original 968-line broad baseline.",
   "files": [
     {
       "path": "PORTFOLIO.md",
@@ -63,24 +63,24 @@
   ],
   "counts": {
     "currentFiles": 11,
-    "candidates": 704,
-    "unreviewed": 704,
+    "candidates": 478,
+    "unreviewed": 478,
     "byContext": {
       "fenced": 307,
-      "prose": 140,
+      "prose": 5,
       "diagram": 1,
-      "table": 75,
-      "inline": 181
+      "table": 34,
+      "inline": 131
     },
     "byToken": {
-      "LINK_DIRECTION": 284,
-      "CONTEXT_NAME_OR_BINDING": 164,
+      "LINK_DIRECTION": 191,
+      "CONTEXT_NAME_OR_BINDING": 68,
       "DIAGRAM_OR_IMAGE": 1,
       "ROOT_ASPECT": 23,
       "START_END_ASPECT": 30,
       "SEMANTIC_METAMODEL": 41,
       "FORMAL_BUNDLE": 50,
-      "LINK_IDENTITY_OR_META_EQUALITY": 312,
+      "LINK_IDENTITY_OR_META_EQUALITY": 170,
       "EXACT_SEQUENCE": 28
     }
   },
@@ -140,18 +140,6 @@
       "context": "fenced",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "README.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15**",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -381,47 +369,11 @@
     },
     {
       "path": "README.md",
-      "line": 99,
-      "source": "> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.8.json).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "README.md",
       "line": 109,
       "source": "- `Nat` с `N0=U`, отдельная шкала `Degree`;",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "README.md",
-      "line": 157,
-      "source": "<a id=\"mts-readme-contract-observatory\"></a>",
-      "context": "prose",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "README.md",
-      "line": 164,
-      "source": "Правила изменения репозитория: [CONTRIBUTING](docs/CONTRIBUTING.md).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -500,18 +452,6 @@
       "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
     },
     {
-      "path": "README.md",
-      "line": 179,
-      "source": "<a id=\"mts-readme-authors\"></a>",
-      "context": "prose",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
       "path": "docs/CONTRIBUTING.md",
       "line": 10,
       "source": "main = текущее состояние",
@@ -542,18 +482,6 @@
       "context": "fenced",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/CONTRIBUTING.md",
-      "line": 74,
-      "source": "| принято: v0.15 | часть текущей принятой семантики |",
-      "context": "table",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -958,36 +886,11 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 3,
-      "source": "> **Текущая МТС: v0.15.** `Execution` `profile` `minimal-portable-amemory-execution@0.1.0` остаётся отдельно `governed` `post`-v0.13 `profile` и не является дополнительным законом v0.15.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 7,
       "source": "Этот документ описывает отдельно управляемый переносимый профиль апамяти 0.1.0 и его исторические детали. Текущая семантика исполнения МТС v0.15 определяется исключительно [принятой FORMAL/Γ](Формальная%20нотация%20МТС.md) и [машинным ядром](../../profiles/mts-v015-meta-interpreter-kernel.json); старые примеры Scope/current-root не являются отдельной исполнительной нормой v0.15. Машинная проекция исторического профиля: [`profiles/amemory-execution-profile.json`](../../profiles/amemory-execution-profile.json).",
       "context": "inline",
       "tokens": [
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 20,
-      "source": "<a id=\"mts-law-L1\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -1055,19 +958,6 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 50,
-      "source": "<a id=\"mts-law-knowledgeStateSeparation\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 69,
       "source": "Resolve      -> найти/проверить существующее",
       "context": "fenced",
@@ -1092,63 +982,11 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 73,
-      "source": "<a id=\"mts-law-L8\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 77,
-      "source": "<a id=\"mts-law-L9\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 79,
       "source": "Текущий доказанный канонический носитель `Link` `identity` остаётся `ROOT-grounded`. Произвольные нефундированные взаимные циклы не получают `semantic` `identity` только потому, что `backend` способен хранить циклический граф.",
       "context": "inline",
       "tokens": [
         "ROOT_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 83,
-      "source": "<a id=\"amemory-currentness\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 107,
-      "source": "<a id=\"amemory-theory-admission\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -1182,37 +1020,11 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 123,
-      "source": "<a id=\"amemory-elementary-transition\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 128,
       "source": "K ⟼ A",
       "context": "fenced",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 135,
-      "source": "<a id=\"mts-v014-v14-l4\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -1358,31 +1170,6 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 184,
-      "source": "<a id=\"amemory-theory-snapshot\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 211,
-      "source": "`Snapshot` не является новой сущностью МТС: это `execution-profile` `boundary`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 228,
       "source": "normalized successor A = normalized successor B",
       "context": "fenced",
@@ -1423,19 +1210,6 @@
       "source": "handoffCount     = 0",
       "context": "fenced",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 257,
-      "source": "<a id=\"amemory-recurrence\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -1523,19 +1297,6 @@
       "source": "STRUCTURAL_END_IS_GLOBAL_HALT = FALSE",
       "context": "fenced",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 282,
-      "source": "<a id=\"amemory-hierarchical-result\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -1634,19 +1395,6 @@
       "source": "persistent Result versions               = INDEPENDENT_LATER_FEATURE",
       "context": "fenced",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 311,
-      "source": "<a id=\"amemory-substrate-boundary\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -1853,25 +1601,11 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 449,
-      "source": "<a id=\"d9-acceptance\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
       "line": 458,
       "source": "**D9-Q03 — Нужно ли физически удалять старую истину?** Нет: старые `Scope` и `K ⟼ A` могут оставаться физически доступными после `semantic` `handoff`.",
       "context": "inline",
       "tokens": [
-        "LINK_DIRECTION",
-        "CONTEXT_NAME_OR_BINDING"
+        "LINK_DIRECTION"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -1896,30 +1630,6 @@
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 476,
-      "source": "**D9-Q12 — Требуется ли глобальное завершение?** Нет: разрешено неограниченное исполнение; структурный `END` не является глобальным halt.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 486,
-      "source": "## 18. Производный результат: инверсия исполнения",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -1967,19 +1677,6 @@
       "source": "A72v persistent Result versions / path-copy      = RETAINED_DEFERRED_RESEARCH",
       "context": "fenced",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Апамять и управление сетью связей.md",
-      "line": 551,
-      "source": "<a id=\"d10-completion\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -2288,31 +1985,6 @@
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15**",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 28,
-      "source": "<a id=\"mts-law-rootBasisBoundary\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
       "line": 41,
       "source": "8 = ROOT",
       "context": "fenced",
@@ -2424,122 +2096,6 @@
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 59,
-      "source": "<a id=\"mts-law-L4\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 60,
-      "source": "<a id=\"mts-law-L5\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 61,
-      "source": "<a id=\"mts-law-L6\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 62,
-      "source": "<a id=\"mts-law-L7\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 64,
-      "source": "<a id=\"mts-v014-v14-l13\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 89,
-      "source": "<a id=\"mts-law-exactAnumRooting\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 90,
-      "source": "<a id=\"mts-law-L10\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 98,
-      "source": "Пустая `ExactSequence` и `R` как `Link` — разные уровни описания: первое относится к последовательностному `carrier`, второе — к структуре `Link`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 100,
-      "source": "<a id=\"mts-v014-v14-l3\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
       "line": 109,
       "source": "[ ] T F",
       "context": "fenced",
@@ -2557,19 +2113,6 @@
       "context": "fenced",
       "tokens": [
         "EXACT_SEQUENCE"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 126,
-      "source": "<a id=\"mts-law-quaternaryNestedContext\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -2601,19 +2144,6 @@
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 141,
-      "source": "<a id=\"mts-law-resolveMaterializeSeparation\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
       "line": 146,
       "source": "resolve      = найти/проверить существующее структурное значение",
       "context": "fenced",
@@ -2638,58 +2168,6 @@
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 152,
-      "source": "<a id=\"mts-law-targetMaterializationBound\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 158,
-      "source": "<a id=\"mts-term-string\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 159,
-      "source": "<a id=\"mts-law-stringByteIdentity\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 160,
-      "source": "<a id=\"mts-law-L11\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
       "line": 167,
       "source": "identity = exact bytes",
       "context": "fenced",
@@ -2702,75 +2180,10 @@
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 172,
-      "source": "<a id=\"mts-law-utf8CarrierBoundary\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 176,
-      "source": "<a id=\"mts-law-stringNestedAnum\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 180,
-      "source": "<a id=\"mts-law-stringOneVsQOne\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
       "line": 182,
       "source": "Символ `\"1\"` как байтовая строка, `legacy` Q13 `token` `1` и структурный символ `1 = PAIR` принадлежат разным слоям. Совпадение глифа не даёт смыслового равенства.",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 186,
-      "source": "<a id=\"mts-law-L13\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Ачисла и сериализация.md",
-      "line": 203,
-      "source": "<a id=\"mts-law-representationNotInterpretation\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -2820,18 +2233,6 @@
       "context": "fenced",
       "tokens": [
         "EXACT_SEQUENCE"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Пучки связей.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15**",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -3033,18 +2434,6 @@
     },
     {
       "path": "docs/specs/Пучки связей.md",
-      "line": 159,
-      "source": "Это различие роли значения не создаёт второго онтологического вида: элементы обоих случаев остаются Связями.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Пучки связей.md",
       "line": 166,
       "source": "{{a,b},c}",
       "context": "fenced",
@@ -3062,18 +2451,6 @@
       "context": "fenced",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Пучки связей.md",
-      "line": 178,
-      "source": "Эти ограничения не исключают дальнейших производных теорий: они описывают **унаследованную поисковую поверхность профиля v0.13**, сохраняемую отдельно от текущей FORMAL v0.15, а не второй нормативный current-синтаксис.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -3505,18 +2882,6 @@
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 5,
-      "source": "> **Версия МТС: v0.15**",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
       "line": 7,
       "source": "> Этот файл полностью строится командой `npm --prefix ts run docs:sync`. Ручная правка семантики здесь не является authority.",
       "context": "inline",
@@ -3938,74 +3303,11 @@
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 127,
-      "source": "| <a id=\"mts-v015-v15-term-01\"></a>`V15-TERM-01` | `TERM` | `COMPONENT_GREEN` | Normative English term for «асеть / асеть связей» is ANet. Aset is not an MTS English term; legacy Aset/aset code identifiers have no terminology or semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
       "line": 128,
       "source": "| <a id=\"mts-v015-v15-auth-01\"></a>`V15-AUTH-01` | `AUTH` | `COMPONENT_GREEN` | One v0.15 execution-core semantic authority path: universal FORMAL and canonical JSON converge to the same native source ANet, then shared resolution/denotation/compiler/Γ execution/projection; no consumer-specific host semantic path is authoritative. |",
       "context": "table",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
-        "CONTEXT_NAME_OR_BINDING",
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 129,
-      "source": "| <a id=\"mts-v015-v15-auth-02\"></a>`V15-AUTH-02` | `AUTH` | `COMPONENT_GREEN` | FORMAL_MIGRATED or VERTICAL_GREEN requires tracked canonical FORMAL artifact, entry, digest, profile and evidence. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 130,
-      "source": "| <a id=\"mts-v015-v15-onto-01\"></a>`V15-ONTO-01` | `ONTO` | `COMPONENT_GREEN` | One-Link ontology: host kinds do not acquire MTS semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 131,
-      "source": "| <a id=\"mts-v015-v15-onto-02\"></a>`V15-ONTO-02` | `ONTO` | `COMPONENT_GREEN` | Prefer ordinary Link + ExactSequence + self-reference topology before extending Grammar. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 132,
-      "source": "| <a id=\"mts-v015-v15-onto-03\"></a>`V15-ONTO-03` | `ONTO` | `COMPONENT_GREEN` | Presentation names carry no semantic authority; topology-preserving rename preserves behavior. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4017,80 +3319,7 @@
       "source": "| <a id=\"mts-v015-v15-struct-01\"></a>`V15-STRUCT-01` | `STRUCT` | `COMPONENT_GREEN` | The v0.15 direct FORMAL/JSON source path preserves the already accepted ROOT/START/END/PAIR structural aspect constructors and lowers them to native Link topology / recursive 8/9/6/1 without enabling arbitrary cyclic bindings. |",
       "context": "table",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
         "ROOT_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 134,
-      "source": "| <a id=\"mts-v015-v15-close-01\"></a>`V15-CLOSE-01` | `CLOSE` | `COMPONENT_GREEN` | VERTICAL_GREEN requires transitive semantic dependency closure for the declared artifact scope. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 135,
-      "source": "| <a id=\"mts-v015-v15-close-02\"></a>`V15-CLOSE-02` | `CLOSE` | `COMPONENT_GREEN` | Every dependency outside the artifact is explicitly classified and versioned. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 136,
-      "source": "| <a id=\"mts-v015-v15-close-03\"></a>`V15-CLOSE-03` | `CLOSE` | `COMPONENT_GREEN` | Program-specific host semantic injection budget is exactly zero. Generic orchestration and backend compatibility/optimization lowerings may exist but have no MTS semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 137,
-      "source": "| <a id=\"mts-v015-v15-fresh-01\"></a>`V15-FRESH-01` | `FRESH` | `COMPONENT_GREEN` | A canonical FORMAL executable artifact reconstructs its executable package in fresh Memory using only fixed generic authorities. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 138,
-      "source": "| <a id=\"mts-v015-v15-fresh-02\"></a>`V15-FRESH-02` | `FRESH` | `COMPONENT_GREEN` | Canonical JSON alone reconstructs the same package in fresh Memory without source-specific repair. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 139,
-      "source": "| <a id=\"mts-v015-v15-fresh-03\"></a>`V15-FRESH-03` | `FRESH` | `COMPONENT_GREEN` | Two fresh Memories with unrelated allocation noise preserve canonical recursive representation and behavior. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4102,80 +3331,7 @@
       "source": "| <a id=\"mts-v015-v15-name-01\"></a>`V15-NAME-01` | `NAME` | `COMPONENT_GREEN` | Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction. |",
       "context": "table",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
         "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 141,
-      "source": "| <a id=\"mts-v015-v15-json-01\"></a>`V15-JSON-01` | `JSON` | `COMPONENT_GREEN` | JSON losslessly projects the complete supported canonical source ANet/model, not only passive carriers. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 142,
-      "source": "| <a id=\"mts-v015-v15-json-02\"></a>`V15-JSON-02` | `JSON` | `COMPONENT_GREEN` | FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 143,
-      "source": "| <a id=\"mts-v015-v15-json-03\"></a>`V15-JSON-03` | `JSON` | `COMPONENT_GREEN` | Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 144,
-      "source": "| <a id=\"mts-v015-v15-vert-01\"></a>`V15-VERT-01` | `VERT` | `COMPONENT_GREEN` | VERTICAL_GREEN requires the complete mandatory evidence bundle and zero semantic injection. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 145,
-      "source": "| <a id=\"mts-v015-v15-vert-02\"></a>`V15-VERT-02` | `VERT` | `COMPONENT_GREEN` | Completion state may only come from registered evidence, never PR/issue/test naming or partial round-trip. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 146,
-      "source": "| <a id=\"mts-v015-v15-and-01\"></a>`V15-AND-01` | `AND` | `VERTICAL_GREEN` | A compact Author-gated Boolean AND source ANet contains only the exact local T/F truth-table semantics expressed as zero-role Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4187,20 +3343,7 @@
       "source": "| <a id=\"mts-v015-v15-and-02\"></a>`V15-AND-02` | `AND` | `VERTICAL_GREEN` | Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through. |",
       "context": "table",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 148,
-      "source": "| <a id=\"mts-v015-v15-and-03\"></a>`V15-AND-03` | `AND` | `VERTICAL_GREEN` | MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving with respect to the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4213,32 +3356,7 @@
       "context": "table",
       "tokens": [
         "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY",
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 150,
-      "source": "| <a id=\"mts-v015-v15-ctx-01\"></a>`V15-CTX-01` | `CTX` | `COMPONENT_GREEN` | Theory, Context/currentness, interpreter/meta-program, entry and result execution roles are represented by Links and semantic ANet membership. Host package/launch code may perform only generic selection/orchestration allowed by the machine contract and cannot supply semantic role authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 151,
-      "source": "| <a id=\"mts-v015-v15-ctx-02\"></a>`V15-CTX-02` | `CTX` | `COMPONENT_GREEN` | The same Link may have different execution roles under different selected ANet contexts only because the corresponding contextual Link memberships differ; host names, manifests or pointers cannot create those roles. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4250,33 +3368,7 @@
       "source": "| <a id=\"mts-v015-v15-gamma-01\"></a>`V15-GAMMA-01` | `GAMMA` | `COMPONENT_GREEN` | One repeated universal Γ is the shared v0.15 semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile. |",
       "context": "table",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
-        "CONTEXT_NAME_OR_BINDING",
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 153,
-      "source": "| <a id=\"mts-v015-v15-formal-proof-01\"></a>`V15-FORMAL-PROOF-01` | `FORMAL_PROOF` | `COMPONENT_GREEN` | Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 154,
-      "source": "| <a id=\"mts-v015-v15-formal-proof-02\"></a>`V15-FORMAL-PROOF-02` | `FORMAL_PROOF` | `COMPONENT_GREEN` | Paired external assurance proves/cross-checks semantic preservation of FORMAL/JSON convergence and canonical recursive 8/9/6/1 metacompilation for the declared fragment; corpus GREEN alone is not proof of soundness. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4297,384 +3389,11 @@
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 156,
-      "source": "| <a id=\"mts-v015-v15-stage-01\"></a>`V15-STAGE-01` | `STAGE` | `COMPONENT_GREEN` | Source bytes, native source ANet, resolution/denotation, semantic ANet, recursive metacompilation, backend compatibility lowering, execution/replay and projection remain separately observable. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 157,
-      "source": "| <a id=\"mts-v015-v15-stage-02\"></a>`V15-STAGE-02` | `STAGE` | `COMPONENT_GREEN` | Read/find/validation are read-only; materialization/publication is explicit and failure-safe. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 158,
-      "source": "| <a id=\"mts-v015-v15-fals-01\"></a>`V15-FALS-01` | `FALS` | `COMPONENT_GREEN` | Every semantic capability has positive, structural mutation, missing authority, context, identity, JSON mutation and fresh-memory falsifiers as applicable. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 159,
-      "source": "| <a id=\"mts-v015-v15-gov-01\"></a>`V15-GOV-01` | `GOV` | `COMPONENT_GREEN` | Machine-readable candidate v0.15 requirements/traceability registry governs completion state. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 160,
-      "source": "| <a id=\"mts-v015-v15-gov-02\"></a>`V15-GOV-02` | `GOV` | `COMPONENT_GREEN` | Acceptance corpus audits direct semantic construction and rejects hidden program-specific host injection or backend-specific semantic authority. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 161,
-      "source": "| <a id=\"mts-v015-v15-gov-03\"></a>`V15-GOV-03` | `GOV` | `COMPONENT_GREEN` | Roadmap/status projections derive completion from registry/evidence rather than hand-maintained prose. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
       "line": 162,
       "source": "| <a id=\"mts-v015-v15-corpus-01\"></a>`V15-CORPUS-01` | `CORPUS` | `COMPONENT_GREEN` | Every Author-approved v0.15 executable artifact is pinned and replayed through FORMAL/JSON -> native source ANet -> semantic ANet -> recursive 8/9/6/1 -> generic compatibility lowering where required -> frozen A-memory 0.175.0, with zero semantic backend patches. |",
       "context": "table",
       "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 163,
-      "source": "| <a id=\"mts-v015-v15-gov-04\"></a>`V15-GOV-04` | `GOV` | `COMPONENT_GREEN` | Normal MTS merge paths cannot bypass required CI/repo-guard enforcement: broad always-bypass repository roles are removed or contained to an explicitly audited emergency actor/process, and an intentional RED repo-guard pull request is mechanically blocked from merging until restored GREEN. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY",
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 164,
-      "source": "| <a id=\"mts-v015-v15-docs-01\"></a>`V15-DOCS-01` | `DOCS` | `COMPONENT_GREEN` | The canonical «Формальная нотация МТС.md» is a deterministic generated projection of the current v0.15 execution-core FORMAL/JSON model, machine registries, selected Gamma/context profiles and Author-approved executable corpus; hand-maintained semantic prose and stale v0.14-only projection are forbidden. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 165,
-      "source": "| <a id=\"mts-v015-v15-ready-01\"></a>`V15-READY-01` | `READY` | `RELEASE_READY` | RELEASE_READY is impossible while any mandatory requirement is below VERTICAL_GREEN or explicitly resolved release state. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 166,
-      "source": "| <a id=\"mts-v015-v15-ready-02\"></a>`V15-READY-02` | `READY` | `RELEASE_READY` | Independent readiness audit attempts to falsify hidden semantics, incomplete JSON, drift, omissions and nondeterminism. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 167,
-      "source": "| <a id=\"mts-v015-v15-ready-03\"></a>`V15-READY-03` | `READY` | `ACCEPTED` | Explicit Author ACCEPT changes accepted/current from v0.14 to v0.15. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 168,
-      "source": "| <a id=\"mts-v015-v15-author-json-01\"></a>`V15-AUTHOR-JSON-01` | `AUTHOR_JSON` | `COMPONENT_GREEN` | Every new canonical logical/executable JSON artifact in v0.15 stops at AUTHOR_REVIEW_PENDING before completion. Proof/aprover artifacts are separately Author-gated in v0.16. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 169,
-      "source": "| <a id=\"mts-v015-v15-author-json-02\"></a>`V15-AUTHOR-JSON-02` | `AUTHOR_JSON` | `COMPONENT_GREEN` | v0.15 Author review shows exact FORMAL, exact JSON, source/semantic mapping, external/backend boundary, round-trip, fresh executable replay and falsifiers. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 170,
-      "source": "| <a id=\"mts-v015-v15-author-json-03\"></a>`V15-AUTHOR-JSON-03` | `AUTHOR_JSON` | `COMPONENT_GREEN` | Author decision is recorded per exact artifact revision/digest; material changes invalidate prior approval. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 171,
-      "source": "| <a id=\"mts-v015-v15-author-json-04\"></a>`V15-AUTHOR-JSON-04` | `AUTHOR_JSON` | `COMPONENT_GREEN` | Author JSON review applies throughout v0.15; batch approval only for an explicitly shown exact batch. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 172,
-      "source": "| <a id=\"mts-v015-v15-reg-01\"></a>`V15-REG-01` | `REG` | `COMPONENT_GREEN` | Every Author-approved JSON enters the permanent executable regression corpus. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 173,
-      "source": "| <a id=\"mts-v015-v15-reg-02\"></a>`V15-REG-02` | `REG` | `COMPONENT_GREEN` | Every FORMAL/model/JSON/metacompiler/recursive/execution change that can affect v0.15 executable semantics replays the complete Author-approved executable JSON corpus. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 174,
-      "source": "| <a id=\"mts-v015-v15-reg-03\"></a>`V15-REG-03` | `REG` | `COMPONENT_GREEN` | Approved JSON/evidence is never silently regenerated; incompatible changes use explicit migration and renewed Author approval. |",
-      "context": "table",
-      "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 191,
-      "source": "<a id=\"mts-law-interpreterSeparation\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 192,
-      "source": "<a id=\"mts-law-formalSquareBracketStringChild\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 193,
-      "source": "<a id=\"mts-law-formalParentheses\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 194,
-      "source": "<a id=\"mts-law-L12\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 195,
-      "source": "<a id=\"mts-law-explicitKContext\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 196,
-      "source": "<a id=\"mts-law-L2\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 197,
-      "source": "<a id=\"mts-law-L3\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 198,
-      "source": "<a id=\"mts-law-sourceUseAuthority\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 199,
-      "source": "<a id=\"mts-law-formalResultAuthority\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 200,
-      "source": "<a id=\"mts-law-associationBoundary\"></a> <!-- исторический стабильный якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/specs/Формальная нотация МТС.md",
-      "line": 202,
-      "source": "<a id=\"mts-v014-v14-l2\"></a> <!-- исторический якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15** · объяснительная проекция принятого основания.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
+        "LINK_DIRECTION"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4711,18 +3430,6 @@
       "context": "table",
       "tokens": [
         "START_END_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 37,
-      "source": "Подробная нормативная формулировка: [V14-L1](Система%20аксиом%20МТС.md#mts-v014-v14-l1).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -4840,18 +3547,6 @@
     },
     {
       "path": "docs/theory/Основания МТС.md",
-      "line": 78,
-      "source": "Нормативный owner: [V14-L12](Система%20аксиом%20МТС.md#mts-v014-v14-l12).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
       "line": 85,
       "source": "R : R->R",
       "context": "fenced",
@@ -4909,30 +3604,6 @@
       "context": "fenced",
       "tokens": [
         "LINK_DIRECTION",
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 102,
-      "source": "При действии `J` корень остаётся фиксирован, а ориентированные роли зеркалятся. Поэтому различение `O/C` не требует абсолютной внешней стрелки: оно локально относительно Context.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 115,
-      "source": "Нормативный owner: [V14-L5](Система%20аксиом%20МТС.md#mts-v014-v14-l5).",
-      "context": "prose",
-      "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
@@ -5127,18 +3798,6 @@
     },
     {
       "path": "docs/theory/Основания МТС.md",
-      "line": 184,
-      "source": "Нормативный owner: [V14-L11](Система%20аксиом%20МТС.md#mts-v014-v14-l11).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
       "line": 192,
       "source": "| `ZERO` | Успешный пустой образ — `ExactSequence([])` |",
       "context": "table",
@@ -5158,19 +3817,6 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING",
         "FORMAL_BUNDLE"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 201,
-      "source": "<a id=\"mts-v014-v14-l14\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -5229,30 +3875,6 @@
     },
     {
       "path": "docs/theory/Основания МТС.md",
-      "line": 285,
-      "source": "Нормативные owners: [V14-L6…L10](Система%20аксиом%20МТС.md#v14-l6-nat-и-отдельная-шкала-degree).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
-      "line": 303,
-      "source": "## Итог: цепочка самоопределения",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Основания МТС.md",
       "line": 312,
       "source": "objective Z2 chirality Ω={W,J(W)}",
       "context": "fenced",
@@ -5290,36 +3912,11 @@
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15** · текущая принятая нормативная проекция.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
       "line": 7,
       "source": "Слово «аксиома» в названии историческое. **A0–A20 не являются 21 независимой аксиомой.** Ниже перечислены 14 унаследованных законов `V14-L1…V14-L14` с исходными зависимостями; они не исчерпывают принятую v0.15, включая FORMAL, ANet и Γ.",
       "context": "inline",
       "tokens": [
         "SEMANTIC_METAMODEL"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 38,
-      "source": "<a id=\"mts-v014-v14-l1\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -5345,32 +3942,6 @@
       "context": "inline",
       "tokens": [
         "START_END_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 56,
-      "source": "<a id=\"mts-v014-v14-l5\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 72,
-      "source": "<a id=\"mts-v014-v14-l6\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -5405,71 +3976,6 @@
       "line": 89,
       "source": "N(n+1) = Nn ⟼ L",
       "context": "fenced",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 95,
-      "source": "<a id=\"mts-v014-v14-l7\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 111,
-      "source": "<a id=\"mts-v014-v14-l8\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 127,
-      "source": "<a id=\"mts-v014-v14-l9\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 143,
-      "source": "<a id=\"mts-v014-v14-l10\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 159,
-      "source": "<a id=\"mts-v014-v14-l11\"></a> <!-- якорь -->",
-      "context": "prose",
       "tokens": [
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
@@ -5643,36 +4149,11 @@
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
-      "line": 217,
-      "source": "Важно: явный `ZERO` — это нулевой **вклад конкретного совпавшего предусловия**. Из него не следует глобальное отсутствие того же семантического `Link` в `Next`: другое активное предусловие может независимо породить этот же `Link`. Экстенсиональное членство и причинное происхождение поэтому различаются.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
       "line": 219,
       "source": "Один общий `kernel` покрывает `1→0`, `1→1`, `1→N`, `N→1`, `N→M`; `host-dispatch` по «функции» или кардинальности не является семантическим `authority`.",
       "context": "inline",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 222,
-      "source": "<a id=\"mts-v014-v14-l12\"></a> <!-- якорь -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -5785,54 +4266,6 @@
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 261,
-      "source": "- **V14-L2** — остенсивная FORMAL-грамматика: [Формальная нотация МТС](../specs/Формальная%20нотация%20МТС.md#mts-v014-v14-l2);",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 262,
-      "source": "- **V14-L3** — версия Q14/Q13: [Ачисла и сериализация](../specs/Ачисла%20и%20сериализация.md#mts-v014-v14-l3);",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 263,
-      "source": "- **V14-L4** — базис результатов реакции: [Апамять и управление сетью связей](../specs/Апамять%20и%20управление%20сетью%20связей.md#mts-v014-v14-l4);",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Система аксиом МТС.md",
-      "line": 265,
-      "source": "- **V14-L14** — слои представления над Link: [Основания МТС](Основания%20МТС.md#mts-v014-v14-l14).",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6046,31 +4479,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 40,
-      "source": "<a id=\"theorem-fnd-01\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 43,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 49,
       "source": "One Link ontology and one abstract Link-forming primitive induce exactly four local self-incidence structural cases; after an oriented Context these are ROOT, START_K, END_K and PAIR.",
       "context": "fenced",
@@ -6193,18 +4601,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 114,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 115,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -6217,35 +4613,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 119,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 120,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 146,
-      "source": "<a id=\"theorem-fnd-02\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -6292,18 +4663,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 209,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@209b46d1bb376b31ad151694886cf0114102d631`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 210,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -6316,35 +4675,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 214,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@209b46d1bb376b31ad151694886cf0114102d631`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 215,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 247,
-      "source": "<a id=\"theorem-fnd-13\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -6463,35 +4797,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 317,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 318,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 322,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6511,43 +4821,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 355,
-      "source": "<a id=\"theorem-fnd-03\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 358,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 404,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@2ef10b56c611e947f4cd0f535afceebd4eaf6a5c`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 405,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -6560,48 +4833,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 409,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@2ef10b56c611e947f4cd0f535afceebd4eaf6a5c`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 410,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 436,
-      "source": "<a id=\"theorem-fnd-04\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 439,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6622,35 +4858,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 480,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@2ef10b56c611e947f4cd0f535afceebd4eaf6a5c`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 481,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 485,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@2ef10b56c611e947f4cd0f535afceebd4eaf6a5c`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6670,48 +4882,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 512,
-      "source": "<a id=\"theorem-fnd-05\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 515,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 521,
       "source": "Canonical recursive structural description is unique on its explicitly declared finite ROOT-decomposable carrier domain.",
       "context": "fenced",
       "tokens": [
         "ROOT_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 561,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@284921e3e23ebfe7f3bf692c5adfe0142d412a39`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6731,60 +4906,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 566,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@284921e3e23ebfe7f3bf692c5adfe0142d412a39`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 567,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 593,
-      "source": "<a id=\"theorem-fnd-06\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 596,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 639,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@91df3c548d8f46c4cdeb42980d1bfa91a69d563d`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6804,35 +4930,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 644,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@91df3c548d8f46c4cdeb42980d1bfa91a69d563d`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 645,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 671,
-      "source": "<a id=\"theorem-fnd-07\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -6881,35 +4982,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 730,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@64a0109002a0c5158db4c173e0288d03c2357906`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 731,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 735,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@64a0109002a0c5158db4c173e0288d03c2357906`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -6929,49 +5006,12 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 741,
-      "source": "    - запись: результат `accepted`; авторитет `native-replay`; источник доказательства `netkeep80/anum_docs@040b69e0288db08b6f63efff9925d47d4128142a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 765,
       "source": "  - `L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role`",
       "context": "inline",
       "tokens": [
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 782,
-      "source": "<a id=\"theorem-fnd-08\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 785,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7030,18 +5070,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 841,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@23584eb5269f684054e649b32b98ab38a333e76a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 842,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -7054,48 +5082,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 846,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@23584eb5269f684054e649b32b98ab38a333e76a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 847,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 875,
-      "source": "<a id=\"theorem-fnd-09\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 878,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7140,18 +5131,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 931,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@23584eb5269f684054e649b32b98ab38a333e76a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 932,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -7164,48 +5143,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 936,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@23584eb5269f684054e649b32b98ab38a333e76a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 937,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 963,
-      "source": "<a id=\"theorem-inv-01\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 966,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7239,18 +5181,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1015,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1016,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -7263,48 +5193,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1020,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1021,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1047,
-      "source": "<a id=\"theorem-inv-02\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1050,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7338,35 +5231,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1101,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1102,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1106,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7386,48 +5255,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1133,
-      "source": "<a id=\"theorem-inv-03\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1136,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1142,
       "source": "ROOT is fixed by recursive inversion.",
       "context": "fenced",
       "tokens": [
         "ROOT_ASPECT"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1177,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7447,48 +5279,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1182,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1183,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1209,
-      "source": "<a id=\"theorem-inv-04\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1212,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7508,35 +5303,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1254,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1255,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1259,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7556,60 +5327,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1288,
-      "source": "<a id=\"theorem-inv-05\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1291,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1336,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1337,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1341,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7629,60 +5351,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1368,
-      "source": "<a id=\"theorem-inv-06\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1371,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1417,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1418,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1422,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7702,46 +5375,9 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1449,
-      "source": "<a id=\"theorem-inv-07\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1452,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1458,
       "source": "Objective chirality survives inversion: J reverses orientation while preserving the structural distinction between the two one-sided self-incidence classes.",
       "context": "fenced",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1498,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
@@ -7763,48 +5399,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1503,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1504,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1530,
-      "source": "<a id=\"theorem-ctx-03\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1533,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7826,18 +5425,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1583,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1584,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
@@ -7850,48 +5437,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1588,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@006b0397d0a5160c47d34db0f20a377edd224132`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1589,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1627,
-      "source": "<a id=\"theorem-exe-02\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1630,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -7996,35 +5546,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1695,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@606aed871ca46c7ffc983c1ddabb44a94b2c4b11`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1696,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1700,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@606aed871ca46c7ffc983c1ddabb44a94b2c4b11`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -8044,46 +5570,9 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1727,
-      "source": "<a id=\"theorem-fnd-11\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1730,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1736,
       "source": "Representation identities are separated: Anum is a rooted sequence representation family, ExactSequence preserves exact positional identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
       "context": "fenced",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1776,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@ce5faa19423feaf892abaa83d1ecdb2d56662e6a`.",
-      "context": "inline",
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
@@ -8105,60 +5594,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1781,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@ce5faa19423feaf892abaa83d1ecdb2d56662e6a`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1782,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1808,
-      "source": "<a id=\"theorem-fnd-12\"></a> <!-- якорь теоремы -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1811,
-      "source": "**Статус:** текущая теорема; нативная классификация: нет.",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1856,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@59d45182354ecc28bf29126abf263bc35e2f994f`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -8178,48 +5618,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1861,
-      "source": "    - запись: результат `proved`; авторитет `external-cross-check`; источник доказательства `netkeep80/anum_docs@59d45182354ecc28bf29126abf263bc35e2f994f`.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 1862,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1914,
-      "source": "<a id=\"candidate-proof-gpr-01\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 1951,
-      "source": "<a id=\"candidate-proof-gpr-02\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -8240,63 +5642,11 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1993,
-      "source": "<a id=\"candidate-proof-gpr-03\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 2015,
       "source": "- `the A->B->C witness state is verifier machinery, not MTS ontology`",
       "context": "inline",
       "tokens": [
         "LINK_DIRECTION"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2033,
-      "source": "<a id=\"candidate-proof-gpr-04\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2077,
-      "source": "<a id=\"candidate-proof-gpr-05\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2119,
-      "source": "<a id=\"candidate-proof-gpr-06\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -8316,19 +5666,6 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2158,
-      "source": "<a id=\"candidate-proof-gpr-07\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 2172,
       "source": "- `empty role bundle: generic matcher succeeds iff antecedent identity holds and substitution is empty`",
       "context": "inline",
@@ -8341,88 +5678,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2192,
-      "source": "<a id=\"candidate-proof-gpr-08\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2229,
-      "source": "<a id=\"candidate-proof-gpr-09\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 2244,
       "source": "- `the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness`",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2271,
-      "source": "<a id=\"candidate-proof-frm-01\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2302,
-      "source": "<a id=\"candidate-proof-frm-02\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2335,
-      "source": "<a id=\"candidate-proof-frm-03\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2366,
-      "source": "<a id=\"candidate-proof-frm-04\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -8443,49 +5702,10 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2401,
-      "source": "<a id=\"candidate-proof-frm-05\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2431,
-      "source": "<a id=\"candidate-proof-frm-06\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
       "line": 2445,
       "source": "- `decode(compile(semantic)) = semantic for the declared recursive profile`",
       "context": "inline",
       "tokens": [
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2462,
-      "source": "<a id=\"candidate-proof-frm-07\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
       "classification": "UNREVIEWED",
@@ -8499,31 +5719,6 @@
       "context": "inline",
       "tokens": [
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/theory/Теоремы МТС.md",
-      "line": 2498,
-      "source": "<a id=\"candidate-proof-frm-08\"></a> <!-- якорь кандидатного доказательства -->",
-      "context": "prose",
-      "tokens": [
-        "LINK_DIRECTION",
-        "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/Словарь терминов МТС.md",
-      "line": 3,
-      "source": "> **Версия МТС: v0.15**",
-      "context": "prose",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
@@ -8658,18 +5853,6 @@
       "tokens": [
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
-      ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
-    },
-    {
-      "path": "docs/Словарь терминов МТС.md",
-      "line": 307,
-      "source": "NO_ADMITTED_RELATION: после исчерпывающего просмотра `Theory` `snapshot` для `antecedent` нет `relation`; `current` `truth` сохраняется.",
-      "context": "inline",
-      "tokens": [
-        "CONTEXT_NAME_OR_BINDING"
       ],
       "classification": "UNREVIEWED",
       "verification": "NOT_VERIFIED",
