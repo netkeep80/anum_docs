@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "Current exact-blob inventory 192 candidates/10 reader surfaces: four obsolete codec equality fences replaced by unambiguous codec tables, with two inline '=' metalanguage mentions; 157 UNCLASSIFIED + four classified FORMAL metamodel/notation blocks remain NOT_VERIFIED. Reviewed non-FORMAL diagrams/codec/governance remain explicitly excluded.",
-      "state": "161_SEMANTIC_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
-      "remediation": "Map all 161 unverified semantic candidate expressions to accepted FORMAL Grammar/metacompiler/denotation and A-memory evidence when executable; do not turn historic metaequations into Link equality by text replacement."
+      "evidence": "193 operator-bearing candidates from exact Git blobs: 33 reviewed non-FORMAL (including operator glyph mentions), 155 UNCLASSIFIED plus five native FORMAL specimens/metamodel blocks still without per-expression complete denotation verification. Five old codec/root-basis equality fences removed or replaced with canonical FORMAL source and codec tables.",
+      "state": "160_SEMANTIC_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
+      "remediation": "Check remaining 160 unverified candidates with accepted FORMAL Grammar/metacompiler/denotation and relevant A-memory replay, then migrate remaining 14 theorem overlays under author/proof boundary."
     },
     {
       "id": "DOC15-006",
@@ -89,9 +89,9 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "192_CURRENT_OPERATOR_CANDIDATES_EXACT_BLOB_INVENTORY_FOUR_OBSOLETE_CODEC_FENCES_ELIMINATED",
-    "D2": "CURRENT_V015_AUTHORITY_AND_48_REQUIREMENTS_IN_CURRENT_FORMAL_SPEC",
-    "D3": "OPEN_161_SEMANTIC_CANDIDATES_AND_14_FORMAL_THEOREM_MIGRATIONS_IN_5_DEPENDENCY_WAVES",
+    "D1": "193_CURRENT_OPERATOR_CANDIDATES_5_OBSOLETE_EQUALS_FENCES_REMOVED_OR_REPLACED",
+    "D2": "48_ACCEPTED_REQUIREMENTS_PLUS_CANONICAL_ROOT_BASIS_FORMAL_SOURCE",
+    "D3": "OPEN_160_UNVERIFIED_CANDIDATES_14_THEOREM_MIGRATIONS",
     "D4": "FORMAL_AND_THEOREM_GENERATORS_UPDATED_AND_TARGETS_REGENERATED",
     "D5": "V015_48_OF_48_NORMATIVE_ROWS_REQUIRED_BY_DOCS_CHECK_V14_PROVENANCE_SEPARATE",
     "D6": "NOT_READY_WAIT_FOR_DENOTATION_AND_THEOREM_MIGRATION",
