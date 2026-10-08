@@ -280,10 +280,10 @@ function sourceFor(names: RoleNames): string {
     "CANONICAL_DESCRIPTION_TAG : FINITE_ROOT_DECOMPOSABLE_TAG->O",
     "EXISTS_UNIQUE_TAG : CANONICAL_DESCRIPTION_TAG->O",
     "IDENTITY_CLAIM_TAG : EXISTS_UNIQUE_TAG->O",
-    "FND05_PREMISES : []",
     "DOMAIN_X : LINK_DOMAIN_TAG->" + names.x,
     "GROUNDED_X : GROUNDED_TAG->" + names.x,
     "FINITE_DOMAIN_X : FINITE_ROOT_DECOMPOSABLE_TAG->" + names.x,
+    "FND05_PREMISES : [GROUNDED_X,FINITE_DOMAIN_X]",
     "DESCRIPTION_ARGS : [" + names.x + "," + names.code + "]",
     "DESCRIPTION_X_CODE : CANONICAL_DESCRIPTION_TAG->DESCRIPTION_ARGS",
     "OTHER_DESCRIPTION_ARGS : [" + names.x + "," + names.other + "]",
@@ -293,8 +293,8 @@ function sourceFor(names: RoleNames): string {
     "UNIQUENESS_RULE : DESCRIPTION_X_OTHER->OTHER_IS_CODE",
     "EXISTS_UNIQUE_DATA : [" + names.code + ",DESCRIPTION_X_CODE,UNIQUENESS_RULE]",
     "EXISTS_UNIQUE_DESCRIPTION : EXISTS_UNIQUE_TAG->EXISTS_UNIQUE_DATA",
-    "FND05_DOMAIN : [DOMAIN_X,GROUNDED_X,FINITE_DOMAIN_X]",
-    "FND05_CONCLUSION : [FND05_DOMAIN,EXISTS_UNIQUE_DESCRIPTION]",
+    "FND05_DOMAIN : [DOMAIN_X]",
+    "FND05_CONCLUSION : [EXISTS_UNIQUE_DESCRIPTION]",
     "FND05_STATEMENT : FND05_PREMISES->FND05_CONCLUSION",
   ].join("\n");
 }
@@ -312,21 +312,26 @@ function verifyCandidate(
   assert(x !== code && x !== other && code !== other, "x/code/other roles are distinct Links");
 
   const premises = readExactSequence(f.memory, value(f, compiled, "FND05_PREMISES")).values;
-  same(premises.length, 0, "FND-05 has no independent formal premise row");
+  same(premises.length, 2, "FND-05 domain guards are structural antecedents");
+  same(premises[0], value(f, compiled, "GROUNDED_X"), "Grounded(x) antecedent");
+  same(premises[1], value(f, compiled, "FINITE_DOMAIN_X"),
+    "finite ROOT-decomposable membership antecedent");
 
   const domain = readExactSequence(f.memory, value(f, compiled, "FND05_DOMAIN")).values;
-  same(domain.length, 3, "domain has Link/Grounded/finite coordinates");
-  const [domainX, groundedX, finiteX] = domain;
+  same(domain.length, 1, "outer domain has one Link coordinate");
+  const [domainX] = domain;
   same(f.memory.poles(domainX!).start, value(f, compiled, "LINK_DOMAIN_TAG"), "Link-domain tag");
   same(f.memory.poles(domainX!).end, x, "Link-domain subject");
-  same(f.memory.poles(groundedX!).start, value(f, compiled, "GROUNDED_TAG"), "Grounded tag");
-  same(f.memory.poles(groundedX!).end, x, "Grounded subject");
+  const groundedX = value(f, compiled, "GROUNDED_X");
+  same(f.memory.poles(groundedX).start, value(f, compiled, "GROUNDED_TAG"), "Grounded tag");
+  same(f.memory.poles(groundedX).end, x, "Grounded subject");
+  const finiteX = value(f, compiled, "FINITE_DOMAIN_X");
   same(
-    f.memory.poles(finiteX!).start,
+    f.memory.poles(finiteX).start,
     value(f, compiled, "FINITE_ROOT_DECOMPOSABLE_TAG"),
     "finite ROOT-decomposable domain tag",
   );
-  same(f.memory.poles(finiteX!).end, x, "finite-domain subject");
+  same(f.memory.poles(finiteX).end, x, "finite-domain subject");
 
   const descArgs = readExactSequence(f.memory, value(f, compiled, "DESCRIPTION_ARGS")).values;
   same(descArgs.length, 2, "canonical description arity");
@@ -357,9 +362,8 @@ function verifyCandidate(
   same(existsData[2], value(f, compiled, "UNIQUENESS_RULE"), "exists-unique rule");
 
   const conclusion = readExactSequence(f.memory, value(f, compiled, "FND05_CONCLUSION")).values;
-  same(conclusion.length, 2, "FND-05 conclusion arity");
-  same(conclusion[0], value(f, compiled, "FND05_DOMAIN"), "conclusion domain");
-  same(conclusion[1], value(f, compiled, "EXISTS_UNIQUE_DESCRIPTION"),
+  same(conclusion.length, 1, "FND-05 conclusion contains only the guarded exists-unique claim");
+  same(conclusion[0], value(f, compiled, "EXISTS_UNIQUE_DESCRIPTION"),
     "conclusion canonical existence/uniqueness");
 
   const statement = f.memory.poles(value(f, compiled, "FND05_STATEMENT"));
@@ -443,7 +447,7 @@ console.log([
   "MTS v0.15 B22 FND-05 candidate FORMAL statement:",
   "MIGRATION_STATUS=CANDIDATE_NOT_PROMOTED",
   "FORMAL_ARTIFACT_KIND=STATEMENT_ONLY",
-  "FORMAL_PREMISES=0",
+  "FORMAL_PREMISES=2_GROUNDED_PLUS_FINITE_DOMAIN",
   "FORMAL_DEPENDENCIES=FND-01+FND-02",
   "DOMAIN=FINITE_GROUNDED_ROOT_DECOMPOSABLE",
   "CANONICAL_DESCRIPTION=ORDINARY_LINK_ROLE",
