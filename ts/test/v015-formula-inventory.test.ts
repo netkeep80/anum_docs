@@ -80,8 +80,15 @@ for (const entry of processCandidates) {
   assert.equal(entry.path, "docs/CONTRIBUTING.md", "process exemption cannot be applied to semantic documentation");
   assert.equal(entry.denotation, "NOT_APPLICABLE_PROCESS_DOCUMENTATION");
 }
+const representationCandidates = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_REPRESENTATION_META_NOTATION");
+assert.equal(representationCandidates.length, 9, "only separate structural codec/Anum representation examples are excluded");
+assert.ok(representationCandidates.every((entry) => entry.path === "docs/specs/Ачисла и сериализация.md" &&
+  entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE"));
+const lifecycleCandidates = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_GOVERNANCE_VOCABULARY");
+assert.equal(lifecycleCandidates.length, 1, "only non-semantic lifecycle vocabulary is excluded");
+assert.equal(lifecycleCandidates[0]!.path, "docs/Словарь терминов МТС.md");
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 180, "semantic FORMAL verification backlog stays explicit");
+assert.equal(pending.length, 170, "remaining FORMAL verification backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; 14 process / 180 pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; 14 process / 9 codec / 1 vocabulary / 170 pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
