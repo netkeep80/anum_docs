@@ -7,8 +7,8 @@
   "files": [
     {
       "path": "README.md",
-      "blobSha": "23bc1c743fceb7aab4dd697f391ea8c7bef51402",
-      "lineCount": 196
+      "blobSha": "0a9e9056cd998c407f8c82dfeaa11b742e07ab06",
+      "lineCount": 187
     },
     {
       "path": "docs/CONTRIBUTING.md",
@@ -17,8 +17,8 @@
     },
     {
       "path": "docs/theory/Основания МТС.md",
-      "blobSha": "5d464bac7a560bcee835cddc3008fe44daa29eeb",
-      "lineCount": 337
+      "blobSha": "e63d81e3758c8cfd1487969a785540914ad5d843",
+      "lineCount": 328
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -58,9 +58,9 @@
   ],
   "counts": {
     "files": 10,
-    "candidates": 194,
-    "fences": 114,
-    "inline": 80
+    "candidates": 192,
+    "fences": 110,
+    "inline": 82
   },
   "acceptanceRules": [
     "Every current normative formula must be classified as accepted FORMAL source or explicitly documented representation/pseudocode with no competing semantic authority.",
@@ -83,30 +83,19 @@
     {
       "id": "F0002",
       "path": "README.md",
-      "startLine": 35,
-      "endLine": 38,
-      "kind": "fence",
-      "language": "text",
-      "source": "11 = ROOT\n10 = START_K\n01 = END_K\n00 = PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "startLine": 32,
+      "endLine": 32,
+      "kind": "inline-code",
+      "source": "=",
+      "role": "NON_FORMAL_METALINGUISTIC_OPERATOR_MENTION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Explicit mention of FORMAL equality glyph in explanatory prose, not an equation or a Link-identity computation."
     },
     {
       "id": "F0003",
       "path": "README.md",
-      "startLine": 44,
-      "endLine": 47,
-      "kind": "fence",
-      "language": "text",
-      "source": "8 = ROOT\n9 = START_K\n6 = END_K\n1 = PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
-    },
-    {
-      "id": "F0004",
-      "path": "README.md",
-      "startLine": 57,
-      "endLine": 63,
+      "startLine": 48,
+      "endLine": 54,
       "kind": "fence",
       "language": "text",
       "source": "Ω = {W, J(W)}\nW ≠ J(W)\nJ² = Id\n\nContext K\n  -> χ(K)\n  -> START_K / END_K",
@@ -114,10 +103,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0005",
+      "id": "F0004",
       "path": "README.md",
-      "startLine": 71,
-      "endLine": 74,
+      "startLine": 62,
+      "endLine": 65,
       "kind": "fence",
       "language": "text",
       "source": "g_AB ∈ {Id, J}\ng_AA = Id\ng_AB = g_BA\ng_AB ∘ g_BC = g_AC",
@@ -125,10 +114,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0006",
+      "id": "F0005",
       "path": "README.md",
-      "startLine": 96,
-      "endLine": 98,
+      "startLine": 87,
+      "endLine": 89,
       "kind": "fence",
       "language": "text",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\nM_t -> Γ(M_t) -> M_(t+1)",
@@ -137,20 +126,20 @@
       "reviewBasis": "README reproduces accepted Rule/Γ schematic, but its denotation still needs explicit FORMAL-source mapping."
     },
     {
-      "id": "F0007",
+      "id": "F0006",
       "path": "README.md",
-      "startLine": 118,
-      "endLine": 118,
+      "startLine": 109,
+      "endLine": 109,
       "kind": "inline-code",
       "source": "N0=U",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0008",
+      "id": "F0007",
       "path": "README.md",
-      "startLine": 137,
-      "endLine": 137,
+      "startLine": 128,
+      "endLine": 128,
       "kind": "inline-code",
       "source": "DEFERRED != REJECTED",
       "role": "NON_FORMAL_GOVERNANCE_VOCABULARY",
@@ -158,10 +147,10 @@
       "reviewBasis": "DEFERRED != REJECTED: explicitly names issue governance states, not equality/Link identity."
     },
     {
-      "id": "F0009",
+      "id": "F0008",
       "path": "README.md",
-      "startLine": 178,
-      "endLine": 184,
+      "startLine": 169,
+      "endLine": 175,
       "kind": "fence",
       "language": "text",
       "source": "new semantic claim\n-> explicit issue / scope\n-> falsifier / executable witness\n-> contract / traceability\n-> one documentation owner\n-> independent readiness\n-> author acceptance",
@@ -170,7 +159,7 @@
       "reviewBasis": "Research-to-issue-to-evidence workflow, not anet semantics or executable FORMAL."
     },
     {
-      "id": "F0010",
+      "id": "F0009",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 10,
       "endLine": 12,
@@ -182,7 +171,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0011",
+      "id": "F0010",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 53,
       "endLine": 55,
@@ -194,7 +183,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0012",
+      "id": "F0011",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 61,
       "endLine": 63,
@@ -206,7 +195,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0013",
+      "id": "F0012",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 84,
       "endLine": 87,
@@ -218,7 +207,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0014",
+      "id": "F0013",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 95,
       "endLine": 105,
@@ -230,7 +219,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0015",
+      "id": "F0014",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 113,
       "endLine": 119,
@@ -242,7 +231,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0016",
+      "id": "F0015",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 154,
       "endLine": 156,
@@ -254,7 +243,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0017",
+      "id": "F0016",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 211,
       "endLine": 217,
@@ -266,7 +255,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0018",
+      "id": "F0017",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 313,
       "endLine": 323,
@@ -278,7 +267,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0019",
+      "id": "F0018",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 333,
       "endLine": 341,
@@ -290,7 +279,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0020",
+      "id": "F0019",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 351,
       "endLine": 355,
@@ -302,7 +291,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0021",
+      "id": "F0020",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 365,
       "endLine": 365,
@@ -314,7 +303,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0022",
+      "id": "F0021",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 384,
       "endLine": 385,
@@ -326,7 +315,7 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
-      "id": "F0023",
+      "id": "F0022",
       "path": "docs/CONTRIBUTING.md",
       "startLine": 444,
       "endLine": 450,
@@ -338,32 +327,21 @@
       "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
+      "id": "F0023",
+      "path": "docs/theory/Основания МТС.md",
+      "startLine": 26,
+      "endLine": 26,
+      "kind": "inline-code",
+      "source": "=",
+      "role": "NON_FORMAL_METALINGUISTIC_OPERATOR_MENTION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Explicit mention of FORMAL equality glyph in explanatory prose, not an equation or a Link-identity computation."
+    },
+    {
       "id": "F0024",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 29,
-      "endLine": 32,
-      "kind": "fence",
-      "language": "text",
-      "source": "11 = ROOT\n10 = START_K\n01 = END_K\n00 = PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
-    },
-    {
-      "id": "F0025",
-      "path": "docs/theory/Основания МТС.md",
-      "startLine": 38,
-      "endLine": 41,
-      "kind": "fence",
-      "language": "text",
-      "source": "ROOT    = 8\nSTART_K = 9\nEND_K   = 6\nPAIR    = 1",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
-    },
-    {
-      "id": "F0026",
-      "path": "docs/theory/Основания МТС.md",
-      "startLine": 53,
-      "endLine": 55,
+      "startLine": 44,
+      "endLine": 46,
       "kind": "fence",
       "language": "text",
       "source": "Ω = {W, J(W)}\nW ≠ J(W)\nJ² = Id",
@@ -371,10 +349,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0027",
+      "id": "F0025",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 70,
-      "endLine": 73,
+      "startLine": 61,
+      "endLine": 64,
       "kind": "fence",
       "language": "text",
       "source": "g_AB ∈ {Id, J}\ng_AA = Id\ng_AB = g_BA\ng_AB ∘ g_BC = g_AC",
@@ -382,20 +360,20 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0028",
+      "id": "F0026",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 76,
-      "endLine": 76,
+      "startLine": 67,
+      "endLine": 67,
       "kind": "inline-code",
       "source": "g_AB = J",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0029",
+      "id": "F0027",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 94,
-      "endLine": 98,
+      "startLine": 85,
+      "endLine": 89,
       "kind": "fence",
       "language": "text",
       "source": "R = ROOT\nO = START(R)\nC = END(R)\nL = PAIR(O,C)\nU = PAIR(C,O)",
@@ -403,10 +381,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0030",
+      "id": "F0028",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 104,
-      "endLine": 108,
+      "startLine": 95,
+      "endLine": 99,
       "kind": "fence",
       "language": "text",
       "source": "R = 8\nO = 98\nC = 68\nL = 19868\nU = 16898",
@@ -414,10 +392,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0031",
+      "id": "F0029",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 133,
-      "endLine": 133,
+      "startLine": 124,
+      "endLine": 124,
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ A",
@@ -425,10 +403,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0032",
+      "id": "F0030",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 159,
-      "endLine": 162,
+      "startLine": 150,
+      "endLine": 153,
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ {A}\n{A} ⟼ {B}\n──────────\nK ⟼ {B}",
@@ -436,20 +414,20 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0033",
+      "id": "F0031",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 165,
-      "endLine": 165,
+      "startLine": 156,
+      "endLine": 156,
       "kind": "inline-code",
       "source": "{A} ⟼ {B}",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0034",
+      "id": "F0032",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 170,
-      "endLine": 174,
+      "startLine": 161,
+      "endLine": 165,
       "kind": "fence",
       "language": "text",
       "source": "нет допущенного отношения для A\n  -> K ⟼ A остаётся текущей истиной\n\nдопущенное отношение для A с пустым образом\n  -> переход состоялся, но A даёт нулевой вклад в следующий образ",
@@ -457,20 +435,20 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0035",
+      "id": "F0033",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 177,
-      "endLine": 177,
+      "startLine": 168,
+      "endLine": 168,
       "kind": "inline-code",
       "source": "A ⟼ B",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0036",
+      "id": "F0034",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 200,
-      "endLine": 203,
+      "startLine": 191,
+      "endLine": 194,
       "kind": "fence",
       "language": "text",
       "source": "A -> {}      успешный пустой образ\nA -> A       активный identity transition\nA -> A♀      продолжение через END\nA -> ♂A      продолжение через START",
@@ -478,10 +456,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0037",
+      "id": "F0035",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 268,
-      "endLine": 268,
+      "startLine": 259,
+      "endLine": 259,
       "kind": "fence",
       "language": "text",
       "source": "∞  ♂  ♀  ⟼",
@@ -489,10 +467,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0038",
+      "id": "F0036",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 284,
-      "endLine": 285,
+      "startLine": 275,
+      "endLine": 276,
       "kind": "fence",
       "language": "text",
       "source": "N0 = U\nN(n+1) = Nn ⟼ L",
@@ -500,10 +478,10 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0039",
+      "id": "F0037",
       "path": "docs/theory/Основания МТС.md",
-      "startLine": 315,
-      "endLine": 333,
+      "startLine": 306,
+      "endLine": 324,
       "kind": "fence",
       "language": "text",
       "source": "Link-only ontology\n        ↓\ntwo relational pole positions\n        ↓\nfour self-incidence cases\n        ↓\nobjective Z2 chirality Ω={W,J(W)}\n        ↓\nContext K selects local χ(K)\n        ↓\nSTART_K / END_K\n        ↓\nR / O / C / L / U\n        ↓\nstructural identity + contextual truth\n        ↓\ngeneralized relational reaction\n        ↓\nAnum / codecs / text / FORMAL as non-ontological representations",
@@ -511,7 +489,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0040",
+      "id": "F0038",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 88,
       "endLine": 89,
@@ -522,7 +500,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0041",
+      "id": "F0039",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 174,
       "endLine": 174,
@@ -532,7 +510,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0042",
+      "id": "F0040",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 174,
       "endLine": 174,
@@ -542,7 +520,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0043",
+      "id": "F0041",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 174,
       "endLine": 174,
@@ -552,7 +530,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0044",
+      "id": "F0042",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 195,
       "endLine": 198,
@@ -563,7 +541,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0045",
+      "id": "F0043",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 204,
       "endLine": 208,
@@ -574,7 +552,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0046",
+      "id": "F0044",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 211,
       "endLine": 211,
@@ -584,7 +562,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0047",
+      "id": "F0045",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 213,
       "endLine": 213,
@@ -594,7 +572,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0048",
+      "id": "F0046",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 238,
       "endLine": 240,
@@ -605,7 +583,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0049",
+      "id": "F0047",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 248,
       "endLine": 251,
@@ -616,7 +594,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0050",
+      "id": "F0048",
       "path": "docs/theory/Система аксиом МТС.md",
       "startLine": 254,
       "endLine": 254,
@@ -626,7 +604,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0051",
+      "id": "F0049",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 17,
       "endLine": 17,
@@ -636,7 +614,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0052",
+      "id": "F0050",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 18,
       "endLine": 18,
@@ -646,7 +624,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0053",
+      "id": "F0051",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 20,
       "endLine": 20,
@@ -656,7 +634,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0054",
+      "id": "F0052",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 23,
       "endLine": 23,
@@ -666,7 +644,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0055",
+      "id": "F0053",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 24,
       "endLine": 24,
@@ -676,7 +654,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0056",
+      "id": "F0054",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 26,
       "endLine": 26,
@@ -686,7 +664,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0057",
+      "id": "F0055",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 27,
       "endLine": 27,
@@ -696,7 +674,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0058",
+      "id": "F0056",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 33,
       "endLine": 33,
@@ -706,7 +684,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0059",
+      "id": "F0057",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 60,
       "endLine": 60,
@@ -717,7 +695,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0060",
+      "id": "F0058",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 115,
       "endLine": 115,
@@ -727,7 +705,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0061",
+      "id": "F0059",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 120,
       "endLine": 120,
@@ -737,7 +715,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0062",
+      "id": "F0060",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 155,
       "endLine": 155,
@@ -748,7 +726,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0063",
+      "id": "F0061",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 165,
       "endLine": 165,
@@ -759,7 +737,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0064",
+      "id": "F0062",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 210,
       "endLine": 210,
@@ -769,7 +747,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0065",
+      "id": "F0063",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 215,
       "endLine": 215,
@@ -779,7 +757,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0066",
+      "id": "F0064",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 256,
       "endLine": 256,
@@ -790,7 +768,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0067",
+      "id": "F0065",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 266,
       "endLine": 266,
@@ -801,7 +779,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0068",
+      "id": "F0066",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 318,
       "endLine": 318,
@@ -811,7 +789,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0069",
+      "id": "F0067",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 323,
       "endLine": 323,
@@ -821,7 +799,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0070",
+      "id": "F0068",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 405,
       "endLine": 405,
@@ -831,7 +809,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0071",
+      "id": "F0069",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 410,
       "endLine": 410,
@@ -841,7 +819,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0072",
+      "id": "F0070",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 445,
       "endLine": 445,
@@ -852,7 +830,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0073",
+      "id": "F0071",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 481,
       "endLine": 481,
@@ -862,7 +840,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0074",
+      "id": "F0072",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 486,
       "endLine": 486,
@@ -872,7 +850,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0075",
+      "id": "F0073",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 562,
       "endLine": 562,
@@ -882,7 +860,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0076",
+      "id": "F0074",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 567,
       "endLine": 567,
@@ -892,7 +870,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0077",
+      "id": "F0075",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 640,
       "endLine": 640,
@@ -902,7 +880,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0078",
+      "id": "F0076",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 645,
       "endLine": 645,
@@ -912,7 +890,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0079",
+      "id": "F0077",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 680,
       "endLine": 680,
@@ -923,7 +901,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0080",
+      "id": "F0078",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 690,
       "endLine": 690,
@@ -934,7 +912,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0081",
+      "id": "F0079",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 713,
       "endLine": 713,
@@ -944,7 +922,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0082",
+      "id": "F0080",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 731,
       "endLine": 731,
@@ -954,7 +932,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0083",
+      "id": "F0081",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 736,
       "endLine": 736,
@@ -964,7 +942,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0084",
+      "id": "F0082",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 765,
       "endLine": 765,
@@ -974,7 +952,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0085",
+      "id": "F0083",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 791,
       "endLine": 791,
@@ -985,7 +963,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0086",
+      "id": "F0084",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 801,
       "endLine": 801,
@@ -996,7 +974,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0087",
+      "id": "F0085",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 815,
       "endLine": 815,
@@ -1007,7 +985,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0088",
+      "id": "F0086",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 842,
       "endLine": 842,
@@ -1017,7 +995,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0089",
+      "id": "F0087",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 847,
       "endLine": 847,
@@ -1027,7 +1005,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0090",
+      "id": "F0088",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 894,
       "endLine": 894,
@@ -1038,7 +1016,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0091",
+      "id": "F0089",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 932,
       "endLine": 932,
@@ -1048,7 +1026,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0092",
+      "id": "F0090",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 937,
       "endLine": 937,
@@ -1058,7 +1036,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0093",
+      "id": "F0091",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 972,
       "endLine": 972,
@@ -1069,7 +1047,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0094",
+      "id": "F0092",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1016,
       "endLine": 1016,
@@ -1079,7 +1057,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0095",
+      "id": "F0093",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1021,
       "endLine": 1021,
@@ -1089,7 +1067,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0096",
+      "id": "F0094",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1056,
       "endLine": 1056,
@@ -1100,7 +1078,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0097",
+      "id": "F0095",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1102,
       "endLine": 1102,
@@ -1110,7 +1088,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0098",
+      "id": "F0096",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1107,
       "endLine": 1107,
@@ -1120,7 +1098,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0099",
+      "id": "F0097",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1178,
       "endLine": 1178,
@@ -1130,7 +1108,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0100",
+      "id": "F0098",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1183,
       "endLine": 1183,
@@ -1140,7 +1118,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0101",
+      "id": "F0099",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1255,
       "endLine": 1255,
@@ -1150,7 +1128,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0102",
+      "id": "F0100",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1260,
       "endLine": 1260,
@@ -1160,7 +1138,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0103",
+      "id": "F0101",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1337,
       "endLine": 1337,
@@ -1170,7 +1148,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0104",
+      "id": "F0102",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1342,
       "endLine": 1342,
@@ -1180,7 +1158,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0105",
+      "id": "F0103",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1418,
       "endLine": 1418,
@@ -1190,7 +1168,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0106",
+      "id": "F0104",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1423,
       "endLine": 1423,
@@ -1200,7 +1178,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0107",
+      "id": "F0105",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1499,
       "endLine": 1499,
@@ -1210,7 +1188,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0108",
+      "id": "F0106",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1504,
       "endLine": 1504,
@@ -1220,7 +1198,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0109",
+      "id": "F0107",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1539,
       "endLine": 1539,
@@ -1231,7 +1209,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0110",
+      "id": "F0108",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1584,
       "endLine": 1584,
@@ -1241,7 +1219,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0111",
+      "id": "F0109",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1589,
       "endLine": 1589,
@@ -1251,7 +1229,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0112",
+      "id": "F0110",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1647,
       "endLine": 1647,
@@ -1262,7 +1240,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0113",
+      "id": "F0111",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1696,
       "endLine": 1696,
@@ -1272,7 +1250,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0114",
+      "id": "F0112",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1701,
       "endLine": 1701,
@@ -1282,7 +1260,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0115",
+      "id": "F0113",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1777,
       "endLine": 1777,
@@ -1292,7 +1270,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0116",
+      "id": "F0114",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1782,
       "endLine": 1782,
@@ -1302,7 +1280,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0117",
+      "id": "F0115",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1857,
       "endLine": 1857,
@@ -1312,7 +1290,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0118",
+      "id": "F0116",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 1862,
       "endLine": 1862,
@@ -1322,7 +1300,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0119",
+      "id": "F0117",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 2015,
       "endLine": 2015,
@@ -1332,7 +1310,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0120",
+      "id": "F0118",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 2244,
       "endLine": 2244,
@@ -1342,7 +1320,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0121",
+      "id": "F0119",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 2445,
       "endLine": 2445,
@@ -1352,7 +1330,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0122",
+      "id": "F0120",
       "path": "docs/theory/Теоремы МТС.md",
       "startLine": 2478,
       "endLine": 2478,
@@ -1362,7 +1340,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0123",
+      "id": "F0121",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 18,
       "endLine": 25,
@@ -1374,7 +1352,7 @@
       "reviewBasis": "Exact block emitted by accepted formal-notation-v015-markdown generator from locked semantic source; mixed explanatory Den/≡ equations and FORMAL tokens require differentiated denotation evidence."
     },
     {
-      "id": "F0124",
+      "id": "F0122",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 33,
       "endLine": 36,
@@ -1386,7 +1364,7 @@
       "reviewBasis": "Exact source-shape examples from canonical FORMAL projection; parser/denotation evidence is not yet attached per row."
     },
     {
-      "id": "F0125",
+      "id": "F0123",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 44,
       "endLine": 51,
@@ -1398,7 +1376,7 @@
       "reviewBasis": "Illustrative two-syntax compiler/denotation pipeline, not source FORMAL."
     },
     {
-      "id": "F0126",
+      "id": "F0124",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 59,
       "endLine": 66,
@@ -1410,7 +1388,7 @@
       "reviewBasis": "Rule/Γ descriptive schematic emitted by accepted generator; metatheoretic notation is not itself a parseable FORMAL program."
     },
     {
-      "id": "F0127",
+      "id": "F0125",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 76,
       "endLine": 78,
@@ -1422,7 +1400,7 @@
       "reviewBasis": "Repository responsibilities diagram, not native FORMAL/ANet."
     },
     {
-      "id": "F0128",
+      "id": "F0126",
       "path": "docs/specs/Формальная нотация МТС.md",
       "startLine": 108,
       "endLine": 116,
@@ -1434,7 +1412,7 @@
       "reviewBasis": "Count/status readout generated from accepted requirement registry, not Link equality or FORMAL source."
     },
     {
-      "id": "F0129",
+      "id": "F0127",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 12,
       "endLine": 23,
@@ -1446,7 +1424,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0130",
+      "id": "F0128",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 35,
       "endLine": 35,
@@ -1458,7 +1436,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0131",
+      "id": "F0129",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 41,
       "endLine": 44,
@@ -1470,7 +1448,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0132",
+      "id": "F0130",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 50,
       "endLine": 54,
@@ -1482,7 +1460,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0133",
+      "id": "F0131",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 146,
       "endLine": 147,
@@ -1494,7 +1472,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0134",
+      "id": "F0132",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 167,
       "endLine": 167,
@@ -1506,7 +1484,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0135",
+      "id": "F0133",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 182,
       "endLine": 182,
@@ -1517,7 +1495,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0136",
+      "id": "F0134",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 210,
       "endLine": 212,
@@ -1529,7 +1507,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0137",
+      "id": "F0135",
       "path": "docs/specs/Ачисла и сериализация.md",
       "startLine": 240,
       "endLine": 243,
@@ -1541,7 +1519,7 @@
       "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
-      "id": "F0138",
+      "id": "F0136",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 27,
       "endLine": 35,
@@ -1552,7 +1530,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0139",
+      "id": "F0137",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 43,
       "endLine": 45,
@@ -1563,7 +1541,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0140",
+      "id": "F0138",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 69,
       "endLine": 70,
@@ -1574,7 +1552,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0141",
+      "id": "F0139",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 100,
       "endLine": 100,
@@ -1585,7 +1563,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0142",
+      "id": "F0140",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 114,
       "endLine": 114,
@@ -1596,7 +1574,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0143",
+      "id": "F0141",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 126,
       "endLine": 126,
@@ -1607,7 +1585,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0144",
+      "id": "F0142",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 156,
       "endLine": 173,
@@ -1618,7 +1596,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0145",
+      "id": "F0143",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 187,
       "endLine": 195,
@@ -1629,7 +1607,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0146",
+      "id": "F0144",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 226,
       "endLine": 226,
@@ -1640,7 +1618,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0147",
+      "id": "F0145",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 238,
       "endLine": 239,
@@ -1651,7 +1629,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0148",
+      "id": "F0146",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 245,
       "endLine": 246,
@@ -1662,7 +1640,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0149",
+      "id": "F0147",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 260,
       "endLine": 265,
@@ -1673,7 +1651,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0150",
+      "id": "F0148",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 271,
       "endLine": 273,
@@ -1684,7 +1662,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0151",
+      "id": "F0149",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 285,
       "endLine": 290,
@@ -1695,7 +1673,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0152",
+      "id": "F0150",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 296,
       "endLine": 302,
@@ -1706,7 +1684,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0153",
+      "id": "F0151",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 336,
       "endLine": 338,
@@ -1717,7 +1695,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0154",
+      "id": "F0152",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 377,
       "endLine": 377,
@@ -1727,7 +1705,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0155",
+      "id": "F0153",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 378,
       "endLine": 378,
@@ -1737,7 +1715,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0156",
+      "id": "F0154",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 379,
       "endLine": 379,
@@ -1747,7 +1725,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0157",
+      "id": "F0155",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 388,
       "endLine": 395,
@@ -1758,7 +1736,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0158",
+      "id": "F0156",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 398,
       "endLine": 398,
@@ -1768,7 +1746,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0159",
+      "id": "F0157",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 403,
       "endLine": 407,
@@ -1779,7 +1757,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0160",
+      "id": "F0158",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 413,
       "endLine": 413,
@@ -1790,7 +1768,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0161",
+      "id": "F0159",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 434,
       "endLine": 434,
@@ -1801,7 +1779,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0162",
+      "id": "F0160",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 444,
       "endLine": 444,
@@ -1812,7 +1790,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0163",
+      "id": "F0161",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 456,
       "endLine": 456,
@@ -1822,7 +1800,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0164",
+      "id": "F0162",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 458,
       "endLine": 458,
@@ -1832,7 +1810,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0165",
+      "id": "F0163",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 470,
       "endLine": 470,
@@ -1842,7 +1820,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0166",
+      "id": "F0164",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 491,
       "endLine": 491,
@@ -1853,7 +1831,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0167",
+      "id": "F0165",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 515,
       "endLine": 516,
@@ -1864,7 +1842,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0168",
+      "id": "F0166",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 555,
       "endLine": 576,
@@ -1875,7 +1853,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0169",
+      "id": "F0167",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 582,
       "endLine": 584,
@@ -1886,7 +1864,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0170",
+      "id": "F0168",
       "path": "docs/specs/Апамять и управление сетью связей.md",
       "startLine": 590,
       "endLine": 599,
@@ -1897,7 +1875,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0171",
+      "id": "F0169",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 28,
       "endLine": 31,
@@ -1908,7 +1886,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0172",
+      "id": "F0170",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 36,
       "endLine": 36,
@@ -1918,7 +1896,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0173",
+      "id": "F0171",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 36,
       "endLine": 36,
@@ -1928,7 +1906,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0174",
+      "id": "F0172",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 39,
       "endLine": 41,
@@ -1939,7 +1917,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0175",
+      "id": "F0173",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 60,
       "endLine": 60,
@@ -1950,7 +1928,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0176",
+      "id": "F0174",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 63,
       "endLine": 63,
@@ -1960,7 +1938,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0177",
+      "id": "F0175",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 68,
       "endLine": 69,
@@ -1971,7 +1949,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0178",
+      "id": "F0176",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 90,
       "endLine": 91,
@@ -1982,7 +1960,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0179",
+      "id": "F0177",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 105,
       "endLine": 109,
@@ -1993,7 +1971,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0180",
+      "id": "F0178",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 127,
       "endLine": 128,
@@ -2004,7 +1982,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0181",
+      "id": "F0179",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 147,
       "endLine": 147,
@@ -2015,7 +1993,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0182",
+      "id": "F0180",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 166,
       "endLine": 167,
@@ -2026,7 +2004,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0183",
+      "id": "F0181",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 187,
       "endLine": 187,
@@ -2037,7 +2015,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0184",
+      "id": "F0182",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 196,
       "endLine": 196,
@@ -2047,7 +2025,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0185",
+      "id": "F0183",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 205,
       "endLine": 212,
@@ -2058,7 +2036,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0186",
+      "id": "F0184",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 218,
       "endLine": 225,
@@ -2069,7 +2047,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0187",
+      "id": "F0185",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 235,
       "endLine": 237,
@@ -2080,7 +2058,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0188",
+      "id": "F0186",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 243,
       "endLine": 244,
@@ -2091,7 +2069,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0189",
+      "id": "F0187",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 250,
       "endLine": 251,
@@ -2102,7 +2080,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0190",
+      "id": "F0188",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 263,
       "endLine": 265,
@@ -2113,7 +2091,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0191",
+      "id": "F0189",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 289,
       "endLine": 290,
@@ -2124,7 +2102,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0192",
+      "id": "F0190",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 325,
       "endLine": 334,
@@ -2135,7 +2113,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0193",
+      "id": "F0191",
       "path": "docs/specs/Пучки связей.md",
       "startLine": 342,
       "endLine": 348,
@@ -2146,7 +2124,7 @@
       "denotation": "NOT_VERIFIED"
     },
     {
-      "id": "F0194",
+      "id": "F0192",
       "path": "docs/Словарь терминов МТС.md",
       "startLine": 691,
       "endLine": 691,
@@ -2160,13 +2138,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 14,
-    "unclassifiedCount": 161,
+    "unclassifiedCount": 157,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 1,
-    "reviewedNonFormalCount": 29,
-    "unverifiedDenotationCount": 165,
+    "reviewedNonFormalCount": 31,
+    "unverifiedDenotationCount": 161,
     "verifiedFormalCount": 0
   }
 }
