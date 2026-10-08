@@ -42,7 +42,7 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "blobSha": "9993b72d272d1a8fe0a82d8a8e73c227da3ad826",
+      "blobSha": "c0db87724af4f5600ebf75e437cb6e59f1fa26f7",
       "lineCount": 630
     },
     {
@@ -1515,7 +1515,7 @@
       "endLine": 35,
       "kind": "fence",
       "language": "text",
-      "source": "MTS v0.14\n  accepted semantic foundation\n\nminimal-portable-amemory-execution@0.1.0\n  separately governed execution profile\n  historical foundation pin = accepted MTS v0.13\n\nnetkeep80/amemory and other backends\n  concrete implementations / storage / CPU / GPU / browser",
+      "source": "MTS v0.15\n  accepted semantic foundation\n\nminimal-portable-amemory-execution@0.1.0\n  separately governed execution profile\n  historical foundation pin = accepted MTS v0.13\n\nnetkeep80/amemory and other backends\n  concrete implementations / storage / CPU / GPU / browser",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
