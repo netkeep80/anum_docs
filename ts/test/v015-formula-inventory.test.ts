@@ -112,8 +112,10 @@ assert.deepEqual(formalSyntaxLegends.map((entry) => entry.id), ["F0128"]);
 assert.ok([...acceptedMetanotation, ...formalSyntaxLegends].every((entry) =>
   entry.path === "docs/specs/Формальная нотация МТС.md" &&
   entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
+  (entry as typeof entry & { sourceArtifact?: string }).sourceArtifact ===
+    "ts/src/tooling/formal-notation-v015-markdown.ts" &&
   typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"),
-  "accepted metanotation and syntax legends must remain explicitly non-executable");
+  "accepted metanotation and syntax legends must remain generator-owned and explicitly non-executable");
 
 const queryMeta = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_DERIVED_QUERY_METANOTATION");
 assert.equal(queryMeta.length, 20, "derived ValueBundle query syntax must not be passed off as native FORMAL source");
