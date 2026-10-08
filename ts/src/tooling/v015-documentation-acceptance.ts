@@ -167,6 +167,10 @@ const V015_EVIDENCE_RUNNERS = Object.freeze({
     sourcePath: "ts/src/tooling/v015-root-basis-evidence-verifier.ts",
     distPath: "ts/dist/src/tooling/v015-root-basis-evidence-verifier.js",
   }),
+  "mts-v015-semantic-metamodel-evidence/v0.1": Object.freeze({
+    sourcePath: "ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts",
+    distPath: "ts/dist/src/tooling/v015-semantic-metamodel-evidence-verifier.js",
+  }),
 } as const);
 
 type V015EvidenceProfile = keyof typeof V015_EVIDENCE_RUNNERS;

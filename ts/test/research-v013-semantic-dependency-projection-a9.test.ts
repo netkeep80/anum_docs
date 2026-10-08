@@ -1217,6 +1217,7 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/v015-documentation-acceptance.ts",
   "ts/src/tooling/v015-native-evidence-verifier.ts",
   "ts/src/tooling/v015-root-basis-evidence-verifier.ts",
+  "ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts",
   "ts/src/tooling/v015-markdown-prose-audit.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",
   "ts/src/tooling/theorem-catalog-markdown.ts",
