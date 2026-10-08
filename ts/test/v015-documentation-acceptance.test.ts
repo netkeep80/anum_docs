@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { scanV015FormalLexicalSurface } from "../src/tooling/v015-markdown-prose-audit.js";
-import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
+import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, inspectV015SecondaryLedgerRow, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 
 const root = findRepositoryRoot();
@@ -126,6 +127,71 @@ assert.ok(evaluateV015DocumentationCompletion({
   verifiedFormalIds: ids.slice(0, 20),
 }).some((issue) => issue.includes("missing FORMAL theorem projections")),
 "20/21 theorem migrations cannot pass acceptance");
+
+// An attacker must not turn a lexical/prose census GREEN with metadata flips.
+const pinnedSource = "A->B";
+const secondarySourceHash = createHash("sha256").update(pinnedSource).digest("hex");
+const primaryWitness = {
+  id: "F-PINNED", path: "docs/test.md", startLine: 2, endLine: 4,
+  role: "FORMAL_V015_NOTATION_SPECIMEN", source: pinnedSource,
+};
+const lexicalProbe = {
+  path: "docs/test.md", line: 3, source: pinnedSource,
+  classification: "UNREVIEWED", verification: "NOT_VERIFIED",
+};
+const proseProbe = {
+  path: "docs/test.md", line: 3, source: pinnedSource,
+  classification: "UNREVIEWED", status: "NOT_VERIFIED",
+};
+assert.equal(inspectV015SecondaryLedgerRow("lexical", lexicalProbe, [primaryWitness], []).pending, true);
+assert.equal(inspectV015SecondaryLedgerRow("prose", proseProbe, [primaryWitness], []).pending, true);
+for (const [ledger, original, flag] of [
+  ["lexical", lexicalProbe, "verification"],
+  ["prose", proseProbe, "status"],
+] as const) {
+  const forged = { ...original, classification: "REVIEWED", [flag]: "VERIFIED" };
+  const result = inspectV015SecondaryLedgerRow(ledger, forged, [primaryWitness], []);
+  assert.equal(result.pending, true, "a declarative status flip cannot pass " + ledger);
+  assert.match(result.defect ?? "", /unsupported review classification\/status/);
+  const partiallyChanged = { ...original, [flag]: "VERIFIED" };
+  assert.equal(inspectV015SecondaryLedgerRow(ledger, partiallyChanged, [], []).pending, true);
+}
+const reviewedNonFormal = {
+  ...lexicalProbe, classification: "NON_FORMAL_GOVERNANCE_VOCABULARY",
+  verification: "REVIEWED_NON_FORMAL",
+  reviewBasis: "This expression describes repository governance prose, not executable MTS FORMAL.",
+  reviewReference: "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-123456",
+  reviewSourceSha256: secondarySourceHash,
+};
+assert.equal(inspectV015SecondaryLedgerRow("lexical", reviewedNonFormal, [], []).pending, false,
+  "a source-pinned human review can exclude a genuinely non-FORMAL occurrence");
+assert.equal(inspectV015SecondaryLedgerRow("lexical", reviewedNonFormal, [primaryWitness], []).pending, true,
+  "a native FORMAL source may not be relabeled as governance prose");
+assert.equal(inspectV015SecondaryLedgerRow("lexical", {
+  ...reviewedNonFormal, reviewReference: "#1951",
+}, [], []).pending, true, "non-FORMAL review needs a traceable comment reference");
+assert.equal(inspectV015SecondaryLedgerRow("lexical", {
+  ...reviewedNonFormal, reviewSourceSha256: "f".repeat(64),
+}, [], []).pending, true, "non-FORMAL review must be bound to exact source");
+const formalReview = {
+  ...lexicalProbe, classification: "FORMAL_V015_NOTATION_SPECIMEN",
+  verification: "VERIFIED_AGAINST_ACCEPTED_V015",
+  primaryCandidateId: "F-PINNED", reviewSourceSha256: secondarySourceHash,
+};
+assert.equal(inspectV015SecondaryLedgerRow("lexical", formalReview, [primaryWitness], []).pending, true,
+  "a FORMAL inventory ID without native verification is not sufficient");
+assert.equal(inspectV015SecondaryLedgerRow("lexical", formalReview, [primaryWitness], [primaryWitness]).pending, false,
+  "the accepted reference must be to an independently verified machine witness");
+assert.equal(inspectV015SecondaryLedgerRow("lexical", {
+  ...formalReview, primaryCandidateId: "F-FAKE",
+}, [primaryWitness], [primaryWitness]).pending, true);
+assert.equal(inspectV015SecondaryLedgerRow("lexical", {
+  ...formalReview, reviewSourceSha256: "0".repeat(64),
+}, [primaryWitness], [primaryWitness]).pending, true);
+assert.equal(inspectV015SecondaryLedgerRow("lexical", {
+  ...formalReview, line: 5,
+}, [primaryWitness], [primaryWitness]).pending, true,
+  "verified native evidence cannot be reused for another source occurrence");
 
 console.log("MTS v0.15 documentation acceptance: release=ACCEPTED normative=48/48 strict=NOT_GREEN " +
   "theoremPending=" + report.theorems.missing.length + " formulaPending=" + report.formulas.pending);
