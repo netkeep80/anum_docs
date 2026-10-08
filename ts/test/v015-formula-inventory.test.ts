@@ -12,7 +12,7 @@ const inventory = JSON.parse(readFileSync(resolve(root, "audits/v015-formula-can
   candidates: { id: string; path: string; startLine: number; endLine: number; kind: string; source: string; role: string; denotation: string }[];
 };
 assert.equal(inventory.schema, "mts-v015-current-doc-formula-candidate-inventory/v0.1");
-assert.equal(inventory.status, "INCOMPLETE_REQUIRES_SEMANTIC_CLASSIFICATION");
+assert.equal(inventory.status, "CLASSIFIED_DENOTATION_VERIFICATION_PENDING");
 const candidate = /⟼|->|≡|∈|⇒|=|\{\}|\{[A-Za-zА-Яа-я, ]+\}|\bDen\(|\bJ\(/u;
 const actual: typeof inventory.candidates = [];
 for (const file of inventory.files) {
