@@ -489,9 +489,13 @@ export function upsertRequirementProjection(
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
   const currentIr = loadMtsSemanticIr(root);
-  const ir = currentIr.schema === "mts-requirement-registry/v0.3"
+  // Compiler-owned V14 law blocks are immutable inherited provenance,
+  // not a replacement for the accepted V15 normative requirements indexed
+  // by formal-notation-v015-markdown and validated in Markdown coverage.
+  const historicalOwnerIr = currentIr.schema === "mts-requirement-registry/v0.3"
     ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
     : currentIr;
+  const ir = historicalOwnerIr;
   if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
     return [];
   }
