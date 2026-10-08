@@ -125,8 +125,42 @@
       "language": "text",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\nM_t -> Γ(M_t) -> M_(t+1)",
       "role": "FORMAL_V015_SEMANTIC_METAMODEL",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "README reproduces accepted Rule/Γ schematic, but its denotation still needs explicit FORMAL-source mapping."
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact documentation metamodel occurrence mapped by a bounded verifier to accepted v0.15 Γ/Rule/Context requirements, kernel/profile decisions and mirrored traceability; this is semantic-metamodel evidence, not parser execution.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067969510",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-semantic-metamodel-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "306ed02550ce3808aa18ed15f046d14fc27022d37781670d96c862f9ded6eb83",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is semantic metamodel notation describing the accepted Γ/Rule execution model; it is not literal parser input or an A-memory reaction program.",
+        "metamodelMapping": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_MAPPING"
+        },
+        "denotation": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_SEMANTIC_LINKS"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-semantic-metamodel-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0005",
+          "formalSourceSha256": "306ed02550ce3808aa18ed15f046d14fc27022d37781670d96c862f9ded6eb83",
+          "semanticAnetSha256": "027996fdef690e0897563f13a58894031644fcbbcc4d17d4795a6ae53849529c",
+          "runnerSourceSha256": "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c",
+          "evidenceCommit": "209b3be3f3bee0065d20fd4b5f9149868c040dc4",
+          "ciRun": "37835687233",
+          "ciJob": "113511990164"
+        }
+      }
     },
     {
       "id": "F0006",
@@ -478,8 +512,42 @@
       "kind": "inline-code",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))",
       "role": "FORMAL_V015_SEMANTIC_METAMODEL",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Accepted Rule/Γ schematic referenced from current FORMAL generator; not claimed to be a standalone compiled source."
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact documentation metamodel occurrence mapped by a bounded verifier to accepted v0.15 Γ/Rule/Context requirements, kernel/profile decisions and mirrored traceability; this is semantic-metamodel evidence, not parser execution.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067969510",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-semantic-metamodel-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is semantic metamodel notation describing the accepted Γ/Rule execution model; it is not literal parser input or an A-memory reaction program.",
+        "metamodelMapping": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_MAPPING"
+        },
+        "denotation": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_SEMANTIC_LINKS"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-semantic-metamodel-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0031",
+          "formalSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+          "semanticAnetSha256": "257cc576383eb10c4a2d3a615b6765d861e27963d96b8d4542b0a9b378ac82b3",
+          "runnerSourceSha256": "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c",
+          "evidenceCommit": "209b3be3f3bee0065d20fd4b5f9149868c040dc4",
+          "ciRun": "37835687233",
+          "ciJob": "113511990164"
+        }
+      }
     },
     {
       "id": "F0032",
@@ -720,8 +788,42 @@
       "kind": "inline-code",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))",
       "role": "FORMAL_V015_SEMANTIC_METAMODEL",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Accepted Rule/Γ schematic referenced from current FORMAL generator; complete native source denotation not attached."
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact documentation metamodel occurrence mapped by a bounded verifier to accepted v0.15 Γ/Rule/Context requirements, kernel/profile decisions and mirrored traceability; this is semantic-metamodel evidence, not parser execution.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067969510",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-semantic-metamodel-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is semantic metamodel notation describing the accepted Γ/Rule execution model; it is not literal parser input or an A-memory reaction program.",
+        "metamodelMapping": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_MAPPING"
+        },
+        "denotation": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_SEMANTIC_LINKS"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-semantic-metamodel-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0048",
+          "formalSourceSha256": "8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+          "semanticAnetSha256": "257cc576383eb10c4a2d3a615b6765d861e27963d96b8d4542b0a9b378ac82b3",
+          "runnerSourceSha256": "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c",
+          "evidenceCommit": "209b3be3f3bee0065d20fd4b5f9149868c040dc4",
+          "ciRun": "37835687233",
+          "ciJob": "113511990164"
+        }
+      }
     },
     {
       "id": "F0049",
@@ -1695,8 +1797,42 @@
       "language": "text",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\n|roles(V,M_t)| = 0  -> grounded exact refinement\n\nM_t -> Γ(M_t) -> M_(t+1)\nsnapshot -> S1 match/bind -> S2 construct -> 0/1/N image -> atomic publication\nJ0 = selected\nJ1 = NOT_REQUIRED",
       "role": "FORMAL_V015_SEMANTIC_METAMODEL",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Rule/Γ descriptive schematic emitted by accepted generator; metatheoretic notation is not itself a parseable FORMAL program."
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "reviewBasis": "Exact documentation metamodel occurrence mapped by a bounded verifier to accepted v0.15 Γ/Rule/Context requirements, kernel/profile decisions and mirrored traceability; this is semantic-metamodel evidence, not parser execution.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067969510",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-semantic-metamodel-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "6556a2c3a6bc80a617fb08279519e8b5d34dc187911df249a26d0ee4d1a575aa",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "This source is semantic metamodel notation describing the accepted Γ/Rule execution model; it is not literal parser input or an A-memory reaction program.",
+        "metamodelMapping": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_MAPPING"
+        },
+        "denotation": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+          "gitBlobSha": "9ee507cb7c29b1b78740228c80da11c6cd7a99ba",
+          "testCase": "METAMODEL_STAGE_SEMANTIC_LINKS"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-semantic-metamodel-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0130",
+          "formalSourceSha256": "6556a2c3a6bc80a617fb08279519e8b5d34dc187911df249a26d0ee4d1a575aa",
+          "semanticAnetSha256": "10189db23b6cd316358055cd8554ca46118be6c3b97c7ca46dcdd12742fd8424",
+          "runnerSourceSha256": "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c",
+          "evidenceCommit": "209b3be3f3bee0065d20fd4b5f9149868c040dc4",
+          "ciRun": "37835687233",
+          "ciJob": "113511990164"
+        }
+      }
     },
     {
       "id": "F0131",
