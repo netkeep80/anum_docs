@@ -36,6 +36,46 @@ export interface V015DocumentationAcceptanceReport {
   readonly ready: boolean;
 }
 
+export interface V015CompletionSignals {
+  readonly acceptedRelease: boolean;
+  readonly normativeExpected: number;
+  readonly normativeProjected: number;
+  readonly historicalIds: readonly string[];
+  readonly overlayIds: readonly string[];
+  readonly verifiedFormalIds: readonly string[];
+  readonly invalidOverlayIds: readonly string[];
+  readonly pendingCount: number;
+  readonly unexpectedFormulaCount: number;
+  readonly evidenceDefects: readonly string[];
+  readonly inventoryIntegrityIssues: readonly string[];
+  readonly sourceClassificationIssues: readonly string[];
+  readonly manifestState: string;
+  readonly contract: string;
+}
+
+/** Shared strict verdict used by the live audit and future-state regression tests. */
+export function evaluateV015DocumentationCompletion(facts: V015CompletionSignals): readonly string[] {
+  const blockers: string[] = [];
+  if (!facts.acceptedRelease || facts.contract !== "mts-contract/v0.15")
+    blockers.push("accepted release authority mismatch");
+  if (facts.normativeExpected !== 48 || facts.normativeProjected !== facts.normativeExpected)
+    blockers.push("normative v0.15 requirements not fully projected");
+  if (new Set(facts.overlayIds).size !== facts.overlayIds.length || facts.invalidOverlayIds.length > 0)
+    blockers.push("invalid/duplicate FORMAL theorem overlays");
+  if (facts.verifiedFormalIds.length !== facts.overlayIds.length)
+    blockers.push("non-migrated or incomplete FORMAL theorem descriptors cannot satisfy coverage");
+  const missing = facts.historicalIds.filter((id) => !facts.verifiedFormalIds.includes(id));
+  if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
+  if (facts.pendingCount > 0) blockers.push("unverified current documentation formula candidates: " + facts.pendingCount);
+  if (facts.unexpectedFormulaCount > 0) blockers.push("unreviewed/unrecognized formula classification: " + facts.unexpectedFormulaCount);
+  if (facts.evidenceDefects.length > 0) blockers.push("FORMAL machine evidence incomplete: " + facts.evidenceDefects.join("; "));
+  if (facts.inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + facts.inventoryIntegrityIssues.join("; "));
+  if (facts.sourceClassificationIssues.length > 0) blockers.push("FORMAL authority-classification mismatch: " + facts.sourceClassificationIssues.join("; "));
+  if (facts.manifestState !== "COMPLETE_VERIFIED")
+    blockers.push("final author-reviewed documentation migration manifest not COMPLETE_VERIFIED");
+  return blockers;
+}
+
 export function assessV015DocumentationAcceptance(root: string): V015DocumentationAcceptanceReport {
   const requirements = read(root, "requirements/mts-v0.15.json");
   const acceptedRelease = requirements.accepted === true && requirements.mtsVersion === "v0.15";
@@ -173,7 +213,8 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     field(item, "denotation").startsWith("NOT_APPLICABLE_") &&
     typeof item.reviewBasis === "string" && item.reviewBasis.length > 0);
   const verified = candidates.filter((item) =>
-    item.role === "FORMAL_V015" && item.denotation === "VERIFIED_AGAINST_ACCEPTED_V015");
+    field(item, "role").startsWith("FORMAL_V015_") &&
+    item.denotation === "VERIFIED_AGAINST_ACCEPTED_V015");
   const other = candidates.length - pending.length - reviewedNonFormal.length - verified.length;
   // Cross-check current FORMAL classification against independently stored
   // theorem source and the accepted generated reader surface. Source labels
@@ -206,18 +247,74 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       }
     }
   }
+  // A declarative VERIFIED flag is insufficient. Each future green claim
+  // must reference source-bound, Git-SHA-pinned machine-checkable witnesses
+  // for grammar, denotation, semantic Link identity, JSON parity and replay.
+  // Partial native fixtures (B10/B20) are not complete attestations.
+  const evidenceDefects: string[] = [];
+  for (const item of verified) {
+    const id = field(item, "id");
+    const evidence = item.semanticEvidence;
+    if (evidence === null || typeof evidence !== "object" || Array.isArray(evidence)) {
+      evidenceDefects.push(id + ": missing semanticEvidence");
+      continue;
+    }
+    const proof = evidence as Obj;
+    const version = proof.compilerVersion;
+    const sourceDigest = proof.formalSourceSha256;
+    if (typeof version !== "string" || version.length < 3 ||
+        typeof sourceDigest !== "string" || !/^[0-9a-f]{64}$/.test(sourceDigest)) {
+      evidenceDefects.push(id + ": missing compiler/version or source digest");
+    } else {
+      const sourceDigestComputed = createHash("sha256").update(field(item, "source"), "utf8").digest("hex");
+      if (sourceDigestComputed !== sourceDigest) evidenceDefects.push(id + ": source digest mismatch");
+    }
+    for (const stage of ["grammar", "denotation", "semanticLinks", "jsonParity", "amemoryReplay"]) {
+      const trace = proof[stage];
+      if (trace === null || typeof trace !== "object" || Array.isArray(trace)) {
+        evidenceDefects.push(id + ": missing " + stage + " machine witness");
+        continue;
+      }
+      const attestation = trace as Obj;
+      const path = attestation.path;
+      const sha = attestation.gitBlobSha;
+      const caseMarker = attestation.testCase;
+      if (typeof path !== "string" || !/^(ts\/test\/v015-|proofs\/v015-)/.test(path) ||
+          typeof sha !== "string" || !/^[0-9a-f]{40}$/.test(sha) ||
+          typeof caseMarker !== "string" || caseMarker.length < 3) {
+        evidenceDefects.push(id + ": malformed " + stage + " witness");
+        continue;
+      }
+      try {
+        const source = readFileSync(resolve(root, path), "utf8");
+        const digest = createHash("sha1")
+          .update("blob " + Buffer.byteLength(source, "utf8") + "\0")
+          .update(source, "utf8").digest("hex");
+        if (digest !== sha || !source.includes(caseMarker)) {
+          evidenceDefects.push(id + ": witness changed or test case absent for " + stage);
+        }
+      } catch {
+        evidenceDefects.push(id + ": unreadable witness for " + stage);
+      }
+    }
+  }
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
-  const blockers: string[] = [];
-  if (!acceptedRelease || coverage.contract !== "mts-contract/v0.15") blockers.push("accepted release authority mismatch");
-  if (normativeExpected !== 48 || normativeProjected !== normativeExpected) blockers.push("normative v0.15 requirements not fully projected");
-  if (new Set(allOverlayIds).size !== allOverlayIds.length || invalidOverlayIds.length > 0) blockers.push("invalid/duplicate FORMAL theorem overlays");
-  if (formalIds.length !== overlay.length) blockers.push("non-migrated or incomplete FORMAL theorem descriptors cannot satisfy coverage");
-  if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
-  if (pending.length > 0) blockers.push("unverified current documentation formula candidates: " + pending.length);
-  if (other > 0) blockers.push("unreviewed/unrecognized formula classification: " + other);
-  if (inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + inventoryIntegrityIssues.join("; "));
-  if (sourceClassificationIssues.length > 0) blockers.push("FORMAL authority-classification mismatch: " + sourceClassificationIssues.join("; "));
-  if (manifest.state !== "COMPLETE_VERIFIED") blockers.push("final author-reviewed documentation migration manifest not COMPLETE_VERIFIED");
+  const blockers = evaluateV015DocumentationCompletion({
+    acceptedRelease,
+    normativeExpected,
+    normativeProjected,
+    historicalIds,
+    overlayIds: allOverlayIds,
+    verifiedFormalIds: formalIds,
+    invalidOverlayIds,
+    pendingCount: pending.length,
+    unexpectedFormulaCount: other,
+    evidenceDefects,
+    inventoryIntegrityIssues,
+    sourceClassificationIssues,
+    manifestState: field(manifest, "state"),
+    contract: coverage.contract,
+  });
   return Object.freeze({
     schema: "mts-v015-current-documentation-acceptance/v0.1" as const,
     acceptedRelease,
