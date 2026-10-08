@@ -7,8 +7,8 @@
   "files": [
     {
       "path": "README.md",
-      "blobSha": "e1e49fd37ddf7ccf63cbca9afceee8a918b69a85",
-      "lineCount": 199
+      "blobSha": "23bc1c743fceb7aab4dd697f391ea8c7bef51402",
+      "lineCount": 196
     },
     {
       "path": "docs/CONTRIBUTING.md",
@@ -128,18 +128,18 @@
       "id": "F0006",
       "path": "README.md",
       "startLine": 96,
-      "endLine": 99,
+      "endLine": 98,
       "kind": "fence",
       "language": "text",
-      "source": "K ⟼ {A}\n{A} ⟼ {B}\n──────────\nK ⟼ {B}",
+      "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))\nTheory -> Rule ∈ M_t\nM_t -> Γ(M_t) -> M_(t+1)",
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     },
     {
       "id": "F0007",
       "path": "README.md",
-      "startLine": 121,
-      "endLine": 121,
+      "startLine": 118,
+      "endLine": 118,
       "kind": "inline-code",
       "source": "N0=U",
       "role": "UNCLASSIFIED",
@@ -148,8 +148,8 @@
     {
       "id": "F0008",
       "path": "README.md",
-      "startLine": 140,
-      "endLine": 140,
+      "startLine": 137,
+      "endLine": 137,
       "kind": "inline-code",
       "source": "DEFERRED != REJECTED",
       "role": "UNCLASSIFIED",
@@ -158,8 +158,8 @@
     {
       "id": "F0009",
       "path": "README.md",
-      "startLine": 181,
-      "endLine": 187,
+      "startLine": 178,
+      "endLine": 184,
       "kind": "fence",
       "language": "text",
       "source": "new semantic claim\n-> explicit issue / scope\n-> falsifier / executable witness\n-> contract / traceability\n-> one documentation owner\n-> independent readiness\n-> author acceptance",
