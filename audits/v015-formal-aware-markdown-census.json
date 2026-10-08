@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 106,
+    "unreviewed": 90,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -5853,9 +5853,12 @@
         "ROOT_ASPECT",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "fff5097c517e92c6345a50926dcbb9307a95550b0a680186e2798a1ae5175d91"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -5922,9 +5925,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "90f1792092329c7acb5a4179e02bbcd435ab01b22519df3a565cd203f2673f33"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -5974,9 +5980,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "ddb13f5b01b9f4d7c53b3f55a9a9db2d6f4d5eddf7a7cb3305586386a4a8f1c7"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6026,9 +6035,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "330a23cbbeec46c87b4af96475b11a03d4adaa574499b617e0f83e655ee4263c"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6038,9 +6050,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "18d0f35fbd0a9a0f1224fbf08eb01dc485f25d4d910eda0e078f0ec16723cf0c"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6070,9 +6085,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "b6269007a57255cfc7c3ba66194d4b8d2a31b19462f0e9716851dc03fa351d7c"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6082,9 +6100,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "0da212e3646639d9d764fcf92632c91d32abf86b96a4bff09bdb16fafda6b573"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6095,9 +6116,12 @@
         "ROOT_ASPECT",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "e39c779c22cdc27f70fa600f99006c5ab119a0ea5a085cf963aa5882b634cc57"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6623,9 +6647,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "aa3e7ad26a40900aefc8614eb9b428fa22f77b4d2264839558720779bfabd9d5"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6847,9 +6874,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "311538381857a43846433627153b01b4fa3e8c114c7e352a650f361e4a3dd980"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6913,9 +6943,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "4c5d3b432637d19616b48fd9cfddff194bb4dcd6443494d96a6505604622219b"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6938,9 +6971,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "7d7826680321a322826ee6add34b3c76be79e0c9c113a71258aeee910449e1f4"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7128,9 +7164,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "acc0ec2c459a85da18537e9a4e6d716dc94e0d3f2be0081287ff4efd045153c5"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7299,9 +7338,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "587330334b1ff45fe80a54725ac9d3dcea1fcd7c329afde2c4df9c7e7e047187"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7403,9 +7445,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "b0ad5f03122366828ce6a2c462e73fa35a0ce082c70e658eb072dab238fc669d"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7554,9 +7599,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The owning theorem section explicitly labels this source as historical v0.14 evidence and not FORMAL v0.15; migration state is tracked separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
+      "reviewSourceSha256": "8e3c9cdaed11e70d190d9e1e86fb53fda17a98dedd61619b957ca5d998333f96"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
