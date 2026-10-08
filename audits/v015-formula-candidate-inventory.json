@@ -1432,8 +1432,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Link structure:\n  8 / 9 / 6 / 1\n  = recursive MTS alphabet\n\nSequence representation:\n  Anum\n  ExactSequence\n  Q\n\nText/bytes:\n  STRING\n  UTF-8",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0130",
@@ -1443,8 +1444,9 @@
       "kind": "fence",
       "language": "text",
       "source": "S ::= 8 | 9 S | 6 S | 1 S S",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0131",
@@ -1454,8 +1456,9 @@
       "kind": "fence",
       "language": "text",
       "source": "8 = ROOT\n9 = START_K\n6 = END_K\n1 = PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0132",
@@ -1465,8 +1468,9 @@
       "kind": "fence",
       "language": "text",
       "source": "R = 8\nO = 98\nC = 68\nL = 19868\nU = 16898",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0133",
@@ -1476,8 +1480,9 @@
       "kind": "fence",
       "language": "text",
       "source": "resolve      = найти/проверить существующее структурное значение\nmaterialize  = создать недостающую допустимую структуру",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0134",
@@ -1487,8 +1492,9 @@
       "kind": "fence",
       "language": "text",
       "source": "identity = exact bytes",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0135",
@@ -1497,8 +1503,9 @@
       "endLine": 182,
       "kind": "inline-code",
       "source": "1 = PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0136",
@@ -1508,8 +1515,9 @@
       "kind": "fence",
       "language": "text",
       "source": "carrier != interpreter\ndescription != use\nbytes != meaning",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0137",
@@ -1519,8 +1527,9 @@
       "kind": "fence",
       "language": "text",
       "source": "J(Link)\nJ(Anum)\nreverse(sequence)\nswap tokens",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Structural 8/9/6/1 codec, sequence/carrier or host API comparison; not native FORMAL syntax. See accepted v0.15 representation-layer separation."
     },
     {
       "id": "F0138",
@@ -2134,15 +2143,18 @@
       "endLine": 691,
       "kind": "inline-code",
       "source": "DEFERRED != REJECTED",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "DEFERRED != REJECTED is lifecycle-status vocabulary, not MTS Link identity equality or FORMAL expression."
     }
   ],
   "classification": {
-    "policy": "Only unambiguous process/governance examples may be excluded from semantic FORMAL parsing. Everything else stays UNCLASSIFIED until per-expression semantic review.",
+    "policy": "Only explicitly reviewed process/lifecycle or codec/representation explanations are exempt from FORMAL parsing. No native FORMAL denotation is claimed for other expressions.",
     "nonFormalProcessCount": 14,
-    "unclassifiedCount": 180,
+    "unclassifiedCount": 170,
     "acceptedFormalDenotationsVerified": 0,
-    "scope": "Do not read PROCESS exclusions as validation of other expressions."
+    "scope": "Do not read PROCESS exclusions as validation of other expressions.",
+    "nonFormalRepresentationCount": 9,
+    "nonFormalGovernanceCount": 1
   }
 }
