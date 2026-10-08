@@ -219,8 +219,8 @@ for (const entry of actualFormalStatements) {
   assert.equal(receipt.runnerSourceSha256,
     "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b");
   if (receipt.evidenceCommit !== undefined) assert.match(receipt.evidenceCommit, /^[0-9a-f]{40}$/);
-  if (receipt.ciRun !== undefined) assert.match(receipt.ciRun, /^\\d+$/);
-  if (receipt.ciJob !== undefined) assert.match(receipt.ciJob, /^\\d+$/);
+  if (receipt.ciRun !== undefined) assert.match(receipt.ciRun, /^\d+$/);
+  if (receipt.ciJob !== undefined) assert.match(receipt.ciJob, /^\d+$/);
 }
 const toolchainPins = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY");
 assert.equal(toolchainPins.length, 42, "Lean/Rocq digests must never count as semantic Link equations");
