@@ -15,7 +15,21 @@ const cli = resolve(root, "ts/dist/src/tooling/v015-native-evidence-verifier.js"
 
 const sourceHashes = new Set<string>();
 const semanticHashes = new Set<string>();
-for (const [id, source] of [["F0180", "{ A }"], ["F0181", "A:{}"]] as const) {
+const evidenceStageMarkers = Object.freeze({
+  grammar: "B20_STAGE_GRAMMAR",
+  denotation: "B20_STAGE_DENOTATION",
+  semanticLinks: "B20_STAGE_SEMANTIC_LINKS",
+  jsonParity: "B20_STAGE_JSON_PARITY",
+});
+assert.deepEqual(Object.keys(evidenceStageMarkers), [...stages],
+  "machine-evidence stage markers must remain aligned with the bounded verifier");
+for (const [id, source] of [
+  ["F0036", "A:{}"],
+  ["F0152", "A:{}"],
+  ["F0180", "{ A }"],
+  ["F0181", "A:{}"],
+  ["F0184", "A:{}"],
+] as const) {
   const sourceHash = createHash("sha256").update(source, "utf8").digest("hex");
   const expectedDigest = deriveV015BoundedAnetDigest(source);
   const input: V015NativeEvidenceRequest = {
@@ -33,6 +47,7 @@ for (const [id, source] of [["F0180", "{ A }"], ["F0181", "A:{}"]] as const) {
   assert.equal(actual.formalSourceSha256, sourceHash);
   assert.equal(actual.semanticAnetSha256, expectedDigest);
   assert.match(actual.runnerSourceSha256, /^[0-9a-f]{64}$/);
+  console.log("B20_EVIDENCE_RECEIPT=" + JSON.stringify(actual));
   const proc = spawnSync(process.execPath, [cli, "--verify-stdin"], {
     cwd: root, input: JSON.stringify(input), encoding: "utf8",
   });
