@@ -156,6 +156,25 @@ export function v015RequiredEvidenceStages(role: string): readonly string[] {
   }
 }
 
+const V015_EVIDENCE_RUNNERS = Object.freeze({
+  "mts-v015-native-evidence/v0.1": Object.freeze({
+    sourcePath: "ts/src/tooling/v015-native-evidence-verifier.ts",
+    distPath: "ts/dist/src/tooling/v015-native-evidence-verifier.js",
+  }),
+  "mts-v015-root-basis-evidence/v0.1": Object.freeze({
+    sourcePath: "ts/src/tooling/v015-root-basis-evidence-verifier.ts",
+    distPath: "ts/dist/src/tooling/v015-root-basis-evidence-verifier.js",
+  }),
+} as const);
+
+type V015EvidenceProfile = keyof typeof V015_EVIDENCE_RUNNERS;
+
+function evidenceRunner(profile: unknown): Readonly<{ sourcePath: string; distPath: string }> | undefined {
+  if (typeof profile !== "string" ||
+      !Object.prototype.hasOwnProperty.call(V015_EVIDENCE_RUNNERS, profile)) return undefined;
+  return V015_EVIDENCE_RUNNERS[profile as V015EvidenceProfile];
+}
+
 export interface V015DocumentationAcceptanceReport {
   readonly schema: "mts-v015-current-documentation-acceptance/v0.1";
   readonly acceptedRelease: boolean;
@@ -454,28 +473,30 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       evidenceDefects.push(id + ": missing derived machineReceipt (source references alone are insufficient)");
     } else {
       const rr = receipt as Obj;
-      if (rr.profile !== "mts-v015-native-evidence/v0.1" ||
+      const runnerProfile = evidenceRunner(rr.profile);
+      if (runnerProfile === undefined ||
           rr.outcome !== "PASS" ||
           typeof rr.formalSourceSha256 !== "string" || rr.formalSourceSha256 !== sourceDigest ||
           typeof rr.semanticAnetSha256 !== "string" || !/^[0-9a-f]{64}$/.test(rr.semanticAnetSha256) ||
           typeof rr.runnerSourceSha256 !== "string" || !/^[0-9a-f]{64}$/.test(rr.runnerSourceSha256)) {
-        evidenceDefects.push(id + ": incomplete machineReceipt semantic identity/replay profile");
+        evidenceDefects.push(id + ": incomplete/unknown machineReceipt semantic identity profile");
+        continue;
       }
-      // Recompute the receipt through a single reviewed native verifier.
-      // Hand-editing this JSON cannot turn a failed semantic check into PASS.
-      const pinnedRunnerSource = resolve(root, "ts/src/tooling/v015-native-evidence-verifier.ts");
+      // Recompute the receipt through the exact versioned verifier profile.
+      // Adding another bounded adapter never changes an already pinned runner.
+      const pinnedRunnerSource = resolve(root, runnerProfile.sourcePath);
       try {
         const trustedSource = readFileSync(pinnedRunnerSource, "utf8");
         const trustedSha = createHash("sha256").update(trustedSource, "utf8").digest("hex");
         if (trustedSha !== rr.runnerSourceSha256) {
-          evidenceDefects.push(id + ": native verifier source differs from pinned revision");
+          evidenceDefects.push(id + ": evidence verifier source differs from pinned revision");
           continue;
         }
       } catch {
-        evidenceDefects.push(id + ": independently reviewed native verifier source unavailable");
+        evidenceDefects.push(id + ": independently reviewed evidence verifier source unavailable");
         continue;
       }
-      const runner = resolve(root, "ts/dist/src/tooling/v015-native-evidence-verifier.js");
+      const runner = resolve(root, runnerProfile.distPath);
       const input = JSON.stringify({
         id, role, source: field(item, "source"), formalSourceSha256: sourceDigest,
         expectedSemanticAnetSha256: rr.semanticAnetSha256,
@@ -489,7 +510,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       } else {
         try {
           const verifiedReceipt = record(JSON.parse(execution.stdout) as unknown, id + ".native-receipt");
-          if (verifiedReceipt.profile !== "mts-v015-native-evidence/v0.1" ||
+          if (verifiedReceipt.profile !== rr.profile ||
               verifiedReceipt.outcome !== "PASS" ||
               verifiedReceipt.caseId !== id ||
               verifiedReceipt.formalSourceSha256 !== sourceDigest ||
