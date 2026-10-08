@@ -48,7 +48,7 @@ function main(): void {
   assert.match(first, /theorems\/formal-v0\.15\.json/);
   assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
   assert.match(first, /генерируемой проекцией кандидатных внешних доказательств/);
-  assert.match(first, /не изменяет принятый реестр из 21 теорем .*MTS v0\.14/i);
+  assert.match(first, /не изменяет исходный реестр 21 теорем .*MTS v0\.14/i);
   assert.match(first, /external-cross-check-only/);
   const candidateAnchors = [
     ...first.matchAll(/<a id="candidate-proof-([^"]+)"><\/a>/g),
