@@ -25,8 +25,8 @@
       "path": "docs/CONTRIBUTING.md",
       "kind": "release-label-contradiction",
       "evidence": "Header v0.15 conflicts with current-v0.14 section 6 and status table.",
-      "state": "OPEN",
-      "remediation": "Repair source-of-truth for process projection/current prose to v0.15; audit all current-release claims."
+      "state": "RESOLVED_IN_PR_PENDING_CI",
+      "remediation": "Current release claims updated to v0.15 in docs/CONTRIBUTING.md; checkCurrentReleasePolicy() wired to docs:check and negative regression added. Exact documentation size baseline re-pinned without increasing hard ceiling."
     },
     {
       "id": "DOC15-002",
@@ -71,5 +71,16 @@
     "Historical evidence remains immutable and explicitly version-scoped.",
     "docs:check, links/anchors and CI green.",
     "Per-file migration evidence reviewed."
-  ]
+  ],
+  "progress": {
+    "D1": "IN_PROGRESS",
+    "issue1951": "OPEN",
+    "openFindings": [
+      "DOC15-002",
+      "DOC15-003",
+      "DOC15-004"
+    ],
+    "ci": "PENDING",
+    "acceptedArtifactsModified": false
+  }
 }
