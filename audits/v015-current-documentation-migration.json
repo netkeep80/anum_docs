@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "Broad lexer finds 704 rows after eliminating 264 Markdown-link/image-bracket false positives (original broad baseline 968) from :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram, with exact source blobs. Old 202 rows are a subset of heuristic syntax, not exhaustive.",
-      "state": "704_ACTIVE_LEXICAL_CANDIDATES_UNREVIEWED_STRICT_REVIEW_GATE",
-      "remediation": "Classify and deduplicate all 704 retained FORMAL-aware lexical rows across 11 documents. The overlapping 202 fenced/inline and 21 prose rows do not establish semantic completeness. Arbitrary status flips fail closed: non-FORMAL exclusions require a source SHA-256, exact reviewed role, review justification and traceable issue-comment URL; FORMAL rows must link to an independently machine-verified primary candidate covering the same source location and role. Novel FORMAL shapes remain blocked pending a native evidence producer."
+      "evidence": "Broad lexer originally found 968 line candidates. Markdown wrapper normalization removed 264 pure-markup false positives; HTML anchor/comment stripping plus prose-colon disambiguation removed 226 more, leaving 478 exact-source FORMAL-aware rows across :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram. The 19 known primary FORMAL candidates remain covered.",
+      "state": "478_ACTIVE_LEXICAL_CANDIDATES_UNREVIEWED_STRICT_REVIEW_GATE",
+      "remediation": "Classify and deduplicate all 478 retained FORMAL-aware lexical rows across 11 documents. The overlapping 202 fenced/inline and 21 prose rows do not establish semantic completeness. Arbitrary status flips fail closed: non-FORMAL exclusions require a source SHA-256, exact reviewed role, review justification and traceable issue-comment URL; FORMAL rows must link to an independently machine-verified primary candidate covering the same source location and role. Novel FORMAL shapes remain blocked pending a native evidence producer."
     },
     {
       "id": "DOC15-006",
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "202_CLASSIFIED_FENCE_INLINE_PLUS_21_PROSE_UNREVIEWED_PLUS_704_BROAD_LEXICAL_UNREVIEWED; SCOPES_OVERLAP; STRICT_SECONDARY_REVIEW_GATE",
+    "D1": "202_CLASSIFIED_FENCE_INLINE_PLUS_21_PROSE_UNREVIEWED_PLUS_478_BROAD_LEXICAL_UNREVIEWED; SCOPES_OVERLAP; STRICT_SECONDARY_REVIEW_GATE",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "OPEN_19_FORMAL_DENOTATIONS_AND_14_THEOREM_MIGRATIONS; 21_PROSE_AND_704_LEXICAL_ROWS_REQUIRE_REVIEW",
+    "D3": "OPEN_19_FORMAL_DENOTATIONS_AND_14_THEOREM_MIGRATIONS; 21_PROSE_AND_478_LEXICAL_ROWS_REQUIRE_REVIEW",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
     "D5": "STRICT_GATE_ROLE_WHITELIST_SYNTHETIC_GREEN_NEGATIVE_REGRESSIONS_AND_SECONDARY_LEDGER_FAIL_CLOSED_GUARD; B20_BOUNDED_NATIVE_VERIFIER_EXISTS; FULL_MACHINE_ATTESTOR_AND_EVIDENCE_PRODUCER_PENDING",
-    "D6": "NOT_READY_SECONDARY_CENSUS_HUMAN_REVIEW_AND_COMPLETE_NATIVE_RECEIPT_EVIDENCE",
+    "D6": "NOT_READY_478_SECONDARY_CENSUS_HUMAN_REVIEW_AND_COMPLETE_NATIVE_RECEIPT_EVIDENCE",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
@@ -103,11 +103,11 @@
   "currentDiscovery": {
     "legacyFencedInline": 202,
     "legacyProse": 21,
-    "lexicalLineCandidates": 704,
+    "lexicalLineCandidates": 478,
     "allCurrentMarkdown": 11,
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "The wider pass deliberately includes noise from version labels and prose. Neither 202 nor 704 is a final number of valid FORMAL expressions. Broad-ledger status flips are not accepted evidence: native source is tied to verified primary receipts, while explicit non-FORMAL exemptions require independently reviewable provenance."
+    "notes": "The broad pass began at 968 lexical line candidates. 264 Markdown wrapper-only and 226 inline-HTML/prose-colon false positives are mechanically excluded, leaving 478 reviewable rows. The 19 known primary FORMAL candidates remain covered. Neither 202 nor 478 is a final count of semantically valid FORMAL expressions. Broad-ledger status flips are not accepted evidence: native source is tied to verified primary receipts, while explicit non-FORMAL exemptions require independently reviewable provenance."
   }
 }
