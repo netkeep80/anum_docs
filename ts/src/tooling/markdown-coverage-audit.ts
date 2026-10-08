@@ -185,7 +185,7 @@ export function auditAcceptedV015RequirementRows(
   accepted: readonly Readonly<{ id: string; group: string; state: string; summary: string }>[],
 ): number {
   const rows = new Map<string, { group: string; state: string; summary: string }>();
-  const pattern = /^\\| <a id="mts-v015-([a-z0-9-]+)"><\\/a>`(V15-[A-Z0-9-]+)` \\| `([^\\`]+)` \\| `([^\\`]+)` \\| (.*) \\|$/gmu;
+  const pattern = /^\| <a id="mts-v015-([a-z0-9-]+)"><\/a>`(V15-[A-Z0-9-]+)` \| `([^`]+)` \| `([^`]+)` \| (.*) \|$/gmu;
   for (const match of markdown.matchAll(pattern)) {
     const [, anchor, id, group, state, summary] = match;
     if (id === undefined || anchor === undefined || group === undefined || state === undefined || summary === undefined) {
@@ -203,7 +203,7 @@ export function auditAcceptedV015RequirementRows(
     const actual = rows.get(req.id);
     if (!actual) fail("current normative requirement missing: " + req.id);
     if (actual.group !== req.group || actual.state !== req.state ||
-        actual.summary !== req.summary.replace(/\\|/g, "\\\\|").replace(/\\r?\\n/g, " ")) {
+        actual.summary !== req.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")) {
       fail("current normative requirement projection differs from accepted source: " + req.id);
     }
   }
