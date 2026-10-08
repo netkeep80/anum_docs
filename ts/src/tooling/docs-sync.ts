@@ -544,7 +544,7 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
   if (!source.includes("## 6. Текущая документация описывает принятую МТС v0.15")) {
     issues.push(path + ": current-documentation authority not v0.15");
   }
-  if (/v0\\.14/.test(source)) {
+  if (/v0\.14/.test(source)) {
     issues.push(path + ": v0.14 found in current contribution policy");
   }
   return issues;
