@@ -569,6 +569,24 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
   if (!glossary.includes("1. \`Current\` \`name\` выбирается по \`terminology\` \`projection\` в \`requirements/mts-v0.15.json\`.")) {
     issues.push("docs/Словарь терминов МТС.md: current terminology must use v0.15 registry");
   }
+  // Historical v0.14 positive-image sketches are valuable evidence,
+  // but their braces and ZERO pseudocode must not impersonate v0.15 FORMAL.
+  const foundation = readFileSync(resolve(root, "docs/theory/Основания МТС.md"), "utf8");
+  if (!foundation.includes("**Историческая схема** положительного образа v0.14") ||
+      !foundation.includes("`A:{}` в принятой FORMAL v0.15 означает") ||
+      foundation.includes("A -> {}      успешный пустой образ")) {
+    issues.push("docs/theory/Основания МТС.md: inherited MP/ZERO pseudocode misrepresented as current FORMAL");
+  }
+  const axioms = readFileSync(resolve(root, "docs/theory/Система аксиом МТС.md"), "utf8");
+  if (!axioms.includes("**Историческая метасхема v0.14**") ||
+      !axioms.includes("пустым результатом `ExactSequence([])`")) {
+    issues.push("docs/theory/Система аксиом МТС.md: historical V14-L11 not separated from current Γ/FORMAL");
+  }
+  const amemory = readFileSync(resolve(root, "docs/specs/Апамять и управление сетью связей.md"), "utf8");
+  if (!amemory.includes("**не является исходной грамматикой FORMAL v0.15**") ||
+      !amemory.includes("**псевдокод профиля 0.1.0**")) {
+    issues.push("docs/specs/Апамять и управление сетью связей.md: legacy profile arrows lack FORMAL authority boundary");
+  }
   const bundles = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
   if (!bundles.includes("В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:")) {
     issues.push("docs/specs/Пучки связей.md: accepted FORMAL context/bundle syntax must be distinguished from derived query meta-notation");
