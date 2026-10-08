@@ -13,6 +13,7 @@ const backlog = JSON.parse(read("audits/v015-theorem-formal-migration-backlog.js
   oldInventoryCount: number;
   formalMigrationCount: number;
   missingCount: number;
+  migrationWaves: { wave: number; ids: string[]; prerequisites: string[]; state: string }[];
   migrationsRequired: { id: string; sourceStatement: string; lawRefs: string[]; dependencies: string[]; premises: string[];
     proposedFormalStatement: null; formalSemanticsEvidence: null; migrationStatus: string }[];
 };
@@ -44,6 +45,27 @@ for (let i = 0; i < remaining.length; i++) {
   assert.equal(plan.formalSemanticsEvidence, null, "do not invent semantic denotation/proof evidence");
   assert.equal(plan.migrationStatus, "BLOCKED_NOT_MIGRATED");
 }
+const handled = new Set(migratedIds);
+const ordered: string[] = [];
+for (const [index, wave] of backlog.migrationWaves.entries()) {
+  assert.equal(wave.wave, index + 1, "migration wave number");
+  assert.equal(wave.state, "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE");
+  assert.ok(wave.ids.length > 0, "migration wave cannot be empty");
+  const expectedPrereqs = new Set<string>();
+  for (const id of wave.ids) {
+    assert.ok(!handled.has(id), id + " cannot be migrated twice");
+    const candidate = remaining.find((item) => item.id === id);
+    assert.ok(candidate, id + " must refer to historical missing theorem");
+    for (const dep of candidate.dependsOn) {
+      assert.ok(handled.has(dep), id + " dependency " + dep + " must precede migration wave");
+      expectedPrereqs.add(dep);
+    }
+    ordered.push(id);
+  }
+  assert.deepEqual(wave.prerequisites, [...expectedPrereqs].sort(), "wave prerequisites exact");
+  for (const id of wave.ids) handled.add(id);
+}
+assert.deepEqual(new Set(ordered), new Set(remaining.map((item) => item.id)));
 if (remaining.length) assert.equal(backlog.status, "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY");
 console.log("v0.15 theorem FORMAL migration: inventory locked; migrated=" +
   migrated.length + "/" + historical.length + "; remaining=" + remaining.length + "; FULL_FORMAL_COVERAGE_NOT_CLAIMED");
