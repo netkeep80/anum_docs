@@ -77,8 +77,9 @@
       "kind": "fence",
       "language": "text",
       "source": "ROOT / {chiral pair} / PAIR",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_FOUNDATION_EXPLANATORY_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Diagram summarizing structural self-incidence/chirality provenance, not an executable FORMAL assertion or a second Link ontology."
     },
     {
       "id": "F0002",
@@ -99,8 +100,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Ω = {W, J(W)}\nW ≠ J(W)\nJ² = Id\n\nContext K\n  -> χ(K)\n  -> START_K / END_K",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0004",
@@ -110,8 +112,9 @@
       "kind": "fence",
       "language": "text",
       "source": "g_AB ∈ {Id, J}\ng_AA = Id\ng_AB = g_BA\ng_AB ∘ g_BC = g_AC",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0005",
@@ -132,8 +135,9 @@
       "endLine": 109,
       "kind": "inline-code",
       "source": "N0=U",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0007",
@@ -345,8 +349,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Ω = {W, J(W)}\nW ≠ J(W)\nJ² = Id",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0025",
@@ -356,8 +361,9 @@
       "kind": "fence",
       "language": "text",
       "source": "g_AB ∈ {Id, J}\ng_AA = Id\ng_AB = g_BA\ng_AB ∘ g_BC = g_AC",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0026",
@@ -366,8 +372,9 @@
       "endLine": 67,
       "kind": "inline-code",
       "source": "g_AB = J",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0027",
@@ -411,8 +418,9 @@
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0031",
@@ -456,8 +464,9 @@
       "kind": "fence",
       "language": "text",
       "source": "нет допущенного отношения для A\n  -> K ⟼ A остаётся текущей истиной\n\nдопущенное отношение для A с пустым образом\n  -> переход состоялся, но A даёт нулевой вклад в следующий образ",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0035",
@@ -466,8 +475,9 @@
       "endLine": 168,
       "kind": "inline-code",
       "source": "A ⟼ B",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0036",
@@ -511,8 +521,9 @@
       "kind": "fence",
       "language": "text",
       "source": "N0 = U\nN(n+1) = Nn ⟼ L",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0040",
@@ -522,8 +533,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Link-only ontology\n        ↓\ntwo relational pole positions\n        ↓\nfour self-incidence cases\n        ↓\nobjective Z2 chirality Ω={W,J(W)}\n        ↓\nContext K selects local χ(K)\n        ↓\nSTART_K / END_K\n        ↓\nR / O / C / L / U\n        ↓\nstructural identity + contextual truth\n        ↓\ngeneralized relational reaction\n        ↓\nAnum / codecs / text / FORMAL as non-ontological representations",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_FOUNDATION_EXPLANATORY_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Diagram summarizing structural self-incidence/chirality provenance, not an executable FORMAL assertion or a second Link ontology."
     },
     {
       "id": "F0041",
@@ -533,8 +545,9 @@
       "kind": "fence",
       "language": "text",
       "source": "N0 = U\nN(n+1) = Nn ⟼ L",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0042",
@@ -622,8 +635,9 @@
       "kind": "fence",
       "language": "text",
       "source": "NO_ADMITTED_RELATION(A)\n  -> текущий K ⟼ A сохраняется\n\nADMITTED_AND_MATCHED(A) + empty image\n  -> успешный нулевой вклад в successor",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0050",
@@ -632,8 +646,9 @@
       "endLine": 211,
       "kind": "inline-code",
       "source": "A ⟼ B",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0051",
@@ -642,8 +657,9 @@
       "endLine": 213,
       "kind": "inline-code",
       "source": "CurrentScopeMember(A⟼B)",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited V14 contextual-truth/selected Theory admissibility metatheory or historical relation sketch; explicitly represented in descriptive foundation/V14-L11 section, not a native FORMAL v0.15 executable program."
     },
     {
       "id": "F0052",
@@ -653,8 +669,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Ω = {W, J(W)}\nW ≠ J(W)\nJ² = Id",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0053",
@@ -664,8 +681,9 @@
       "kind": "fence",
       "language": "text",
       "source": "g_AB ∈ {Id, J}\ng_AA = Id\ng_AB = g_BA\ng_AB ∘ g_BC = g_AC",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0054",
@@ -674,8 +692,9 @@
       "endLine": 254,
       "kind": "inline-code",
       "source": "g_AB=J",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
     },
     {
       "id": "F0055",
@@ -2430,13 +2449,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 15,
-    "unclassifiedCount": 19,
+    "unclassifiedCount": 0,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 164,
-    "unverifiedDenotationCount": 38,
+    "reviewedNonFormalCount": 183,
+    "unverifiedDenotationCount": 19,
     "verifiedFormalCount": 0
   }
 }
