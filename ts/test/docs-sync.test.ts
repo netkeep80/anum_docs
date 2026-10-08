@@ -70,6 +70,22 @@ assert.ok(!rendered.includes("Строковый носитель:"), "release p
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
 
+const acceptedRequirements = JSON.parse(readFileSync(resolve(repositoryRoot, "requirements/mts-v0.15.json"), "utf8")) as {
+  accepted: boolean;
+  requirements: { id: string; mandatory: boolean; group: string; state: string; summary: string }[];
+};
+assert.equal(acceptedRequirements.accepted, true);
+const formalCurrentDoc = readFileSync(resolve(repositoryRoot, "docs/specs/Формальная нотация МТС.md"), "utf8");
+const requiredEntries = acceptedRequirements.requirements.filter((item) => item.mandatory !== false);
+assert.equal(requiredEntries.length, 48, "accepted normative registry must be explicit");
+assert.ok(formalCurrentDoc.includes("## 9a. Нормативный реестр требований v0.15"));
+for (const requirement of requiredEntries) {
+  const anchor = '<a id="mts-v015-' + requirement.id.toLowerCase() + '"></a>';
+  assert.equal(formalCurrentDoc.split(anchor).length - 1, 1, requirement.id + " must be projected exactly once");
+  assert.ok(formalCurrentDoc.includes(requirement.summary.replace(/\\|/g, "\\\\|").replace(/\\r?\\n/g, " ")),
+    requirement.id + " normative summary must come from source");
+}
+
 const theoremCatalogSource = readFileSync(resolve(repositoryRoot, "docs/theory/Теоремы МТС.md"), "utf8");
 assert.ok(
   theoremCatalogSource.includes("[принятый контракт MTS v0.15](../../contracts/mts-contract-v0.15.json)"),
