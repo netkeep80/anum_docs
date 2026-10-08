@@ -175,6 +175,37 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const verified = candidates.filter((item) =>
     item.role === "FORMAL_V015" && item.denotation === "VERIFIED_AGAINST_ACCEPTED_V015");
   const other = candidates.length - pending.length - reviewedNonFormal.length - verified.length;
+  // Cross-check current FORMAL classification against independently stored
+  // theorem source and the accepted generated reader surface. Source labels
+  // cannot be reclassified as historical merely to evade denotation work.
+  const sourceClassificationIssues: string[] = [];
+  for (const entry of overlay) {
+    const id = field(entry, "id");
+    const statement = field(entry, "formalStatement");
+    const matches = candidates.filter((candidate) =>
+      candidate.path === "docs/theory/Теоремы МТС.md" &&
+      candidate.kind === "fence" &&
+      candidate.source === statement &&
+      candidate.role === "FORMAL_V015_THEOREM_STATEMENT");
+    if (matches.length !== 1) {
+      sourceClassificationIssues.push("formal theorem overlay not tracked as FORMAL source: " + id);
+    }
+  }
+  for (const candidate of candidates) {
+    const source = field(candidate, "source");
+    const path = field(candidate, "path");
+    if ((path === "docs/specs/Формальная нотация МТС.md" &&
+         (source.includes("A->B->C = (A->B)->C") ||
+          source.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))"))) ||
+        ((source === "A:{}" || source === "{ A }") &&
+         ["docs/specs/Пучки связей.md",
+          "docs/specs/Апамять и управление сетью связей.md",
+          "docs/theory/Основания МТС.md"].includes(path))) {
+      if (!field(candidate, "role").startsWith("FORMAL_V015_")) {
+        sourceClassificationIssues.push("current FORMAL example improperly exempted: " + path);
+      }
+    }
+  }
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
   const blockers: string[] = [];
   if (!acceptedRelease || coverage.contract !== "mts-contract/v0.15") blockers.push("accepted release authority mismatch");
@@ -185,6 +216,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   if (pending.length > 0) blockers.push("unverified current documentation formula candidates: " + pending.length);
   if (other > 0) blockers.push("unreviewed/unrecognized formula classification: " + other);
   if (inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + inventoryIntegrityIssues.join("; "));
+  if (sourceClassificationIssues.length > 0) blockers.push("FORMAL authority-classification mismatch: " + sourceClassificationIssues.join("; "));
   if (manifest.state !== "COMPLETE_VERIFIED") blockers.push("final author-reviewed documentation migration manifest not COMPLETE_VERIFIED");
   return Object.freeze({
     schema: "mts-v015-current-documentation-acceptance/v0.1" as const,
