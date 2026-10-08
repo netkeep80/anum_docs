@@ -219,6 +219,22 @@ try {
   writeFileSync(contributingPath, currentPolicy, "utf8");
   assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
   
+  for (const [path, authority] of [
+    ["docs/theory/Основания МТС.md", "[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+    ["docs/theory/Система аксиом МТС.md", "[контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+  ] as const) {
+    const fullPath = resolve(tempRoot, path);
+    const original = readFileSync(fullPath, "utf8");
+    assert.ok(original.includes(authority), path + " must identify current v0.15 authority");
+    writeFileSync(fullPath, original.replace(authority, "[контракт v0.14](../../contracts/mts-contract-v0.14.json)"), "utf8");
+    assert.ok(
+      checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)),
+      path + ": D2 negative authority downgrade must fail closed",
+    );
+    writeFileSync(fullPath, original, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
+
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
