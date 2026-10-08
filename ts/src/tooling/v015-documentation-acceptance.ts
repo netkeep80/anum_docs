@@ -77,12 +77,12 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     indexedPaths.add(path);
     const source = readFileSync(resolve(root, path), "utf8");
     const gitBlobSha = createHash("sha1")
-      .update("blob " + Buffer.byteLength(source, "utf8") + "\\0")
+      .update("blob " + Buffer.byteLength(source, "utf8") + "\0")
       .update(source, "utf8").digest("hex");
     if (gitBlobSha !== field(file, "blobSha")) {
       inventoryIntegrityIssues.push("source SHA drift: " + path);
     }
-    const lines = source.split(/\\r?\\n/);
+    const lines = source.split(/\r?\n/);
     sourceLines.set(path, lines);
     if (lines.length !== file.lineCount) {
       inventoryIntegrityIssues.push("source line count drift: " + path);
@@ -108,7 +108,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       continue;
     }
     const excerpt = kind === "fence"
-      ? lines.slice((begin as number) - 1, end as number).join("\\n")
+      ? lines.slice((begin as number) - 1, end as number).join("\n")
       : lines[(begin as number) - 1];
     if ((kind === "fence" && excerpt !== source) ||
         (kind === "inline-code" && (begin !== end || !excerpt?.includes("`" + source + "`"))) ||
