@@ -103,6 +103,23 @@
         "NATIVE_PROOF=NOT_CLAIMED",
         "APROVER_ACCEPT=NOT_CLAIMED"
       ]
+    },
+    {
+      "id": "F0203",
+      "theoremId": "FND-03",
+      "source": "FND03_STATEMENT : FND03_PREMISES->FND03_CONCLUSION",
+      "formalSourcePath": "ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts",
+      "testBlobSha": "105887e33524696ef743c966af96c9a9a3e8f9d0",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "outputMarkers": [
+        "MTS v0.15 B21 FND-03 FORMAL statement:",
+        "MIGRATION_STATUS=FORMAL_MIGRATED",
+        "ACCEPTED_REQUIREMENTS=V15-ONTO-01+V15-ONTO-03+V15-STRUCT-01",
+        "PRESENTATION_RENAME=SEMANTICALLY_STABLE",
+        "NATIVE_PROOF=NOT_CLAIMED",
+        "APROVER_ACCEPT=NOT_CLAIMED"
+      ]
     }
   ]
 }

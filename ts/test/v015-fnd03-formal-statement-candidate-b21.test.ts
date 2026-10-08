@@ -25,7 +25,7 @@ import { materializeV015LinkDefinitionProfile } from "../src/v015-link-definitio
 import { materializeV012StringAnum } from "../src/v012-string-anum.js";
 
 function assert(value: unknown, message: string): asserts value {
-  if (!value) throw new Error("v0.15 B21 FND-03 candidate FORMAL statement: " + message);
+  if (!value) throw new Error("v0.15 B21 FND-03 FORMAL statement: " + message);
 }
 function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), message + ": values differ");
@@ -311,8 +311,8 @@ sameBytes(
 }
 
 console.log([
-  "MTS v0.15 B21 FND-03 candidate FORMAL statement:",
-  "MIGRATION_STATUS=CANDIDATE_NOT_PROMOTED",
+  "MTS v0.15 B21 FND-03 FORMAL statement:",
+  "MIGRATION_STATUS=FORMAL_MIGRATED",
   "FORMAL_ARTIFACT_KIND=STATEMENT_ONLY",
   "FORMAL_PREMISES=0",
   "FORMAL_DEPENDENCIES=FND-01+FND-02",
