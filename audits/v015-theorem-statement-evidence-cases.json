@@ -94,7 +94,7 @@
       "theoremId": "EXE-02",
       "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
       "formalSourcePath": "ts/test/v015-exe02-formal-statement-b17.test.ts",
-      "testBlobSha": "3cfc5ea70978814f01ba03f4379cb7833d7afe",
+      "testBlobSha": "3cfc5ea70978814f01ba03f4379cbad7833d7afe",
       "proofClosure": "NO_PROOF_ARTIFACT",
       "formalArtifactKind": "STATEMENT_ONLY",
       "outputMarkers": [
