@@ -82,7 +82,7 @@ assert.ok(formalCurrentDoc.includes("## 9a. Нормативный реестр 
 for (const requirement of requiredEntries) {
   const anchor = '<a id="mts-v015-' + requirement.id.toLowerCase() + '"></a>';
   assert.equal(formalCurrentDoc.split(anchor).length - 1, 1, requirement.id + " must be projected exactly once");
-  assert.ok(formalCurrentDoc.includes(requirement.summary.replace(/\\|/g, "\\\\|").replace(/\\r?\\n/g, " ")),
+  assert.ok(formalCurrentDoc.includes(requirement.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")),
     requirement.id + " normative summary must come from source");
 }
 
