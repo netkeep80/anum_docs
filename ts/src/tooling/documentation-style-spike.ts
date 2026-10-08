@@ -55,7 +55,7 @@ function repoLink(path: string, sha: string): string {
 }
 function status(theorem: TheoremProjectionTheorem): string {
   if (theorem.formalV015.migrationStatus === "NOT_MIGRATED")
-    return "FORMAL v0.15: формулировка не мигрирована. Исторические свидетельства не повышаются до нативного доказательства.";
+    return "FORMAL v0.15: " + quoted("NOT_MIGRATED") + " — формулировка не мигрирована. Исторические свидетельства не повышаются до нативного доказательства.";
   return "FORMAL v0.15: " + quoted(theorem.formalV015.migrationStatus) +
     "; формулировка **не означает нового доказательства**.";
 }
