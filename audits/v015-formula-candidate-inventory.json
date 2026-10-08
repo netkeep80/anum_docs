@@ -684,8 +684,11 @@
       "endLine": 17,
       "kind": "inline-code",
       "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0056",
@@ -694,8 +697,11 @@
       "endLine": 18,
       "kind": "inline-code",
       "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0057",
@@ -704,8 +710,11 @@
       "endLine": 20,
       "kind": "inline-code",
       "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-04",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0058",
@@ -714,8 +723,11 @@
       "endLine": 23,
       "kind": "inline-code",
       "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0059",
@@ -724,8 +736,11 @@
       "endLine": 24,
       "kind": "inline-code",
       "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0060",
@@ -734,8 +749,11 @@
       "endLine": 26,
       "kind": "inline-code",
       "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-01",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0061",
@@ -744,8 +762,11 @@
       "endLine": 27,
       "kind": "inline-code",
       "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0062",
@@ -754,8 +775,11 @@
       "endLine": 33,
       "kind": "inline-code",
       "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "CTX-03",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0063",
@@ -765,8 +789,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-01",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-01 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0064",
@@ -775,8 +802,9 @@
       "endLine": 115,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0065",
@@ -785,8 +813,9 @@
       "endLine": 120,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0066",
@@ -796,8 +825,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0067",
@@ -807,8 +839,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-02 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0068",
@@ -817,8 +852,9 @@
       "endLine": 210,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0069",
@@ -827,8 +863,9 @@
       "endLine": 215,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0070",
@@ -838,8 +875,11 @@
       "kind": "fence",
       "language": "text",
       "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0071",
@@ -849,8 +889,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-13 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0072",
@@ -859,8 +902,9 @@
       "endLine": 318,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0073",
@@ -869,8 +913,9 @@
       "endLine": 323,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0074",
@@ -879,8 +924,9 @@
       "endLine": 405,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0075",
@@ -889,8 +935,9 @@
       "endLine": 410,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0076",
@@ -900,8 +947,11 @@
       "kind": "fence",
       "language": "text",
       "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-04",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0077",
@@ -910,8 +960,9 @@
       "endLine": 481,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0078",
@@ -920,8 +971,9 @@
       "endLine": 486,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0079",
@@ -930,8 +982,9 @@
       "endLine": 562,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0080",
@@ -940,8 +993,9 @@
       "endLine": 567,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0081",
@@ -950,8 +1004,9 @@
       "endLine": 640,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0082",
@@ -960,8 +1015,9 @@
       "endLine": 645,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0083",
@@ -971,8 +1027,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0084",
@@ -982,8 +1041,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-07 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0085",
@@ -992,8 +1054,9 @@
       "endLine": 713,
       "kind": "inline-code",
       "source": "F2F3OneSidedExistence for structural L = O⟼C",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0086",
@@ -1002,8 +1065,9 @@
       "endLine": 731,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0087",
@@ -1012,8 +1076,9 @@
       "endLine": 736,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0088",
@@ -1022,8 +1087,9 @@
       "endLine": 765,
       "kind": "inline-code",
       "source": "L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0089",
@@ -1033,8 +1099,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0090",
@@ -1044,8 +1113,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-08 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0091",
@@ -1055,8 +1127,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Do not collapse NO_ADMITTED_RELATION into explicit ZERO; ambient Link existence is not admission authority; selected-Theory admission must not be reclassified as CurrentScopeMember/ContextualRule merely to reuse FND-07 composition; ContextualScopeCompositionLaw is not an FND-08 reaction premise; Produced output is not the whole successor because unmatched current members survive; extensional Next=Active does not imply quiescence; no unrestricted host rewrite/global substitution, host RuleKind, multivalued-function primitive or result-cardinality opcode is implied.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0092",
@@ -1065,8 +1138,9 @@
       "endLine": 842,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0093",
@@ -1075,8 +1149,9 @@
       "endLine": 847,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0094",
@@ -1086,8 +1161,11 @@
       "kind": "fence",
       "language": "text",
       "source": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-09",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for FND-09 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0095",
@@ -1096,8 +1174,9 @@
       "endLine": 932,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0096",
@@ -1106,8 +1185,9 @@
       "endLine": 937,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0097",
@@ -1117,8 +1197,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-01",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0098",
@@ -1127,8 +1210,9 @@
       "endLine": 1016,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0099",
@@ -1137,8 +1221,9 @@
       "endLine": 1021,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0100",
@@ -1148,8 +1233,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0101",
@@ -1158,8 +1246,9 @@
       "endLine": 1102,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0102",
@@ -1168,8 +1257,9 @@
       "endLine": 1107,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0103",
@@ -1178,8 +1268,9 @@
       "endLine": 1178,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0104",
@@ -1188,8 +1279,9 @@
       "endLine": 1183,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0105",
@@ -1198,8 +1290,9 @@
       "endLine": 1255,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0106",
@@ -1208,8 +1301,9 @@
       "endLine": 1260,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0107",
@@ -1218,8 +1312,9 @@
       "endLine": 1337,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0108",
@@ -1228,8 +1323,9 @@
       "endLine": 1342,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0109",
@@ -1238,8 +1334,9 @@
       "endLine": 1418,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0110",
@@ -1248,8 +1345,9 @@
       "endLine": 1423,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0111",
@@ -1258,8 +1356,9 @@
       "endLine": 1499,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0112",
@@ -1268,8 +1367,9 @@
       "endLine": 1504,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0113",
@@ -1279,8 +1379,11 @@
       "kind": "fence",
       "language": "text",
       "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "CTX-03",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
     },
     {
       "id": "F0114",
@@ -1289,8 +1392,9 @@
       "endLine": 1584,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0115",
@@ -1299,8 +1403,9 @@
       "endLine": 1589,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0116",
@@ -1310,8 +1415,11 @@
       "kind": "fence",
       "language": "text",
       "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "NOT_VERIFIED",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "EXE-02",
+      "reviewBasis": "Exact current v0.15 FORMAL theorem source expression for EXE-02 from candidate proof overlay. Presence does not establish independent semantic denotation or aprover proof closure."
     },
     {
       "id": "F0117",
@@ -1320,8 +1428,9 @@
       "endLine": 1696,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0118",
@@ -1330,8 +1439,9 @@
       "endLine": 1701,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0119",
@@ -1340,8 +1450,9 @@
       "endLine": 1777,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0120",
@@ -1350,8 +1461,9 @@
       "endLine": 1782,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0121",
@@ -1360,8 +1472,9 @@
       "endLine": 1857,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0122",
@@ -1370,8 +1483,9 @@
       "endLine": 1862,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
     },
     {
       "id": "F0123",
@@ -1380,8 +1494,9 @@
       "endLine": 2015,
       "kind": "inline-code",
       "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0124",
@@ -1390,8 +1505,9 @@
       "endLine": 2244,
       "kind": "inline-code",
       "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0125",
@@ -1400,8 +1516,9 @@
       "endLine": 2445,
       "kind": "inline-code",
       "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0126",
@@ -1410,8 +1527,9 @@
       "endLine": 2478,
       "kind": "inline-code",
       "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0127",
@@ -2278,13 +2396,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 15,
-    "unclassifiedCount": 125,
+    "unclassifiedCount": 53,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 65,
-    "unverifiedDenotationCount": 137,
+    "reviewedNonFormalCount": 130,
+    "unverifiedDenotationCount": 72,
     "verifiedFormalCount": 0
   }
 }
