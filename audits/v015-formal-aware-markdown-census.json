@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 478,
+    "unreviewed": 466,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -93,9 +93,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Repository portfolio-flow arrow; this diagram governs work/dependencies and is explicitly not semantic authority.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "765c969bd2181c65a3f7b4323d6317ab51450581691e72b32fd889c508edc76a"
     },
     {
       "path": "PORTFOLIO.md",
@@ -105,9 +108,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Repository portfolio-flow arrow; this diagram labels the anum_docs responsibility split and is not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "20873dddf20d484db081c7517e4dc50ad17354e9b1b4c04b6e1fd65ff9fdf3a6"
     },
     {
       "path": "PORTFOLIO.md",
@@ -117,9 +123,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Repository portfolio-flow arrow; this diagram labels proof responsibility and is not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "aafa19c1411fc94208f4febd49ed6743e43872f76be2ba483323e2431772ae08"
     },
     {
       "path": "PORTFOLIO.md",
@@ -129,9 +138,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Repository portfolio-flow arrow; this diagram labels contracts/conformance responsibility and is not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "958b327e6595d75d2175403e567fe13872971add63a049b8e8cffd15d956934b"
     },
     {
       "path": "PORTFOLIO.md",
@@ -141,9 +153,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ARCHITECTURE_DIAGRAM",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Repository portfolio-flow arrow; this diagram labels implementation responsibility and is not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "e05590f5a743cf4e473da39c1d61a9cc3517b7398823d34630f13fa5658312f3"
     },
     {
       "path": "README.md",
@@ -363,9 +378,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The lexical hit is the repository command name docs:sync inside release-presentation guidance, not an MTS contextual binding.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "78598a8c795cd2bcdcfb7293fc3f6d2ef66ce1dea28c00d732813814a6bc88cd"
     },
     {
       "path": "README.md",
@@ -784,9 +802,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The source is an npm documentation-generation command; docs:sync is repository tooling syntax, not MTS FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "6dffadcb4e35f0989959bc6b1f8890dcada72e108e14e2761b46216453ee0298"
     },
     {
       "path": "docs/CONTRIBUTING.md",
@@ -796,9 +817,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The source is an npm documentation-check command; docs:check is repository tooling syntax, not MTS FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "dff94a5c85bbce8fd49290f62983d17b18b1239793196e584781886b4f3e2f4e"
     },
     {
       "path": "docs/CONTRIBUTING.md",
@@ -808,9 +832,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This sentence defines repository ownership of generated blocks; docs:sync is tooling vocabulary, not MTS FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "7fb3ec39eecfa91e7ba83e82b4af309e9927ce279b229fdf33cce3c2b39eaa2b"
     },
     {
       "path": "docs/CONTRIBUTING.md",
@@ -2126,9 +2153,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The colon labels an explanatory comparison row for the recursive alphabet; it is representation prose, not contextual binding.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "be601e7440d478dcb8e262c6051d60effaf5835d9a1a6a3e7949083d6f076ed9"
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
@@ -2138,9 +2168,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The colon labels an explanatory comparison row for the Q alphabet; it is representation prose, not contextual binding.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "02422c986fe8c54a164fc316b94843bb21d0176f03f2030c4777950dde551946"
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
@@ -2888,9 +2921,12 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_GOVERNANCE_VOCABULARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated-file notice describes docs:sync ownership and authority rules; the command-name colon is not FORMAL syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065689438",
+      "reviewSourceSha256": "934a205529ad39722227aef1f35e7dc85c11333f33926f918c8779bc04b6fbab"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
