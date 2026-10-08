@@ -41,23 +41,23 @@
       "path": "docs/theory/Теоремы МТС.md",
       "kind": "formal-proof-status-ambiguity",
       "evidence": "v0.14 accepted theorem inventory and v0.15-candidate formal theorem overlay are presented together.",
-      "state": "RELEASE_AND_PROOF_STATUS_SEPARATED_IN_GENERATOR",
-      "remediation": "Theorem catalog generator and its Markdown projection now identify accepted v0.15 semantic authority and separately identify v0.15-candidate as proof-migration status. Candidate evidence remains unpromoted. FORMAL conversion of original theorem formula texts is still pending."
+      "state": "7_OF_21_FORMAL_THEOREM_PROJECTIONS_14_MISSING",
+      "remediation": "Theorem generator and Markdown show 7/21, annotate original source as historical; 14 missing IDs are version-pinned in audits/v015-theorem-formal-migration-backlog.json. No new unreviewed FORMAL source or proof status promoted."
     },
     {
       "id": "DOC15-004",
       "path": "ts/src/tooling/markdown-coverage-audit.ts",
       "kind": "audit-coverage-fallback",
-      "evidence": "Current v0.15 requirements/v0.3 trigger unconditional requirements/mts-v0.14.json coverage fallback; projectionState is V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951.",
-      "state": "OPEN_COMPATIBILITY_FALLBACK",
-      "remediation": "Migrate ownership/projections, then make v0.15 coverage mandatory and fail-closed, removing compatibility fallback."
+      "evidence": "Generated v0.15 FORMAL spec now includes all 48 canonical mandatory requirements, unique anchors/summary rows. markdown-coverage-audit checks v0.15 directly; old v0.14 owner blocks explicitly only historical provenance. docs:check enforces all 48 rows.",
+      "state": "V15_NORMATIVE_48_OF_48_INDEXED_HISTORICAL_V14_SCOPED",
+      "remediation": "No normative v0.14 fallback remains in Markdown coverage; semantic FORMAL theorem/example conformance is still separate and incomplete."
     },
     {
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "10 current surfaces, 194 operator-bearing candidate occurrences (114 fenced blocks; 80 inline expressions). Exact blob SHA + line range captured; automated negative drift test present.",
-      "state": "194_CANDIDATES_NOT_SEMANTICALLY_CLASSIFIED",
+      "evidence": "194 operator-bearing fragments in 10 current surfaces, with exact source Git blob IDs: 14 non-FORMAL governance diagrams + 9 codec/representation notations + 1 lifecycle term classified; 170 unclassified and NOT_VERIFIED. Test fail-closed on snapshot/source drift.",
+      "state": "170_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
       "remediation": "Classify FORMAL vs representation code vs metanotation/pseudocode, then verify all actual FORMAL source expressions against accepted parser/compiler/semantic denotation; introduce fail-closed formal conformance gate."
     },
     {
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "194_OPERATOR_BEARING_CANDIDATES_INVENTORIED_ON_10_CURRENT_SURFACES",
-    "D2": "PARTIAL_CURRENT_AUTHORITY_FIXED_IN_README_FOUNDATION_AXIOMS",
-    "D3": "OPEN_194_CANDIDATES_REVIEW_PENDING",
-    "D4": "PARTIAL_THEOREM_GENERATOR_AND_TARGET_SYNCED",
-    "D5": "OPEN_V14_MARKDOWN_COVERAGE_FALLBACK_REMAINS",
-    "D6": "NOT_READY",
+    "D1": "194_CANDIDATES_EXACT_BLOB_INVENTORY_24_UNAMBIGUOUS_NON_FORMAL_EXCLUSIONS",
+    "D2": "CURRENT_V015_AUTHORITY_AND_48_REQUIREMENTS_IN_CURRENT_FORMAL_SPEC",
+    "D3": "OPEN_170_UNCLASSIFIED_FORMULAS_AND_14_THEOREM_MIGRATIONS",
+    "D4": "FORMAL_AND_THEOREM_GENERATORS_UPDATED_AND_TARGETS_REGENERATED",
+    "D5": "V015_48_OF_48_NORMATIVE_ROWS_REQUIRED_BY_DOCS_CHECK_V14_PROVENANCE_SEPARATE",
+    "D6": "NOT_READY_WAIT_FOR_DENOTATION_AND_THEOREM_MIGRATION",
     "issue1951": "OPEN",
     "ci": "PENDING_FINAL_HEAD",
     "acceptedArtifactsModified": false
