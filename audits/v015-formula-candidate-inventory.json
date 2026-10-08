@@ -1718,8 +1718,9 @@
       "kind": "fence",
       "language": "text",
       "source": "MTS v0.15\n  accepted semantic foundation\n\nminimal-portable-amemory-execution@0.1.0\n  separately governed execution profile\n  historical foundation pin = accepted MTS v0.13\n\nnetkeep80/amemory and other backends\n  concrete implementations / storage / CPU / GPU / browser",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0143",
@@ -1729,8 +1730,9 @@
       "kind": "fence",
       "language": "text",
       "source": "V013_SUFFICIENT = FALSE\nV013_PLUS_EXECUTION_PROFILE = TRUE\nSEMANTIC_EXTENSION_REQUIRED = FALSE for minimal complete A-memory",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0144",
@@ -1740,8 +1742,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Resolve      -> найти/проверить существующее\nMaterialize  -> создать разрешённую отсутствующую структуру",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0145",
@@ -1751,8 +1754,9 @@
       "kind": "fence",
       "language": "text",
       "source": "physical existence != current semantic state",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0146",
@@ -1761,8 +1765,9 @@
       "endLine": 109,
       "kind": "inline-code",
       "source": "K ⟼ A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0147",
@@ -1783,8 +1788,9 @@
       "kind": "fence",
       "language": "text",
       "source": "Theory ⟼ relation",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0149",
@@ -1794,8 +1800,9 @@
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0150",
@@ -1805,8 +1812,9 @@
       "kind": "fence",
       "language": "text",
       "source": "NO_ADMITTED_RELATION(A, Theory)\n  -> сохранить текущую истину\n\nspecific relation lookup = NOT_FOUND\n  -> только результат одного чтения\n  -> НЕ доказательство NO_ADMITTED_RELATION\n\nZERO\n  admitted A -> []\n  -> нулевой вклад в successor\n\nONE\n  admitted A -> [B]\n  -> один канонический successor\n\nMANY\n  admitted A -> [B,C,...]\n  -> объединить все канонические successors",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0151",
@@ -1838,8 +1846,9 @@
       "kind": "fence",
       "language": "text",
       "source": "TheorySnapshot_t\n  = admissions visible at reaction start\n\nall current members of reaction t\n  use the same TheorySnapshot_t\n\nnew admission created during t\n  may exist physically immediately\n  becomes executable in reaction t+1",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0154",
@@ -1849,8 +1858,9 @@
       "kind": "fence",
       "language": "text",
       "source": "normalized successor A = normalized successor B",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0155",
@@ -1860,8 +1870,9 @@
       "kind": "fence",
       "language": "text",
       "source": "build complete successor\n-> publish exactly one atomic current-root handoff",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0156",
@@ -1871,8 +1882,9 @@
       "kind": "fence",
       "language": "text",
       "source": "matchedRelations = 0\nhandoffCount     = 0",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0157",
@@ -1882,8 +1894,9 @@
       "kind": "fence",
       "language": "text",
       "source": "S0 = { K ⟼ A }\n\nA ⟼ [B]\nB ⟼ [A]\n\nS0 -> {K⟼B} -> S0 -> ...",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0158",
@@ -1893,8 +1906,9 @@
       "kind": "fence",
       "language": "text",
       "source": "RECURRENCE_IMPLIES_QUIESCENCE = FALSE\nGLOBAL_TERMINATION_REQUIRED   = FALSE\nSTRUCTURAL_END_IS_GLOBAL_HALT = FALSE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0159",
@@ -1904,8 +1918,9 @@
       "kind": "fence",
       "language": "text",
       "source": "H = X ⟼ (Y ⟼ Z)\n\nK ⟼ A\nA ⟼ [H]\n------\nK ⟼ H",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0160",
@@ -1915,8 +1930,9 @@
       "kind": "fence",
       "language": "text",
       "source": "HIERARCHICAL_LINK_AS_RESULT = supported by minimal reaction\n\ndynamic hierarchical Result construction = INDEPENDENT_LATER_FEATURE\nnested Context / Result lifecycle         = INDEPENDENT_LATER_FEATURE\npersistent Result versions               = INDEPENDENT_LATER_FEATURE\n\nDEFERRED != REJECTED",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0161",
@@ -1926,8 +1942,9 @@
       "kind": "fence",
       "language": "text",
       "source": "PROGRAM_SEMANTIC_AUTHORITY = LINK_CARRIED_THEORY_RELATIONS\nSCOPED_SELF_HOSTED_PROGRAM_SEMANTICS = TRUE\nFULLY_SELF_HOSTED_MTS_SYSTEM = FALSE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0162",
@@ -1936,8 +1953,9 @@
       "endLine": 379,
       "kind": "inline-code",
       "source": "K⟼A; A⟼[B]",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0163",
@@ -1946,8 +1964,9 @@
       "endLine": 380,
       "kind": "inline-code",
       "source": "A⟼[]",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0164",
@@ -1956,8 +1975,9 @@
       "endLine": 381,
       "kind": "inline-code",
       "source": "A⟼[B,C]",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0165",
@@ -1967,8 +1987,9 @@
       "kind": "fence",
       "language": "text",
       "source": "current:\n  K ⟼ A\n\nadmitted:\n  A ⟼ [B]\n\nnext:\n  K ⟼ B",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0166",
@@ -1977,8 +1998,9 @@
       "endLine": 400,
       "kind": "inline-code",
       "source": "K⟼A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0167",
@@ -1988,8 +2010,9 @@
       "kind": "fence",
       "language": "text",
       "source": "no admitted relation\n-> preserve K ⟼ A\n\nadmitted A -> []\n-> do not include K ⟼ A in successor",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0168",
@@ -1999,8 +2022,9 @@
       "kind": "fence",
       "language": "text",
       "source": "A -> [B,C,B]",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0169",
@@ -2010,8 +2034,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{K⟼A} -> {K⟼B} -> {K⟼A} -> ...",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0170",
@@ -2021,8 +2046,9 @@
       "kind": "fence",
       "language": "text",
       "source": "normalized successor A = normalized successor B",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0171",
@@ -2031,8 +2057,9 @@
       "endLine": 458,
       "kind": "inline-code",
       "source": "K ⟼ A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0172",
@@ -2041,8 +2068,9 @@
       "endLine": 460,
       "kind": "inline-code",
       "source": "K ⟼ A",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0173",
@@ -2051,8 +2079,9 @@
       "endLine": 472,
       "kind": "inline-code",
       "source": "matchedRelations = 0",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Illustrative read/resolve, selected Theory, reaction, ZERO/ONE/MANY, handoff or recurrence pseudo-notation from A-memory profile 0.1.0, explicitly distinguished from current v0.15 FORMAL grammar in section 6; no native executable FORMAL denotation asserted."
     },
     {
       "id": "F0174",
@@ -2062,8 +2091,9 @@
       "kind": "fence",
       "language": "text",
       "source": "THEORY_DUALIZATION = TRUE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0175",
@@ -2073,8 +2103,9 @@
       "kind": "fence",
       "language": "text",
       "source": "A72u dual-tree / single-assignment Result slots = GREEN_SCOPED_RESEARCH\nA72v persistent Result versions / path-copy      = RETAINED_DEFERRED_RESEARCH",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0176",
@@ -2084,8 +2115,9 @@
       "kind": "fence",
       "language": "text",
       "source": "amemory D7 issue 24 = COMPLETED\namemory PR 25 = MERGED\namemory main = 90a6a3a26ad14b8d00fca0ec6e66fa1fdd9a5203\n\naccepted foundation pin =\n  440caf09558d4ff5cfda11805cb3ef97b48d1ad5\n\nexecution profile pin =\n  af4e3dadbb9857fba7239a58f79ed2da59bc5c42\n\nexecution profile blob =\n  e2c614e1556f31f6230cb69d686d1f22ab2c97e8\n\nimplementedProfileId = minimal-portable-amemory-execution\nimplementedProfileVersion = 0.1.0\n\nsupportLevel = partial\nfullProfileConformance = false\ncurrent reaction Scope = NOT_IMPLEMENTED_FOR_EXECUTION\n\nP10 / P15 = supporting evidence only\nP01-P09 / P11-P14 / P16-P17 = not-yet-executed",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0177",
@@ -2095,8 +2127,9 @@
       "kind": "fence",
       "language": "text",
       "source": "V013_SUFFICIENT = FALSE\nV013_PLUS_EXECUTION_PROFILE = TRUE\nSEMANTIC_EXTENSION_REQUIRED = FALSE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0178",
@@ -2106,8 +2139,9 @@
       "kind": "fence",
       "language": "text",
       "source": "A_MEMORY_DOCUMENTATION = COMPLETE\nGLOSSARY = CONVERGED\nAMEMORY_IMPLEMENTATION_DOCS = ALIGNED\nBROKEN_CURRENT_LINKS = 0\nCOMPETING_A_MEMORY_SEMANTIC_OWNERS = 0\nUNSCOPED_SELF_HOSTING_CLAIMS = 0\nHOST_SCHEDULING_PRESENTED_AS_SEMANTICS = 0\nD1_D10 = COMPLETE\n\nFULL_REACTION_PROFILE_CONFORMANCE = FALSE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical status/provenance ledger of separately governed minimal-portable-amemory-execution@0.1.0; explicitly not semantic Link identity nor accepted v0.15 native FORMAL program."
     },
     {
       "id": "F0179",
@@ -2396,13 +2430,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 15,
-    "unclassifiedCount": 53,
+    "unclassifiedCount": 19,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 130,
-    "unverifiedDenotationCount": 72,
+    "reviewedNonFormalCount": 164,
+    "unverifiedDenotationCount": 38,
     "verifiedFormalCount": 0
   }
 }
