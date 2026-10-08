@@ -13,6 +13,9 @@ assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
 assert.equal(report.formulas.total, 202);
+assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
+assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
+assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
 assert.equal(report.formulas.pending + report.formulas.reviewedNonFormal + report.formulas.verified, report.formulas.total);
 assert.ok(!report.blockers.some((issue) => issue.includes("stale/tampered formula inventory")),
   "current source SHA and independently rediscovered formula candidates must be exact");
@@ -37,6 +40,7 @@ const complete = {
   verifiedFormalIds: ids,
   invalidOverlayIds: [],
   pendingCount: 0,
+  prosePendingCount: 0,
   unexpectedFormulaCount: 0,
   evidenceDefects: [],
   inventoryIntegrityIssues: [],
@@ -51,6 +55,11 @@ assert.ok(evaluateV015DocumentationCompletion({
   evidenceDefects: ["F0001: missing semantic source/denotation/replay witness"],
 }).some((issue) => issue.includes("machine evidence incomplete")),
 "changing VERIFIED metadata without machine evidence must not allow GREEN");
+assert.ok(evaluateV015DocumentationCompletion({
+  ...complete,
+  prosePendingCount: 1,
+}).some((issue) => issue.includes("unreviewed plain Markdown formula candidates")),
+"one unreviewed prose/table formula must block terminal acceptance");
 assert.ok(evaluateV015DocumentationCompletion({
   ...complete,
   pendingCount: 1,
