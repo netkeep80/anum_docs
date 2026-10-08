@@ -34,15 +34,19 @@ try {
     "A : [B]",
     "[A,B]",
     "![semantic arrow A->B](figure.png)",
+    "```formal",
+    "[A](B)",
+    "```",
   ].join("\n"), "utf8");
   const lexicalFixtureResult = scanV015FormalLexicalSurface(lexicalFixture);
-  assert.equal(lexicalFixtureResult.observations.length, 4,
+  assert.equal(lexicalFixtureResult.observations.length, 5,
     "ordinary Markdown link labels must not become ExactSequence false positives");
   assert.deepEqual(lexicalFixtureResult.observations.map(({ line, tokens }) => [line, tokens]), [
     [3, ["LINK_DIRECTION"]],
     [4, ["CONTEXT_NAME_OR_BINDING", "EXACT_SEQUENCE"]],
     [5, ["EXACT_SEQUENCE"]],
     [6, ["LINK_DIRECTION", "DIAGRAM_OR_IMAGE"]],
+    [8, ["EXACT_SEQUENCE"]],
   ], "real FORMAL labels, bracket sequences and diagram arrows must remain discoverable");
 } finally {
   rmSync(lexicalFixture, { recursive: true, force: true });

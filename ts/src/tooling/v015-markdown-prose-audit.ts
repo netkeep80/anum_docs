@@ -123,8 +123,9 @@ export function scanV015FormalLexicalSurface(root: string): V015FormalLexicalSca
       if (/^\s*<!--/.test(source)) continue;
       // Markdown link/image brackets are presentation syntax, not FORMAL ExactSequence.
       // Keep visible labels (including FORMAL operators), but discard link destinations.
+      // Fenced code remains literal FORMAL source; only rendered Markdown is normalized.
       // Diagram/image discovery still runs on the original source line.
-      const semanticText = source.replace(/!?\[([^\]\n]+)\]\([^)\n]*\)/g, "$1");
+      const semanticText = inFence ? source : source.replace(/!?\[([^\]\n]+)\]\([^)\n]*\)/g, "$1");
       const tokens = checks.filter(([name, re]) =>
         re.test(name === "DIAGRAM_OR_IMAGE" ? source : semanticText)).map(([name]) => name);
       if (tokens.length === 0) continue;
