@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "194 operator-bearing fragments in 10 current surfaces, with exact source Git blob IDs: 14 non-FORMAL governance diagrams + 9 codec/representation notations + 1 lifecycle term classified; 170 unclassified and NOT_VERIFIED. Test fail-closed on snapshot/source drift.",
-      "state": "170_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
-      "remediation": "Classify FORMAL vs representation code vs metanotation/pseudocode, then verify all actual FORMAL source expressions against accepted parser/compiler/semantic denotation; introduce fail-closed formal conformance gate."
+      "evidence": "Current exact-blob inventory 192 candidates/10 reader surfaces: four obsolete codec equality fences replaced by unambiguous codec tables, with two inline '=' metalanguage mentions; 157 UNCLASSIFIED + four classified FORMAL metamodel/notation blocks remain NOT_VERIFIED. Reviewed non-FORMAL diagrams/codec/governance remain explicitly excluded.",
+      "state": "161_SEMANTIC_CANDIDATES_PENDING_DENOTATION_VERIFICATION",
+      "remediation": "Map all 161 unverified semantic candidate expressions to accepted FORMAL Grammar/metacompiler/denotation and A-memory evidence when executable; do not turn historic metaequations into Link equality by text replacement."
     },
     {
       "id": "DOC15-006",
@@ -89,9 +89,9 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "194_CANDIDATES_EXACT_BLOB_INVENTORY_24_UNAMBIGUOUS_NON_FORMAL_EXCLUSIONS",
+    "D1": "192_CURRENT_OPERATOR_CANDIDATES_EXACT_BLOB_INVENTORY_FOUR_OBSOLETE_CODEC_FENCES_ELIMINATED",
     "D2": "CURRENT_V015_AUTHORITY_AND_48_REQUIREMENTS_IN_CURRENT_FORMAL_SPEC",
-    "D3": "OPEN_170_UNCLASSIFIED_FORMULAS_AND_14_THEOREM_MIGRATIONS",
+    "D3": "OPEN_161_SEMANTIC_CANDIDATES_AND_14_FORMAL_THEOREM_MIGRATIONS_IN_5_DEPENDENCY_WAVES",
     "D4": "FORMAL_AND_THEOREM_GENERATORS_UPDATED_AND_TARGETS_REGENERATED",
     "D5": "V015_48_OF_48_NORMATIVE_ROWS_REQUIRED_BY_DOCS_CHECK_V14_PROVENANCE_SEPARATE",
     "D6": "NOT_READY_WAIT_FOR_DENOTATION_AND_THEOREM_MIGRATION",
