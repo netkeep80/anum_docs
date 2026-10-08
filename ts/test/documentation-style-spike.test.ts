@@ -24,11 +24,27 @@ for (const style of MTS_DOCUMENTATION_STYLES) {
   assert.ok(output.includes(sourceSha), "immutable source link");
   assert.ok(output.includes(first.provenance.currentIndex), "theorem provenance remains");
   assert.ok(output.includes(first.provenance.formalOverlay), "FORMAL overlay provenance remains");
+  assert.ok(output.includes("Исходные допущения"), "full theorem assumptions remain accessible");
+  assert.ok(output.includes("Связи с принятыми законами"), "law references remain accessible");
+  assert.ok(output.includes("FORMAL-зависимости"), "FORMAL metadata remains accessible");
+  assert.ok(output.includes("Замкнутость доказательного артефакта"), "proof closure remains visible");
+  assert.ok(output.includes("Статус aprover"), "native proof status must not disappear");
+  for (const law of first.lawRefs)
+    assert.ok(output.includes(law), "canonical theorem law references remain visible");
+  if (first.assumptions.length)
+    assert.ok(output.includes(first.assumptions[0]!), "source assumptions must be preserved");
+  for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const)
+    for (const item of first.evidence[lane]) {
+      assert.ok(output.includes(item.path), "registered evidence source retained");
+      assert.ok(output.includes(item.proofAuthority), "authority type retained");
+    }
   for (const lane of ["TypeScript", "Lean4", "Rocq", "MTS-native", "aprover"])
     assert.ok(output.includes(lane), "all proof/evidence lanes remain visible: " + lane);
   snapshots.push(output);
 }
 assert.equal(new Set(snapshots).size, 3, "three genuinely different layout profiles");
+// A future theorem's own fenced source must not prematurely close its Markdown fence.
+
 const missing = model.theorems.find((item) => item.formalV015.migrationStatus === "NOT_MIGRATED");
 assert.ok(missing !== undefined);
 for (const style of MTS_DOCUMENTATION_STYLES) {

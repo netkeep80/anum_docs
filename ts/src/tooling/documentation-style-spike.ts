@@ -38,7 +38,11 @@ function quoted(value: string): string {
   return marker + value + marker;
 }
 function sourceBlock(value: string): string {
-  return ["~~~text", value, "~~~"].join("\n");
+  const longest = [...value.matchAll(/~+/g)].reduce(
+    (max, match) => Math.max(max, match[0].length), 2,
+  );
+  const fence = "~".repeat(longest + 1);
+  return [fence + "text", value, fence].join("\n");
 }
 function pretty(value: unknown): string {
   return typeof value === "string" ? value : JSON.stringify(value) ?? String(value);
@@ -69,11 +73,24 @@ function facts(theorem: TheoremProjectionTheorem, sha: string): string[] {
     "**Ограничения:** " + quoted(pretty(theorem.exclusions)),
     "",
     "**Состояние FORMAL:** " + status(theorem),
+    "",
+    "**Замкнутость доказательного артефакта:** " +
+      quoted(theorem.formalV015.proofClosure ?? "не определена"),
+    "",
+    "**Статус aprover:** " +
+      quoted(theorem.formalV015.aproverStatus ?? "не зарегистрирован"),
+    "",
+    "**Классификация MTS-native:** " +
+      quoted(theorem.nativeAssurance?.classification ?? "не зарегистрирована"),
   ];
   if (theorem.formalV015.migrationStatus !== "NOT_MIGRATED" &&
       theorem.formalV015.formalStatement !== null) {
     result.push("", "**FORMAL-формулировка (не доказательство)**", "",
       sourceBlock(theorem.formalV015.formalStatement));
+  }
+  if (theorem.formalV015.formalSourcePath !== null) {
+    result.push("", "**Исходный FORMAL-артефакт:** " +
+      repoLink(theorem.formalV015.formalSourcePath, sha));
   }
   return [
     ...result,
@@ -93,11 +110,39 @@ function provenance(theorem: TheoremProjectionTheorem, sha: string): string[] {
       (theorem.dependsOn.length ? theorem.dependsOn.map(quoted).join(", ") : "нет"),
     "- **Формальные предпосылки:** " +
       (theorem.formalPremises.length ? theorem.formalPremises.map(quoted).join(", ") : "не зарегистрированы"),
+    "- **Исходные допущения:** " +
+      (theorem.assumptions.length ? theorem.assumptions.map(quoted).join(", ") : "не заявлены"),
+    "- **Связи с принятыми законами:** " +
+      (theorem.lawRefs.length ? theorem.lawRefs.map(quoted).join(", ") : "не зарегистрированы"),
+    "- **Происхождение:** " + quoted(theorem.origin ?? "не классифицировано"),
+    "- **Волна:** " + quoted(theorem.wave ?? "не классифицирована"),
+    "- **FORMAL-зависимости:** " +
+      (theorem.formalV015.formalDependencies.length
+        ? theorem.formalV015.formalDependencies.map(quoted).join(", ") : "не зарегистрированы"),
+    "- **FORMAL-область:** " +
+      (theorem.formalV015.formalDomain.length
+        ? theorem.formalV015.formalDomain.map(quoted).join(", ") : "не зарегистрирована"),
+    "- **FORMAL-экзистенциальная область:** " +
+      (theorem.formalV015.formalExistentialDomain.length
+        ? theorem.formalV015.formalExistentialDomain.map(quoted).join(", ") : "не зарегистрирована"),
+    "- **Не являются внешними FORMAL-предпосылками:** " +
+      (theorem.formalV015.formalNonPremises.length
+        ? theorem.formalV015.formalNonPremises.map(quoted).join(", ") : "нет"),
+    "- **Тип FORMAL-артефакта:** " +
+      quoted(theorem.formalV015.formalArtifactKind ?? "не зарегистрирован"),
+    "- **Native assurance / независимость:** " +
+      quoted(theorem.nativeAssurance?.classification ?? "нет нативного свидетельства") +
+      " / " + (theorem.nativeAssurance?.independent === true ? "да" : "нет или не подтверждено"),
   ];
   for (const lane of LANES) {
     for (const evidence of theorem.evidence[lane])
       output.push("- **" + LANE_NAMES[lane] + ":** " +
-        repoLink(evidence.path, sha) + " — authority " + quoted(evidence.proofAuthority));
+        repoLink(evidence.path, sha) + " — тип " + quoted(evidence.kind) +
+        "; роль " + quoted(evidence.role) +
+        "; authority " + quoted(evidence.proofAuthority) +
+        (evidence.record === undefined ? "" :
+          "; результат " + quoted(evidence.record.result) +
+          "; авторитет записи " + quoted(evidence.record.authority)));
   }
   return [...output, "", "</details>"];
 }
