@@ -66,6 +66,18 @@ for (const [index, wave] of backlog.migrationWaves.entries()) {
   for (const id of wave.ids) handled.add(id);
 }
 assert.deepEqual(new Set(ordered), new Set(remaining.map((item) => item.id)));
+const fnd04 = backlog.migrationsRequired.find((item) => item.id === "FND-04") as typeof backlog.migrationsRequired[number] & {
+  existingPartialEvidence: { kind: string; formalSourceFragment: string; sourcePath: string; sourceBlobSha: string; limitation: string };
+};
+assert.ok(fnd04?.existingPartialEvidence, "FND-04 partial witness mapping is recorded");
+assert.equal(fnd04.existingPartialEvidence.kind, "FORMAL_ROOT_BASIS_BINDING_WITNESS_ONLY");
+const witnessBytes = read(fnd04.existingPartialEvidence.sourcePath);
+assert.equal(blobSha(witnessBytes), fnd04.existingPartialEvidence.sourceBlobSha, "FND-04 source witness pinned exactly");
+assert.ok(witnessBytes.includes('"' + fnd04.existingPartialEvidence.formalSourceFragment + '"'),
+  "FND-04 binding fragment actually appears in native FORMAL test");
+assert.equal(fnd04.proposedFormalStatement, null, "partial witness does not qualify as theorem FORMAL migration");
+assert.ok(fnd04.existingPartialEvidence.limitation.includes("Do not set FORMAL_MIGRATED"));
+
 if (remaining.length) assert.equal(backlog.status, "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY");
 console.log("v0.15 theorem FORMAL migration: inventory locked; migrated=" +
   migrated.length + "/" + historical.length + "; remaining=" + remaining.length + "; FULL_FORMAL_COVERAGE_NOT_CLAIMED");
