@@ -62,6 +62,9 @@ assert.ok(isV015FormalRole("FORMAL_V015_THEOREM_STATEMENT"));
 assert.ok(isV015FormalRole("FORMAL_V015_SEMANTIC_METAMODEL"));
 assert.ok(!isV015FormalRole("FORMAL_V015"), "undeclared generic role cannot bypass verification");
 assert.ok(!isV015FormalRole("FORMAL_V015_UNREVIEWED"), "unknown native role cannot pass");
+assert.ok(isV015NonFormalRole("NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE"));
+assert.ok(isV015NonFormalRole("NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE"));
+assert.ok(isV015NonFormalRole("NON_FORMAL_PRESENTATION_ASSET"));
 assert.ok(!isV015NonFormalRole("NON_FORMAL_FAKE"), "new non-FORMAL exclusions require explicit review");
 assert.deepEqual(v015RequiredEvidenceStages("FORMAL_V015_THEOREM_STATEMENT"),
   ["grammar", "denotation", "semanticLinks", "theoremMapping"]);
