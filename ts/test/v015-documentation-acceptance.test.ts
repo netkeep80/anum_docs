@@ -18,6 +18,8 @@ assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
 assert.equal(report.formulas.total, 202);
+assert.equal(report.formulas.verified, 5, "only the five bounded B20 exact occurrences have native receipts");
+assert.equal(report.formulas.pending, 14, "all unsupported theorem/metamodel/general FORMAL sources remain fail-closed");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 7, "exact-source crosswalk leaves only source-like/mixed prose observations pending");
