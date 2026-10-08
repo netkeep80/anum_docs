@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 46,
+    "unreviewed": 41,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -4989,9 +4989,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0028"
+      ],
+      "reviewBasis": "This exact source line is contained in the F0028 five-definition root-basis fence; the dedicated bounded root-basis receipt verifies the complete fence and the accepted Link/wire/J1 identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067610561",
+      "reviewSourceSha256": "2d272f07e8d696b93cd3b75e7bbd9c69584aa9016be68536b215f8fdba926218"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5002,9 +5008,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0028"
+      ],
+      "reviewBasis": "This exact source line is contained in the F0028 five-definition root-basis fence; the dedicated bounded root-basis receipt verifies the complete fence and the accepted Link/wire/J1 identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067610561",
+      "reviewSourceSha256": "f16d41e8c227088d06f5e6e577f5f24638b2979768ab4a8947f17847a5ec64a1"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5015,9 +5027,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0028"
+      ],
+      "reviewBasis": "This exact source line is contained in the F0028 five-definition root-basis fence; the dedicated bounded root-basis receipt verifies the complete fence and the accepted Link/wire/J1 identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067610561",
+      "reviewSourceSha256": "41c89dbabf6090ede7293add96aa2a95e560c2120eceaa63197d969729a60433"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5028,9 +5046,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0028"
+      ],
+      "reviewBasis": "This exact source line is contained in the F0028 five-definition root-basis fence; the dedicated bounded root-basis receipt verifies the complete fence and the accepted Link/wire/J1 identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067610561",
+      "reviewSourceSha256": "46277d3102233e46cad3c98f774a5e70cb8e97a60676da1851fa35e973e3c509"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5041,9 +5065,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0028"
+      ],
+      "reviewBasis": "This exact source line is contained in the F0028 five-definition root-basis fence; the dedicated bounded root-basis receipt verifies the complete fence and the accepted Link/wire/J1 identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067610561",
+      "reviewSourceSha256": "ed8cbd3e86529a79b5aec68fcca51ed9e7eee4add51a1927c606ebd648f96dda"
     },
     {
       "path": "docs/theory/Основания МТС.md",
