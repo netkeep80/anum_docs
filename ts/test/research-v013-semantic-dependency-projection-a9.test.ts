@@ -209,6 +209,9 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-direct-json-source.ts",
   "ts/src/v015-direct-formal-source.ts",
   "ts/src/v015-direct-source.ts",
+  // Post-v0.13 documentation verifier builds an isolated, temporary B20 Memory.
+  // Its writes are not part of immutable historical v0.13 package evidence.
+  "ts/src/tooling/v015-native-evidence-verifier.ts",
 ]);
 
 // Exceptions are path+function exact so any unrelated historical or candidate growth still fails closed.
@@ -742,6 +745,8 @@ setEqual(
     "ts/src/native-syntax-grammar.ts#materializeNat",
     "ts/src/native-syntax-grammar.ts#materializeNativeSyntaxGrammar",
     "ts/src/portable-closed-rooted-proof.ts#exportPortableClosedRootedProof",
+    "ts/src/tooling/v015-native-evidence-verifier.ts#fresh",
+    "ts/src/tooling/v015-native-evidence-verifier.ts#rootFixture",
     "ts/src/v013-hierarchical-carrier.ts#build",
     "ts/src/v015-formal-evaluation.ts#admitTriggeredRule",
     "ts/src/v015-formal-evaluation.ts#defineV015GroundedUnaryEvaluationRule",
