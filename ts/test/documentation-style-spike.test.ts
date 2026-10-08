@@ -4,6 +4,7 @@ import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 import {
   MTS_DOCUMENTATION_STYLES,
   renderMtsDocumentationStylePreview,
+  type MtsDocumentationPreviewRequest,
 } from "../src/tooling/documentation-style-spike.js";
 
 const model = loadRepositoryTheoremProjectionModel(findRepositoryRoot());
@@ -13,7 +14,7 @@ assert.equal(model.theorems.length, 21, "historical corpus preserved");
 const sourceSha = "813a1569300b241a3b70eb282eecd8231db15e4b";
 const snapshots: string[] = [];
 for (const style of MTS_DOCUMENTATION_STYLES) {
-  const args = { model, theoremId: first.id, style, sourceCommitSha: sourceSha };
+  const args: MtsDocumentationPreviewRequest = { model, theoremId: first.id, style, sourceCommitSha: sourceSha };
   const output = renderMtsDocumentationStylePreview(args);
   assert.equal(output, renderMtsDocumentationStylePreview(args), "deterministic");
   assert.ok(output.includes(first.statement), "theorem statement must not be changed or shortened");
