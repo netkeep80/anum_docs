@@ -26,9 +26,9 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 132461,
+  baselineCodePoints: 132545,
   baselineLines: 3442,
-  baselineWords: 18384,
+  baselineWords: 18394,
   hardCeilingCodePoints: 135948,
 });
 
@@ -590,6 +590,9 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
   const bundles = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
   if (!bundles.includes("В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:")) {
     issues.push("docs/specs/Пучки связей.md: accepted FORMAL context/bundle syntax must be distinguished from derived query meta-notation");
+  }
+  if (bundles.includes("только текущую поверхность v0.13")) {
+    issues.push("docs/specs/Пучки связей.md: inherited v0.13 query API mislabeled current normative surface");
   }
   const theoremCatalog = readFileSync(resolve(root, "docs/theory/Теоремы МТС.md"), "utf8");
   if (!theoremCatalog.includes("Доказательный overlay в принятой FORMAL v0.15:") ||
