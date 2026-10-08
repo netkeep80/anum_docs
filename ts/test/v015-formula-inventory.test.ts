@@ -254,7 +254,7 @@ for (const entry of nativeWitnessCandidates) {
   assert.equal(receipt.outcome, "PASS");
   assert.equal(receipt.caseId, entry.id);
   assert.equal(receipt.formalSourceSha256, semantic!.formalSourceSha256);
-  assert.match(receipt.semanticAnetSha256, /^[0-9a-f]{64}$/);
+  assert.match(receipt.semanticAnetSha256!, /^[0-9a-f]{64}$/, "native receipt requires semantic ANet SHA-256");
   assert.equal(receipt.runnerSourceSha256,
     "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720");
   assert.equal(receipt.evidenceCommit, "89614d94e479d21550de5522e1f5168be0decb48");
