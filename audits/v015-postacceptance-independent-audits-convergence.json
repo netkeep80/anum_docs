@@ -1,0 +1,117 @@
+{
+  "schema": "mts-v015-two-independent-audits-convergence/v0.1",
+  "date": "2026-10-08",
+  "ownerIssue": 1951,
+  "ownerPR": 2079,
+  "acceptedRelease": {
+    "version": "v0.15",
+    "mainAcceptanceSha": "813a1569300b241a3b70eb282eecd8231db15e4b",
+    "immutableSemantics": true
+  },
+  "scope": "Machine-controlled post-acceptance DOCUMENTATION only; does not rewrite accepted FORMAL/JSON, theorem evidence, or release",
+  "statuses": [
+    {
+      "id": "P0-A1",
+      "status": "IMPLEMENTED_PENDING_FINAL_CI",
+      "finding": "Verified role FORMAL_V015 bug and unreachable GREEN",
+      "remediation": "Explicit exact allowlists; specialized semantic obligations; future synthetic terminal GREEN and negative evidence/unknown-role tests",
+      "sources": [
+        "ts/src/tooling/v015-documentation-acceptance.ts",
+        "ts/test/v015-documentation-acceptance.test.ts"
+      ]
+    },
+    {
+      "id": "P0-A2",
+      "status": "PARTIAL_FAIL_CLOSED",
+      "finding": "Metadata-only VERIFIED can fake semantic proof",
+      "remediation": "Derived verified count only after source-bound evidence checking and actual Node native-verifier invocation; native verifier still not implemented so none claimed VERIFIED",
+      "sources": [
+        "ts/src/tooling/v015-documentation-acceptance.ts"
+      ]
+    },
+    {
+      "id": "P0-B1",
+      "status": "IMPLEMENTED_WIDE_CENSUS_UNREVIEWED",
+      "finding": "202 fenced/inline heuristic misses plain Markdown",
+      "remediation": "21 additional prose/table lexical hits on 11 current docs; 968 independently broader FORMAL-aware line hits including :, [], ROOT/START/END, tables and diagram references. Both ledgers source-pinned, fail closed. Counts overlap, not 202+21+968 independent formulas.",
+      "sources": [
+        "audits/v015-markdown-prose-lexical-inventory.json",
+        "audits/v015-formal-aware-markdown-census.json",
+        "ts/src/tooling/v015-markdown-prose-audit.ts"
+      ]
+    },
+    {
+      "id": "P0-B2",
+      "status": "PARTIAL",
+      "finding": "Hard-coded current-doc universe may omit new versioned Markdown",
+      "remediation": "Current-doc scan discovers 11 root/docs markdown surfaces and blocks unregistered new Markdown; two immutable research originals excluded. Diagram references covered lexically but visual semantics remain unreviewed.",
+      "sources": [
+        "ts/src/tooling/v015-markdown-prose-audit.ts",
+        "audits/v015-formal-aware-markdown-census.json"
+      ]
+    },
+    {
+      "id": "P0-B3",
+      "status": "PENDING_REVIEW",
+      "finding": "Every lexeme candidate requires source/semantic classification, not regex-only completeness",
+      "remediation": "968 broad candidates currently UNREVIEWED/NOT_VERIFIED. Heuristic-only 202/202 classification is historical audit subset, never full FORMAL coverage.",
+      "sources": [
+        "audits/v015-formal-aware-markdown-census.json",
+        "audits/v015-formula-candidate-inventory.json"
+      ]
+    },
+    {
+      "id": "P0-C",
+      "status": "BLOCKED_NATIVE_ATTESTOR",
+      "finding": "Truth of VERIFIED must be derived from grammar→native source ANet→denotation→semantic Link comparison→applicable replay/proof mapping→pinned evidence",
+      "remediation": "Static testCase substring insufficient; evidence stage profiles per role and spawnSync native receipt-verifier boundary added. Implement tested native evidence verifier/receipt producer; no status promotion until verified execution.",
+      "sources": [
+        "ts/src/tooling/v015-documentation-acceptance.ts"
+      ]
+    },
+    {
+      "id": "P1-FORMAL-SPEC",
+      "status": "TEXT_CORRECTED_NOT_SEMANTICALLY_CERTIFIED",
+      "finding": "A->B->C = (A->B)->C mixes metalevel equality with Link identity",
+      "remediation": "Generated owner and generated Markdown explicitly scope equality to explanatory parsing/denotation, not executable FORMAL operator",
+      "sources": [
+        "ts/src/tooling/formal-notation-v015-markdown.ts",
+        "docs/specs/Формальная нотация МТС.md"
+      ]
+    },
+    {
+      "id": "P1-LEGACY-BUNDLE",
+      "status": "TEXT_CORRECTED",
+      "finding": "Current document declared current v0.13 search API",
+      "remediation": "Inherited search-profile v0.13 role distinguished from accepted FORMAL v0.15",
+      "sources": [
+        "docs/specs/Пучки связей.md"
+      ]
+    },
+    {
+      "id": "P1-THEOREMS",
+      "status": "BLOCKED_14_NOT_MIGRATED",
+      "finding": "Only 7/21 theorem FORMAL source statements migrated",
+      "remediation": "Five dependency-wave backlog pinned; immutable Lean4/Rocq evidence not upgraded, author approval gate retained; leave untouched until P0 green-capable",
+      "sources": [
+        "audits/v015-theorem-formal-migration-backlog.json"
+      ]
+    },
+    {
+      "id": "P1-GOVERNANCE",
+      "status": "ISSUES_UPDATED_PR1989_OPEN_HISTORICAL",
+      "finding": "Old accepted v0.14 current statements in #657 #1431 #1861 and unfinished research #1926; draft research PR #1989 ambiguous",
+      "remediation": "Updated issues with accepted v0.15 current and historical labels; PR #1989 marked historical DO NOT MERGE WHOLE via comment 6056408699; keep open pending preservation/closure decision."
+    },
+    {
+      "id": "FINAL-ACCEPTANCE",
+      "status": "NOT_READY",
+      "finding": "Passed ordinary CI is not docs/v0.15 proof; repo-guard skipped on draft",
+      "remediation": "Required: current-doc universe, all classifications, machine attestation, 21/21 theorem migration, manifest COMPLETE_VERIFIED, docs:v015:accept, CI, Observatory, blocking repo-guard and independent audit."
+    }
+  ],
+  "overall": "FAIL_CLOSED_P0_NOT_DONE",
+  "manifestPromotionAllowed": false,
+  "proofAuthorityChanged": false,
+  "allowedMerge": false
+}
