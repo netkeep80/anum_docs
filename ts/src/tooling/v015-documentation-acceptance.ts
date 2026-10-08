@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -55,6 +56,66 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const invalidOverlayIds = allOverlayIds.filter((id) => !historicalIds.includes(id));
   const inventory = read(root, "audits/v015-formula-candidate-inventory.json");
   const candidates = list(inventory.candidates, "formula candidates");
+  const indexedFiles = list(inventory.files, "formula source files");
+  const expectedSources = new Set([
+    "README.md", "docs/CONTRIBUTING.md",
+    "docs/theory/Основания МТС.md", "docs/theory/Система аксиом МТС.md",
+    "docs/theory/Теоремы МТС.md", "docs/specs/Формальная нотация МТС.md",
+    "docs/specs/Ачисла и сериализация.md",
+    "docs/specs/Апамять и управление сетью связей.md",
+    "docs/specs/Пучки связей.md", "docs/Словарь терминов МТС.md",
+  ]);
+  const indexedPaths = new Set<string>();
+  const sourceLines = new Map<string, string[]>();
+  const inventoryIntegrityIssues: string[] = [];
+  for (const file of indexedFiles) {
+    const path = field(file, "path");
+    if (!expectedSources.has(path) || indexedPaths.has(path)) {
+      inventoryIntegrityIssues.push("unexpected/duplicate source: " + path);
+      continue;
+    }
+    indexedPaths.add(path);
+    const source = readFileSync(resolve(root, path), "utf8");
+    const gitBlobSha = createHash("sha1")
+      .update("blob " + Buffer.byteLength(source, "utf8") + "\\0")
+      .update(source, "utf8").digest("hex");
+    if (gitBlobSha !== field(file, "blobSha")) {
+      inventoryIntegrityIssues.push("source SHA drift: " + path);
+    }
+    const lines = source.split(/\\r?\\n/);
+    sourceLines.set(path, lines);
+    if (lines.length !== file.lineCount) {
+      inventoryIntegrityIssues.push("source line count drift: " + path);
+    }
+  }
+  if (indexedPaths.size !== expectedSources.size) {
+    inventoryIntegrityIssues.push("current documentation sources not exhaustively indexed");
+  }
+  const candidateIds = new Set<string>();
+  for (const candidate of candidates) {
+    const id = field(candidate, "id");
+    const path = field(candidate, "path");
+    const kind = field(candidate, "kind");
+    const source = field(candidate, "source");
+    const lines = sourceLines.get(path);
+    const begin = candidate.startLine;
+    const end = candidate.endLine;
+    if (candidateIds.has(id)) inventoryIntegrityIssues.push("duplicate formula candidate ID: " + id);
+    candidateIds.add(id);
+    if (lines === undefined || !Number.isInteger(begin) || !Number.isInteger(end) ||
+        (begin as number) < 1 || (end as number) < (begin as number)) {
+      inventoryIntegrityIssues.push("invalid formula source coordinates: " + id);
+      continue;
+    }
+    const excerpt = kind === "fence"
+      ? lines.slice((begin as number) - 1, end as number).join("\\n")
+      : lines[(begin as number) - 1];
+    if ((kind === "fence" && excerpt !== source) ||
+        (kind === "inline-code" && (begin !== end || !excerpt?.includes("`" + source + "`"))) ||
+        !["fence", "inline-code"].includes(kind)) {
+      inventoryIntegrityIssues.push("formula source/line drift: " + id);
+    }
+  }
   const pending = candidates.filter((item) =>
     field(item, "role") === "UNCLASSIFIED" || field(item, "denotation") === "NOT_VERIFIED");
   const reviewedNonFormal = candidates.filter((item) => field(item, "role").startsWith("NON_FORMAL_") &&
@@ -72,6 +133,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
   if (pending.length > 0) blockers.push("unverified current documentation formula candidates: " + pending.length);
   if (other > 0) blockers.push("unreviewed/unrecognized formula classification: " + other);
+  if (inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + inventoryIntegrityIssues.join("; "));
   if (manifest.state !== "COMPLETE_VERIFIED") blockers.push("final author-reviewed documentation migration manifest not COMPLETE_VERIFIED");
   return Object.freeze({
     schema: "mts-v015-current-documentation-acceptance/v0.1" as const,
