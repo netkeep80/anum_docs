@@ -22,8 +22,8 @@ assert.equal(report.prose.files, 11, "full current markdown surface includes POR
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
-assert.equal(report.lexical.candidates, 704, "lexical discovery records :/[]/ROOT/fence/table/diagram lines");
-assert.equal(report.lexical.unreviewed, 704, "wide-scan lexemes require separate review");
+assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
+assert.equal(report.lexical.unreviewed, 478, "wide-scan lexemes require separate review");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
