@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 48,
+    "unreviewed": 46,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -3279,9 +3279,16 @@
         "CONTEXT_NAME_OR_BINDING",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0180",
+        "F0181"
+      ],
+      "reviewBasis": "This line contains two current FORMAL B20 specimens; both exact primary occurrences F0180 ({ A }) and F0181 (A:{}) have independent native receipts and jointly cover every FORMAL overlap on the line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066165780",
+      "reviewSourceSha256": "dc333e9ace679e70bef31035ea50e3e299ff86eddb87ef7a1d905036b2a6d160"
     },
     {
       "path": "docs/specs/Пучки связей.md",
@@ -3310,9 +3317,15 @@
         "CONTEXT_NAME_OR_BINDING",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_NOTATION_SPECIMEN",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0184"
+      ],
+      "reviewBasis": "This line contains the exact current FORMAL B20 specimen A:{} tracked as F0184; its native receipt covers the only FORMAL overlap on the line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066165780",
+      "reviewSourceSha256": "00b0e5d3993c5a3c7bc92bb46e9ac36e2df66701e5e32c9e3ed22ab2a95de06f"
     },
     {
       "path": "docs/specs/Пучки связей.md",
