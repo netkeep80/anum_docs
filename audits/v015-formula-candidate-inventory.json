@@ -47,7 +47,7 @@
     },
     {
       "path": "docs/specs/Пучки связей.md",
-      "blobSha": "506cbf5e3582a70b48a359ba008585e820cc2863",
+      "blobSha": "7764bbffa1962f8a8c7e3cad81d27c9c502df96f",
       "lineCount": 352
     },
     {
@@ -1999,8 +1999,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{a,b}\n{}\na{b,c}\n{a,b}c",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0180",
@@ -2009,8 +2010,9 @@
       "endLine": 36,
       "kind": "inline-code",
       "source": "{ A }",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
     },
     {
       "id": "F0181",
@@ -2019,8 +2021,9 @@
       "endLine": 36,
       "kind": "inline-code",
       "source": "A:{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
     },
     {
       "id": "F0182",
@@ -2030,8 +2033,9 @@
       "kind": "fence",
       "language": "text",
       "source": "метанотация {...}\n!=\nвнутренний FORMAL-оператор",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0183",
@@ -2041,8 +2045,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0184",
@@ -2051,8 +2056,9 @@
       "endLine": 63,
       "kind": "inline-code",
       "source": "A:{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "The current FORMAL v0.15 notation example is explicitly contrasted with the derived search API in §1. Independent parser/denotation evidence for this occurrence remains pending."
     },
     {
       "id": "F0185",
@@ -2062,8 +2068,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{}\n-> ambiguous-empty-bundle-role",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0186",
@@ -2073,8 +2080,9 @@
       "kind": "fence",
       "language": "text",
       "source": "path\n!= semantic Link identity",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0187",
@@ -2084,8 +2092,9 @@
       "kind": "fence",
       "language": "text",
       "source": "occurrence\n-> validate\n-> resolve canonical Link\n-> retain provenance\n-> extensional deduplication",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0188",
@@ -2095,8 +2104,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{a,b} = {b,a}\n{a,a} = {a}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Extensional ValueBundle equality is explicitly scoped in §5 to the derived query API; it is NOT the accepted FORMAL Link-identity = operator."
     },
     {
       "id": "F0189",
@@ -2106,8 +2116,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{a} = a",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Explicitly rejected singleton-coercion hypothesis in §6 of the derived ValueBundle API, not a FORMAL Link-identity axiom."
     },
     {
       "id": "F0190",
@@ -2117,8 +2128,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{{a,b},c}\n-> nested-value-bundle-not-supported",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0191",
@@ -2128,8 +2140,9 @@
       "kind": "fence",
       "language": "text",
       "source": "ValueBundle{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0192",
@@ -2138,8 +2151,9 @@
       "endLine": 196,
       "kind": "inline-code",
       "source": "{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0193",
@@ -2149,8 +2163,9 @@
       "kind": "fence",
       "language": "text",
       "source": "a{b,c}\n-> существующие a⟼b и a⟼c\n\n{a,b}c\n-> существующие a⟼c и b⟼c\n\n{a,b}{c,d}\n-> существующие пары декартова произведения",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0194",
@@ -2160,8 +2175,9 @@
       "kind": "fence",
       "language": "text",
       "source": "a{}\n-> все существующие исходящие Связи из a\n\n{}b\n-> все существующие входящие Связи в b\n\n{}{}\n-> все существующие Связи выбранной перечислимой апамяти",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0195",
@@ -2171,8 +2187,9 @@
       "kind": "fence",
       "language": "text",
       "source": "query\n!=\nmaterialize",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0196",
@@ -2182,8 +2199,9 @@
       "kind": "fence",
       "language": "text",
       "source": "missing pair\n-> absent result",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0197",
@@ -2193,8 +2211,9 @@
       "kind": "fence",
       "language": "text",
       "source": "missing pair\n-> synthetic Link",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0198",
@@ -2204,8 +2223,9 @@
       "kind": "fence",
       "language": "text",
       "source": "{} -> DELETE\n{} -> global ANY in every context\n{} -> ontological EMPTY entity",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0199",
@@ -2215,8 +2235,9 @@
       "kind": "fence",
       "language": "text",
       "source": "shared Link\n!= duplicated semantic Link",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0200",
@@ -2226,8 +2247,9 @@
       "kind": "fence",
       "language": "text",
       "source": "bundle -> primitive set ontology\n{a} = a\noccurrence path -> Link identity\nempty syntax -> intrinsic role\nempty ValueBundle -> global wildcard everywhere\nquery -> materialize\nmissing pair -> synthetic Link\nnested ValueBundle -> accepted\nbundle-valued definition -> accepted\n{ } -> internal F1 operators",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Explicitly rejected singleton-coercion hypothesis in §6 of the derived ValueBundle API, not a FORMAL Link-identity axiom."
     },
     {
       "id": "F0201",
@@ -2237,8 +2259,9 @@
       "kind": "fence",
       "language": "text",
       "source": "структурное свидетельство\n-> роль\n-> разрешение каждого вхождения\n-> канонические Связи\n-> отдельное происхождение\n-> экстенсиональное пучковое значение\n-> read-only query expansion",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy v0.13/14 derived read-only ConstraintBundle/ValueBundle query/pseudocode example, explicitly distinguished from accepted FORMAL v0.15 context and bundle syntax in §1; no source denotation asserted."
     },
     {
       "id": "F0202",
@@ -2255,13 +2278,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 15,
-    "unclassifiedCount": 148,
+    "unclassifiedCount": 125,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 45,
-    "unverifiedDenotationCount": 157,
+    "reviewedNonFormalCount": 65,
+    "unverifiedDenotationCount": 137,
     "verifiedFormalCount": 0
   }
 }
