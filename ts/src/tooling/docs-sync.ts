@@ -25,9 +25,9 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 115682,
+  baselineCodePoints: 115963,
   baselineLines: 3404,
-  baselineWords: 16010,
+  baselineWords: 16059,
   hardCeilingCodePoints: 116951,
 });
 
@@ -546,6 +546,15 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
   }
   if (/v0\.14/.test(source)) {
     issues.push(path + ": v0.14 found in current contribution policy");
+  }
+  for (const [documentPath, exactAuthority] of [
+    ["docs/theory/Основания МТС.md", "[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+    ["docs/theory/Система аксиом МТС.md", "[контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+  ] as const) {
+    const document = readFileSync(resolve(root, documentPath), "utf8");
+    if (!document.includes("mts-doc-version: v0.15") || !document.includes(exactAuthority)) {
+      issues.push(documentPath + ": accepted v0.15 normative authority missing");
+    }
   }
   return issues;
 }
