@@ -66,13 +66,18 @@ assert.equal(inventory.counts.files, inventory.files.length);
 assert.equal(inventory.counts.candidates, actual.length);
 assert.equal(inventory.counts.fences, actual.filter((entry) => entry.kind === "fence").length);
 assert.equal(inventory.counts.inline, actual.filter((entry) => entry.kind === "inline-code").length);
-for (let i = 0; i < actual.length; i++) {
-  const expected = inventory.candidates[i]!;
-  const observed = actual[i]!;
-  for (const key of ["id", "path", "startLine", "endLine", "kind", "source"] as const) {
-    assert.equal(observed[key], expected[key], "candidate " + observed.id + " " + key);
-  }
-}
+const occurrenceKey = (entry: typeof inventory.candidates[number]): string =>
+  JSON.stringify([entry.path, entry.startLine, entry.endLine, entry.kind, entry.source]);
+const actualOccurrenceKeys = actual.map(occurrenceKey).sort();
+const inventoryOccurrenceKeys = inventory.candidates.map(occurrenceKey).sort();
+assert.deepEqual(actualOccurrenceKeys, inventoryOccurrenceKeys,
+  "formula inventory must cover the exact current source occurrences independent of audit-ID ordering");
+assert.equal(new Set(actualOccurrenceKeys).size, actualOccurrenceKeys.length,
+  "source occurrence identity must be unambiguous before assigning a stable audit ID");
+const auditIds = inventory.candidates.map((entry) => entry.id);
+assert.equal(new Set(auditIds).size, auditIds.length, "formula audit IDs are unique stable identities");
+assert.ok(auditIds.every((id) => /^F[0-9]{4}$/.test(id)),
+  "formula audit IDs use the stable Fdddd namespace");
 assert.equal(inventory.candidates.length, actual.length);
 const processCandidates = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_PROCESS_DIAGRAM");
 assert.equal(processCandidates.length, 15, "only reviewed governance/process diagram cases are non-FORMAL");
