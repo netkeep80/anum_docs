@@ -1,0 +1,75 @@
+{
+  "schema": "mts-v015-current-documentation-migration/v0.1",
+  "ownerIssue": 1951,
+  "auditBaseCommit": "813a1569300b241a3b70eb282eecd8231db15e4b",
+  "acceptedVersion": "v0.15",
+  "authority": {
+    "requirements": "requirements/mts-v0.15.json",
+    "contract": "contracts/mts-contract-v0.15.json",
+    "traceability": "traceability/mts-v0.15.json",
+    "conformance": "contracts/mts-conformance-v0.15.json",
+    "formalProjection": "profiles/mts-v015-formal-notation-projection.json",
+    "kernel": "profiles/mts-v015-meta-interpreter-kernel.json"
+  },
+  "state": "INCOMPLETE_FAIL_CLOSED",
+  "rules": [
+    "Accepted v0.15 is the only normative target for current documents and FORMAL formulas.",
+    "Do not modify immutable historical proof/release records or Author-approved FORMAL/JSON artifacts.",
+    "Do not promote a theorem's evidence status just because FORMAL v0.15 is accepted.",
+    "Regenerate compiler-owned Markdown only through its ProjectionModel.",
+    "A formula migration requires denotation-preserving parser/compiler/conformance evidence; regex-only rewrites are forbidden."
+  ],
+  "findings": [
+    {
+      "id": "DOC15-001",
+      "path": "docs/CONTRIBUTING.md",
+      "kind": "release-label-contradiction",
+      "evidence": "Header v0.15 conflicts with current-v0.14 section 6 and status table.",
+      "state": "OPEN",
+      "remediation": "Repair source-of-truth for process projection/current prose to v0.15; audit all current-release claims."
+    },
+    {
+      "id": "DOC15-002",
+      "path": "docs/theory/Система аксиом МТС.md",
+      "kind": "normative-authority-mismatch",
+      "evidence": "Current v0.15 header with v0.14-only lead normative references and V14-only law inventory.",
+      "state": "OPEN",
+      "remediation": "Use v0.15 accepted contract/traceability/requirements for current authority; preserve V14-law inherited evidence with explicit provenance and separate current v0.15 semantics."
+    },
+    {
+      "id": "DOC15-003",
+      "path": "docs/theory/Теоремы МТС.md",
+      "kind": "formal-proof-status-ambiguity",
+      "evidence": "v0.14 accepted theorem inventory and v0.15-candidate formal theorem overlay are presented together.",
+      "state": "OPEN",
+      "remediation": "Explicitly separate accepted v0.15 notation from proof-assurance status; preserve conditional/candidate proof evidence."
+    },
+    {
+      "id": "DOC15-004",
+      "path": "ts/src/tooling/markdown-coverage-audit.ts",
+      "kind": "audit-coverage-fallback",
+      "evidence": "Current v0.15 requirements/v0.3 trigger unconditional requirements/mts-v0.14.json coverage fallback; projectionState is V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951.",
+      "state": "OPEN",
+      "remediation": "Migrate ownership/projections, then make v0.15 coverage mandatory and fail-closed, removing compatibility fallback."
+    }
+  ],
+  "plannedSurfaces": [
+    "README.md",
+    "docs/CONTRIBUTING.md",
+    "docs/theory/",
+    "docs/specs/",
+    "docs/Словарь терминов МТС.md",
+    "theorems/ projection models",
+    "proofs/ generated catalog projections",
+    "ts/src/tooling/ document generators"
+  ],
+  "completionGates": [
+    "No current Markdown asserts v0.14 is current authority.",
+    "No v0.14 fallback is used for current v0.15 Markdown coverage.",
+    "All current formulas conform to accepted v0.15 FORMAL under semantically checked source/denotation.",
+    "Generated Markdown reproducibly matches canonical projection model.",
+    "Historical evidence remains immutable and explicitly version-scoped.",
+    "docs:check, links/anchors and CI green.",
+    "Per-file migration evidence reviewed."
+  ]
+}
