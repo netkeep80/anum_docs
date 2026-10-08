@@ -98,8 +98,6 @@ function fixture(): Fixture {
     blockItemRole,
     declarationNameRole,
     declarationBodyRole,
-    sequenceForm,
-    sequenceItemRole,
   });
   const definitionProfileRoot = materializeV015LinkDefinitionProfile(memory, {
     pairForm,
@@ -107,6 +105,8 @@ function fixture(): Fixture {
     pairLeftRole,
     pairRightRole,
     referencedNameRole,
+    sequenceForm,
+    sequenceItemRole,
   });
   return Object.freeze({
     memory,
