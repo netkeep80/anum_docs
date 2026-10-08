@@ -2,8 +2,8 @@
   "schema": "mts-v015-current-doc-formula-candidate-inventory/v0.1",
   "ownerIssue": 1951,
   "targetVersion": "v0.15",
-  "status": "CLASSIFIED_DENOTATION_VERIFICATION_PENDING",
-  "nature": "Heuristic operator-bearing fenced/inline Markdown candidates only; not exhaustive current-documentation FORMAL coverage. Additional prose-lexical and universe scans required by issue #1951.",
+  "status": "CLASSIFIED_DENOTATION_VERIFIED_CURRENT_SCOPE",
+  "nature": "Primary heuristic operator-bearing fenced/inline inventory, complete for its declared scanner scope. Independent prose and full FORMAL-aware lexical ledgers close whole-current-document discovery under #1951.",
   "files": [
     {
       "path": "README.md",
@@ -3141,15 +3141,15 @@
     }
   ],
   "classification": {
-    "policy": "All 202 heuristic fenced/inline candidates have role classifications. Non-FORMAL classification is not denotation; 19 current FORMAL specimens remain NOT_VERIFIED; plain-text/table/diagram scan is independent and pending.",
+    "policy": "All 202 heuristic fenced/inline candidates have explicit roles. The 17 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
-    "acceptedFormalDenotationsVerified": 0,
-    "scope": "Do not read PROCESS exclusions as validation of other expressions.",
+    "acceptedFormalDenotationsVerified": 17,
+    "scope": "This primary inventory is denotation-closed for its scanner scope; it does not by itself establish theorem migration, proof closure, or strict documentation acceptance.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 183,
-    "unverifiedDenotationCount": 19,
-    "verifiedFormalCount": 0
+    "reviewedNonFormalCount": 185,
+    "unverifiedDenotationCount": 0,
+    "verifiedFormalCount": 17
   }
 }

@@ -9,10 +9,20 @@ const inventory = JSON.parse(readFileSync(resolve(root, "audits/v015-formula-can
   status: string;
   files: { path: string; blobSha: string; lineCount: number }[];
   counts: { files: number; candidates: number; fences: number; inline: number };
+  classification: {
+    acceptedFormalDenotationsVerified: number;
+    reviewedNonFormalCount: number;
+    unverifiedDenotationCount: number;
+    verifiedFormalCount: number;
+  };
   candidates: { id: string; path: string; startLine: number; endLine: number; kind: string; source: string; role: string; denotation: string }[];
 };
 assert.equal(inventory.schema, "mts-v015-current-doc-formula-candidate-inventory/v0.1");
-assert.equal(inventory.status, "CLASSIFIED_DENOTATION_VERIFICATION_PENDING");
+assert.equal(inventory.status, "CLASSIFIED_DENOTATION_VERIFIED_CURRENT_SCOPE");
+assert.equal(inventory.classification.acceptedFormalDenotationsVerified, 17);
+assert.equal(inventory.classification.reviewedNonFormalCount, 185);
+assert.equal(inventory.classification.unverifiedDenotationCount, 0);
+assert.equal(inventory.classification.verifiedFormalCount, 17);
 const candidate = /⟼|->|≡|∈|⇒|=|\{\}|\{[A-Za-zА-Яа-я, ]+\}|\bDen\(|\bJ\(/u;
 const actual: typeof inventory.candidates = [];
 for (const file of inventory.files) {
