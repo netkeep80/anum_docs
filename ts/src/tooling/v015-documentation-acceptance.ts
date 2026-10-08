@@ -389,9 +389,17 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   for (const candidate of candidates) {
     const source = field(candidate, "source");
     const path = field(candidate, "path");
+    if (path === "docs/specs/Формальная нотация МТС.md" &&
+        source.includes("A->B->C = (A->B)->C")) {
+      if (field(candidate, "role") !== "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION" ||
+          candidate.sourceArtifact !== "ts/src/tooling/formal-notation-v015-markdown.ts") {
+        sourceClassificationIssues.push(
+          "accepted parsing/denotation metanotation lost generator-owned classification: " + path);
+      }
+      continue;
+    }
     if ((path === "docs/specs/Формальная нотация МТС.md" &&
-         (source.includes("A->B->C = (A->B)->C") ||
-          source.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))"))) ||
+         source.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))")) ||
         ((source === "A:{}" || source === "{ A }") &&
          ["docs/specs/Пучки связей.md",
           "docs/specs/Апамять и управление сетью связей.md",
