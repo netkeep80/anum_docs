@@ -12,7 +12,7 @@ assert.equal(report.normative.expected, 48);
 assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
-assert.equal(report.formulas.total, 194);
+assert.equal(report.formulas.total, 192);
 assert.equal(report.formulas.pending + report.formulas.reviewedNonFormal + report.formulas.verified, report.formulas.total);
 assert.equal(report.ready, report.blockers.length === 0);
 if (report.theorems.missing.length > 0 || report.formulas.pending > 0) {
