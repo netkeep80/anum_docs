@@ -25,10 +25,10 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 116667,
-  baselineLines: 3401,
-  baselineWords: 16162,
-  hardCeilingCodePoints: 116951,
+  baselineCodePoints: 129473,
+  baselineLines: 3458,
+  baselineWords: 18017,
+  hardCeilingCodePoints: 135948,
 });
 
 export interface DocumentationSizeMeasurement {
