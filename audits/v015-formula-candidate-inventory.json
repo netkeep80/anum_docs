@@ -2,8 +2,8 @@
   "schema": "mts-v015-current-doc-formula-candidate-inventory/v0.1",
   "ownerIssue": 1951,
   "targetVersion": "v0.15",
-  "status": "INCOMPLETE_REQUIRES_SEMANTIC_CLASSIFICATION",
-  "nature": "Conservative operator-bearing text/code candidates; not proof of complete formula coverage or syntactic/semantic correctness.",
+  "status": "CLASSIFIED_DENOTATION_VERIFICATION_PENDING",
+  "nature": "Heuristic operator-bearing fenced/inline Markdown candidates only; not exhaustive current-documentation FORMAL coverage. Additional prose-lexical and universe scans required by issue #1951.",
   "files": [
     {
       "path": "README.md",
@@ -47,7 +47,7 @@
     },
     {
       "path": "docs/specs/Пучки связей.md",
-      "blobSha": "7764bbffa1962f8a8c7e3cad81d27c9c502df96f",
+      "blobSha": "29c355e5beceb72f8fe5ec2e8b295f3351fd02a6",
       "lineCount": 352
     },
     {
@@ -2507,7 +2507,7 @@
     }
   ],
   "classification": {
-    "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
+    "policy": "All 202 heuristic fenced/inline candidates have role classifications. Non-FORMAL classification is not denotation; 19 current FORMAL specimens remain NOT_VERIFIED; plain-text/table/diagram scan is independent and pending.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
     "acceptedFormalDenotationsVerified": 0,
