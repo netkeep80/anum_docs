@@ -44,10 +44,15 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const historical = list(read(root, "theorems/current-v0.14.json").theorems, "historical theorems");
   const overlay = list(read(root, "theorems/formal-v0.15.json").entries, "FORMAL theorem entries");
   const historicalIds = historical.map((entry) => field(entry, "id"));
-  const formalIds = overlay.map((entry) => field(entry, "id"));
+  const allOverlayIds = overlay.map((entry) => field(entry, "id"));
+  const migrated = overlay.filter((entry) =>
+    entry.migrationStatus === "FORMAL_MIGRATED" &&
+    typeof entry.formalStatement === "string" && entry.formalStatement.length > 0 &&
+    typeof entry.formalSourcePath === "string" && entry.formalSourcePath.length > 0);
+  const formalIds = migrated.map((entry) => field(entry, "id"));
   const formalSet = new Set(formalIds);
   const missing = historicalIds.filter((id) => !formalSet.has(id));
-  const invalidOverlayIds = formalIds.filter((id) => !historicalIds.includes(id));
+  const invalidOverlayIds = allOverlayIds.filter((id) => !historicalIds.includes(id));
   const inventory = read(root, "audits/v015-formula-candidate-inventory.json");
   const candidates = list(inventory.candidates, "formula candidates");
   const pending = candidates.filter((item) =>
@@ -62,7 +67,8 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const blockers: string[] = [];
   if (!acceptedRelease || coverage.contract !== "mts-contract/v0.15") blockers.push("accepted release authority mismatch");
   if (normativeExpected !== 48 || normativeProjected !== normativeExpected) blockers.push("normative v0.15 requirements not fully projected");
-  if (formalSet.size !== formalIds.length || invalidOverlayIds.length > 0) blockers.push("invalid/duplicate FORMAL theorem overlays");
+  if (new Set(allOverlayIds).size !== allOverlayIds.length || invalidOverlayIds.length > 0) blockers.push("invalid/duplicate FORMAL theorem overlays");
+  if (formalIds.length !== overlay.length) blockers.push("non-migrated or incomplete FORMAL theorem descriptors cannot satisfy coverage");
   if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
   if (pending.length > 0) blockers.push("unverified current documentation formula candidates: " + pending.length);
   if (other > 0) blockers.push("unreviewed/unrecognized formula classification: " + other);
