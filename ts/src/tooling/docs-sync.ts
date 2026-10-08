@@ -26,9 +26,9 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 132545,
+  baselineCodePoints: 133370,
   baselineLines: 3442,
-  baselineWords: 18394,
+  baselineWords: 18498,
   hardCeilingCodePoints: 135948,
 });
 
@@ -566,6 +566,14 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
     issues.push("README.md: current execution description must use accepted v0.15 Γ/FORMAL, not legacy MP shortcut");
   }
   const glossary = readFileSync(resolve(root, "docs/Словарь терминов МТС.md"), "utf8");
+  for (const exact of [
+    "Историческая реляционная **метазапись v0.14**",
+    "Унаследованная математическая **метазапись v0.14**",
+    "историческая математическая метазапись хиральности",
+    "историческая реляционная **метасхема допуска**",
+  ]) {
+    if (!glossary.includes(exact)) issues.push("docs/Словарь терминов МТС.md: unscoped older glyph formula " + exact);
+  }
   if (!glossary.includes("1. \`Current\` \`name\` выбирается по \`terminology\` \`projection\` в \`requirements/mts-v0.15.json\`.")) {
     issues.push("docs/Словарь терминов МТС.md: current terminology must use v0.15 registry");
   }
