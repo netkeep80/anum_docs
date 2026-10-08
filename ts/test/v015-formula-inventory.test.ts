@@ -135,7 +135,10 @@ const historicalTheorems = JSON.parse(readFileSync(resolve(root, "theorems/curre
   theorems: { id: string; statement: string }[];
 };
 const formalOverlay = JSON.parse(readFileSync(resolve(root, "theorems/formal-v0.15.json"), "utf8")) as {
-  entries: { id: string; formalStatement: string }[];
+  entries: {
+    id: string; formalStatement: string; proofClosure: string; formalArtifactKind: string;
+    aproverStatus: string;
+  }[];
 };
 const historicalStatements = inventory.candidates.filter((entry) =>
   entry.role === "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT") as Array<typeof inventory.candidates[number] & {
@@ -151,11 +154,57 @@ for (const entry of historicalStatements) {
 const actualFormalStatements = inventory.candidates.filter((entry) =>
   entry.role === "FORMAL_V015_THEOREM_STATEMENT") as typeof historicalStatements;
 assert.equal(actualFormalStatements.length, 7, "current FORMAL overlay instances tracked individually");
+const expectedTheoremReceipts = new Map([
+  ["F0063", ["FND-01", "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb", "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
+  ["F0067", ["FND-02", "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355", "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a", "N_A_FOR_KERNEL_REALIZATION", "KERNEL_REALIZATION"]],
+  ["F0071", ["FND-13", "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804", "94dd33cc30f2a55bb1f7b187c89990c3f050309f0e1d3069c20d506f04bd8cbf", "N_A_FOR_KERNEL_REALIZATION", "KERNEL_REALIZATION"]],
+  ["F0084", ["FND-07", "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe", "4e367ad2c0657f4374721225ce0aeb82939f6021da76236740a27f29d39c759e", "CLOSED", "CLOSED_PROOF"]],
+  ["F0090", ["FND-08", "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c", "fb610912423b26659fd29795d5bb9311f040755a3f89bd590ae4aa2e4fc3cf29", "OPEN_CONDITIONAL", "OPEN_PROOF"]],
+  ["F0094", ["FND-09", "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067", "5ae0ddc9fb7c387afd9c68382a83c67ba1d379bcd129d7295c2fdebc8d7ef359", "OPEN_CONDITIONAL", "OPEN_PROOF"]],
+  ["F0116", ["EXE-02", "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265", "d6d9114f7acab454b2f607ee419623b4acf3ab98c9da16b46c1593af1d15566a", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
+] as const);
 for (const entry of actualFormalStatements) {
   assert.equal(entry.sourceArtifact, "theorems/formal-v0.15.json");
-  assert.equal(entry.denotation, "NOT_VERIFIED", "a FORMAL syntactic overlay does not prove denotation or proof closure");
-  assert.equal(formalOverlay.entries.find((theorem) => theorem.id === entry.sourceTheoremId)?.formalStatement,
-    entry.source, entry.id + " exact theorem FORMAL statement source");
+  assert.equal(entry.denotation, "VERIFIED_AGAINST_ACCEPTED_V015",
+    "the seven migrated theorem statement sources require bounded mapping receipts");
+  const expected = expectedTheoremReceipts.get(entry.id);
+  assert.ok(expected, entry.id + " theorem receipt is explicitly enumerated");
+  assert.equal(entry.sourceTheoremId, expected![0]);
+  const overlay = formalOverlay.entries.find((theorem) => theorem.id === entry.sourceTheoremId);
+  assert.equal(overlay?.formalStatement, entry.source, entry.id + " exact theorem FORMAL statement source");
+  assert.equal(overlay?.proofClosure, expected![3], entry.id + " proof closure must not be promoted");
+  assert.equal(overlay?.formalArtifactKind, expected![4], entry.id + " artifact kind must not be promoted");
+  assert.equal(overlay?.aproverStatus, "NOT_RECORDED", entry.id + " aprover status must remain NOT_RECORDED");
+
+  const semantic = (entry as typeof entry & { semanticEvidence?: Record<string, any> }).semanticEvidence;
+  assert.ok(semantic, entry.id + " theorem statement requires semanticEvidence");
+  assert.equal(semantic!.compilerVersion, "mts-v015-theorem-statement-evidence/v0.1");
+  assert.equal(semantic!.acceptedFormalVersion, "v0.15");
+  assert.equal(semantic!.formalSourceSha256, expected![1]);
+  assert.equal(semantic!.executionApplicability, "NOT_APPLICABLE");
+  assert.ok(String(semantic!.executionRationale).length >= 20);
+  for (const [stage, marker] of Object.entries({
+    grammar: "THEOREM_STAGE_GRAMMAR",
+    denotation: "THEOREM_STAGE_DENOTATION",
+    semanticLinks: "THEOREM_STAGE_SEMANTIC_LINKS",
+    theoremMapping: "THEOREM_STAGE_MAPPING",
+  })) {
+    const stageEvidence = semantic![stage] as { path: string; gitBlobSha: string; testCase: string };
+    assert.equal(stageEvidence.path, "ts/test/v015-theorem-statement-evidence-verifier.test.ts");
+    assert.equal(stageEvidence.gitBlobSha, "4e024d487f681dccf5107a46ba119e25ff1d3293");
+    assert.equal(stageEvidence.testCase, marker);
+  }
+  const receipt = semantic!.machineReceipt as Record<string, string>;
+  assert.equal(receipt.profile, "mts-v015-theorem-statement-evidence/v0.1");
+  assert.equal(receipt.outcome, "PASS");
+  assert.equal(receipt.caseId, entry.id);
+  assert.equal(receipt.formalSourceSha256, expected![1]);
+  assert.equal(receipt.semanticAnetSha256, expected![2]);
+  assert.equal(receipt.runnerSourceSha256,
+    "32eb8efb817143e1400dbf83ee6e0f2eae3042176f1c0dfe6389d76ea9be5f26");
+  assert.equal(receipt.evidenceCommit, "71d272fefc28ed02e1f62594c6e1d0f3a12a3695");
+  assert.equal(receipt.ciRun, "37840620817");
+  assert.equal(receipt.ciJob, "113528751647");
 }
 const toolchainPins = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY");
 assert.equal(toolchainPins.length, 42, "Lean/Rocq digests must never count as semantic Link equations");
@@ -353,14 +402,14 @@ const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIF
 assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 10,
-  "five B20, root-basis F0028 and four semantic-metamodel occurrences may claim verified denotation");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 17,
+  "all 17 executable/current FORMAL primary occurrences have bounded source/denotation receipts");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 7,
-  "only FORMAL theorem statements remain pending denotation verification");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 0,
+  "primary FORMAL denotation backlog is closed independently of the 14 missing theorem migrations");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 7, "theorem semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 0, "all primary formula candidates are classified and denotation-closed");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
@@ -368,4 +417,4 @@ assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
 
 
 console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length +
-  " candidates; all 202 expressions scoped; 10 bounded FORMAL denotations verified; 7 theorem FORMAL denotations pending; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+  " candidates; all 202 expressions scoped; 17 bounded FORMAL denotations verified; primary FORMAL denotation backlog=0; 14 theorem migrations remain separate; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
