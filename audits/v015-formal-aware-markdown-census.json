@@ -6239,7 +6239,7 @@
     {
       "path": "docs/theory/Теоремы МТС.md",
       "line": 21,
-      "source": "| [FND-05](#theorem-fnd-05) | `NOT_MIGRATED` | `Canonical recursive structural description is unique on its explicitly declared finite ROOT-decomposable carrier domain.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 2 исполняемых свидетельств |",
+      "source": "| [FND-05](#theorem-fnd-05) | `FORMAL_MIGRATED` | `Canonical recursive structural description is unique on its explicitly declared finite ROOT-decomposable carrier domain.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 2 исполняемых свидетельств |",
       "context": "table",
       "tokens": [
         "ROOT_ASPECT"
@@ -6249,7 +6249,7 @@
       "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
       "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
       "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
-      "reviewSourceSha256": "90f1792092329c7acb5a4179e02bbcd435ab01b22519df3a565cd203f2673f33"
+      "reviewSourceSha256": "44933a42d440856f707678d687397c927acdde7334a13268992d67e57d4d1d8c"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
