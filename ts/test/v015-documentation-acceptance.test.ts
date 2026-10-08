@@ -1,4 +1,8 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { scanV015FormalLexicalSurface } from "../src/tooling/v015-markdown-prose-audit.js";
 import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 
@@ -17,8 +21,33 @@ assert.equal(report.prose.files, 11, "full current markdown surface includes POR
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
-assert.equal(report.lexical.candidates, 968, "lexical discovery records :/[]/ROOT/fence/table/diagram lines");
-assert.equal(report.lexical.unreviewed, 968, "wide-scan lexemes require separate review");
+assert.equal(report.lexical.candidates, 704, "lexical discovery records :/[]/ROOT/fence/table/diagram lines");
+assert.equal(report.lexical.unreviewed, 704, "wide-scan lexemes require separate review");
+
+const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
+try {
+  mkdirSync(join(lexicalFixture, "docs"));
+  writeFileSync(join(lexicalFixture, "README.md"), [
+    "<!-- mts-doc-version: v0.15 -->",
+    "[STATUS](https://example.org/status)",
+    "[Theory->Rule](https://example.org/arrow)",
+    "A : [B]",
+    "[A,B]",
+    "![semantic arrow A->B](figure.png)",
+  ].join("\n"), "utf8");
+  const lexicalFixtureResult = scanV015FormalLexicalSurface(lexicalFixture);
+  assert.equal(lexicalFixtureResult.observations.length, 4,
+    "ordinary Markdown link labels must not become ExactSequence false positives");
+  assert.deepEqual(lexicalFixtureResult.observations.map(({ line, tokens }) => [line, tokens]), [
+    [3, ["LINK_DIRECTION"]],
+    [4, ["CONTEXT_NAME_OR_BINDING", "EXACT_SEQUENCE"]],
+    [5, ["EXACT_SEQUENCE"]],
+    [6, ["LINK_DIRECTION", "DIAGRAM_OR_IMAGE"]],
+  ], "real FORMAL labels, bracket sequences and diagram arrows must remain discoverable");
+} finally {
+  rmSync(lexicalFixture, { recursive: true, force: true });
+}
+
 assert.ok(isV015FormalRole("FORMAL_V015_NOTATION_SPECIMEN"));
 assert.ok(isV015FormalRole("FORMAL_V015_THEOREM_STATEMENT"));
 assert.ok(isV015FormalRole("FORMAL_V015_SEMANTIC_METAMODEL"));

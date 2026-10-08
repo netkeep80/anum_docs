@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "Broad lexer finds 968 rows from :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram, with exact source blobs. Old 202 rows are a subset of heuristic syntax, not exhaustive.",
+      "evidence": "Broad lexer finds 704 rows after eliminating 264 Markdown-link/image-bracket false positives (original broad baseline 968) from :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram, with exact source blobs. Old 202 rows are a subset of heuristic syntax, not exhaustive.",
       "state": "BROAD_COVERAGE_REOPENED_968_LEXICAL_CANDIDATES_UNREVIEWED",
-      "remediation": "Classify and deduplicate 968 broad lexical rows across 11 documents; 202 previously classified fenced/inline and 21 prose rows are partial overlapping evidence only. No completion claim until independent grammar/semantics/diagram mapping."
+      "remediation": "Classify and deduplicate 704 remaining broad lexical rows across 11 documents; 202 previously classified fenced/inline and 21 prose rows are partial overlapping evidence only. No completion claim until independent grammar/semantics/diagram mapping."
     },
     {
       "id": "DOC15-006",
@@ -103,11 +103,11 @@
   "currentDiscovery": {
     "legacyFencedInline": 202,
     "legacyProse": 21,
-    "lexicalLineCandidates": 968,
+    "lexicalLineCandidates": 704,
     "allCurrentMarkdown": 11,
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "The wider pass deliberately includes noise from version labels and prose. Neither 202 nor 968 is a final number of valid FORMAL expressions."
+    "notes": "The wider pass deliberately includes noise from version labels and prose. Neither 202 nor 704 is a final number of valid FORMAL expressions."
   }
 }

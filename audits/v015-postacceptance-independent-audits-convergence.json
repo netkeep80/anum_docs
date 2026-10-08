@@ -33,7 +33,7 @@
       "id": "P0-B1",
       "status": "IMPLEMENTED_WIDE_CENSUS_UNREVIEWED",
       "finding": "202 fenced/inline heuristic misses plain Markdown",
-      "remediation": "21 additional prose/table lexical hits on 11 current docs; 968 independently broader FORMAL-aware line hits including :, [], ROOT/START/END, tables and diagram references. Both ledgers source-pinned, fail closed. Counts overlap, not 202+21+968 independent formulas.",
+      "remediation": "21 additional prose/table lexical hits on 11 current docs; 704 independently broader FORMAL-aware line hits after filtering 264 pure Markdown markup bracket candidates including :, [], ROOT/START/END, tables and diagram references. Both ledgers source-pinned, fail closed. Counts overlap, not 202+21+704 independent formulas.",
       "sources": [
         "audits/v015-markdown-prose-lexical-inventory.json",
         "audits/v015-formal-aware-markdown-census.json",
@@ -54,7 +54,7 @@
       "id": "P0-B3",
       "status": "PENDING_REVIEW",
       "finding": "Every lexeme candidate requires source/semantic classification, not regex-only completeness",
-      "remediation": "968 broad candidates currently UNREVIEWED/NOT_VERIFIED. Heuristic-only 202/202 classification is historical audit subset, never full FORMAL coverage.",
+      "remediation": "704 broad candidates currently UNREVIEWED/NOT_VERIFIED. Heuristic-only 202/202 classification is historical audit subset, never full FORMAL coverage.",
       "sources": [
         "audits/v015-formal-aware-markdown-census.json",
         "audits/v015-formula-candidate-inventory.json"
