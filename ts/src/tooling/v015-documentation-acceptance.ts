@@ -56,6 +56,8 @@ export const NON_FORMAL_V015_ROLES = new Set([
   "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
   "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
   "NON_FORMAL_PRESENTATION_ASSET",
+  "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+  "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
 ] as const);
 export function isV015FormalRole(role: string): boolean {
   return (FORMAL_V015_ROLES as ReadonlySet<string>).has(role);
