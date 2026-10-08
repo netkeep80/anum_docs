@@ -60,6 +60,23 @@ export function isV015NonFormalRole(role: string): boolean {
   return (NON_FORMAL_V015_ROLES as ReadonlySet<string>).has(role);
 }
 
+/**
+ * Different semantic obligations apply to native source, theorem claims and
+ * explanatory metatheory. These stages name evidence, NOT proof acceptance.
+ */
+export function v015RequiredEvidenceStages(role: string): readonly string[] {
+  switch (role) {
+    case "FORMAL_V015_NOTATION_SPECIMEN":
+      return ["grammar", "denotation", "semanticLinks", "jsonParity"];
+    case "FORMAL_V015_THEOREM_STATEMENT":
+      return ["grammar", "denotation", "semanticLinks", "theoremMapping"];
+    case "FORMAL_V015_SEMANTIC_METAMODEL":
+      return ["metamodelMapping", "denotation", "semanticLinks"];
+    default:
+      throw new Error("unrecognized native FORMAL documentation role: " + role);
+  }
+}
+
 export interface V015DocumentationAcceptanceReport {
   readonly schema: "mts-v015-current-documentation-acceptance/v0.1";
   readonly acceptedRelease: boolean;
@@ -244,18 +261,12 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       break;
     }
   }
-  const pending = candidates.filter((item) =>
-    field(item, "role") === "UNCLASSIFIED" || field(item, "denotation") === "NOT_VERIFIED");
   const reviewedNonFormal = candidates.filter((item) => isV015NonFormalRole(field(item, "role")) &&
-    field(item, "denotation") === "NOT_APPLICABLE_FORMAL_SOURCE" &&
-    typeof item.reviewBasis === "string" && item.reviewBasis.length > 0 ||
-    isV015NonFormalRole(field(item, "role")) &&
-    field(item, "denotation") === "NOT_APPLICABLE_PROCESS_DOCUMENTATION" &&
+    ["NOT_APPLICABLE_FORMAL_SOURCE", "NOT_APPLICABLE_PROCESS_DOCUMENTATION"].includes(field(item, "denotation")) &&
     typeof item.reviewBasis === "string" && item.reviewBasis.length > 0);
-  const verified = candidates.filter((item) =>
+  const claimedVerified = candidates.filter((item) =>
     isV015FormalRole(field(item, "role")) &&
     item.denotation === "VERIFIED_AGAINST_ACCEPTED_V015");
-  const other = candidates.length - pending.length - reviewedNonFormal.length - verified.length;
   // Cross-check current FORMAL classification against independently stored
   // theorem source and the accepted generated reader surface. Source labels
   // cannot be reclassified as historical merely to evade denotation work.
@@ -292,24 +303,41 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   // for grammar, denotation, semantic Link identity, JSON parity and replay.
   // Partial native fixtures (B10/B20) are not complete attestations.
   const evidenceDefects: string[] = [];
-  for (const item of verified) {
+  const verified: Obj[] = [];
+  for (const item of claimedVerified) {
     const id = field(item, "id");
+    const before = evidenceDefects.length;
     const evidence = item.semanticEvidence;
     if (evidence === null || typeof evidence !== "object" || Array.isArray(evidence)) {
       evidenceDefects.push(id + ": missing semanticEvidence");
       continue;
     }
     const proof = evidence as Obj;
+    const role = field(item, "role");
     const version = proof.compilerVersion;
     const sourceDigest = proof.formalSourceSha256;
     if (typeof version !== "string" || version.length < 3 ||
         typeof sourceDigest !== "string" || !/^[0-9a-f]{64}$/.test(sourceDigest)) {
       evidenceDefects.push(id + ": missing compiler/version or source digest");
     } else {
-      const sourceDigestComputed = createHash("sha256").update(field(item, "source"), "utf8").digest("hex");
-      if (sourceDigestComputed !== sourceDigest) evidenceDefects.push(id + ": source digest mismatch");
+      const computed = createHash("sha256").update(field(item, "source"), "utf8").digest("hex");
+      if (computed !== sourceDigest) evidenceDefects.push(id + ": source digest mismatch");
     }
-    for (const stage of ["grammar", "denotation", "semanticLinks", "jsonParity", "amemoryReplay"]) {
+    // All source examples are pinned to the accepted version, not future grammar.
+    if (proof.acceptedFormalVersion !== "v0.15") {
+      evidenceDefects.push(id + ": evidence does not target accepted v0.15");
+    }
+    const stages = v015RequiredEvidenceStages(role);
+    const applicability = proof.executionApplicability;
+    if (applicability !== "APPLICABLE" && applicability !== "NOT_APPLICABLE") {
+      evidenceDefects.push(id + ": execution applicability not classified");
+    }
+    const requiredStages = applicability === "APPLICABLE" ? [...stages, "amemoryReplay"] : stages;
+    if (applicability === "NOT_APPLICABLE" &&
+        (typeof proof.executionRationale !== "string" || proof.executionRationale.length < 20)) {
+      evidenceDefects.push(id + ": missing no-replay rationale");
+    }
+    for (const stage of requiredStages) {
       const trace = proof[stage];
       if (trace === null || typeof trace !== "object" || Array.isArray(trace)) {
         evidenceDefects.push(id + ": missing " + stage + " machine witness");
@@ -337,7 +365,31 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
         evidenceDefects.push(id + ": unreadable witness for " + stage);
       }
     }
+    // Source references alone do not prove the executable witness ran.
+    // A future acceptance attestor must produce a replay-derived receipt.
+    const receipt = proof.machineReceipt;
+    if (receipt === null || typeof receipt !== "object" || Array.isArray(receipt)) {
+      evidenceDefects.push(id + ": missing derived machineReceipt (source references alone are insufficient)");
+    } else {
+      const rr = receipt as Obj;
+      if (rr.profile !== "mts-v015-native-evidence/v0.1" ||
+          rr.outcome !== "PASS" ||
+          typeof rr.formalSourceSha256 !== "string" || rr.formalSourceSha256 !== sourceDigest ||
+          typeof rr.semanticAnetSha256 !== "string" || !/^[0-9a-f]{64}$/.test(rr.semanticAnetSha256) ||
+          typeof rr.runnerSourceSha256 !== "string" || !/^[0-9a-f]{64}$/.test(rr.runnerSourceSha256)) {
+        evidenceDefects.push(id + ": incomplete machineReceipt semantic identity/replay profile");
+      }
+      // A receipt is not accepted by its metadata alone: an executable
+      // receipt verifier is still required to recompute its derivation.
+      evidenceDefects.push(id + ": receipt replay-verifier not yet implemented (fail closed)");
+    }
+    if (evidenceDefects.length === before) verified.push(item);
   }
+  const pending = candidates.filter((item) =>
+    field(item, "role") === "UNCLASSIFIED" ||
+    field(item, "denotation") === "NOT_VERIFIED" ||
+    isV015FormalRole(field(item, "role")) && !verified.includes(item));
+  const other = candidates.length - pending.length - reviewedNonFormal.length - verified.length;
   // Broad second pass covers prose and Markdown tables outside fenced/inline code;
   // the current-doc universe is discovered from the repository, not a fixed list.
   const prose = scanV015MarkdownProse(root);
