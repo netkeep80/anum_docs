@@ -24,6 +24,9 @@ export interface ObservatoryMarkdownCoverageSummary {
   readonly canonicalNodeCount: number;
   readonly nonCanonicalAnchorCount: number;
   readonly requirementCount: number;
+  readonly currentNormativeRequirementCount: number;
+  readonly currentNormativeProjectedCount: number;
+  readonly inheritedV014RequirementCount: number;
   readonly requirementBackedSectionCount: number;
   readonly ownedBlockCount: number;
   readonly unanchoredHeadingCount: number;
@@ -163,6 +166,9 @@ export function validateMarkdownCoverage(value: unknown): ObservatoryMarkdownCov
     canonicalNodeCount: count(summaryRaw.canonicalNodeCount, "coverage.summary.canonicalNodeCount"),
     nonCanonicalAnchorCount: count(summaryRaw.nonCanonicalAnchorCount, "coverage.summary.nonCanonicalAnchorCount"),
     requirementCount: count(summaryRaw.requirementCount, "coverage.summary.requirementCount"),
+    currentNormativeRequirementCount: count(summaryRaw.currentNormativeRequirementCount, "coverage.summary.currentNormativeRequirementCount"),
+    currentNormativeProjectedCount: count(summaryRaw.currentNormativeProjectedCount, "coverage.summary.currentNormativeProjectedCount"),
+    inheritedV014RequirementCount: count(summaryRaw.inheritedV014RequirementCount, "coverage.summary.inheritedV014RequirementCount"),
     requirementBackedSectionCount: count(summaryRaw.requirementBackedSectionCount, "coverage.summary.requirementBackedSectionCount"),
     ownedBlockCount: count(summaryRaw.ownedBlockCount, "coverage.summary.ownedBlockCount"),
     unanchoredHeadingCount: count(summaryRaw.unanchoredHeadingCount, "coverage.summary.unanchoredHeadingCount"),
@@ -170,6 +176,13 @@ export function validateMarkdownCoverage(value: unknown): ObservatoryMarkdownCov
     currentlyUnclassifiedSectionCount: count(summaryRaw.currentlyUnclassifiedSectionCount, "coverage.summary.currentlyUnclassifiedSectionCount"),
   });
 
+  if (summary.currentNormativeProjectedCount > summary.currentNormativeRequirementCount) {
+    fail("current normative projected count exceeds accepted requirement count");
+  }
+  if (summary.inheritedV014RequirementCount !== summary.requirementCount &&
+      root.contract === "mts-contract/v0.15") {
+    fail("historical v0.14 requirements are not separately accounted");
+  }
   const sum = (field: keyof ObservatoryMarkdownCoverageDocument): number =>
     documents.reduce((total, document) => total + (typeof document[field] === "number" ? document[field] as number : 0), 0);
   const observed = {
