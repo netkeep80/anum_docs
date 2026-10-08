@@ -154,7 +154,7 @@ for (const entry of historicalStatements) {
 const actualFormalStatements = inventory.candidates.filter((entry) =>
   entry.role === "FORMAL_V015_THEOREM_STATEMENT") as typeof historicalStatements;
 assert.equal(actualFormalStatements.length, 7, "current FORMAL overlay instances tracked individually");
-const expectedTheoremReceipts = new Map([
+const expectedTheoremReceipts = new Map<string, readonly [string, string, string, string, string]>([
   ["F0063", ["FND-01", "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb", "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
   ["F0067", ["FND-02", "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355", "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a", "N_A_FOR_KERNEL_REALIZATION", "KERNEL_REALIZATION"]],
   ["F0071", ["FND-13", "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804", "94dd33cc30f2a55bb1f7b187c89990c3f050309f0e1d3069c20d506f04bd8cbf", "N_A_FOR_KERNEL_REALIZATION", "KERNEL_REALIZATION"]],
