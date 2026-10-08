@@ -1654,9 +1654,11 @@
       "kind": "fence",
       "language": "text",
       "source": ":A ≡ R:A\nA->B->C = (A->B)->C\nDen([]) = ExactSequence([]) = R\nDen([e1,...,en]) = ExactSequence([Den(e1),...,Den(en)])\n∞      = ROOT\n♂S     = START(S)\nS♀     = END(S)\nA->B   = PAIR(A,B)",
-      "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Exact block emitted by accepted formal-notation-v015-markdown generator from locked semantic source; mixed explanatory Den/≡ equations and FORMAL tokens require differentiated denotation evidence."
+      "role": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generator-owner text explicitly states that this fence contains metalinguistic explanations of parsing/denotation rules, not expressions in executable FORMAL v0.15.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "sourceArtifact": "ts/src/tooling/formal-notation-v015-markdown.ts"
     },
     {
       "id": "F0128",
@@ -1666,9 +1668,11 @@
       "kind": "fence",
       "language": "text",
       "source": "{ A }        — объявление без локальной правой части\nA:{}         — явно пустой именованный пучок\nA:X          — связывание имени с выражением\n[A,B,...]    — только ExactSequence; порядок и кратность сохраняются",
-      "role": "FORMAL_V015_NOTATION_SPECIMEN",
-      "denotation": "NOT_VERIFIED",
-      "reviewBasis": "Exact source-shape examples from canonical FORMAL projection; parser/denotation evidence is not yet attached per row."
+      "role": "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generator-owner block is a schematic FORMAL syntax legend with explanatory em-dash prose and ellipsis; it is not literal parser input. Concrete executable shapes are tested separately.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "sourceArtifact": "ts/src/tooling/formal-notation-v015-markdown.ts"
     },
     {
       "id": "F0129",
