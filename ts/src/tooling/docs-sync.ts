@@ -556,6 +556,27 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
       issues.push(documentPath + ": accepted v0.15 normative authority missing");
     }
   }
+  const readme = readFileSync(resolve(root, "README.md"), "utf8");
+  if (
+    !readme.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))") ||
+    !readme.includes("M_t -> Γ(M_t) -> M_(t+1)") ||
+    readme.includes("K ⟼ {A}\\n{A} ⟼ {B}")
+  ) {
+    issues.push("README.md: current execution description must use accepted v0.15 Γ/FORMAL, not legacy MP shortcut");
+  }
+  const glossary = readFileSync(resolve(root, "docs/Словарь терминов МТС.md"), "utf8");
+  if (!glossary.includes("1. \`Current\` \`name\` выбирается по \`terminology\` \`projection\` в \`requirements/mts-v0.15.json\`.")) {
+    issues.push("docs/Словарь терминов МТС.md: current terminology must use v0.15 registry");
+  }
+  const bundles = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
+  if (!bundles.includes("В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:")) {
+    issues.push("docs/specs/Пучки связей.md: accepted FORMAL context/bundle syntax must be distinguished from derived query meta-notation");
+  }
+  const theoremCatalog = readFileSync(resolve(root, "docs/theory/Теоремы МТС.md"), "utf8");
+  if (!theoremCatalog.includes("Доказательный overlay в принятой FORMAL v0.15:") ||
+      !theoremCatalog.includes("Статус миграции доказательств: \`v0.15-candidate\`; не статус выпуска MTS.")) {
+    issues.push("docs/theory/Теоремы МТС.md: accepted release cannot be conflated with proof migration");
+  }
   return issues;
 }
 
