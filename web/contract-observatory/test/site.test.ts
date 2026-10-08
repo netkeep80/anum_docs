@@ -120,9 +120,13 @@ assert(realHtml.includes("Зависимые требования"), "reverse de
 assert(realHtml.includes("неразрешённых или отсутствующих обязательных метаданных = 0"), "clean validated IR has explicit zero diagnostics");
 assert(realHtml.includes("Сравнение по стабильному ID недоступно"), "missing previous compiler registry is explicit instead of inferred");
 same(realMarkdownCoverage.summary.documentCount, 12, "P5 renders all registered Markdown documents");
-same(realMarkdownCoverage.projectionState, "V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951", "P5 observes explicit v0.14 Markdown compatibility projection under accepted v0.15");
+same(realMarkdownCoverage.projectionState, "V015_ACCEPTED_48_NORMATIVE_ROWS_PROJECTED_FORMULA_MIGRATION_PENDING_1951", "P5 observes explicit v0.14 Markdown compatibility projection under accepted v0.15");
 same(realMarkdownCoverage.proseMaterializationPending, false, "P5 has no pending prose materialization");
 same(realMarkdownCoverage.summary.requirementCount, 16, "P5 renders semantic + repository requirements");
+same(realMarkdownCoverage.summary.currentNormativeRequirementCount, 48, "P5 current accepted normative requirement count");
+same(realMarkdownCoverage.summary.currentNormativeProjectedCount, 48, "P5 all current requirements uniquely indexed");
+same(realMarkdownCoverage.summary.inheritedV014RequirementCount, 16, "P5 inherited v0.14 owner blocks distinct");
+
 same(realMarkdownCoverage.summary.requirementBackedSectionCount, 16, "P5 materializes every projected requirement owner");
 same(realMarkdownCoverage.summary.ownedBlockCount, 16, "P5 exposes exactly one compiler-owned block per projected requirement");
 assert(realMarkdownCoverage.summary.researchHistoricalSectionCount > 0, "P5 keeps research/history reader-visible");
