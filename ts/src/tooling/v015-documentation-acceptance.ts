@@ -116,6 +116,57 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       inventoryIntegrityIssues.push("formula source/line drift: " + id);
     }
   }
+  // Rediscover the operator-bearing source surface independently from JSON.
+  // Omitting an expression from the inventory cannot make acceptance green.
+  const operatorBearing = /⟼|->|≡|∈|⇒|=|\{\}|\{[A-Za-zА-Яа-я, ]+\}|\bDen\(|\bJ\(/u;
+  const discovered: Array<{
+    path: string; kind: string; source: string; startLine: number; endLine: number;
+  }> = [];
+  for (const file of indexedFiles) {
+    const path = field(file, "path");
+    const lines = sourceLines.get(path);
+    if (lines === undefined) continue;
+    let insideFence = false;
+    let firstLine = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!;
+      const marker = line.match(/^\s*(\x60{3}|~~~)(\w*)/);
+      if (marker !== null) {
+        if (!insideFence) {
+          insideFence = true;
+          firstLine = i;
+        } else {
+          const source = lines.slice(firstLine + 1, i).join("\n");
+          if (operatorBearing.test(source)) discovered.push({
+            path, kind: "fence", source, startLine: firstLine + 2, endLine: i,
+          });
+          insideFence = false;
+        }
+        continue;
+      }
+      if (insideFence) continue;
+      for (const match of line.matchAll(/\x60([^\x60\n]+)\x60/g)) {
+        const source = match[1]!;
+        if (operatorBearing.test(source)) discovered.push({
+          path, kind: "inline-code", source, startLine: i + 1, endLine: i + 1,
+        });
+      }
+    }
+  }
+  if (discovered.length !== candidates.length) {
+    inventoryIntegrityIssues.push("unindexed source expressions: discovered=" +
+      discovered.length + " declared=" + candidates.length);
+  }
+  for (let i = 0; i < Math.min(discovered.length, candidates.length); i++) {
+    const actual = discovered[i]!;
+    const expected = candidates[i]!;
+    if (actual.path !== expected.path || actual.kind !== expected.kind ||
+        actual.source !== expected.source || actual.startLine !== expected.startLine ||
+        actual.endLine !== expected.endLine) {
+      inventoryIntegrityIssues.push("expression inventory mismatch at index " + i);
+      break;
+    }
+  }
   const pending = candidates.filter((item) =>
     field(item, "role") === "UNCLASSIFIED" || field(item, "denotation") === "NOT_VERIFIED");
   const reviewedNonFormal = candidates.filter((item) => field(item, "role").startsWith("NON_FORMAL_") &&
