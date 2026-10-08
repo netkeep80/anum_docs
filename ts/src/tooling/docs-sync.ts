@@ -5,6 +5,7 @@ import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mt
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
+import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
 import { loadRepositoryTheoremProjectionModel } from "./theorem-projection-model.js";
 import { FORMAL_NOTATION_V015_TARGET_PATH, renderFormalNotationV015Markdown } from "./formal-notation-v015-markdown.js";
@@ -609,6 +610,12 @@ function main(): void {
   const historicalV013Provenance = auditHistoricalV013FoundationProvenance(root);
   if (historicalV013Provenance.issues.length) {
     fail(`нарушена historical v0.13 foundation provenance baseline: ${historicalV013Provenance.issues.map((entry) => entry.message).join("; ")}`);
+  }
+  const markdownCoverage = buildMarkdownCoverageAudit(root);
+  if (markdownCoverage.contract === "mts-contract/v0.15" &&
+      (markdownCoverage.summary.currentNormativeRequirementCount !== 48 ||
+       markdownCoverage.summary.currentNormativeProjectedCount !== 48)) {
+    fail("current v0.15 normative Markdown requirement projection incomplete");
   }
   const size = measureRepositoryCurrentDocumentationSize(root);
   if (!currentDocumentationSizeWithinBudget(size)) {
