@@ -62,6 +62,65 @@ export function isV015NonFormalRole(role: string): boolean {
 }
 
 /**
+ * Secondary Markdown censuses are independent discovery ledgers, not proof.
+ * A status flip is never evidence: allow only explicit non-FORMAL adjudication
+ * with a source-bound review record, or a FORMAL row linked to a verified native
+ * candidate from the primary inventory. New unsupported FORMAL shapes fail closed.
+ */
+export function inspectV015SecondaryLedgerRow(
+  ledger: "prose" | "lexical",
+  entry: Obj,
+  primaryCandidates: readonly Obj[],
+  verifiedPrimary: readonly Obj[],
+): Readonly<{ pending: boolean; defect?: string }> {
+  const statusKey = ledger === "prose" ? "status" : "verification";
+  const classification = entry.classification;
+  const status = entry[statusKey];
+  const label = ledger + ":" + String(entry.path) + ":" + String(entry.line);
+  if (classification === "UNREVIEWED" && status === "NOT_VERIFIED")
+    return { pending: true };
+  if (typeof entry.path !== "string" || !Number.isInteger(entry.line) ||
+      typeof entry.source !== "string" || typeof classification !== "string" ||
+      typeof status !== "string")
+    return { pending: true, defect: label + ": malformed secondary review row" };
+
+  const role = classification;
+  const sourceHash = createHash("sha256").update(entry.source, "utf8").digest("hex");
+  const overlapping = primaryCandidates.filter((candidate) =>
+    candidate.path === entry.path &&
+    typeof candidate.startLine === "number" && typeof candidate.endLine === "number" &&
+    candidate.startLine <= (entry.line as number) && candidate.endLine >= (entry.line as number));
+  if (isV015NonFormalRole(role)) {
+    const review = entry.reviewBasis;
+    const reference = entry.reviewReference;
+    if (status !== "REVIEWED_NON_FORMAL" ||
+        typeof review !== "string" || review.trim().length < 40 ||
+        typeof reference !== "string" ||
+        !/^https:\/\/github\.com\/netkeep80\/anum_docs\/(?:issues|pull)\/\d+#issuecomment-\d+$/.test(reference) ||
+        entry.reviewSourceSha256 !== sourceHash) {
+      return { pending: true, defect: label + ": non-FORMAL exclusion lacks pinned, traceable review" };
+    }
+    if (overlapping.some((candidate) => isV015FormalRole(String(candidate.role)))) {
+      return { pending: true, defect: label + ": non-FORMAL exclusion overlaps native FORMAL candidate" };
+    }
+    return { pending: false };
+  }
+  if (isV015FormalRole(role)) {
+    const candidate = primaryCandidates.find((item) => item.id === entry.primaryCandidateId);
+    if (status !== "VERIFIED_AGAINST_ACCEPTED_V015" || !candidate ||
+        candidate.role !== role || candidate.path !== entry.path ||
+        typeof candidate.startLine !== "number" || typeof candidate.endLine !== "number" ||
+        candidate.startLine > (entry.line as number) || candidate.endLine < (entry.line as number) ||
+        !verifiedPrimary.includes(candidate) ||
+        entry.reviewSourceSha256 !== sourceHash) {
+      return { pending: true, defect: label + ": FORMAL classification lacks linked native machine-verification receipt" };
+    }
+    return { pending: false };
+  }
+  return { pending: true, defect: label + ": unsupported review classification/status (fail closed)" };
+}
+
+/**
  * Different semantic obligations apply to native source, theorem claims and
  * explanatory metatheory. These stages name evidence, NOT proof acceptance.
  */
@@ -452,8 +511,10 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     if (expected.path !== actual.path || expected.line !== actual.line || expected.source !== actual.source)
       proseIntegrity.push("prose occurrence drift: index " + i);
   }
-  const prosePending = indexedProse.filter((entry) =>
-    entry.classification === "UNREVIEWED" || entry.status === "NOT_VERIFIED");
+  const proseReviews = indexedProse.map((entry) =>
+    inspectV015SecondaryLedgerRow("prose", entry, candidates, verified));
+  const prosePending = proseReviews.filter((review) => review.pending);
+  for (const review of proseReviews) if (review.defect) sourceClassificationIssues.push(review.defect);
   if (proseIntegrity.length > 0) inventoryIntegrityIssues.push(...proseIntegrity);
   // Third, separate lexical pass: colon bindings, ExactSequence, ROOT aspects,
   // diagrams and table text. It is intentionally broader than the 202 legacy
@@ -479,8 +540,10 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
         JSON.stringify(pinned.tokens) !== JSON.stringify(actual.tokens))
       lexicalIssues.push("FORMAL-aware lexical mismatch at index " + i);
   }
-  const lexicalPending = lexicalRows.filter((entry) =>
-    entry.classification === "UNREVIEWED" || entry.verification === "NOT_VERIFIED");
+  const lexicalReviews = lexicalRows.map((entry) =>
+    inspectV015SecondaryLedgerRow("lexical", entry, candidates, verified));
+  const lexicalPending = lexicalReviews.filter((review) => review.pending);
+  for (const review of lexicalReviews) if (review.defect) sourceClassificationIssues.push(review.defect);
   if (lexicalIssues.length > 0) inventoryIntegrityIssues.push(...lexicalIssues);
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
   const blockers = evaluateV015DocumentationCompletion({
