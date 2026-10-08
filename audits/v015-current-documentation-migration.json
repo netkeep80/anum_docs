@@ -57,8 +57,8 @@
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
       "evidence": "Broad lexer originally found 968 line candidates. Markdown wrapper normalization removed 264 pure-markup false positives; HTML anchor/comment stripping plus prose-colon disambiguation removed 226 more, leaving 478 exact-source FORMAL-aware rows across :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram. The 19 known primary FORMAL candidates remain covered.",
-      "state": "478_TOTAL_335_REVIEWED_NON_FORMAL_143_PENDING_STRICT_GATE",
-      "remediation": "Continue only on the 143 unresolved rows: 38 known FORMAL-overlap rows, 2 mixed FORMAL/historical lines, 3 NON_FORMAL-overlap rows with residual lexical material, and 100 unmatched candidates. The 335 reviewed NON_FORMAL rows are source-SHA/review pinned; 313 of them were transferred only after exhaustive primary-coverage/residual-token proof."
+      "state": "478_TOTAL_430_REVIEWED_NON_FORMAL_48_FORMAL_OR_MIXED_PENDING",
+      "remediation": "Lexical triage is complete at the semantic boundary. Do not further reduce the 48 pending rows by prose classification. Remaining set: 38 rows linked to 19 primary FORMAL candidates, 2 mixed current-FORMAL/historical lines, 3 composite residual rows, and 5 new source-like cases requiring FORMAL/span-level adjudication."
     },
     {
       "id": "DOC15-006",
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "478_BROAD_LEXICAL_ROWS:335_REVIEWED_NON_FORMAL+143_PENDING; STRICT_SECONDARY_REVIEW_GATE",
+    "D1": "478_BROAD_LEXICAL_ROWS:430_REVIEWED_NON_FORMAL+48_FORMAL_OR_MIXED_PENDING; TRIAGE_BOUNDARY_REACHED",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "OPEN_19_PRIMARY_FORMAL_DENOTATIONS_AND_14_THEOREM_MIGRATIONS; 21_PROSE_PLUS_143_LEXICAL_PENDING",
+    "D3": "OPEN_19_PRIMARY_FORMAL_DENOTATIONS_AND_14_THEOREM_MIGRATIONS; 21_PROSE_PLUS_48_LEXICAL_FORMAL_OR_MIXED_PENDING",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
     "D5": "STRICT_GATE_ROLE_WHITELIST_SYNTHETIC_GREEN_NEGATIVE_REGRESSIONS_AND_SECONDARY_LEDGER_FAIL_CLOSED_GUARD; B20_BOUNDED_NATIVE_VERIFIER_EXISTS; FULL_MACHINE_ATTESTOR_AND_EVIDENCE_PRODUCER_PENDING",
-    "D6": "NOT_READY_143_LEXICAL_ROWS_21_PROSE_AND_COMPLETE_NATIVE_RECEIPT_EVIDENCE",
+    "D6": "NOT_READY_FORMAL_EVIDENCE_48_LEXICAL_21_PROSE_AND_14_THEOREMS",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
@@ -108,14 +108,14 @@
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "The broad pass began at 968 lexical line candidates. 264 Markdown wrapper-only and 226 inline-HTML/prose-colon false positives are mechanically excluded, leaving 478 reviewable rows. 22 rows were independently reviewed as obvious process/representation/history exclusions; another 313 inherited an exact existing NON_FORMAL role only after a machine crosswalk proved exhaustive primary coverage and zero residual FORMAL-aware tokens. 143 remain fail-closed. The 19 known primary FORMAL candidates remain covered.",
-    "lexicalReviewedNonFormal": 335,
-    "lexicalPending": 143,
+    "notes": "The broad pass began at 968 lexical line candidates. After deterministic presentation-noise removal, 478 remained. 430 are now source-SHA/review-pinned NON_FORMAL. Triage stops intentionally at 48 expression-bearing or mixed rows; these require FORMAL/span-level evidence rather than further prose exemptions.",
+    "lexicalReviewedNonFormal": 430,
+    "lexicalPending": 48,
     "pendingBreakdown": {
       "knownFormalOverlap": 38,
       "mixedFormalHistorical": 2,
       "nonFormalOverlapWithResidualLexemes": 3,
-      "unmatched": 100
+      "newSourceLike": 5
     }
   }
 }
