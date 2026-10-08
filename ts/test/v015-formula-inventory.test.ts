@@ -301,18 +301,66 @@ for (const entry of nativeWitnessCandidates) {
   assert.equal(receipt.ciRun, "37820849894");
   assert.equal(receipt.ciJob, "113461627151");
 }
+const semanticMetamodel = inventory.candidates.filter((entry) =>
+  entry.role === "FORMAL_V015_SEMANTIC_METAMODEL");
+assert.deepEqual(semanticMetamodel.map((entry) => entry.id).sort(),
+  ["F0005", "F0031", "F0048", "F0130"].sort());
+const expectedMetamodel = new Map([
+  ["F0005", ["306ed02550ce3808aa18ed15f046d14fc27022d37781670d96c862f9ded6eb83",
+    "027996fdef690e0897563f13a58894031644fcbbcc4d17d4795a6ae53849529c"]],
+  ["F0031", ["8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+    "257cc576383eb10c4a2d3a615b6765d861e27963d96b8d4542b0a9b378ac82b3"]],
+  ["F0048", ["8a347f3a822a28be0a9c6ea41c30f1efe81bcb28fe91f34bb289837a5759d9b0",
+    "257cc576383eb10c4a2d3a615b6765d861e27963d96b8d4542b0a9b378ac82b3"]],
+  ["F0130", ["6556a2c3a6bc80a617fb08279519e8b5d34dc187911df249a26d0ee4d1a575aa",
+    "10189db23b6cd316358055cd8554ca46118be6c3b97c7ca46dcdd12742fd8424"]],
+]);
+for (const entry of semanticMetamodel) {
+  assert.equal(entry.denotation, "VERIFIED_AGAINST_ACCEPTED_V015");
+  const semantic = (entry as typeof entry & { semanticEvidence?: Record<string, any> }).semanticEvidence;
+  assert.ok(semantic, entry.id + " metamodel requires semanticEvidence");
+  assert.equal(semantic!.compilerVersion, "mts-v015-semantic-metamodel-evidence/v0.1");
+  assert.equal(semantic!.acceptedFormalVersion, "v0.15");
+  assert.equal(semantic!.executionApplicability, "NOT_APPLICABLE");
+  assert.ok(String(semantic!.executionRationale).length >= 20);
+  const expected = expectedMetamodel.get(entry.id);
+  assert.ok(expected, entry.id + " exact metamodel receipt is enumerated");
+  assert.equal(semantic!.formalSourceSha256, expected![0]);
+  for (const [stage, marker] of Object.entries({
+    metamodelMapping: "METAMODEL_STAGE_MAPPING",
+    denotation: "METAMODEL_STAGE_DENOTATION",
+    semanticLinks: "METAMODEL_STAGE_SEMANTIC_LINKS",
+  })) {
+    const stageEvidence = semantic![stage] as { path: string; gitBlobSha: string; testCase: string };
+    assert.equal(stageEvidence.path, "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts");
+    assert.equal(stageEvidence.gitBlobSha, "9ee507cb7c29b1b78740228c80da11c6cd7a99ba");
+    assert.equal(stageEvidence.testCase, marker);
+  }
+  const receipt = semantic!.machineReceipt as Record<string, string>;
+  assert.equal(receipt.profile, "mts-v015-semantic-metamodel-evidence/v0.1");
+  assert.equal(receipt.outcome, "PASS");
+  assert.equal(receipt.caseId, entry.id);
+  assert.equal(receipt.formalSourceSha256, expected![0]);
+  assert.equal(receipt.semanticAnetSha256, expected![1]);
+  assert.equal(receipt.runnerSourceSha256,
+    "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c");
+  assert.equal(receipt.evidenceCommit, "209b3be3f3bee0065d20fd4b5f9149868c040dc4");
+  assert.equal(receipt.ciRun, "37835687233");
+  assert.equal(receipt.ciJob, "113511990164");
+}
+
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
 assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 6,
-  "only five B20 plus the exact root-basis occurrence may currently claim verified denotation");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 10,
+  "five B20, root-basis F0028 and four semantic-metamodel occurrences may claim verified denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 11,
-  "unsupported FORMAL theorem/metamodel specimens stay pending denotation verification");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 7,
+  "only FORMAL theorem statements remain pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 11, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 7, "theorem semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
@@ -320,4 +368,4 @@ assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
 
 
 console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length +
-  " candidates; all 202 expressions scoped; 6 bounded FORMAL denotations verified; 11 FORMAL denotations pending; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+  " candidates; all 202 expressions scoped; 10 bounded FORMAL denotations verified; 7 theorem FORMAL denotations pending; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
