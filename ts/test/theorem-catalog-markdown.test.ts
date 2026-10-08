@@ -45,6 +45,17 @@ function main(): void {
     "catalog must disclose derived/no-proof-authority status",
   );
   assert.match(first, /доказательный overlay в принятой FORMAL v0\.15/i);
+  const migratedCount = model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length;
+  assert.ok(first.includes("FORMAL v0.15: `" + migratedCount + "` / `" + model.theorems.length + "`"),
+    "theorem catalog must disclose measured, not inferred, FORMAL migration coverage");
+  assert.ok(first.includes("| ID | FORMAL v0.15 | Исходная формулировка v0.14 (историческое evidence) |"),
+    "historical v0.14 theorem statement must not be presented as current FORMAL");
+  for (const item of model.theorems) {
+    const statusRow = "| [" + item.id + "](#theorem-" + item.id.toLowerCase() + ") | `" +
+      item.formalV015.migrationStatus + "` |";
+    assert.ok(first.includes(statusRow), item.id + ": exact theorem FORMAL migration status visible in catalog");
+  }
+
   assert.match(first, /theorems\/formal-v0\.15\.json/);
   assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
   assert.match(first, /генерируемой проекцией кандидатных внешних доказательств/);
