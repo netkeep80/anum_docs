@@ -19,10 +19,10 @@ const inventory = JSON.parse(readFileSync(resolve(root, "audits/v015-formula-can
 };
 assert.equal(inventory.schema, "mts-v015-current-doc-formula-candidate-inventory/v0.1");
 assert.equal(inventory.status, "CLASSIFIED_DENOTATION_VERIFIED_CURRENT_SCOPE");
-assert.equal(inventory.classification.acceptedFormalDenotationsVerified, 17);
+assert.equal(inventory.classification.acceptedFormalDenotationsVerified, 18);
 assert.equal(inventory.classification.reviewedNonFormalCount, 185);
 assert.equal(inventory.classification.unverifiedDenotationCount, 0);
-assert.equal(inventory.classification.verifiedFormalCount, 17);
+assert.equal(inventory.classification.verifiedFormalCount, 18);
 const candidate = /⟼|->|≡|∈|⇒|=|\{\}|\{[A-Za-zА-Яа-я, ]+\}|\bDen\(|\bJ\(/u;
 const actual: typeof inventory.candidates = [];
 for (const file of inventory.files) {
