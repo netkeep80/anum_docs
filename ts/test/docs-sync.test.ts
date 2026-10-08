@@ -70,6 +70,20 @@ assert.ok(!rendered.includes("Строковый носитель:"), "release p
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
 
+const theoremCatalogSource = readFileSync(resolve(repositoryRoot, "docs/theory/Теоремы МТС.md"), "utf8");
+assert.ok(
+  theoremCatalogSource.includes("[принятый контракт MTS v0.15](../../contracts/mts-contract-v0.15.json)"),
+  "current theorem projection must identify accepted v0.15 semantic authority",
+);
+assert.ok(
+  theoremCatalogSource.includes("Статус миграции доказательств: `v0.15-candidate`; не статус выпуска MTS."),
+  "candidate proof migration must not be conflated with MTS release acceptance",
+);
+assert.ok(
+  !theoremCatalogSource.includes("не принимает `MTS v0.15`"),
+  "external candidate proofs must not falsely deny accepted v0.15 release",
+);
+
 const readmeSource = readFileSync(resolve(repositoryRoot, "README.md"), "utf8");
 assert.equal(
   readmeSource.split("mts-doc-version: v0.15").length - 1,
