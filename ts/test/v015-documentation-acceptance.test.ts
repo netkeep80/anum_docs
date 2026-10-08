@@ -25,7 +25,7 @@ assert.equal(report.prose.observations, 21, "broader prose-lexical observations 
 assert.equal(report.prose.unreviewed, 7, "exact-source crosswalk leaves only source-like/mixed prose observations pending");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
-assert.equal(report.lexical.unreviewed, 48, "lexical triage stops at the expression-bearing/mixed/FORMAL evidence boundary");
+assert.equal(report.lexical.unreviewed, 46, "two clean bundle rows are linked to complete B20 receipts; mixed/source-like FORMAL rows remain pending");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
