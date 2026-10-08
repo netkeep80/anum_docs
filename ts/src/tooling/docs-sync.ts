@@ -560,7 +560,7 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
   if (
     !readme.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))") ||
     !readme.includes("M_t -> Γ(M_t) -> M_(t+1)") ||
-    readme.includes("K ⟼ {A}\\n{A} ⟼ {B}")
+    readme.includes("K ⟼ {A}\n{A} ⟼ {B}")
   ) {
     issues.push("README.md: current execution description must use accepted v0.15 Γ/FORMAL, not legacy MP shortcut");
   }
