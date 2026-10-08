@@ -171,19 +171,32 @@ const formalAmemoryBundle = inventory.candidates.filter((entry) =>
 assert.equal(formalAmemoryBundle.length, 1);
 assert.equal(formalAmemoryBundle[0]!.source, "A:{}");
 assert.equal(formalAmemoryBundle[0]!.denotation, "NOT_VERIFIED");
+const inheritedMathematics = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION");
+const inheritedRelational = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_INHERITED_V014_RELATIONAL_METASCHEME");
+const foundationDiagrams = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_FOUNDATION_EXPLANATORY_DIAGRAM");
+assert.equal(inheritedMathematics.length, 11, "v0.14 mathematics is not FORMAL equality source");
+assert.equal(inheritedRelational.length, 6, "contextual proof sketches are not native FORMAL programs");
+assert.equal(foundationDiagrams.length, 2, "foundation illustrations do not need invented denotation");
+assert.ok([...inheritedMathematics, ...inheritedRelational, ...foundationDiagrams].every((entry) =>
+  entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
+  typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"),
+  "legacy notation exemptions are scope-limited and documented");
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 19, "remaining UNCLASSIFIED formula backlog stays explicit");
+assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
   entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 19,
   "classified FORMAL explanatory specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 38, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 19, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical theorem and A-memory profile roles scoped; 38 denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; all 202 expressions scoped; 19 FORMAL denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
