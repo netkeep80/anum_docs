@@ -57,8 +57,8 @@
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
       "evidence": "Broad lexer originally found 968 line candidates. Markdown wrapper normalization removed 264 pure-markup false positives; HTML anchor/comment stripping plus prose-colon disambiguation removed 226 more, leaving 478 exact-source FORMAL-aware rows across :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram. The 19 known primary FORMAL candidates remain covered.",
-      "state": "PRIMARY_FORMAL_17_OF_17_VERIFIED_SECONDARY_THEOREM_ROWS_PENDING_LINKAGE",
-      "remediation": "All 17 current primary FORMAL occurrences now have bounded source/denotation receipts. The seven broad theorem rows still require exact secondary linkage; this does not reduce the separate 14-theorem migration backlog or change proof closure."
+      "state": "PRIMARY_AND_SECONDARY_FORMULA_CENSUS_CLOSED_478_OF_478",
+      "remediation": "Primary FORMAL source/denotation is 17/17 verified; broad lexical 478/478 and prose 21/21 are fully classified/verified. Remaining documentation acceptance blocker is the separate 14-theorem FORMAL migration backlog plus final whole-repository audit."
     },
     {
       "id": "DOC15-006",
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "478_BROAD_LEXICAL_ROWS:450_REVIEWED_NON_FORMAL+19_VERIFIED_FORMAL_LINES+2_REVIEWED_MIXED+7_PENDING; THEOREM_ONLY",
+    "D1": "478_BROAD_LEXICAL_ROWS:CLOSED_450_REVIEWED_NON_FORMAL+26_VERIFIED_FORMAL_LINES+2_REVIEWED_MIXED+0_PENDING",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "PRIMARY_FORMAL_17_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; 14_THEOREM_MIGRATIONS_OPEN; PROSE_0_PENDING; LEXICAL_7_THEOREM_PENDING",
+    "D3": "PRIMARY_FORMAL_17_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; PROSE_21_OF_21_CLOSED; LEXICAL_478_OF_478_CLOSED; 14_THEOREM_MIGRATIONS_OPEN",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
     "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; THEOREM_STATEMENTS_7_PASS; PRIMARY_FORMAL_17_OF_17_VERIFIED",
-    "D6": "NOT_READY_7_LEXICAL_THEOREM_ROWS_REQUIRE_SECONDARY_LINKAGE; 14_THEOREM_MIGRATIONS_OPEN",
+    "D6": "NOT_READY_ONLY_14_THEOREM_MIGRATIONS_PLUS_FINAL_REPOSITORY_AUDIT",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
@@ -108,13 +108,11 @@
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "Primary FORMAL source/denotation inventory is now 17/17 verified through four bounded profiles: B20 notation, root-basis F0028, semantic metamodel, and seven already-migrated theorem statements. Broad census remains 7 theorem rows pending exact secondary linkage. Prose is closed. The separate 14-theorem FORMAL migration backlog remains fully open and is not affected by these receipts.",
+    "notes": "Current formula/source census is closed: primary FORMAL 17/17 bounded-receipt verified; broad lexical 478/478 = 450 reviewed NON_FORMAL + 26 verified FORMAL lines + 2 span-level reviewed mixed lines; prose 21/21 resolved. This does not migrate the 14 missing theorem statements and does not change their historical proof status.",
     "lexicalReviewedNonFormal": 450,
-    "lexicalPending": 7,
-    "pendingBreakdown": {
-      "unresolvedTheoremFormalOverlap": 7
-    },
-    "lexicalVerifiedFormalLines": 19,
+    "lexicalPending": 0,
+    "pendingBreakdown": {},
+    "lexicalVerifiedFormalLines": 26,
     "proseReviewedNonFormal": 19,
     "prosePending": 0,
     "primaryFormalVerified": 17,

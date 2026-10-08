@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 7,
+    "unreviewed": 0,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -6451,9 +6451,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0063"
+      ],
+      "reviewSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6639,9 +6645,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0067"
+      ],
+      "reviewSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -6722,9 +6734,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0071"
+      ],
+      "reviewSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7074,9 +7092,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0084"
+      ],
+      "reviewSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7181,9 +7205,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0090"
+      ],
+      "reviewSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7278,9 +7308,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0094"
+      ],
+      "reviewSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7780,9 +7816,15 @@
         "LINK_DIRECTION",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0116"
+      ],
+      "reviewSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
+      "reviewBasis": "Exact theorem-catalog source line is fully covered by one independently verified FORMAL theorem primary receipt; no mixed or additional primary span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068622994"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
