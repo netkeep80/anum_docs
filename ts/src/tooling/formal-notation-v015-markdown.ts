@@ -326,8 +326,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
       const group = string(requirement.group, id + ".group");
       const state = string(requirement.state, id + ".state");
       const summary = string(requirement.summary, id + ".summary")
-        .replace(/\\|/g, "\\\\|")
-        .replace(/\\r?\\n/g, " ");
+        .replace(/\|/g, "\\|")
+        .replace(/\r?\n/g, " ");
       return "| <a id=\"mts-v015-" + id.toLowerCase() + "\"></a>" + q + id + q +
         " | " + q + group + q + " | " + q + state + q + " | " + summary + " |";
     }),
