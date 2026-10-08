@@ -287,5 +287,79 @@
       "migrationStatus": "BLOCKED_NOT_MIGRATED",
       "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT"
     }
-  ]
+  ],
+  "migrationWaves": [
+    {
+      "wave": 1,
+      "ids": [
+        "FND-03",
+        "FND-05",
+        "INV-01"
+      ],
+      "prerequisites": [
+        "FND-01",
+        "FND-02"
+      ],
+      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+    },
+    {
+      "wave": 2,
+      "ids": [
+        "FND-04",
+        "FND-06",
+        "FND-11",
+        "INV-02",
+        "INV-03",
+        "INV-04"
+      ],
+      "prerequisites": [
+        "FND-03",
+        "FND-05",
+        "FND-13",
+        "INV-01"
+      ],
+      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+    },
+    {
+      "wave": 3,
+      "ids": [
+        "FND-12",
+        "INV-05"
+      ],
+      "prerequisites": [
+        "FND-01",
+        "FND-11",
+        "INV-01",
+        "INV-02",
+        "INV-04"
+      ],
+      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+    },
+    {
+      "wave": 4,
+      "ids": [
+        "INV-06",
+        "INV-07"
+      ],
+      "prerequisites": [
+        "INV-02",
+        "INV-03",
+        "INV-04",
+        "INV-05"
+      ],
+      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+    },
+    {
+      "wave": 5,
+      "ids": [
+        "CTX-03"
+      ],
+      "prerequisites": [
+        "INV-02",
+        "INV-07"
+      ],
+      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+    }
+  ],
+  "acceptanceBoundary": "Waves are dependency ordering only; not semantic migration or proof authority. Each theorem needs approved FORMAL source plus compiler/denotation and recorded proof status."
 }
