@@ -283,7 +283,7 @@ function sourceFor(names: RoleNames): string {
     "DOMAIN_X : LINK_DOMAIN_TAG->" + names.x,
     "GROUNDED_X : GROUNDED_TAG->" + names.x,
     "FINITE_DOMAIN_X : FINITE_ROOT_DECOMPOSABLE_TAG->" + names.x,
-    "FND05_PREMISES : [GROUNDED_X,FINITE_DOMAIN_X]",
+    "FND05_DOMAIN_GUARDS : [GROUNDED_X,FINITE_DOMAIN_X]",
     "DESCRIPTION_ARGS : [" + names.x + "," + names.code + "]",
     "DESCRIPTION_X_CODE : CANONICAL_DESCRIPTION_TAG->DESCRIPTION_ARGS",
     "OTHER_DESCRIPTION_ARGS : [" + names.x + "," + names.other + "]",
@@ -295,7 +295,7 @@ function sourceFor(names: RoleNames): string {
     "EXISTS_UNIQUE_DESCRIPTION : EXISTS_UNIQUE_TAG->EXISTS_UNIQUE_DATA",
     "FND05_DOMAIN : [DOMAIN_X]",
     "FND05_CONCLUSION : [EXISTS_UNIQUE_DESCRIPTION]",
-    "FND05_STATEMENT : FND05_PREMISES->FND05_CONCLUSION",
+    "FND05_STATEMENT : FND05_DOMAIN_GUARDS->FND05_CONCLUSION",
   ].join("\n");
 }
 const source = sourceFor(canonicalNames);
@@ -311,10 +311,10 @@ function verifyCandidate(
   const other = value(f, compiled, names.other);
   assert(x !== code && x !== other && code !== other, "x/code/other roles are distinct Links");
 
-  const premises = readExactSequence(f.memory, value(f, compiled, "FND05_PREMISES")).values;
-  same(premises.length, 2, "FND-05 domain guards are structural antecedents");
-  same(premises[0], value(f, compiled, "GROUNDED_X"), "Grounded(x) antecedent");
-  same(premises[1], value(f, compiled, "FINITE_DOMAIN_X"),
+  const domainGuards = readExactSequence(f.memory, value(f, compiled, "FND05_DOMAIN_GUARDS")).values;
+  same(domainGuards.length, 2, "FND-05 domain guards are structural antecedents");
+  same(domainGuards[0], value(f, compiled, "GROUNDED_X"), "Grounded(x) antecedent");
+  same(domainGuards[1], value(f, compiled, "FINITE_DOMAIN_X"),
     "finite ROOT-decomposable membership antecedent");
 
   const domain = readExactSequence(f.memory, value(f, compiled, "FND05_DOMAIN")).values;
@@ -367,7 +367,7 @@ function verifyCandidate(
     "conclusion canonical existence/uniqueness");
 
   const statement = f.memory.poles(value(f, compiled, "FND05_STATEMENT"));
-  same(statement.start, value(f, compiled, "FND05_PREMISES"), "statement premise carrier");
+  same(statement.start, value(f, compiled, "FND05_DOMAIN_GUARDS"), "statement domain-guard carrier");
   same(statement.end, value(f, compiled, "FND05_CONCLUSION"), "statement conclusion carrier");
 
   const json = encodeV015FormalSourceAsetJson(
@@ -432,6 +432,19 @@ sameBytes(
 {
   const wrong = fixture();
   const mutatedSource = source.replace(
+    "FND05_DOMAIN_GUARDS : [GROUNDED_X,FINITE_DOMAIN_X]",
+    "FND05_DOMAIN_GUARDS : []",
+  );
+  const mutated = compile(wrong, mutatedSource);
+  differentBytes(
+    wire(first, compiled, "FND05_STATEMENT"),
+    wire(wrong, mutated, "FND05_STATEMENT"),
+    "dropping theorem domain guards must change statement identity",
+  );
+}
+{
+  const wrong = fixture();
+  const mutatedSource = source.replace(
     "IDENTITY_ARGS : [OTHER,CODE]",
     "IDENTITY_ARGS : [CODE,OTHER]",
   );
@@ -447,7 +460,8 @@ console.log([
   "MTS v0.15 B22 FND-05 candidate FORMAL statement:",
   "MIGRATION_STATUS=CANDIDATE_NOT_PROMOTED",
   "FORMAL_ARTIFACT_KIND=STATEMENT_ONLY",
-  "FORMAL_PREMISES=2_GROUNDED_PLUS_FINITE_DOMAIN",
+  "FORMAL_PREMISES=0",
+  "FORMAL_DOMAIN_GUARDS=2_GROUNDED_PLUS_FINITE_DOMAIN",
   "FORMAL_DEPENDENCIES=FND-01+FND-02",
   "DOMAIN=FINITE_GROUNDED_ROOT_DECOMPOSABLE",
   "CANONICAL_DESCRIPTION=ORDINARY_LINK_ROLE",
@@ -458,6 +472,7 @@ console.log([
   "FRESH_MEMORY_WIRE_PARITY=GREEN",
   "JSON_J1=EXACT",
   "FINITE_DOMAIN_MUTATION=DIFF",
+  "DOMAIN_GUARD_REMOVAL=DIFF",
   "UNIQUENESS_DIRECTION_MUTATION=DIFF",
   "HISTORICAL_EXTERNAL_PROOF=UNCHANGED",
   "NATIVE_PROOF=NOT_CLAIMED",
