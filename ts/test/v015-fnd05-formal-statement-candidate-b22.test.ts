@@ -183,7 +183,10 @@ function historicalFnd05(): HistoricalTheorem {
   same(JSON.stringify(theorem.dependsOn), JSON.stringify(["FND-01", "FND-02"]),
     "historical dependencies");
   same(theorem.formalPremises.length, 0, "historical formal premise count");
-  assert(/finite Grounded/i.test(theorem.scope), "scope retains finite Grounded boundary");
+  assert(/\bfinite\b/i.test(theorem.scope), "scope retains finite boundary");
+  assert(/Grounded Links/i.test(theorem.scope), "scope retains Grounded Links boundary");
+  assert(/finite recursive-carrier decision/i.test(theorem.scope),
+    "scope retains explicit finite recursive-carrier decision");
   assert(/cycles/i.test(theorem.exclusions), "scope explicitly excludes arbitrary cycles");
   assert(theorem.evidence.lean4.length > 0 && theorem.evidence.coq.length > 0,
     "historical paired external evidence remains registered");
