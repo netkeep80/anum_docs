@@ -421,8 +421,9 @@
       "endLine": 133,
       "kind": "inline-code",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Accepted Rule/Γ schematic referenced from current FORMAL generator; not claimed to be a standalone compiled source."
     },
     {
       "id": "F0032",
@@ -432,8 +433,9 @@
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ {A}\n{A} ⟼ {B}\n──────────\nK ⟼ {B}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Foundation §7 explicitly labels K⟼{A}/{A}⟼{B} positive-image sketch as pre-v0.15 mathematical shorthand, not native FORMAL."
     },
     {
       "id": "F0033",
@@ -442,8 +444,9 @@
       "endLine": 156,
       "kind": "inline-code",
       "source": "{A} ⟼ {B}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Foundation §7 explicitly scopes braces as historical multivalued-relation shorthand, not current FORMAL context/bundle syntax."
     },
     {
       "id": "F0034",
@@ -473,8 +476,9 @@
       "endLine": 197,
       "kind": "inline-code",
       "source": "A:{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Explicit named empty-bundle source form accepted in current FORMAL; parser/denotation witness for this occurrence not yet attached."
     },
     {
       "id": "F0037",
@@ -483,8 +487,9 @@
       "endLine": 197,
       "kind": "inline-code",
       "source": "A -> {}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_PSEUDOCODE_MENTION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Document explicitly identifies A -> {} as superseded v0.14 pseudocode for ZERO; current FORMAL A:{} has different meaning."
     },
     {
       "id": "F0038",
@@ -494,8 +499,9 @@
       "kind": "fence",
       "language": "text",
       "source": "∞  ♂  ♀  ⟼",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_STRUCTURAL_GLYPH_LEGEND",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Legacy structural glyph inventory only: ∞ ♂ ♀ ⟼; not a program or logical equation."
     },
     {
       "id": "F0039",
@@ -537,8 +543,9 @@
       "endLine": 174,
       "kind": "inline-code",
       "source": "A72W_ZERO_MATCH_DELETE=SUPERSEDED",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EVIDENCE_FLAG",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Exact historical A72w/A72y provenance status identifier in V14-L11 evidence; not an executable FORMAL expression."
     },
     {
       "id": "F0043",
@@ -547,8 +554,9 @@
       "endLine": 174,
       "kind": "inline-code",
       "source": "NO_MATCH=INERT_CURRENT_MEMBER",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EVIDENCE_FLAG",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical NO_MATCH outcome name/value in A72y evidence; not Link-identity equation."
     },
     {
       "id": "F0044",
@@ -557,8 +565,9 @@
       "endLine": 174,
       "kind": "inline-code",
       "source": "EXPLICIT_ZERO_IMAGE=EMPTY_EXACT_SEQUENCE",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_EVIDENCE_FLAG",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Historical explicit-ZERO evidence classification, not a native FORMAL source definition."
     },
     {
       "id": "F0045",
@@ -567,8 +576,9 @@
       "endLine": 192,
       "kind": "inline-code",
       "source": "{A}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Axiom §V14-L11 explicitly scopes {A} as historical positive-image notation rather than current FORMAL declarations."
     },
     {
       "id": "F0046",
@@ -577,8 +587,9 @@
       "endLine": 192,
       "kind": "inline-code",
       "source": "{B}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Axiom §V14-L11 explicitly scopes {B} as historical positive-image notation rather than current FORMAL declarations."
     },
     {
       "id": "F0047",
@@ -588,8 +599,9 @@
       "kind": "fence",
       "language": "text",
       "source": "K ⟼ {A}\n{A} ⟼ {B}\n──────────\nK ⟼ {B}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Axiom §V14-L11 explicitly labels full schematic as inherited v0.14 meta-notation; not executable FORMAL v0.15."
     },
     {
       "id": "F0048",
@@ -598,8 +610,9 @@
       "endLine": 201,
       "kind": "inline-code",
       "source": "Rule = V -> (Antecedent -> ExactSequence(Image...))",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Accepted Rule/Γ schematic referenced from current FORMAL generator; complete native source denotation not attached."
     },
     {
       "id": "F0049",
@@ -1640,8 +1653,9 @@
       "endLine": 109,
       "kind": "inline-code",
       "source": "A ⟼ [B]",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_PSEUDOCODE_MENTION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Execution profile introduction explicitly warns A ⟼ [B] is historical relational notation, not FORMAL v0.15 grammar."
     },
     {
       "id": "F0148",
@@ -1683,8 +1697,9 @@
       "endLine": 180,
       "kind": "inline-code",
       "source": "admitted A -> []",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_HISTORICAL_PSEUDOCODE_MENTION",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Execution profile explicitly labels admitted A -> [] as legacy pseudocode; v0.15 ZERO represented by ExactSequence([])."
     },
     {
       "id": "F0152",
@@ -1693,8 +1708,9 @@
       "endLine": 180,
       "kind": "inline-code",
       "source": "A:{}",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "FORMAL_V015_NOTATION_SPECIMEN",
+      "denotation": "NOT_VERIFIED",
+      "reviewBasis": "Current FORMAL explicitly defines A:{} as empty named bundle, not deletion; source occurrence not independently compiled."
     },
     {
       "id": "F0153",
@@ -2239,13 +2255,13 @@
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
     "nonFormalProcessCount": 15,
-    "unclassifiedCount": 164,
+    "unclassifiedCount": 148,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
-    "reviewedNonFormalCount": 33,
-    "unverifiedDenotationCount": 169,
+    "reviewedNonFormalCount": 45,
+    "unverifiedDenotationCount": 157,
     "verifiedFormalCount": 0
   }
 }
