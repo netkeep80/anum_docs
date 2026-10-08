@@ -151,19 +151,39 @@ const externalProofCommentary = inventory.candidates.filter((entry) =>
   entry.role === "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY");
 assert.equal(externalProofCommentary.length, 7);
 assert.ok(externalProofCommentary.every((entry) => entry.path === "docs/theory/Теоремы МТС.md"));
+const amemoryProfileCandidates = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH" ||
+  entry.role === "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS");
+assert.equal(amemoryProfileCandidates.length, 34, "A-memory 0.1.0 profile examples are not native FORMAL programs");
+assert.equal(amemoryProfileCandidates.filter((entry) =>
+  entry.role === "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_SKETCH").length, 25);
+assert.equal(amemoryProfileCandidates.filter((entry) =>
+  entry.role === "NON_FORMAL_HISTORICAL_EXECUTION_PROFILE_STATUS").length, 9);
+assert.ok(amemoryProfileCandidates.every((entry) =>
+  entry.path === "docs/specs/Апамять и управление сетью связей.md" &&
+  entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE"));
+const amemoryDocumentation = readFileSync(resolve(root, "docs/specs/Апамять и управление сетью связей.md"), "utf8");
+assert.ok(amemoryDocumentation.includes("**не является исходной грамматикой FORMAL v0.15**"));
+assert.ok(amemoryDocumentation.includes("**псевдокод профиля 0.1.0**"));
+const formalAmemoryBundle = inventory.candidates.filter((entry) =>
+  entry.path === "docs/specs/Апамять и управление сетью связей.md" &&
+  entry.role === "FORMAL_V015_NOTATION_SPECIMEN");
+assert.equal(formalAmemoryBundle.length, 1);
+assert.equal(formalAmemoryBundle[0]!.source, "A:{}");
+assert.equal(formalAmemoryBundle[0]!.denotation, "NOT_VERIFIED");
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 53, "remaining UNCLASSIFIED formula backlog stays explicit");
+assert.equal(pending.length, 19, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
   entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 19,
   "classified FORMAL explanatory specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 72, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 38, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical theorem statements/provenance scoped; 72 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; historical theorem and A-memory profile roles scoped; 38 denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
