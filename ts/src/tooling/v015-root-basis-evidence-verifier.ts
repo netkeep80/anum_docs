@@ -98,24 +98,27 @@ interface Fixture {
 function fixture(): Fixture {
   const memory = new Memory();
   const basis = ensureRootBasis(memory);
-  let cursor = memory.ensure(basis.U, basis.L);
-  const fresh = (): LinkHandle => {
-    cursor = memory.ensure(cursor, basis.C);
-    return cursor;
-  };
+  // Tooling is orchestration-only: it must not become a new direct Link-write
+  // owner. Stable private vocabulary handles are materialized through the
+  // already governed string-Anum constructor instead of Memory.ensure().
+  const tag = (name: string): LinkHandle => materializeV012StringAnum(
+    memory,
+    basis,
+    encoder.encode("v015-root-basis-evidence/" + name),
+  ).anumLink;
 
-  const syntaxTag = fresh();
-  const markerSeed = fresh();
-  const pairForm = fresh();
-  const nameRefForm = fresh();
-  const declarationForm = fresh();
-  const blockForm = fresh();
-  const pairLeftRole = fresh();
-  const pairRightRole = fresh();
-  const referencedNameRole = fresh();
-  const declarationNameRole = fresh();
-  const declarationBodyRole = fresh();
-  const blockItemRole = fresh();
+  const syntaxTag = tag("syntax-tag");
+  const markerSeed = tag("marker-seed");
+  const pairForm = tag("pair-form");
+  const nameRefForm = tag("name-ref-form");
+  const declarationForm = tag("declaration-form");
+  const blockForm = tag("block-form");
+  const pairLeftRole = tag("pair-left-role");
+  const pairRightRole = tag("pair-right-role");
+  const referencedNameRole = tag("referenced-name-role");
+  const declarationNameRole = tag("declaration-name-role");
+  const declarationBodyRole = tag("declaration-body-role");
+  const blockItemRole = tag("block-item-role");
 
   const rules: readonly NativeSyntaxGrammarRuleSpec[] = [
     { form: pairForm, fields: [
