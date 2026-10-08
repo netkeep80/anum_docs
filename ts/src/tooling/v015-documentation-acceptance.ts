@@ -109,14 +109,30 @@ export function inspectV015SecondaryLedgerRow(
     return { pending: false };
   }
   if (isV015FormalRole(role)) {
-    const candidate = primaryCandidates.find((item) => item.id === entry.primaryCandidateId);
-    if (status !== "VERIFIED_AGAINST_ACCEPTED_V015" || !candidate ||
-        candidate.role !== role || candidate.path !== entry.path ||
-        typeof candidate.startLine !== "number" || typeof candidate.endLine !== "number" ||
-        candidate.startLine > (entry.line as number) || candidate.endLine < (entry.line as number) ||
-        !verifiedPrimary.includes(candidate) ||
+    const ids = Array.isArray(entry.primaryCandidateIds)
+      ? entry.primaryCandidateIds
+      : typeof entry.primaryCandidateId === "string" ? [entry.primaryCandidateId] : [];
+    if (ids.length === 0 || ids.some((id) => typeof id !== "string") ||
+        new Set(ids).size !== ids.length) {
+      return { pending: true, defect: label + ": FORMAL classification lacks exact primary candidate IDs" };
+    }
+    const linked = ids.map((id) => primaryCandidates.find((item) => item.id === id));
+    const overlappingFormal = overlapping.filter((candidate) =>
+      isV015FormalRole(String(candidate.role)));
+    const overlappingNonFormal = overlapping.filter((candidate) =>
+      isV015NonFormalRole(String(candidate.role)));
+    const coversEveryFormal = overlappingFormal.length === linked.length &&
+      overlappingFormal.every((candidate) => ids.includes(String(candidate.id)));
+    const linkedValid = linked.every((candidate) => candidate !== undefined &&
+      candidate.role === role && candidate.path === entry.path &&
+      typeof candidate.startLine === "number" && typeof candidate.endLine === "number" &&
+      candidate.startLine <= (entry.line as number) && candidate.endLine >= (entry.line as number) &&
+      verifiedPrimary.includes(candidate));
+    if (status !== "VERIFIED_AGAINST_ACCEPTED_V015" || !linkedValid ||
+        !coversEveryFormal || overlappingNonFormal.length > 0 ||
         entry.reviewSourceSha256 !== sourceHash) {
-      return { pending: true, defect: label + ": FORMAL classification lacks linked native machine-verification receipt" };
+      return { pending: true, defect: label +
+        ": FORMAL line requires all overlapping native receipts and no mixed NON_FORMAL span" };
     }
     return { pending: false };
   }
