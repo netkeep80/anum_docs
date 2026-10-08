@@ -19,13 +19,13 @@ assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
 assert.equal(report.formulas.total, 202);
 assert.equal(report.formulas.verified, 6, "five B20 occurrences plus exact root-basis F0028 have bounded native receipts");
-assert.equal(report.formulas.pending, 13, "all unsupported theorem/metamodel/general FORMAL sources remain fail-closed");
+assert.equal(report.formulas.pending, 11, "unsupported theorem/metamodel FORMAL sources remain fail-closed after metanotation-role correction");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 2, "only prose rows embedding unresolved semantic-metamodel FORMAL remain pending");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
 assert.equal(report.lexical.candidates, 478, "lexical discovery records retained FORMAL-aware rows after markup-noise normalization");
-assert.equal(report.lexical.unreviewed, 33, "safe prose/evidence rows are reviewed; mixed/source-like FORMAL rows remain pending");
+assert.equal(report.lexical.unreviewed, 21, "generator-owned metanotation/legend rows are reviewed; genuine FORMAL/mixed rows remain pending");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
@@ -67,6 +67,8 @@ assert.ok(!isV015FormalRole("FORMAL_V015_UNREVIEWED"), "unknown native role cann
 assert.ok(isV015NonFormalRole("NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE"));
 assert.ok(isV015NonFormalRole("NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE"));
 assert.ok(isV015NonFormalRole("NON_FORMAL_PRESENTATION_ASSET"));
+assert.ok(isV015NonFormalRole("NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION"));
+assert.ok(isV015NonFormalRole("NON_FORMAL_FORMAL_SYNTAX_LEGEND"));
 assert.ok(!isV015NonFormalRole("NON_FORMAL_FAKE"), "new non-FORMAL exclusions require explicit review");
 assert.deepEqual(v015RequiredEvidenceStages("FORMAL_V015_THEOREM_STATEMENT"),
   ["grammar", "denotation", "semanticLinks", "theoremMapping"]);
