@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { findRepositoryRoot } from "./docs-sync.js";
-import { scanV015MarkdownProse } from "./v015-markdown-prose-audit.js";
+import { scanV015FormalLexicalSurface, scanV015MarkdownProse } from "./v015-markdown-prose-audit.js";
 
 type Obj = Record<string, unknown>;
 function record(value: unknown, name: string): Obj {
@@ -85,6 +85,7 @@ export interface V015DocumentationAcceptanceReport {
   readonly theorems: Readonly<{ historical: number; formal: number; missing: readonly string[] }>;
   readonly formulas: Readonly<{ total: number; pending: number; reviewedNonFormal: number; verified: number }>;
   readonly prose: Readonly<{ files: number; observations: number; unreviewed: number }>;
+  readonly lexical: Readonly<{ files: number; candidates: number; unreviewed: number }>;
   readonly blockers: readonly string[];
   readonly ready: boolean;
 }
@@ -99,6 +100,7 @@ export interface V015CompletionSignals {
   readonly invalidOverlayIds: readonly string[];
   readonly pendingCount: number;
   readonly prosePendingCount: number;
+  readonly lexicalPendingCount: number;
   readonly unexpectedFormulaCount: number;
   readonly evidenceDefects: readonly string[];
   readonly inventoryIntegrityIssues: readonly string[];
@@ -122,6 +124,7 @@ export function evaluateV015DocumentationCompletion(facts: V015CompletionSignals
   if (missing.length > 0) blockers.push("missing FORMAL theorem projections: " + missing.join(", "));
   if (facts.pendingCount > 0) blockers.push("unverified current documentation formula candidates: " + facts.pendingCount);
   if (facts.prosePendingCount > 0) blockers.push("unreviewed plain Markdown formula candidates: " + facts.prosePendingCount);
+  if (facts.lexicalPendingCount > 0) blockers.push("unreviewed full FORMAL-aware Markdown lexical candidates: " + facts.lexicalPendingCount);
   if (facts.unexpectedFormulaCount > 0) blockers.push("unreviewed/unrecognized formula classification: " + facts.unexpectedFormulaCount);
   if (facts.evidenceDefects.length > 0) blockers.push("FORMAL machine evidence incomplete: " + facts.evidenceDefects.join("; "));
   if (facts.inventoryIntegrityIssues.length > 0) blockers.push("stale/tampered formula inventory: " + facts.inventoryIntegrityIssues.join("; "));
@@ -440,6 +443,33 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const prosePending = indexedProse.filter((entry) =>
     entry.classification === "UNREVIEWED" || entry.status === "NOT_VERIFIED");
   if (proseIntegrity.length > 0) inventoryIntegrityIssues.push(...proseIntegrity);
+  // Third, separate lexical pass: colon bindings, ExactSequence, ROOT aspects,
+  // diagrams and table text. It is intentionally broader than the 202 legacy
+  // operator-bearing spans and 21 ordinary-prose matches.
+  const lexical = scanV015FormalLexicalSurface(root);
+  const lexicalLedger = read(root, "audits/v015-formal-aware-markdown-census.json");
+  const lexicalRows = list(lexicalLedger.candidates, "FORMAL lexical candidates");
+  const lexicalFiles = list(lexicalLedger.files, "FORMAL lexical sources");
+  const lexicalIssues: string[] = [...lexical.unregistered.map((path) => "unregistered Markdown source: " + path)];
+  if (lexicalFiles.length !== lexical.files.length || lexicalRows.length !== lexical.observations.length)
+    lexicalIssues.push("FORMAL-aware file universe or candidate count drift");
+  for (let i = 0; i < Math.min(lexicalFiles.length, lexical.files.length); i++) {
+    const actual = lexical.files[i]!;
+    const pinned = lexicalFiles[i]!;
+    if (pinned.path !== actual.path || pinned.blobSha !== actual.blobSha ||
+        pinned.lineCount !== actual.lineCount) lexicalIssues.push("FORMAL-aware source blob drift: " + actual.path);
+  }
+  for (let i = 0; i < Math.min(lexicalRows.length, lexical.observations.length); i++) {
+    const actual = lexical.observations[i]!;
+    const pinned = lexicalRows[i]!;
+    if (pinned.path !== actual.path || pinned.line !== actual.line ||
+        pinned.source !== actual.source || pinned.context !== actual.context ||
+        JSON.stringify(pinned.tokens) !== JSON.stringify(actual.tokens))
+      lexicalIssues.push("FORMAL-aware lexical mismatch at index " + i);
+  }
+  const lexicalPending = lexicalRows.filter((entry) =>
+    entry.classification === "UNREVIEWED" || entry.verification === "NOT_VERIFIED");
+  if (lexicalIssues.length > 0) inventoryIntegrityIssues.push(...lexicalIssues);
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
   const blockers = evaluateV015DocumentationCompletion({
     acceptedRelease,
@@ -451,6 +481,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     invalidOverlayIds,
     pendingCount: pending.length,
     prosePendingCount: prosePending.length,
+    lexicalPendingCount: lexicalPending.length,
     unexpectedFormulaCount: other,
     evidenceDefects,
     inventoryIntegrityIssues,
@@ -465,6 +496,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     theorems: Object.freeze({ historical: historical.length, formal: formalIds.length, missing: Object.freeze(missing) }),
     formulas: Object.freeze({ total: candidates.length, pending: pending.length, reviewedNonFormal: reviewedNonFormal.length, verified: verified.length }),
     prose: Object.freeze({ files: prose.files.length, observations: prose.observations.length, unreviewed: prosePending.length }),
+    lexical: Object.freeze({ files: lexical.files.length, candidates: lexical.observations.length, unreviewed: lexicalPending.length }),
     blockers: Object.freeze(blockers),
     ready: blockers.length === 0,
   });
