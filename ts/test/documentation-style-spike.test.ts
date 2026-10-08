@@ -45,6 +45,34 @@ for (const style of MTS_DOCUMENTATION_STYLES) {
 assert.equal(new Set(snapshots).size, 3, "three genuinely different layout profiles");
 // A future theorem's own fenced source must not prematurely close its Markdown fence.
 
+// Corpus-wide no-information-loss invariant: three renderers × all 21 records.
+for (const theorem of model.theorems) {
+  for (const style of MTS_DOCUMENTATION_STYLES) {
+    const page = renderMtsDocumentationStylePreview({
+      model, theoremId: theorem.id, style, sourceCommitSha: sourceSha,
+    });
+    assert.ok(page.includes(theorem.statement), "exact statement: " + theorem.id + " " + style);
+    assert.ok(page.includes(theorem.id), "ID: " + theorem.id);
+    assert.ok(page.includes(theorem.formalV015.migrationStatus),
+      "no hidden migration status: " + theorem.id + " " + style);
+    for (const law of theorem.lawRefs)
+      assert.ok(page.includes(law), "omitted law reference: " + theorem.id + " " + law);
+    for (const assumption of theorem.assumptions)
+      assert.ok(page.includes(assumption), "omitted assumption: " + theorem.id);
+    for (const dependency of theorem.dependsOn)
+      assert.ok(page.includes(dependency), "omitted theorem dependency: " + theorem.id);
+    for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const) {
+      for (const evidence of theorem.evidence[lane]) {
+        assert.ok(page.includes(evidence.path), "evidence lost: " + theorem.id + " " + evidence.path);
+        assert.ok(page.includes(evidence.proofAuthority),
+          "evidence proof authority lost: " + theorem.id + " " + lane);
+      }
+    }
+    if (theorem.formalV015.formalStatement !== null)
+      assert.ok(page.includes(theorem.formalV015.formalStatement),
+        "existing FORMAL statement lost: " + theorem.id + " " + style);
+  }
+}
 const missing = model.theorems.find((item) => item.formalV015.migrationStatus === "NOT_MIGRATED");
 assert.ok(missing !== undefined);
 for (const style of MTS_DOCUMENTATION_STYLES) {
