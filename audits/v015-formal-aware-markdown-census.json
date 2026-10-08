@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 466,
+    "unreviewed": 456,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -2129,9 +2129,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row is the Q14 source-alphabet display in the representation/codec section, not an executable ExactSequence FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "72ceb36267297d75b417931f21d105e15c8b8e935f8d745b9d5809a61ed24e7c"
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
@@ -2141,9 +2144,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row is the immutable historical Q13 source-alphabet display, not an executable ExactSequence FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "bd5f69bdb4b00c0a2e98b81b74eea3562d572cb0ee19ac58e82c30ad05647dec"
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
@@ -2255,9 +2261,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row is part of the representation-stack sketch and labels the Q14 source alphabet, not a FORMAL program.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "4d491e4fb961ab8b5ae3e09f795dc60e00786f5a817325d2b66e5da7195b0ee1"
     },
     {
       "path": "docs/specs/Ачисла и сериализация.md",
@@ -2267,9 +2276,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row is part of the representation-stack sketch and labels the legacy Q13 source alphabet, not a FORMAL program.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "a761f022a6d689de82f71ffb5bd4e556947fd26d45b80ea3386722c804d908c1"
     },
     {
       "path": "docs/specs/Пучки связей.md",
@@ -5816,9 +5828,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The glossary explicitly labels K-to-A as historical v0.14 relational metanotation rather than current FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "2d0900268d4b2d462b80a7c43f6d01986bb547ce5556a7da1244e94e946cbf0a"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -5890,9 +5905,12 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The glossary explicitly identifies this Nat equation/successor expression as inherited v0.14 mathematical metanotation, not FORMAL Link identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "509d3a210079e6a1bbcf644b03122a75a048f6d600f5ee881313b0f824ba951a"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -5927,9 +5945,12 @@
         "SEMANTIC_METAMODEL",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The glossary explicitly identifies the chirality equation as historical mathematical metanotation and not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "810fbd52d1c35e7c9592a9b7bf709192f554642d191c137f37f2ce015a6c2ee0"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -5953,9 +5974,12 @@
         "LINK_DIRECTION",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The glossary explicitly labels Theory-to-Rule as a historical admission metascheme and contrasts it with current FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "05c4989e099c10127bab1a954aaf13ffd8d3b41d46d5b6b028eb954136a8ba4b"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -5965,9 +5989,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This glossary row describes the versioned Q14 source alphabet; bracket glyphs are codec representation notation, not ExactSequence source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "703ce27742921596a76821fd7e83e18f8819e76e659882f3515a19218a928005"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -5977,9 +6004,12 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_REPRESENTATION_META_NOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This glossary row describes the immutable legacy Q13 source alphabet; bracket glyphs are codec representation notation, not ExactSequence source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472",
+      "reviewSourceSha256": "117e4eec88c35f52c962767f31efa9c422ddb615f93c2a5fae595b88c969e431"
     }
   ]
 }
