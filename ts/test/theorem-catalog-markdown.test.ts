@@ -44,7 +44,7 @@ function main(): void {
     /генерируемая человекочитаемая проекция.*не является.*источником.*доказательной.*истины/is,
     "catalog must disclose derived/no-proof-authority status",
   );
-  assert.match(first, /кандидатная проекция FORMAL/i);
+  assert.match(first, /доказательный overlay в принятой FORMAL v0\.15/i);
   assert.match(first, /theorems\/formal-v0\.15\.json/);
   assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
   assert.match(first, /генерируемой проекцией кандидатных внешних доказательств/);
