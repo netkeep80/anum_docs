@@ -184,6 +184,29 @@ assert.ok([...inheritedMathematics, ...inheritedRelational, ...foundationDiagram
   entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
   typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"),
   "legacy notation exemptions are scope-limited and documented");
+const nativeWitnessCandidates = inventory.candidates.filter((entry) =>
+  (entry as typeof entry & { nativeEvidence?: unknown }).nativeEvidence !== undefined);
+assert.equal(nativeWitnessCandidates.length, 6, "native B10/B20 partial witnesses cover six current FORMAL specimens");
+assert.deepEqual(nativeWitnessCandidates.map((entry) => entry.id).sort(),
+  ["F0028", "F0036", "F0152", "F0180", "F0181", "F0184"].sort());
+for (const entry of nativeWitnessCandidates) {
+  const witness = (entry as typeof entry & { nativeEvidence: {
+    kind: string; testPath: string; testBlobSha: string; status: string; limitation: string;
+    verifiedOnCommit: string; ciRun: string; scope: string;
+  } }).nativeEvidence;
+  assert.ok(["NATIVE_FORMAL_ROOT_BASIS_WIRE",
+    "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION"].includes(witness.kind));
+  assert.equal(witness.status, "PARTIAL_NATIVE_WITNESS_GREEN");
+  assert.equal(entry.denotation, "NOT_VERIFIED",
+    "successful native fixture is not complete FORMAL proof/replay acceptance");
+  const original = readFileSync(resolve(root, witness.testPath), "utf8");
+  const gitObject = Buffer.from("blob " + Buffer.byteLength(original, "utf8") + "\0" + original, "utf8");
+  assert.equal(createHash("sha1").update(gitObject).digest("hex"), witness.testBlobSha,
+    entry.id + " evidence file must match pinned native test source");
+  assert.ok(witness.scope.length > 15 && witness.limitation.includes("NOT_VERIFIED"));
+  assert.equal(witness.verifiedOnCommit, "3348e490b1751b4a68b24159fddc8c820200abb5");
+  assert.ok(witness.ciRun.endsWith("/37749386834"));
+}
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
 assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
