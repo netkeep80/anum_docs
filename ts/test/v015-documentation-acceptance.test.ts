@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion } from "../src/tooling/v015-documentation-acceptance.js";
+import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 
 const root = findRepositoryRoot();
@@ -16,6 +16,23 @@ assert.equal(report.formulas.total, 202);
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 21, "previously omitted ordinary markdown formulas still block acceptance");
+assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
+assert.equal(report.lexical.candidates, 968, "lexical discovery records :/[]/ROOT/fence/table/diagram lines");
+assert.equal(report.lexical.unreviewed, 968, "wide-scan lexemes require separate review");
+assert.ok(isV015FormalRole("FORMAL_V015_NOTATION_SPECIMEN"));
+assert.ok(isV015FormalRole("FORMAL_V015_THEOREM_STATEMENT"));
+assert.ok(isV015FormalRole("FORMAL_V015_SEMANTIC_METAMODEL"));
+assert.ok(!isV015FormalRole("FORMAL_V015"), "undeclared generic role cannot bypass verification");
+assert.ok(!isV015FormalRole("FORMAL_V015_UNREVIEWED"), "unknown native role cannot pass");
+assert.ok(!isV015NonFormalRole("NON_FORMAL_FAKE"), "new non-FORMAL exclusions require explicit review");
+assert.deepEqual(v015RequiredEvidenceStages("FORMAL_V015_THEOREM_STATEMENT"),
+  ["grammar", "denotation", "semanticLinks", "theoremMapping"]);
+assert.deepEqual(v015RequiredEvidenceStages("FORMAL_V015_SEMANTIC_METAMODEL"),
+  ["metamodelMapping", "denotation", "semanticLinks"],
+  "metatheory does not need imaginary executable A-memory replay");
+assert.throws(() => v015RequiredEvidenceStages("FORMAL_V015_UNREVIEWED"),
+  /unrecognized native FORMAL documentation role/);
+
 assert.equal(report.formulas.pending + report.formulas.reviewedNonFormal + report.formulas.verified, report.formulas.total);
 assert.ok(!report.blockers.some((issue) => issue.includes("stale/tampered formula inventory")),
   "current source SHA and independently rediscovered formula candidates must be exact");
@@ -41,6 +58,7 @@ const complete = {
   invalidOverlayIds: [],
   pendingCount: 0,
   prosePendingCount: 0,
+  lexicalPendingCount: 0,
   unexpectedFormulaCount: 0,
   evidenceDefects: [],
   inventoryIntegrityIssues: [],
@@ -55,6 +73,11 @@ assert.ok(evaluateV015DocumentationCompletion({
   evidenceDefects: ["F0001: missing semantic source/denotation/replay witness"],
 }).some((issue) => issue.includes("machine evidence incomplete")),
 "changing VERIFIED metadata without machine evidence must not allow GREEN");
+assert.ok(evaluateV015DocumentationCompletion({
+  ...complete,
+  lexicalPendingCount: 1,
+}).some((issue) => issue.includes("unreviewed full FORMAL-aware Markdown lexical candidates")),
+"one unreviewed binding or ROOT/[] occurrence must fail terminal acceptance");
 assert.ok(evaluateV015DocumentationCompletion({
   ...complete,
   prosePendingCount: 1,
