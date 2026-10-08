@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   Memory,
   ensureRootBasis,
@@ -255,6 +257,24 @@ try {
     error.code === "template-mismatch";
 }
 assert(mismatch, "grounded FORMAL rejects non-identical antecedent");
+
+// Exact documented source-shape examples are checked against the native
+// FORMAL/JSON denotation and explicit empty-bundle/bare declaration witnesses
+// below. An inner A:{} declaration is not conflated with the full root form.
+const formalSpec = readFileSync(resolve(process.cwd(), "..", "docs/specs/Формальная нотация МТС.md"), "utf8");
+const bundleSpec = readFileSync(resolve(process.cwd(), "..", "docs/specs/Пучки связей.md"), "utf8");
+const foundationSpec = readFileSync(resolve(process.cwd(), "..", "docs/theory/Основания МТС.md"), "utf8");
+const amemorySpec = readFileSync(resolve(process.cwd(), "..", "docs/specs/Апамять и управление сетью связей.md"), "utf8");
+assert(formalSpec.includes("{ A }        — объявление без локальной правой части"),
+  "current FORMAL declaration shape is the tested bare source form");
+assert(formalSpec.includes("A:{}         — явно пустой именованный пучок"),
+  "current FORMAL notation gives A:{} its empty named bundle role");
+assert(bundleSpec.includes("`{ A }` объявляет имя, а `A:{}` задаёт явно пустой именованный пучок"),
+  "derived ValueBundle guide retains current FORMAL role distinction");
+assert(foundationSpec.includes("`A:{}` в принятой FORMAL v0.15 означает"),
+  "current foundation does not confuse old ZERO pseudocode with empty named bundle");
+assert(amemorySpec.includes("`A:{}` определяет пустой именованный пучок"),
+  "historical A-memory profile does not promote empty bundle to deletion semantics");
 
 const parityCases = [
   ["{}", "{}"],
