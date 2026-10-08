@@ -125,9 +125,26 @@ export function scanV015FormalLexicalSurface(root: string): V015FormalLexicalSca
       // Keep visible labels (including FORMAL operators), but discard link destinations.
       // Fenced code remains literal FORMAL source; only rendered Markdown is normalized.
       // Diagram/image discovery still runs on the original source line.
-      const semanticText = inFence ? source : source.replace(/!?\[([^\]\n]+)\]\([^)\n]*\)/g, "$1");
-      const tokens = checks.filter(([name, re]) =>
-        re.test(name === "DIAGRAM_OR_IMAGE" ? source : semanticText)).map(([name]) => name);
+      const semanticText = inFence ? source : source
+        // Inline HTML anchors/comments are Markdown infrastructure, not MTS
+        // equality/direction syntax. Strip only markup; visible text survives.
+        .replace(/<!--.*?-->/g, " ")
+        .replace(/<[^>\n]+>/g, " ")
+        .replace(/!?\[([^\]\n]+)\]\([^)\n]*\)/g, "$1");
+      const inlineCodeText = inFence ? source :
+        Array.from(source.matchAll(/\x60([^\x60\n]+)\x60/g), (match) => match[1]!).join(" ");
+      const strongContextBinding =
+        /(?:^|[\s\x60"'({,])(?::[A-Za-zА-Яа-я_][\wА-Яа-я]*)|(?:[A-Za-zА-Яа-я_][\wА-Яа-я]*)\s*:\s*(?:\{\}|\[[^\]]*\]|\()/u;
+      const tokens = checks.filter(([name, re]) => {
+        if (name === "DIAGRAM_OR_IMAGE") return re.test(source);
+        if (name === "CONTEXT_NAME_OR_BINDING") {
+          // Bare prose "term: value" is overwhelmingly punctuation, not
+          // contextual naming. Strong FORMAL shapes remain visible everywhere;
+          // weak A:B forms are accepted only in literal code/fenced source.
+          return strongContextBinding.test(semanticText) || re.test(inlineCodeText);
+        }
+        return re.test(semanticText);
+      }).map(([name]) => name);
       if (tokens.length === 0) continue;
       const context: V015LexicalContext =
         tokens.includes("DIAGRAM_OR_IMAGE") || (inFence && /^(mermaid|dot)$/.test(fenceLanguage))
