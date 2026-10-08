@@ -14,6 +14,10 @@ assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
 assert.equal(report.formulas.total, 202);
 assert.equal(report.formulas.pending + report.formulas.reviewedNonFormal + report.formulas.verified, report.formulas.total);
+assert.ok(!report.blockers.some((issue) => issue.includes("stale/tampered formula inventory")),
+  "current source SHA and independently rediscovered formula candidates must be exact");
+assert.ok(!report.blockers.some((issue) => issue.includes("FORMAL authority-classification mismatch")),
+  "accepted theorem/notation sources must remain explicitly FORMAL");
 assert.equal(report.ready, report.blockers.length === 0);
 if (report.theorems.missing.length > 0 || report.formulas.pending > 0) {
   assert.equal(report.ready, false, "incomplete FORMAL migration cannot pass document acceptance");
