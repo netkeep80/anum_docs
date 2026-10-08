@@ -57,8 +57,8 @@
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
       "evidence": "Broad lexer originally found 968 line candidates. Markdown wrapper normalization removed 264 pure-markup false positives; HTML anchor/comment stripping plus prose-colon disambiguation removed 226 more, leaving 478 exact-source FORMAL-aware rows across :/[]/ROOT/START/END/Γ/Ω/bindings/tables/fenced/inline/prose/diagram. The 19 known primary FORMAL candidates remain covered.",
-      "state": "478_TOTAL_430_REVIEWED_NON_FORMAL_2_VERIFIED_FORMAL_LINES_46_PENDING",
-      "remediation": "Primary inventory now has 5/19 exact B20 FORMAL occurrences verified by native receipts. Two clean broad bundle-document rows are linked to complete primary receipt sets. Remaining 46 broad rows are intentionally pending: mixed FORMAL/historical, composite residual, unsupported source-like, or FORMAL occurrences requiring non-B20 evidence."
+      "state": "478_TOTAL_430_REVIEWED_NON_FORMAL_7_VERIFIED_FORMAL_LINES_41_PENDING",
+      "remediation": "Primary inventory now has 6/19 exact bounded FORMAL occurrences verified by native receipts (5 B20 plus F0028 root basis). Seven clean broad FORMAL lines are linked to complete primary receipt sets. Remaining 41 broad rows are intentionally pending: mixed FORMAL/historical, composite residual, unsupported source-like, or FORMAL occurrences requiring theorem/metamodel/general evidence."
     },
     {
       "id": "DOC15-006",
@@ -89,12 +89,12 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "478_BROAD_LEXICAL_ROWS:430_REVIEWED_NON_FORMAL+2_VERIFIED_FORMAL_LINES+46_PENDING; STRICT_SECONDARY_REVIEW_GATE",
+    "D1": "478_BROAD_LEXICAL_ROWS:430_REVIEWED_NON_FORMAL+7_VERIFIED_FORMAL_LINES+41_PENDING; STRICT_SECONDARY_REVIEW_GATE",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "PRIMARY_FORMAL_5_VERIFIED_14_PENDING; 14_THEOREM_MIGRATIONS_OPEN; 7_PROSE+46_LEXICAL_PENDING",
+    "D3": "PRIMARY_FORMAL_6_VERIFIED_13_PENDING; 14_THEOREM_MIGRATIONS_OPEN; 7_PROSE+41_LEXICAL_PENDING",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
-    "D5": "STRICT_GATE_MULTI_PRIMARY_COMPLETE_COVERAGE; B20_NATIVE_RECEIPTS_5_PASS; UNSUPPORTED_FORMAL_FAILS_CLOSED",
-    "D6": "NOT_READY_14_PRIMARY_FORMAL_46_LEXICAL_7_PROSE_14_THEOREMS",
+    "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_NATIVE_RECEIPTS_5_PASS; ROOT_BASIS_F0028_RECEIPT_PASS; UNSUPPORTED_FORMAL_FAILS_CLOSED",
+    "D6": "NOT_READY_13_PRIMARY_FORMAL_41_LEXICAL_7_PROSE_14_THEOREMS",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
@@ -108,19 +108,19 @@
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "UNREVIEWED",
-    "notes": "Broad census: 478 total = 430 reviewed NON_FORMAL + 2 clean FORMAL lines linked to complete B20 receipt sets + 46 pending. Primary inventory: 5 exact B20 occurrences verified, 14 FORMAL candidates pending. Prose ledger: 14/21 reviewed by exact-source crosswalk, 7 pending. No theorem migration status was promoted.",
+    "notes": "Broad census: 478 total = 430 reviewed NON_FORMAL + 7 clean FORMAL lines linked to complete bounded receipt sets + 41 pending. Primary inventory: 6 exact bounded occurrences verified (5 B20 + F0028 root basis), 13 FORMAL candidates pending. Prose ledger: 14/21 reviewed by exact-source crosswalk, 7 pending. No theorem migration status was promoted.",
     "lexicalReviewedNonFormal": 430,
-    "lexicalPending": 46,
+    "lexicalPending": 41,
     "pendingBreakdown": {
-      "knownFormalOrUnsupportedOverlap": 36,
+      "knownFormalOrUnsupportedOverlap": 31,
       "mixedFormalHistorical": 2,
       "nonFormalOverlapWithResidualLexemes": 3,
       "newSourceLike": 5
     },
-    "lexicalVerifiedFormalLines": 2,
+    "lexicalVerifiedFormalLines": 7,
     "proseReviewedNonFormal": 14,
     "prosePending": 7,
-    "primaryFormalVerified": 5,
-    "primaryFormalPending": 14
+    "primaryFormalVerified": 6,
+    "primaryFormalPending": 13
   }
 }
