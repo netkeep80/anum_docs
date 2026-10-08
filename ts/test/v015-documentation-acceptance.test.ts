@@ -32,22 +32,26 @@ try {
     "<!-- mts-doc-version: v0.15 -->",
     "[STATUS](https://example.org/status)",
     "[Theory->Rule](https://example.org/arrow)",
+    "<a id=\"technical-anchor\"></a> <!-- stable anchor -->",
+    "Версия МТС: v0.15",
     "A : [B]",
     "[A,B]",
+    "`K:A`",
     "![semantic arrow A->B](figure.png)",
     "```formal",
     "[A](B)",
     "```",
   ].join("\n"), "utf8");
   const lexicalFixtureResult = scanV015FormalLexicalSurface(lexicalFixture);
-  assert.equal(lexicalFixtureResult.observations.length, 5,
-    "ordinary Markdown link labels must not become ExactSequence false positives");
+  assert.equal(lexicalFixtureResult.observations.length, 6,
+    "Markdown/HTML infrastructure and prose colons must not become FORMAL false positives");
   assert.deepEqual(lexicalFixtureResult.observations.map(({ line, tokens }) => [line, tokens]), [
     [3, ["LINK_DIRECTION"]],
-    [4, ["CONTEXT_NAME_OR_BINDING", "EXACT_SEQUENCE"]],
-    [5, ["EXACT_SEQUENCE"]],
-    [6, ["LINK_DIRECTION", "DIAGRAM_OR_IMAGE"]],
-    [8, ["EXACT_SEQUENCE"]],
+    [6, ["CONTEXT_NAME_OR_BINDING", "EXACT_SEQUENCE"]],
+    [7, ["EXACT_SEQUENCE"]],
+    [8, ["CONTEXT_NAME_OR_BINDING"]],
+    [9, ["LINK_DIRECTION", "DIAGRAM_OR_IMAGE"]],
+    [11, ["EXACT_SEQUENCE"]],
   ], "real FORMAL labels, bracket sequences and diagram arrows must remain discoverable");
 } finally {
   rmSync(lexicalFixture, { recursive: true, force: true });
