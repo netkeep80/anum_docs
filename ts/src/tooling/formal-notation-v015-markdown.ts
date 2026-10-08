@@ -314,6 +314,29 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "",
     "Текущий документ описывает принятый выпуск v0.15; решение Автора зафиксировано в " + q + "#1876 issuecomment-6046228475" + q + ".",
     "",
+    "## 9a. Нормативный реестр требований v0.15",
+    "",
+    "Ниже приведены все " + String(mandatory.length) + " обязательных требования из принятой " +
+      q + "requirements/mts-v0.15.json" + q + ". Это проекция принятых записей, а не новые законы или доказательства.",
+    "",
+    "| ID | Группа | Состояние принятия | Нормативное содержание |",
+    "|---|---|---|---|",
+    ...mandatory.map((requirement) => {
+      const id = string(requirement.id, "requirement id");
+      const group = string(requirement.group, id + ".group");
+      const state = string(requirement.state, id + ".state");
+      const summary = string(requirement.summary, id + ".summary")
+        .replace(/\\|/g, "\\\\|")
+        .replace(/\\r?\\n/g, " ");
+      return "| <a id=\"mts-v015-" + id.toLowerCase() + "\"></a>" + q + id + q +
+        " | " + q + group + q + " | " + q + state + q + " | " + summary + " |";
+    }),
+    "",
+    "У каждой записи остаётся собственная машинная authority в " + q + "contracts/mts-contract-v0.15.json" +
+      q + ", трассировка в " + q + "traceability/mts-v0.15.json" +
+      q + " и evidence по исходному ID. Унаследованные " + q + "V14-L*" + q +
+      " сохраняются ниже исключительно как историческая версия.",
+    "",
     "## 10. Отложено в v0.16",
     "",
     ...deferred.map((item) => "- " + q + item + q + ";"),
