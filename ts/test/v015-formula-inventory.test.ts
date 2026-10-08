@@ -115,8 +115,8 @@ const acceptedBundleSource = inventory.candidates.filter((entry) =>
   entry.path === "docs/specs/Пучки связей.md" && entry.role === "FORMAL_V015_NOTATION_SPECIMEN");
 assert.equal(acceptedBundleSource.length, 3);
 assert.deepEqual(acceptedBundleSource.map((entry) => entry.source).sort(), ["A:{}", "A:{}", "{ A }"].sort());
-assert.ok(acceptedBundleSource.every((entry) => entry.denotation === "NOT_VERIFIED"),
-  "do not fake v0.15 FORMAL denotation while classifying syntax specimens");
+assert.ok(acceptedBundleSource.every((entry) => entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015"),
+  "the three exact bundle specimens are now backed by bounded native B20 receipts");
 const historicalTheorems = JSON.parse(readFileSync(resolve(root, "theorems/current-v0.14.json"), "utf8")) as {
   theorems: { id: string; statement: string }[];
 };
@@ -170,7 +170,7 @@ const formalAmemoryBundle = inventory.candidates.filter((entry) =>
   entry.role === "FORMAL_V015_NOTATION_SPECIMEN");
 assert.equal(formalAmemoryBundle.length, 1);
 assert.equal(formalAmemoryBundle[0]!.source, "A:{}");
-assert.equal(formalAmemoryBundle[0]!.denotation, "NOT_VERIFIED");
+assert.equal(formalAmemoryBundle[0]!.denotation, "VERIFIED_AGAINST_ACCEPTED_V015");
 const inheritedMathematics = inventory.candidates.filter((entry) =>
   entry.role === "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION");
 const inheritedRelational = inventory.candidates.filter((entry) =>
@@ -189,37 +189,95 @@ const nativeWitnessCandidates = inventory.candidates.filter((entry) =>
 assert.equal(nativeWitnessCandidates.length, 6, "native B10/B20 partial witnesses cover six current FORMAL specimens");
 assert.deepEqual(nativeWitnessCandidates.map((entry) => entry.id).sort(),
   ["F0028", "F0036", "F0152", "F0180", "F0181", "F0184"].sort());
+const boundedVerifiedIds = new Set(["F0036", "F0152", "F0180", "F0181", "F0184"]);
+const expectedB20SourceHashes = new Map([
+  ["F0180", "c72070dee0bb1c1ba234511d101ebb704b11fe525c35c297ae89cfe86033ad70"],
+  ["F0036", "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9"],
+  ["F0152", "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9"],
+  ["F0181", "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9"],
+  ["F0184", "c9e8f2bccf320fa68d223b05a79ae6c3ff12cc11cbc85f6c93b58b498b8028a9"],
+]);
 for (const entry of nativeWitnessCandidates) {
   const witness = (entry as typeof entry & { nativeEvidence: {
     kind: string; testPath: string; testBlobSha: string; status: string; limitation: string;
     verifiedOnCommit: string; ciRun: string; scope: string;
+  }; semanticEvidence?: {
+    compilerVersion: string; acceptedFormalVersion: string; formalSourceSha256: string;
+    executionApplicability: string; executionRationale: string;
+    grammar: { path: string; gitBlobSha: string; testCase: string };
+    denotation: { path: string; gitBlobSha: string; testCase: string };
+    semanticLinks: { path: string; gitBlobSha: string; testCase: string };
+    jsonParity: { path: string; gitBlobSha: string; testCase: string };
+    machineReceipt: {
+      profile: string; outcome: string; caseId: string; formalSourceSha256: string;
+      semanticAnetSha256: string; runnerSourceSha256: string; evidenceCommit: string;
+      ciRun: string; ciJob: string;
+    };
   } }).nativeEvidence;
   assert.ok(["NATIVE_FORMAL_ROOT_BASIS_WIRE",
     "FORMAL_JSON_SOURCE_PARITY_EMPTY_BUNDLE_DENOTATION"].includes(witness.kind));
-  assert.equal(witness.status, "PARTIAL_NATIVE_WITNESS_GREEN");
-  assert.equal(entry.denotation, "NOT_VERIFIED",
-    "successful native fixture is not complete FORMAL proof/replay acceptance");
   const original = readFileSync(resolve(root, witness.testPath), "utf8");
   const gitObject = Buffer.from("blob " + Buffer.byteLength(original, "utf8") + "\0" + original, "utf8");
   assert.equal(createHash("sha1").update(gitObject).digest("hex"), witness.testBlobSha,
     entry.id + " evidence file must match pinned native test source");
-  assert.ok(witness.scope.length > 15 && witness.limitation.includes("NOT_VERIFIED"));
-  assert.equal(witness.verifiedOnCommit, "3348e490b1751b4a68b24159fddc8c820200abb5");
-  assert.ok(witness.ciRun.endsWith("/37749386834"));
+  if (!boundedVerifiedIds.has(entry.id)) {
+    assert.equal(entry.id, "F0028", "only the older root-basis fixture may remain partial");
+    assert.equal(witness.status, "PARTIAL_NATIVE_WITNESS_GREEN");
+    assert.equal(entry.denotation, "NOT_VERIFIED");
+    assert.ok(witness.limitation.includes("NOT_VERIFIED"));
+    assert.equal(witness.verifiedOnCommit, "3348e490b1751b4a68b24159fddc8c820200abb5");
+    assert.ok(witness.ciRun.endsWith("/37749386834"));
+    continue;
+  }
+  assert.equal(witness.status, "BOUNDED_NATIVE_RECEIPT_VERIFIED");
+  assert.equal(entry.denotation, "VERIFIED_AGAINST_ACCEPTED_V015");
+  const semantic = (entry as typeof entry & { semanticEvidence?: Record<string, any> }).semanticEvidence;
+  assert.ok(semantic, entry.id + " verified denotation requires semanticEvidence");
+  assert.equal(semantic!.compilerVersion, "mts-v015-native-evidence/v0.1");
+  assert.equal(semantic!.acceptedFormalVersion, "v0.15");
+  assert.equal(semantic!.formalSourceSha256, expectedB20SourceHashes.get(entry.id));
+  assert.equal(semantic!.executionApplicability, "NOT_APPLICABLE");
+  assert.ok(String(semantic!.executionRationale).length >= 20);
+  for (const [stage, marker] of Object.entries({
+    grammar: "B20_STAGE_GRAMMAR",
+    denotation: "B20_STAGE_DENOTATION",
+    semanticLinks: "B20_STAGE_SEMANTIC_LINKS",
+    jsonParity: "B20_STAGE_JSON_PARITY",
+  })) {
+    const stageEvidence = semantic![stage] as { path: string; gitBlobSha: string; testCase: string };
+    assert.equal(stageEvidence.path, "ts/test/v015-native-evidence-verifier.test.ts");
+    assert.equal(stageEvidence.gitBlobSha, "59ebaa3313e4e1619199de39a6332e26b77fdb73");
+    assert.equal(stageEvidence.testCase, marker);
+  }
+  const receipt = semantic!.machineReceipt as Record<string, string>;
+  assert.equal(receipt.profile, "mts-v015-native-evidence/v0.1");
+  assert.equal(receipt.outcome, "PASS");
+  assert.equal(receipt.caseId, entry.id);
+  assert.equal(receipt.formalSourceSha256, semantic!.formalSourceSha256);
+  assert.match(receipt.semanticAnetSha256, /^[0-9a-f]{64}$/);
+  assert.equal(receipt.runnerSourceSha256,
+    "4ae3b27df9eefa97e1a4ad06a53a18c66eaa07406ae87599dafa6cd81abd3720");
+  assert.equal(receipt.evidenceCommit, "89614d94e479d21550de5522e1f5168be0decb48");
+  assert.equal(receipt.ciRun, "37820849894");
+  assert.equal(receipt.ciJob, "113461627151");
 }
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
 assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 19,
-  "classified FORMAL explanatory specimens stay pending denotation verification");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 5,
+  "only the bounded B20 exact source occurrences may currently claim verified denotation");
+assert.equal(inventory.candidates.filter((entry) =>
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 14,
+  "unsupported FORMAL theorem/metamodel/general specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 19, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 14, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; all 202 expressions scoped; 19 FORMAL denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length +
+  " candidates; all 202 expressions scoped; 5 bounded B20 FORMAL denotations verified; 14 FORMAL denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
