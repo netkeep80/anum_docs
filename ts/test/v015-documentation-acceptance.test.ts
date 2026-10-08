@@ -17,7 +17,7 @@ assert.equal(report.normative.expected, 48);
 assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
-assert.equal(report.formulas.total, 202);
+assert.equal(report.formulas.total, 203);
 assert.equal(report.formulas.verified, 18, "all current primary FORMAL occurrences have bounded receipts, including eight migrated theorem statements");
 assert.equal(report.formulas.pending, 0, "primary FORMAL source/denotation backlog is closed; missing theorem migrations remain separate blockers");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
