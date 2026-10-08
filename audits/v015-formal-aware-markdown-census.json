@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 33,
+    "unreviewed": 21,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -4186,9 +4186,15 @@
         "LINK_IDENTITY_OR_META_EQUALITY",
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "e9d9fa3646dd63f8f3ffeda495277c831ad04c0fb8a6d03f8aae30e335cad1f5",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4199,9 +4205,15 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "75d32c5dff8b1379afe835c3fa4f81007601b06f28515296727f2111d443f10f",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4213,9 +4225,15 @@
         "EXACT_SEQUENCE",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "9ca4c13156de66be4cd4dbb494568a5e046c045919126f4480d88c76c39cf644",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4227,9 +4245,15 @@
         "EXACT_SEQUENCE",
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "36b01623bdd205a9aefb8663a6dcf32d95ca50739857443bd50ba427946e41c0",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4239,9 +4263,15 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "e4c9492507cfdebb8c2c77a8e4462737801dcbc43fe8642ca1bf69ca80fe3301",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4252,9 +4282,15 @@
         "LINK_IDENTITY_OR_META_EQUALITY",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "11f839300754b4af2acdda6cc33f9cf24113a326792224f1d76cf63c2dd60f70",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4264,9 +4300,15 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "48f026158ab72874c305761999c0e81dbc446667f9a1964801ef0ed2b0a68384",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4277,9 +4319,15 @@
         "LINK_DIRECTION",
         "LINK_IDENTITY_OR_META_EQUALITY"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner explicitly classifies this fence as metalinguistic parsing/denotation explanation, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "79e222065088e53282e7e494c7ac4324c51648deb3b67f54a34111dc69df5a4d",
+      "primaryCandidateIds": [
+        "F0127"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4289,9 +4337,15 @@
       "tokens": [
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner emits this as a schematic FORMAL syntax legend with explanatory prose/ellipsis, not literal parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "b96bc0253103f04e3501953efddbbe4aa9a98a0633a0731b1358072644f32b17",
+      "primaryCandidateIds": [
+        "F0128"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4302,9 +4356,15 @@
         "CONTEXT_NAME_OR_BINDING",
         "FORMAL_BUNDLE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner emits this as a schematic FORMAL syntax legend with explanatory prose/ellipsis, not literal parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "cd764683c9674922972e158e34caf4b0619dab1926fd5a2e099452e973e4a05f",
+      "primaryCandidateIds": [
+        "F0128"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4314,9 +4374,15 @@
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner emits this as a schematic FORMAL syntax legend with explanatory prose/ellipsis, not literal parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "90708c7b9f8d3a5c7a2f65ca9f5818fe30fea126b6738851171f2d6a96389015",
+      "primaryCandidateIds": [
+        "F0128"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -4326,9 +4392,15 @@
       "tokens": [
         "EXACT_SEQUENCE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_FORMAL_SYNTAX_LEGEND",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "Generator owner emits this as a schematic FORMAL syntax legend with explanatory prose/ellipsis, not literal parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067746500",
+      "reviewSourceSha256": "d242561b5dc1e3fd31cc36f74d2a71b12df1362c8fc688816984a16573443beb",
+      "primaryCandidateIds": [
+        "F0128"
+      ]
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
