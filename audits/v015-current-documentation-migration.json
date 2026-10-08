@@ -25,7 +25,7 @@
       "path": "docs/CONTRIBUTING.md",
       "kind": "release-label-contradiction",
       "evidence": "Header v0.15 conflicts with current-v0.14 section 6 and status table.",
-      "state": "RESOLVED_IN_PR_PENDING_CI",
+      "state": "CORRECTED_IN_PR_AWAITING_FINAL_CI",
       "remediation": "Current release claims updated to v0.15 in docs/CONTRIBUTING.md; checkCurrentReleasePolicy() wired to docs:check and negative regression added. Exact documentation size baseline re-pinned without increasing hard ceiling."
     },
     {
@@ -33,24 +33,40 @@
       "path": "docs/theory/Система аксиом МТС.md",
       "kind": "normative-authority-mismatch",
       "evidence": "Current v0.15 header with v0.14-only lead normative references and V14-only law inventory.",
-      "state": "OPEN",
-      "remediation": "Use v0.15 accepted contract/traceability/requirements for current authority; preserve V14-law inherited evidence with explicit provenance and separate current v0.15 semantics."
+      "state": "V15_AUTHORITY_CORRECTED_IN_PR_FULL_PROJECTION_PENDING",
+      "remediation": "Current theory/axiom introductions point to accepted v0.15 contract/requirements/traceability. V14-L law blocks remain version-scoped inherited evidence. Full mapping of 48 accepted requirements into current documentation remains pending."
     },
     {
       "id": "DOC15-003",
       "path": "docs/theory/Теоремы МТС.md",
       "kind": "formal-proof-status-ambiguity",
       "evidence": "v0.14 accepted theorem inventory and v0.15-candidate formal theorem overlay are presented together.",
-      "state": "OPEN",
-      "remediation": "Explicitly separate accepted v0.15 notation from proof-assurance status; preserve conditional/candidate proof evidence."
+      "state": "RELEASE_AND_PROOF_STATUS_SEPARATED_IN_GENERATOR",
+      "remediation": "Theorem catalog generator and its Markdown projection now identify accepted v0.15 semantic authority and separately identify v0.15-candidate as proof-migration status. Candidate evidence remains unpromoted. FORMAL conversion of original theorem formula texts is still pending."
     },
     {
       "id": "DOC15-004",
       "path": "ts/src/tooling/markdown-coverage-audit.ts",
       "kind": "audit-coverage-fallback",
       "evidence": "Current v0.15 requirements/v0.3 trigger unconditional requirements/mts-v0.14.json coverage fallback; projectionState is V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951.",
-      "state": "OPEN",
+      "state": "OPEN_COMPATIBILITY_FALLBACK",
       "remediation": "Migrate ownership/projections, then make v0.15 coverage mandatory and fail-closed, removing compatibility fallback."
+    },
+    {
+      "id": "DOC15-005",
+      "path": "audits/v015-formula-candidate-inventory.json",
+      "kind": "formula-source-and-denotation-coverage",
+      "evidence": "10 current surfaces, 194 operator-bearing candidate occurrences (114 fenced blocks; 80 inline expressions). Exact blob SHA + line range captured; automated negative drift test present.",
+      "state": "194_CANDIDATES_NOT_SEMANTICALLY_CLASSIFIED",
+      "remediation": "Classify FORMAL vs representation code vs metanotation/pseudocode, then verify all actual FORMAL source expressions against accepted parser/compiler/semantic denotation; introduce fail-closed formal conformance gate."
+    },
+    {
+      "id": "DOC15-006",
+      "path": "docs/specs/Пучки связей.md",
+      "kind": "legacy-bundle-notation-vs-formal",
+      "evidence": "Previously asserted curly braces exclusively meta-notation despite accepted v0.15 FORMAL A:{} empty named bundle.",
+      "state": "SCOPED_IN_PR_LEGACY_FORMULAS_PENDING_MIGRATION",
+      "remediation": "Intro now explicitly distinguishes legacy search profile notations from accepted FORMAL v0.15 Context/bundle constructs. Remaining legacy examples require line-by-line migration/classification."
     }
   ],
   "plannedSurfaces": [
@@ -73,14 +89,14 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "IN_PROGRESS",
+    "D1": "194_OPERATOR_BEARING_CANDIDATES_INVENTORIED_ON_10_CURRENT_SURFACES",
+    "D2": "PARTIAL_CURRENT_AUTHORITY_FIXED_IN_README_FOUNDATION_AXIOMS",
+    "D3": "OPEN_194_CANDIDATES_REVIEW_PENDING",
+    "D4": "PARTIAL_THEOREM_GENERATOR_AND_TARGET_SYNCED",
+    "D5": "OPEN_V14_MARKDOWN_COVERAGE_FALLBACK_REMAINS",
+    "D6": "NOT_READY",
     "issue1951": "OPEN",
-    "openFindings": [
-      "DOC15-002",
-      "DOC15-003",
-      "DOC15-004"
-    ],
-    "ci": "PENDING",
+    "ci": "PENDING_FINAL_HEAD",
     "acceptedArtifactsModified": false
   }
 }
