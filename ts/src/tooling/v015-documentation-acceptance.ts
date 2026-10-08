@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -379,9 +380,34 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
           typeof rr.runnerSourceSha256 !== "string" || !/^[0-9a-f]{64}$/.test(rr.runnerSourceSha256)) {
         evidenceDefects.push(id + ": incomplete machineReceipt semantic identity/replay profile");
       }
-      // A receipt is not accepted by its metadata alone: an executable
-      // receipt verifier is still required to recompute its derivation.
-      evidenceDefects.push(id + ": receipt replay-verifier not yet implemented (fail closed)");
+      // Recompute the receipt through a single reviewed native verifier.
+      // Hand-editing this JSON cannot turn a failed semantic check into PASS.
+      const runner = resolve(root, "ts/dist/src/tooling/v015-native-evidence-verifier.js");
+      const input = JSON.stringify({
+        id, role, source: field(item, "source"), formalSourceSha256: sourceDigest,
+        expectedSemanticAnetSha256: rr.semanticAnetSha256,
+        stages: requiredStages,
+      });
+      const execution = spawnSync(process.execPath, [runner, "--verify-stdin"], {
+        cwd: root, input, encoding: "utf8", timeout: 30000, maxBuffer: 4 * 1024 * 1024,
+      });
+      if (execution.error || execution.status !== 0) {
+        evidenceDefects.push(id + ": native receipt verifier failed or unavailable (fail closed)");
+      } else {
+        try {
+          const verifiedReceipt = record(JSON.parse(execution.stdout) as unknown, id + ".native-receipt");
+          if (verifiedReceipt.profile !== "mts-v015-native-evidence/v0.1" ||
+              verifiedReceipt.outcome !== "PASS" ||
+              verifiedReceipt.caseId !== id ||
+              verifiedReceipt.formalSourceSha256 !== sourceDigest ||
+              verifiedReceipt.semanticAnetSha256 !== rr.semanticAnetSha256 ||
+              verifiedReceipt.runnerSourceSha256 !== rr.runnerSourceSha256) {
+            evidenceDefects.push(id + ": native receipt output not equivalent to pinned expected evidence");
+          }
+        } catch {
+          evidenceDefects.push(id + ": unreadable native receipt verifier output");
+        }
+      }
     }
     if (evidenceDefects.length === before) verified.push(item);
   }
