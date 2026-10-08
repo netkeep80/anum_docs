@@ -2149,12 +2149,12 @@
   ],
   "classification": {
     "policy": "Non-FORMAL diagrams/status are narrowly exempted with rationale. Current FORMAL descriptive/metamodel examples may be classified but remain NOT_VERIFIED until native source/denotation conformance evidence.",
-    "nonFormalProcessCount": 14,
+    "nonFormalProcessCount": 15,
     "unclassifiedCount": 155,
     "acceptedFormalDenotationsVerified": 0,
     "scope": "Do not read PROCESS exclusions as validation of other expressions.",
     "nonFormalRepresentationCount": 9,
-    "nonFormalGovernanceCount": 1,
+    "nonFormalGovernanceCount": 2,
     "reviewedNonFormalCount": 33,
     "unverifiedDenotationCount": 160,
     "verifiedFormalCount": 0
