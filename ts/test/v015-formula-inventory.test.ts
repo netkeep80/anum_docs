@@ -69,9 +69,19 @@ assert.equal(inventory.counts.inline, actual.filter((entry) => entry.kind === "i
 for (let i = 0; i < actual.length; i++) {
   const expected = inventory.candidates[i]!;
   const observed = actual[i]!;
-  for (const key of ["id", "path", "startLine", "endLine", "kind", "source", "role", "denotation"] as const) {
+  for (const key of ["id", "path", "startLine", "endLine", "kind", "source"] as const) {
     assert.equal(observed[key], expected[key], "candidate " + observed.id + " " + key);
   }
 }
 assert.equal(inventory.candidates.length, actual.length);
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+const processCandidates = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_PROCESS_DIAGRAM");
+assert.equal(processCandidates.length, 14, "only the governance/process diagram scope is reviewed as non-FORMAL");
+for (const entry of processCandidates) {
+  assert.equal(entry.path, "docs/CONTRIBUTING.md", "process exemption cannot be applied to semantic documentation");
+  assert.equal(entry.denotation, "NOT_APPLICABLE_PROCESS_DOCUMENTATION");
+}
+const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
+assert.equal(pending.length, 180, "semantic FORMAL verification backlog stays explicit");
+assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
+
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; 14 process / 180 pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
