@@ -249,6 +249,21 @@ try {
     assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
   }
 
+  for (const [path, authority, bad] of [
+    ["README.md", "M_t -> Γ(M_t) -> M_(t+1)", "M_t -> legacy_exec(M_t)"],
+    ["docs/Словарь терминов МТС.md", "requirements/mts-v0.15.json", "requirements/mts-v0.14.json"],
+    ["docs/specs/Пучки связей.md", "В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:", "В старом API фигурные скобки только метанотация:"],
+    ["docs/theory/Теоремы МТС.md", "Доказательный overlay в принятой FORMAL v0.15:", "Кандидатная проекция FORMAL:"],
+  ] as const) {
+    const file = resolve(tempRoot, path);
+    const content = readFileSync(file, "utf8");
+    assert.ok(content.includes(authority), path + " current source must carry v0.15 authority");
+    writeFileSync(file, content.replace(authority, bad), "utf8");
+    assert.ok(checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)), path + " downgrade must fail docs-check");
+    writeFileSync(file, content, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
+
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
