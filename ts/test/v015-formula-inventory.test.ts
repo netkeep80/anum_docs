@@ -88,18 +88,18 @@ const lifecycleCandidates = inventory.candidates.filter((entry) => entry.role ==
 assert.equal(lifecycleCandidates.length, 2, "only identified lifecycle vocabulary is excluded");
 assert.deepEqual(new Set(lifecycleCandidates.map((entry) => entry.path)), new Set(["docs/Словарь терминов МТС.md", "README.md"]));
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");
-assert.equal(pending.length, 161, "remaining UNCLASSIFIED formula backlog stays explicit");
+assert.equal(pending.length, 157, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
   entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 4,
   "classified FORMAL explanatory specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 165, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 161, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
   "every role classification requires human-readable evidence/rationale");
 
 
-console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; 15 process / 9 codec / 2 vocabulary / 3 other meta / 165 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length + " candidates; 4 obsolete codec equations retired; 161 semantic pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
