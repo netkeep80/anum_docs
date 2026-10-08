@@ -64,7 +64,7 @@
   "counts": {
     "currentFiles": 11,
     "candidates": 478,
-    "unreviewed": 90,
+    "unreviewed": 66,
     "byContext": {
       "fenced": 307,
       "prose": 5,
@@ -168,9 +168,12 @@
       "tokens": [
         "DIAGRAM_OR_IMAGE"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_PRESENTATION_ASSET",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This is the repository banner image and carries no MTS FORMAL expression or semantic operator.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "1b44f1441ebf396dc909dd21ab1f00ef65db162d224289030dda15c73c84fe97"
     },
     {
       "path": "README.md",
@@ -390,9 +393,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "29aa56999caf4b2a1371bcd3225093af9ef3086ef673d06035f6482e8514ab48"
     },
     {
       "path": "README.md",
@@ -1222,9 +1228,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "ab15036d06cc3c7c0f29d8cdf1405d98c357375a2af5f50051593b9693a3c38c"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -1234,9 +1243,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "f27f51f284b5bb160972cd694668da9863919e196bcaf334e780ce887c80cd3a"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -1354,9 +1366,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "7941839c18052244865ec961ad71425882ba1a3dc05b7aa51e1fb869dcc91485"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -2327,9 +2342,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "280847c022d8c879a192faec9e0c502ab220d234c8a1fafdacda0a2b9c32e07b"
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
@@ -4409,9 +4427,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "6ee5980b8daaac5e5130fe57f7126ac431b81dcb90ddb0980906284aba031a97"
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -5284,9 +5305,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "ec3c608070a3823e88828f4ea34b981977f50cc6c8b0b265c78d0d6037e2e1fc"
     },
     {
       "path": "docs/theory/Основания МТС.md",
@@ -5370,9 +5394,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "ecdbf54974243790748a40d6da5268c06135e52a80b0379145b6246c5e7d7c64"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5382,9 +5409,12 @@
       "tokens": [
         "SEMANTIC_METAMODEL"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "86bd653cca37884c2a722cc1a2d7becd0b64a2539eaae838a37c919468a8918c"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5407,9 +5437,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "77af9472dc0fca65e3a3bb899c6a68eeb74519d263dcdc1e95b9fb3c1e5c8a78"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5737,9 +5770,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "af13d61f66dc755a90f57b1f9eb43c1732b2de9a60e06e4d5cef590b084c11cf"
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
@@ -5840,9 +5876,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This table cell indexes the theorem concerning ROOT uniqueness; it is catalog/evidence presentation, not theorem source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "46846dbfc49417f06b809751aea769d87cb696bded350c5032198cbf0c3ba2d0"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
@@ -7818,9 +7857,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "7ca10610f57c9ad5085aaa58b926f86f03258f78dcdeddaced62b449adabdbb0"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7842,9 +7884,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "c9b1e4f2aa318fbe22890cb47f762a2dafa24ce6fa55505a795b8497c6a378c4"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7854,9 +7899,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "12609d1501247a743a9be78ebe11976648cc4a14b946df98bcca439d1c371ed6"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7881,9 +7929,12 @@
       "tokens": [
         "ROOT_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "e02b9cb954d0c7c597c13f57480893a0ac423d71c38a5ebd189457a9765a4d4b"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7893,9 +7944,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "326eff8a1f0c7314d6c4107805f0566165300cd8d1339d97e91d553d8a6243bc"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7906,9 +7960,12 @@
         "ROOT_ASPECT",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "56702ecdc0c33374a63ce306502a4c0bdf1b8d411378b45d36e940a9b4d8ad29"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7918,9 +7975,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "2c1f695de532a7a8314f2c7ba3ebdf837f94da8db647aa2a4e35a7db3d6f39df"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7930,9 +7990,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "b922614b532a353d85fc8cab746f6049c7bca3e382f70604bca566141b62a31f"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7958,9 +8021,12 @@
       "tokens": [
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "5711f64b57267b9449590769c19e9a528e54e09c1042fbe16194010fd555c2da"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7970,9 +8036,12 @@
       "tokens": [
         "LINK_DIRECTION"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "The state-to-successor arrow is explanatory process shorthand in glossary prose, not a Link-construction FORMAL expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "0949a8c15d2edf36c6ac68899eae2b797c14c5ecfc91fad7ba710952c4bd2ebe"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -7999,9 +8068,12 @@
         "ROOT_ASPECT",
         "START_END_ASPECT"
       ],
-      "classification": "UNREVIEWED",
-      "verification": "NOT_VERIFIED",
-      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception."
+      "classification": "NON_FORMAL_STRUCTURAL_GLYPH_LEGEND",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This compact 11/10/01/00 to ROOT/START/END/PAIR statement is a structural legend, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345",
+      "reviewSourceSha256": "f9921d927ccfb7a25ba6a5696e02833276b20dbd38e4fc522d7a026e3edfde75"
     },
     {
       "path": "docs/Словарь терминов МТС.md",
