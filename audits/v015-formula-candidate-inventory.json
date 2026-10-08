@@ -174,8 +174,9 @@
       "kind": "fence",
       "language": "text",
       "source": "main = текущее состояние\nGit / закрытые задачи / закрытые запросы на слияние = история\nодна смысловая тема -> один текущий владелец",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0011",
@@ -185,8 +186,9 @@
       "kind": "fence",
       "language": "text",
       "source": "реализация делает X\n!=\nМТС означает X",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0012",
@@ -196,8 +198,9 @@
       "kind": "fence",
       "language": "text",
       "source": "в JSON записано X\n!=\nX доказано",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0013",
@@ -207,8 +210,9 @@
       "kind": "fence",
       "language": "text",
       "source": "GREEN != принято\nреестр теорем != доказательство сам по себе\nдоказанный производный результат != новый принятый закон\nисследовательский тест != текущая норма",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0014",
@@ -218,8 +222,9 @@
       "kind": "fence",
       "language": "text",
       "source": "problem / falsifier\n-> один смысловой владелец\n-> проверяемая формулировка\n-> RED witness\n-> минимальное изменение\n-> GREEN witness\n-> conformance projection\n-> contract projection\n-> documentation\n-> CI + repo-guard\n-> явное принятие или отклонение",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0015",
@@ -229,8 +234,9 @@
       "kind": "fence",
       "language": "text",
       "source": "смысл\n-> проверяемая гипотеза\n-> ядро\n-> исполнимое свидетельство\n-> машинная проекция\n-> человекочитаемая документация\n-> принятие",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0016",
@@ -240,8 +246,9 @@
       "kind": "fence",
       "language": "markdown",
       "source": "# Заголовок\n<!-- версия документа МТС; mts-doc-version: CURRENT -->\n> **Версия МТС: текущая**",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0017",
@@ -251,8 +258,9 @@
       "kind": "fence",
       "language": "text",
       "source": "preferred term\nкраткое определение\nслой\nстатус\nПодробнее -> canonical owner section/anchor\nНе путать с\nдругие имена",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0018",
@@ -262,8 +270,9 @@
       "kind": "fence",
       "language": "text",
       "source": "поле start\n!=\nдоказательство START\n\nswitch(\"9\")\n!=\nполномочие FORMAL\n\nmemory.outgoing(theory)\n!=\nопределение Theory",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0019",
@@ -273,8 +282,9 @@
       "kind": "fence",
       "language": "text",
       "source": "read\nsearch\nresolve\nverify\nreplay\n!=\nensure\nmaterialize\nwrite",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0020",
@@ -284,8 +294,9 @@
       "kind": "fence",
       "language": "text",
       "source": "апамять A\n-> рабочее представление\n-> переносимые данные\n-> апамять B\n-> структурное сравнение",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0021",
@@ -295,8 +306,9 @@
       "kind": "fence",
       "language": "text",
       "source": "// mts-version-evidence: required-from=0.13",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0022",
@@ -306,8 +318,9 @@
       "kind": "fence",
       "language": "text",
       "source": "GREEN != принято\nнет GREEN => принять невозможно",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0023",
@@ -317,8 +330,9 @@
       "kind": "fence",
       "language": "text",
       "source": "один owner\n-> проверяемое изменение\n-> evidence\n-> governed PR\n-> GREEN CI/repo-guard\n-> merge\n-> current documentation remains one coherent v0.15 surface",
-      "role": "UNCLASSIFIED",
-      "denotation": "NOT_VERIFIED"
+      "role": "NON_FORMAL_PROCESS_DIAGRAM",
+      "denotation": "NOT_APPLICABLE_PROCESS_DOCUMENTATION",
+      "reviewBasis": "Process/CI/governance workflow prose in docs/CONTRIBUTING.md, not semantic FORMAL source or a Link identity assertion."
     },
     {
       "id": "F0024",
@@ -2123,5 +2137,12 @@
       "role": "UNCLASSIFIED",
       "denotation": "NOT_VERIFIED"
     }
-  ]
+  ],
+  "classification": {
+    "policy": "Only unambiguous process/governance examples may be excluded from semantic FORMAL parsing. Everything else stays UNCLASSIFIED until per-expression semantic review.",
+    "nonFormalProcessCount": 14,
+    "unclassifiedCount": 180,
+    "acceptedFormalDenotationsVerified": 0,
+    "scope": "Do not read PROCESS exclusions as validation of other expressions."
+  }
 }
