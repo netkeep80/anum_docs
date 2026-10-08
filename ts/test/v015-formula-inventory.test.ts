@@ -103,6 +103,18 @@ assert.ok(axiom.includes("**Историческая метасхема v0.14**"
 assert.ok(foundation.includes("`A:{}` в принятой FORMAL v0.15 означает"));
 assert.ok(!foundation.includes("A -> {}      успешный пустой образ"),
   "old pseudo ZERO cannot masquerade as current FORMAL example");
+const acceptedMetanotation = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_ACCEPTED_SEMANTIC_METANOTATION");
+const formalSyntaxLegends = inventory.candidates.filter((entry) =>
+  entry.role === "NON_FORMAL_FORMAL_SYNTAX_LEGEND");
+assert.deepEqual(acceptedMetanotation.map((entry) => entry.id), ["F0127"]);
+assert.deepEqual(formalSyntaxLegends.map((entry) => entry.id), ["F0128"]);
+assert.ok([...acceptedMetanotation, ...formalSyntaxLegends].every((entry) =>
+  entry.path === "docs/specs/Формальная нотация МТС.md" &&
+  entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
+  typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"),
+  "accepted metanotation and syntax legends must remain explicitly non-executable");
+
 const queryMeta = inventory.candidates.filter((entry) => entry.role === "NON_FORMAL_DERIVED_QUERY_METANOTATION");
 assert.equal(queryMeta.length, 20, "derived ValueBundle query syntax must not be passed off as native FORMAL source");
 assert.ok(queryMeta.every((entry) =>
@@ -294,11 +306,11 @@ assert.equal(inventory.candidates.filter((entry) =>
   entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 6,
   "only five B20 plus the exact root-basis occurrence may currently claim verified denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 13,
-  "unsupported FORMAL theorem/metamodel/general specimens stay pending denotation verification");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 11,
+  "unsupported FORMAL theorem/metamodel specimens stay pending denotation verification");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
-assert.equal(verificationBacklog.length, 13, "semantic proof/denotation backlog remains nonzero");
+assert.equal(verificationBacklog.length, 11, "semantic proof/denotation backlog remains nonzero");
 assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
   (typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string" &&
    (entry as typeof entry & { reviewBasis?: string }).reviewBasis!.length > 0)),
@@ -306,4 +318,4 @@ assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
 
 
 console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length +
-  " candidates; all 202 expressions scoped; 6 bounded FORMAL denotations verified; 13 FORMAL denotations pending; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+  " candidates; all 202 expressions scoped; 6 bounded FORMAL denotations verified; 11 FORMAL denotations pending; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
