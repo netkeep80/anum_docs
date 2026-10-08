@@ -221,7 +221,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     `**Происхождение:** ${theorem.origin === null ? "—" : inlineCode(theorem.origin)}.  `,
     `**Волна:** ${theorem.wave === null ? "—" : inlineCode(theorem.wave)}.`,
     "",
-    "**Исходная формулировка:**",
+    "**Исходная формулировка (исторический v0.14 evidence, не FORMAL v0.15):**",
     "~~~text",
     theorem.statement,
     "~~~",
@@ -356,12 +356,16 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "",
     "## Сводка",
     "",
-    "| ID | Исходная формулировка | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
-    "| --- | --- | --- | --- | --- | --- | --- |",
+    "FORMAL v0.15: " + inlineCode(String(model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length)) +
+      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную FORMAL-формулировку; остальные имеют статус " +
+      inlineCode("NOT_MIGRATED") + ". Это не меняет accepted v0.15 release и не повышает доказательную authority.",
+    "",
+    "| ID | FORMAL v0.15 | Исходная формулировка v0.14 (историческое evidence) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
   ];
   for (const theorem of model.theorems) {
     lines.push(
-      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(tableCell(theorem.statement))} | ${tableCell(nativeStatus(theorem))} | ${evidenceSummary(theorem, "lean4")} | ${evidenceSummary(theorem, "coq")} | ${evidenceSummary(theorem, "mtsNative")} | ${evidenceSummary(theorem, "typescript")} |`,
+      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(theorem.formalV015.migrationStatus)} | ${inlineCode(tableCell(theorem.statement))} | ${tableCell(nativeStatus(theorem))} | ${evidenceSummary(theorem, "lean4")} | ${evidenceSummary(theorem, "coq")} | ${evidenceSummary(theorem, "mtsNative")} | ${evidenceSummary(theorem, "typescript")} |`,
     );
   }
   lines.push("", "## Теоремы", "");
