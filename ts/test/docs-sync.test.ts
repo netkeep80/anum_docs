@@ -280,6 +280,21 @@ try {
     assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
   }
 
+  for (const [path, required, downgrade] of [
+    ["docs/theory/Основания МТС.md", "**Историческая схема** положительного образа v0.14", "Форма положительного образа v0.15"],
+    ["docs/theory/Система аксиом МТС.md", "**Историческая метасхема v0.14**", "Нативная форма v0.15"],
+    ["docs/specs/Апамять и управление сетью связей.md", "**псевдокод профиля 0.1.0**", "принятая FORMAL v0.15"],
+  ] as const) {
+    const location = resolve(tempRoot, path);
+    const original = readFileSync(location, "utf8");
+    assert.ok(original.includes(required), path + " must explicitly scope legacy notation");
+    writeFileSync(location, original.replace(required, downgrade), "utf8");
+    assert.ok(checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)),
+      path + " must fail if v0.14/v0.15 source grammar boundary is erased");
+    writeFileSync(location, original, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
+
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");
   assert.deepEqual(checkRepositoryDocs(tempRoot), [CANONICAL_DOCS[0]], "устаревший блок должен обнаруживаться");
