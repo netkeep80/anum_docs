@@ -62,11 +62,13 @@
     },
     {
       "id": "P0-C",
-      "status": "BLOCKED_NATIVE_ATTESTOR",
+      "status": "PARTIAL_BOUNDED_B20_NATIVE_VERIFIER_ONLY",
       "finding": "Truth of VERIFIED must be derived from grammar→native source ANet→denotation→semantic Link comparison→applicable replay/proof mapping→pinned evidence",
-      "remediation": "Static testCase substring insufficient; evidence stage profiles per role and spawnSync native receipt-verifier boundary added. Implement tested native evidence verifier/receipt producer; no status promotion until verified execution.",
+      "remediation": "B20 source-shape verifier now compiles existing approved { A } and A:{} shapes through native FORMAL and JSON source-ANet compiler, compares actual Link identities and denotations, emits digest-bound CLI receipts, and rejects unsupported roles/shapes/replay. Full per-occurrence evidence producer and remaining corpus still missing; NO semantic candidate promoted.",
       "sources": [
-        "ts/src/tooling/v015-documentation-acceptance.ts"
+        "ts/src/tooling/v015-documentation-acceptance.ts",
+        "ts/src/tooling/v015-native-evidence-verifier.ts",
+        "ts/test/v015-native-evidence-verifier.test.ts"
       ]
     },
     {
