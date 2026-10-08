@@ -120,6 +120,24 @@
         "NATIVE_PROOF=NOT_CLAIMED",
         "APROVER_ACCEPT=NOT_CLAIMED"
       ]
+    },
+    {
+      "id": "F0204",
+      "theoremId": "FND-05",
+      "source": "FND05_STATEMENT : FND05_DOMAIN_GUARDS->FND05_CONCLUSION",
+      "formalSourcePath": "ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts",
+      "testBlobSha": "9d5007e899c29a1238cb169b4093343028ca2648",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "outputMarkers": [
+        "MTS v0.15 B22 FND-05 FORMAL statement:",
+        "MIGRATION_STATUS=FORMAL_MIGRATED",
+        "FORMAL_DOMAIN_GUARDS=2_GROUNDED_PLUS_FINITE_DOMAIN",
+        "DOMAIN_GUARD_REMOVAL=DIFF",
+        "HISTORICAL_EXTERNAL_PROOF=UNCHANGED",
+        "NATIVE_PROOF=NOT_CLAIMED",
+        "APROVER_ACCEPT=NOT_CLAIMED"
+      ]
     }
   ]
 }
