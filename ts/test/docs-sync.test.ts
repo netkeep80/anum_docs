@@ -88,11 +88,11 @@ for (const requirement of requiredEntries) {
 
 const theoremCatalogSource = readFileSync(resolve(repositoryRoot, "docs/theory/Теоремы МТС.md"), "utf8");
 assert.ok(
-  theoremCatalogSource.includes("[принятый контракт MTS v0.15](../../contracts/mts-contract-v0.15.json)"),
+  theoremCatalogSource.includes("[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"),
   "current theorem projection must identify accepted v0.15 semantic authority",
 );
 assert.ok(
-  theoremCatalogSource.includes("Статус миграции доказательств: `v0.15-candidate`; не статус выпуска MTS."),
+  theoremCatalogSource.includes("Статус миграции доказательств: `v0.15-candidate`; не статус выпуска МТС."),
   "candidate proof migration must not be conflated with MTS release acceptance",
 );
 assert.ok(
