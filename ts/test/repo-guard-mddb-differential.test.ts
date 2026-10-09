@@ -303,7 +303,7 @@ try {
     'insertMarkdownChild({ ...args, options: { transparentOwnedBlocks: "not-an-array" } });',
   ].join("\n"));
   run(process.execPath, [
-    resolve("node_modules/typescript/bin/tsc.js"),
+    resolve("node_modules/typescript/bin/tsc"),
     "--noEmit", "--strict", "--exactOptionalPropertyTypes",
     "--noUncheckedIndexedAccess", "--skipLibCheck",
     "--module", "NodeNext", "--moduleResolution", "NodeNext",
