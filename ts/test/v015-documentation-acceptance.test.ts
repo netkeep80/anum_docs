@@ -83,7 +83,7 @@ assert.ok(!report.blockers.some((issue) => issue.includes("stale/tampered formul
   "current source SHA and independently rediscovered formula candidates must be exact");
 assert.ok(!report.blockers.some((issue) => issue.includes("FORMAL authority-classification mismatch")),
   "accepted theorem/notation sources must remain explicitly FORMAL");
-assert.equal(report.ready, report.blockers.length === 0);
+assert.equal(report.ready, report.blockers.length === 0);\nassert.equal(report.ready, true, "Author-accepted final migration manifest must close the strict documentation gate");
 if (report.theorems.missing.length > 0 || report.formulas.pending > 0) {
   assert.equal(report.ready, false, "incomplete FORMAL migration cannot pass document acceptance");
 }
