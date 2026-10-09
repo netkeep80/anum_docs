@@ -101,6 +101,32 @@ function main(): void {
     "every current theorem appears exactly once and in current inventory order",
   );
 
+  const headingLines = first.split("\n");
+  assert.equal(headingLines.filter((line) => line.startsWith("# ")).length, 1,
+    "theorem catalog must have exactly one H1");
+  assert.equal(headingLines.filter((line) => line.startsWith("## Теорема ")).length, 0,
+    "theorem cards must not flatten into H2 siblings of the theorem section");
+  assert.equal(headingLines.filter((line) => line.startsWith("### Теорема ")).length, model.theorems.length,
+    "all theorem cards must be H3 children of ## Теоремы");
+  assert.equal(
+    headingLines.filter((line) => line.startsWith("### Кандидатное доказательство ")).length,
+    model.candidateProofs.length,
+    "candidate proof cards remain H3 children of their own H2 section",
+  );
+  for (const heading of [
+    "#### Формальная запись FORMAL v0.15",
+    "#### Связи и предпосылки",
+    "#### Доказательная база",
+    "#### Подтверждение",
+    "#### Происхождение данных",
+  ]) {
+    assert.equal(
+      headingLines.filter((line) => line === heading).length,
+      model.theorems.length,
+      heading + ": exactly once per theorem card",
+    );
+  }
+
   assert.deepEqual(THEOREM_PRESENTATION_PROFILE_BY_SURFACE, {
     "theory-foundations": "academic",
     "catalog-glossary": "reference",
@@ -114,21 +140,21 @@ function main(): void {
   assert.ok(orderProbe !== undefined);
   const academicOrder = renderTheoremCardMarkdown(orderProbe, "academic");
   assert.ok(
-    academicOrder.indexOf("**Область действия:**") < academicOrder.indexOf("### Формальная запись FORMAL v0.15"),
+    academicOrder.indexOf("**Область действия:**") < academicOrder.indexOf("#### Формальная запись FORMAL v0.15"),
     "academic profile must explain scope before formal machinery",
   );
   const referenceOrder = renderTheoremCardMarkdown(orderProbe, "reference");
   assert.ok(
-    referenceOrder.indexOf("### Формальная запись FORMAL v0.15") < referenceOrder.indexOf("**Область действия:**"),
+    referenceOrder.indexOf("#### Формальная запись FORMAL v0.15") < referenceOrder.indexOf("**Область действия:**"),
     "reference profile must expose canonical FORMAL before expanded scope",
   );
   const evidenceOrder = renderTheoremCardMarkdown(orderProbe, "evidence-first");
   assert.ok(
-    evidenceOrder.indexOf("**Исходная формулировка") < evidenceOrder.indexOf("### Доказательная база"),
+    evidenceOrder.indexOf("**Исходная формулировка") < evidenceOrder.indexOf("#### Доказательная база"),
     "evidence-first profile must identify the claim before presenting its evidence",
   );
   assert.ok(
-    evidenceOrder.indexOf("### Доказательная база") < evidenceOrder.indexOf("### Формальная запись FORMAL v0.15"),
+    evidenceOrder.indexOf("#### Доказательная база") < evidenceOrder.indexOf("#### Формальная запись FORMAL v0.15"),
     "evidence-first profile must prioritize evidence immediately after the claim",
   );
 
@@ -211,7 +237,7 @@ function main(): void {
   }
 
   const fnd07 = section(first, "FND-07");
-  assert.match(fnd07, /### Формальная запись FORMAL v0\.15/);
+  assert.match(fnd07, /#### Формальная запись FORMAL v0\.15/);
   assert.match(fnd07, /FORMAL_MIGRATED/);
   assert.match(fnd07, /CLOSED/);
   assert.match(fnd07, /FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION/);
