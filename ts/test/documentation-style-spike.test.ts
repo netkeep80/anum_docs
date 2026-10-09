@@ -1,0 +1,113 @@
+import assert from "node:assert/strict";
+import { loadRepositoryTheoremProjectionModel, type TheoremProjectionModel } from "../src/tooling/theorem-projection-model.js";
+import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
+import {
+  MTS_DOCUMENTATION_STYLES,
+  renderMtsDocumentationStylePreview,
+  type MtsDocumentationPreviewRequest,
+} from "../src/tooling/documentation-style-spike.js";
+
+const model = loadRepositoryTheoremProjectionModel(findRepositoryRoot());
+const first = model.theorems[0];
+assert.ok(first !== undefined, "theorem model must be populated");
+assert.equal(model.theorems.length, 21, "historical corpus preserved");
+const sourceSha = "76e8942e0f5ea01a5f9f85803470b73ccc4ce208";
+assert.equal(model.theorems.filter((item) => item.formalV015.migrationStatus === "NOT_MIGRATED").length, 0,
+  "post-#1951 current theorem model must have 21/21 FORMAL statements");
+const snapshots: string[] = [];
+for (const style of MTS_DOCUMENTATION_STYLES) {
+  const args: MtsDocumentationPreviewRequest = { model, theoremId: first.id, style, sourceCommitSha: sourceSha };
+  const output = renderMtsDocumentationStylePreview(args);
+  assert.equal(output, renderMtsDocumentationStylePreview(args), "deterministic");
+  assert.ok(output.includes(first.statement), "theorem statement must not be changed or shortened");
+  assert.ok(output.includes(first.id));
+  assert.ok(output.includes(first.formalV015.migrationStatus), "FORMAL status remains visible");
+  assert.ok(output.includes("DESIGN SPIKE #2080"));
+  assert.ok(output.includes("не является семантическим источником"));
+  assert.ok(output.includes(sourceSha), "immutable source link");
+  assert.ok(output.includes(first.provenance.currentIndex), "theorem provenance remains");
+  assert.ok(output.includes(first.provenance.formalOverlay), "FORMAL overlay provenance remains");
+  assert.ok(output.includes("Исходные допущения"), "full theorem assumptions remain accessible");
+  assert.ok(output.includes("Связи с принятыми законами"), "law references remain accessible");
+  assert.ok(output.includes("FORMAL-зависимости"), "FORMAL metadata remains accessible");
+  assert.ok(output.includes("Замкнутость доказательного артефакта"), "proof closure remains visible");
+  assert.ok(output.includes("Статус aprover"), "native proof status must not disappear");
+  for (const law of first.lawRefs)
+    assert.ok(output.includes(law), "canonical theorem law references remain visible");
+  if (first.assumptions.length)
+    assert.ok(output.includes(first.assumptions[0]!), "source assumptions must be preserved");
+  for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const)
+    for (const item of first.evidence[lane]) {
+      assert.ok(output.includes(item.path), "registered evidence source retained");
+      assert.ok(output.includes(item.proofAuthority), "authority type retained");
+    }
+  for (const lane of ["TypeScript", "Lean4", "Rocq", "MTS-native", "aprover"])
+    assert.ok(output.includes(lane), "all proof/evidence lanes remain visible: " + lane);
+  snapshots.push(output);
+}
+assert.equal(new Set(snapshots).size, 3, "three genuinely different layout profiles");
+// A future theorem's own fenced source must not prematurely close its Markdown fence.
+
+// Corpus-wide no-information-loss invariant: three renderers × all 21 records.
+for (const theorem of model.theorems) {
+  for (const style of MTS_DOCUMENTATION_STYLES) {
+    const page = renderMtsDocumentationStylePreview({
+      model, theoremId: theorem.id, style, sourceCommitSha: sourceSha,
+    });
+    assert.ok(page.includes(theorem.statement), "exact statement: " + theorem.id + " " + style);
+    assert.ok(page.includes(theorem.id), "ID: " + theorem.id);
+    assert.ok(page.includes(theorem.formalV015.migrationStatus),
+      "no hidden migration status: " + theorem.id + " " + style);
+    for (const law of theorem.lawRefs)
+      assert.ok(page.includes(law), "omitted law reference: " + theorem.id + " " + law);
+    for (const assumption of theorem.assumptions)
+      assert.ok(page.includes(assumption), "omitted assumption: " + theorem.id);
+    for (const dependency of theorem.dependsOn)
+      assert.ok(page.includes(dependency), "omitted theorem dependency: " + theorem.id);
+    for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const) {
+      for (const evidence of theorem.evidence[lane]) {
+        assert.ok(page.includes(evidence.path), "evidence lost: " + theorem.id + " " + evidence.path);
+        assert.ok(page.includes(evidence.proofAuthority),
+          "evidence proof authority lost: " + theorem.id + " " + lane);
+      }
+    }
+    if (theorem.formalV015.formalStatement !== null)
+      assert.ok(page.includes(theorem.formalV015.formalStatement),
+        "existing FORMAL statement lost: " + theorem.id + " " + style);
+  }
+}
+const syntheticMissing = {
+  ...first,
+  formalV015: {
+    ...first.formalV015,
+    migrationStatus: "NOT_MIGRATED",
+    proofClosure: null,
+    formalArtifactKind: null,
+    formalStatement: null,
+    formalPremises: [],
+    formalDependencies: [],
+    formalDomain: [],
+    formalExistentialDomain: [],
+    formalNonPremises: [],
+    formalSourcePath: null,
+    nativeClassification: null,
+    kernelLaw: null,
+    nativeIndependent: null,
+    aproverStatus: null,
+  },
+};
+const syntheticMissingModel: TheoremProjectionModel = {
+  ...model,
+  theorems: [syntheticMissing],
+};
+for (const style of MTS_DOCUMENTATION_STYLES) {
+  const text = renderMtsDocumentationStylePreview({
+    model: syntheticMissingModel, theoremId: syntheticMissing.id, style, sourceCommitSha: sourceSha,
+  });
+  assert.ok(text.includes("не мигрирована"), "never conceal a missing FORMAL overlay");
+}
+const base = { model, theoremId: first.id, style: "academic" as const, sourceCommitSha: sourceSha };
+assert.throws(() => renderMtsDocumentationStylePreview({ ...base, theoremId: "UNKNOWN" }), /theorem not present/);
+assert.throws(() => renderMtsDocumentationStylePreview({ ...base, sourceCommitSha: "main" }), /pinned 40-hex/);
+assert.throws(() => renderMtsDocumentationStylePreview({ ...base, style: "invalid" as "academic" }), /unsupported style/);
+console.log("MTS style spike: three deterministic model-derived theorem layouts, exact statements, version/proof boundary and pinned provenance PASS");
