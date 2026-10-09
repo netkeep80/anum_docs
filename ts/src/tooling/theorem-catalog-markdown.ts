@@ -330,7 +330,7 @@ function orderedCardSections(
     return [statement, scope, formal, relations, evidence, assurance, provenance];
   }
   if (profile === "evidence-first") {
-    return [evidence, assurance, statement, formal, scope, relations, provenance];
+    return [statement, evidence, assurance, formal, scope, relations, provenance];
   }
   return [statement, formal, scope, relations, evidence, assurance, provenance];
 }
