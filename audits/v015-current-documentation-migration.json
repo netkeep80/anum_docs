@@ -11,7 +11,7 @@
     "formalProjection": "profiles/mts-v015-formal-notation-projection.json",
     "kernel": "profiles/mts-v015-meta-interpreter-kernel.json"
   },
-  "state": "INCOMPLETE_FAIL_CLOSED",
+  "state": "MACHINE_VERIFIED_AWAITING_AUTHOR_REVIEW",
   "rules": [
     "Accepted v0.15 is the only normative target for current documents and FORMAL formulas.",
     "Do not modify immutable historical proof/release records or Author-approved FORMAL/JSON artifacts.",
@@ -25,24 +25,24 @@
       "path": "docs/CONTRIBUTING.md",
       "kind": "release-label-contradiction",
       "evidence": "Header v0.15 conflicts with current-v0.14 section 6 and status table.",
-      "state": "CORRECTED_IN_PR_AWAITING_FINAL_CI",
-      "remediation": "Current release claims updated to v0.15 in docs/CONTRIBUTING.md; checkCurrentReleasePolicy() wired to docs:check and negative regression added. Exact documentation size baseline re-pinned without increasing hard ceiling."
+      "state": "VERIFIED_CURRENT_V015_RELEASE_LABELS",
+      "remediation": "Current release claims are v0.15; docs:check release-policy guards and current-surface regressions are GREEN on exact audit head."
     },
     {
       "id": "DOC15-002",
       "path": "docs/theory/Система аксиом МТС.md",
       "kind": "normative-authority-mismatch",
       "evidence": "Current v0.15 header with v0.14-only lead normative references and V14-only law inventory.",
-      "state": "V15_AUTHORITY_CORRECTED_IN_PR_FULL_PROJECTION_PENDING",
-      "remediation": "Current theory/axiom introductions point to accepted v0.15 contract/requirements/traceability. V14-L law blocks remain version-scoped inherited evidence. Full mapping of 48 accepted requirements into current documentation remains pending."
+      "state": "VERIFIED_V15_AUTHORITY_48_OF_48_PROJECTED",
+      "remediation": "Current theory/axiom introductions point to accepted v0.15 authority; all 48 accepted normative requirements are uniquely projected and checked, while V14-L blocks remain explicitly inherited historical evidence."
     },
     {
       "id": "DOC15-003",
       "path": "docs/theory/Теоремы МТС.md",
       "kind": "formal-proof-status-ambiguity",
       "evidence": "v0.14 accepted theorem inventory and v0.15-candidate formal theorem overlay are presented together.",
-      "state": "21_OF_21_FORMAL_THEOREM_PROJECTIONS_0_MISSING",
-      "remediation": "Theorem generator and Markdown now show 21/21 after bounded FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04, FND-06, FND-11, INV-05, FND-12, INV-06, INV-07 and CTX-03 statement migrations; original sources remain historical and no theorem ID remains in the FORMAL migration backlog. No native/aprover proof status promoted. Final whole-repository documentation audit remains required before COMPLETE_VERIFIED."
+      "state": "VERIFIED_21_OF_21_FORMAL_THEOREM_PROJECTIONS",
+      "remediation": "Theorem generator and Markdown expose 21/21 bounded FORMAL statement migrations; historical v0.14 theorem text remains provenance-only; native/aprover proof authority is unchanged."
     },
     {
       "id": "DOC15-004",
@@ -57,16 +57,16 @@
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
       "evidence": "Broad lexer originally found 968 line candidates; deterministic Markdown/HTML/prose noise removal produced the reviewed FORMAL-aware ledger. After all bounded theorem statement migrations through CTX-03 the current broad ledger has 499 exact-source rows; primary heuristic inventory has 216 operator-bearing candidates.",
-      "state": "PRIMARY_AND_SECONDARY_FORMULA_CENSUS_CLOSED_499_OF_499",
-      "remediation": "Primary FORMAL source/denotation is 31/31 verified; broad lexical 499/499 and prose 21/21 are fully classified/verified. Theorem FORMAL coverage is 21/21. Remaining documentation acceptance blocker is the final whole-repository documentation/links/anchors/provenance audit and author-reviewed migration manifest."
+      "state": "VERIFIED_PRIMARY_AND_SECONDARY_FORMULA_CENSUS_CLOSED_499_OF_499",
+      "remediation": "Primary FORMAL source/denotation is 31/31 verified; broad lexical 499/499 and prose 21/21 are closed; theorem FORMAL coverage is 21/21."
     },
     {
       "id": "DOC15-006",
       "path": "docs/specs/Пучки связей.md",
       "kind": "legacy-bundle-notation-vs-formal",
       "evidence": "Previously asserted curly braces exclusively meta-notation despite accepted v0.15 FORMAL A:{} empty named bundle.",
-      "state": "SCOPED_IN_PR_LEGACY_FORMULAS_PENDING_MIGRATION",
-      "remediation": "Intro now explicitly distinguishes legacy search profile notations from accepted FORMAL v0.15 Context/bundle constructs. Remaining legacy examples require line-by-line migration/classification."
+      "state": "VERIFIED_CURRENT_FORMAL_SCOPED_LEGACY_HISTORY_ONLY",
+      "remediation": "Current bundle notation is explicitly aligned to accepted FORMAL v0.15; retained legacy spellings are classified as historical/non-FORMAL evidence by the closed inventories."
     }
   ],
   "plannedSurfaces": [
@@ -94,9 +94,9 @@
     "D3": "PRIMARY_FORMAL_31_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; PROSE_21_OF_21_CLOSED; LEXICAL_499_OF_499_CLOSED; THEOREM_MIGRATIONS_21_OF_21_CLOSED",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
     "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; THEOREM_STATEMENTS_21_PASS; PRIMARY_FORMAL_31_OF_31_VERIFIED",
-    "D6": "NOT_READY_FINAL_WHOLE_REPOSITORY_DOCUMENTATION_AUDIT_ONLY",
+    "D6": "MACHINE_AUDIT_COMPLETE_AWAITING_AUTHOR_REVIEW",
     "issue1951": "OPEN",
-    "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
+    "ci": "EXACT_HEAD_4F6A38_CI_10093_SUCCESS_OBSERVATORY_1552_SUCCESS_REPO_GUARD_SKIPPED_WHILE_DRAFT",
     "acceptedArtifactsModified": false
   },
   "twoIndependentAuditReview": "audits/v015-postacceptance-independent-audits-convergence.json",
@@ -127,5 +127,42 @@
     },
     "proseVerifiedFormal": 2,
     "lexicalReviewedMixed": 2
+  },
+  "finalWholeRepositoryAudit": {
+    "evidenceHead": "4f6a38ce5c10d48b715616cd110e3cd5846bb850",
+    "auditedAt": "2026-10-09",
+    "currentMarkdownFiles": 11,
+    "repositoryTreeEntries": 963,
+    "internalRelativeLinksChecked": 531,
+    "brokenInternalRelativeLinks": 0,
+    "theoremSummaryAnchorRefs": 21,
+    "missingTheoremSummaryAnchors": 0,
+    "currentReleaseSurface": "GREEN_V0_15_NO_OBSOLETE_CURRENT_MARKERS",
+    "normativeRequirements": "48_OF_48",
+    "theoremFormalCoverage": "21_OF_21",
+    "primaryFormalDenotations": "31_OF_31",
+    "broadFormalAwareLexical": "499_OF_499",
+    "proseLedger": "21_OF_21",
+    "acceptedV015SensitiveFilesChanged": 0,
+    "prImmutableFilesChanged": 0,
+    "generatedMarkdownDeterminism": "GREEN_VIA_DOCS_CHECK",
+    "ci": {
+      "run": 10093,
+      "state": "SUCCESS"
+    },
+    "observatory": {
+      "run": 1552,
+      "state": "SUCCESS"
+    },
+    "repoGuard": {
+      "run": 4710,
+      "state": "SKIPPED_DRAFT_NOT_COUNTED_AS_PASS"
+    },
+    "historicalRetention": "Explicitly version-scoped v0.14/research evidence may remain; no retained historical material is current v0.15 authority.",
+    "authorReview": "PENDING",
+    "remainingBeforeMerge": [
+      "Author explicitly reviews/accepts this migration manifest.",
+      "After manifest becomes COMPLETE_VERIFIED, remove Draft and require an executed blocking repo-guard result on the exact ready-for-review head."
+    ]
   }
 }
