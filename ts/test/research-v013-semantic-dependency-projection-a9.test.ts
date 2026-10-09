@@ -1221,6 +1221,9 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/v015-theorem-statement-evidence-verifier.ts",
   "ts/src/tooling/v015-markdown-prose-audit.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",
+  // #2114: generic child-insertion deletion is explicitly non-semantic
+  // tooling evolution. Preserve frozen v0.13 S3 evidence unchanged.
+  "ts/src/tooling/markdown-section-adapter.ts",
   "ts/src/tooling/theorem-catalog-markdown.ts",
   "ts/src/tooling/theorem-projection-contract.ts",
   "ts/src/tooling/theorem-projection-model.ts",

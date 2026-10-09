@@ -6,7 +6,6 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import {
-  insertMarkdownChild as localInsertMarkdownChild,
   listMarkdownAnchorIds as localListMarkdownAnchorIds,
   listMarkdownChildren as localListMarkdownChildren,
   listMarkdownSections as localListMarkdownSections,
@@ -193,43 +192,38 @@ try {
   const localOwned = localReadOwnedMarkdownBlock(source, blockId);
   assert.deepEqual(upstreamOwned, localOwned, "owned-block byte identity must match");
 
-  // #622: a caller-owned region precedes Node A's heading. Local MTS
-  // insertion sees the region; upstream must see it only with explicit options.
+  // Stage A (#2115) proved exact byte-equivalence with MTS-local insertion.
+  // Stage B removes that generic implementation. Keep a fixed, independently
+  // specified expected fixture: no reimplementation of Markdown insertion.
   const nestedChild = { anchorId: "node-a2", title: "Node A2", payload: "Authored A2." };
+  const expectedNested = source.replace(
+    '<a id="node-b"></a>',
+    '<a id="node-a2"></a>\n### Node A2\nAuthored A2.\n\n<a id="node-b"></a>',
+  );
+  assert.notEqual(expectedNested, source, "expected insertion boundary exists");
   const upstreamNested = upstream.insertMarkdownChild({
-    source,
-    mode: "hybrid",
-    parentAnchorId: "node-a",
-    child: nestedChild,
-    options,
+    source, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
   }) as string;
-  const localNested = localInsertMarkdownChild({
-    source,
-    mode: "hybrid",
-    parentAnchorId: "node-a",
-    child: nestedChild,
-  });
-  assert.equal(upstreamNested, localNested,
-    "hybrid insertion under transparent owned metadata is byte-identical");
+  assert.equal(upstreamNested, expectedNested, "hybrid insertion matches exact accepted fixture");
   assert.deepEqual(
     normalizeNode(upstream.readMarkdownNode(upstreamNested, "node-a", options)),
-    normalizeNode(localReadMarkdownNode(localNested, "node-a")),
-    "transparent parent survives insertion",
+    normalizeNode(localReadMarkdownNode(expectedNested, "node-a")),
+    "canonical parent preserves the accepted MTS read coordinates",
   );
   assert.deepEqual(
     normalizeNode(upstream.readMarkdownNode(upstreamNested, nestedChild.anchorId, options)),
-    normalizeNode(localReadMarkdownNode(localNested, nestedChild.anchorId)),
-    "inserted child has the same canonical coordinates",
+    normalizeNode(localReadMarkdownNode(expectedNested, nestedChild.anchorId)),
+    "new child preserves the accepted MTS read coordinates",
   );
   assert.deepEqual(
     upstream.listMarkdownChildren(upstreamNested, "node-a", options).map((node: { anchorId: string }) => node.anchorId),
-    localListMarkdownChildren(localNested, "node-a").map((node) => node.anchorId),
-    "all previous children and the new child survive",
+    localListMarkdownChildren(expectedNested, "node-a").map((node) => node.anchorId),
+    "previous children and inserted child retain accepted IDs",
   );
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(upstream.resolveMarkdownAnchor(upstreamNested, id),
-      upstream.resolveMarkdownAnchor(localNested, id),
-      `original anchor ${id} remains at its expected coordinates`);
+      upstream.resolveMarkdownAnchor(expectedNested, id),
+      `original anchor ${id} remains at expected coordinates`);
   }
   // The source is untouched on *both* sides of the insertion, byte for byte.
   const insertionAt = localReadMarkdownNode(source, "node-a").end;
@@ -250,9 +244,10 @@ try {
   const crlfNested = upstream.insertMarkdownChild({
     source: crlf, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
   });
-  assert.equal(crlfNested, localInsertMarkdownChild({
-    source: crlf, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild,
-  }), "CRLF hybrid insertion is byte-identical");
+  assert.equal(crlfNested, crlf.replace(
+    '<a id="node-b"></a>',
+    '<a id="node-a2"></a>\r\n### Node A2\r\nAuthored A2.\r\n\r\n<a id="node-b"></a>',
+  ), "CRLF hybrid insertion matches exact expected bytes");
 
   assert.throws(() => upstream.insertMarkdownChild({
     source, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild,
@@ -329,21 +324,22 @@ try {
   assert.equal(updatedUpstream, updatedLocal, "owned-block replacement must be byte-identical");
 
   const child = { anchorId: "node-c", title: "Node C", payload: "Authored C." };
-  assert.equal(
-    upstream.insertMarkdownChild({
-      source,
-      mode: "hybrid",
-      parentAnchorId: "root",
-      child,
-    }),
-    localInsertMarkdownChild({
-      source,
-      mode: "hybrid",
-      parentAnchorId: "root",
-      child,
-    }),
-    "child insertion must be byte-identical for a canonical parent",
-  );
+  assert.equal(upstream.insertMarkdownChild({
+    source, mode: "hybrid", parentAnchorId: "root", child,
+  }), source + '\n<a id="node-c"></a>\n## Node C\nAuthored C.\n\n',
+  "strict parent insertion matches exact accepted fixture");
+
+  for (const badPayload of ["## hidden heading", '<a id="hidden"></a>']) {
+    assert.throws(() => upstream.insertMarkdownChild({
+      source, mode: "hybrid", parentAnchorId: "root",
+      child: { anchorId: "invalid-payload", title: "Invalid", payload: badPayload },
+    }), /payload cannot contain headings or stable anchors/);
+  }
+  assert.throws(() => upstream.insertMarkdownChild({
+    source: '<a id="deep"></a>\n###### Depth 6\n',
+    mode: "hybrid", parentAnchorId: "deep",
+    child: { anchorId: "too-deep", title: "Too deep" },
+  }), /heading level 6 cannot have/);
 
   assert.throws(
     () => upstream.readMarkdownNode(source, "node-a"),
