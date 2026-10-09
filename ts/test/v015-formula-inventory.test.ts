@@ -139,7 +139,7 @@ assert.ok(queryMeta.every((entry) =>
   entry.denotation === "NOT_APPLICABLE_FORMAL_SOURCE" &&
   typeof (entry as typeof entry & { reviewBasis?: string }).reviewBasis === "string"));
 const bundleDoc = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
-assert.ok(bundleDoc.includes("равенство значений производного поискового API, **не** оператор идентичности Link в FORMAL v0.15"));
+assert.ok(bundleDoc.includes("равенство значений производного поискового API, **не** оператор идентичности `Link` в `FORMAL` v0.15"));
 const acceptedBundleSource = inventory.candidates.filter((entry) =>
   entry.path === "docs/specs/Пучки связей.md" && entry.role === "FORMAL_V015_NOTATION_SPECIMEN");
 assert.equal(acceptedBundleSource.length, 3);
