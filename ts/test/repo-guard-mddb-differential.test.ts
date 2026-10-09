@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -16,7 +16,7 @@ import {
   resolveMarkdownAnchor as localResolveMarkdownAnchor,
 } from "../src/tooling/markdown-section-adapter.js";
 
-const REPO_GUARD_SHA = "756944656fa14de752f44bb404e1dca852f5fa6a";
+const REPO_GUARD_SHA = "c7d50c439f3e9c9c195f7870ef17f5098d94b824";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -192,6 +192,125 @@ try {
   const upstreamOwned = upstream.readOwnedMarkdownBlock(source, blockSpec);
   const localOwned = localReadOwnedMarkdownBlock(source, blockId);
   assert.deepEqual(upstreamOwned, localOwned, "owned-block byte identity must match");
+
+  // #622: a caller-owned region precedes Node A's heading. Local MTS
+  // insertion sees the region; upstream must see it only with explicit options.
+  const nestedChild = { anchorId: "node-a2", title: "Node A2", payload: "Authored A2." };
+  const upstreamNested = upstream.insertMarkdownChild({
+    source,
+    mode: "hybrid",
+    parentAnchorId: "node-a",
+    child: nestedChild,
+    options,
+  }) as string;
+  const localNested = localInsertMarkdownChild({
+    source,
+    mode: "hybrid",
+    parentAnchorId: "node-a",
+    child: nestedChild,
+  });
+  assert.equal(upstreamNested, localNested,
+    "hybrid insertion under transparent owned metadata is byte-identical");
+  assert.deepEqual(
+    normalizeNode(upstream.readMarkdownNode(upstreamNested, "node-a", options)),
+    normalizeNode(localReadMarkdownNode(localNested, "node-a")),
+    "transparent parent survives insertion",
+  );
+  assert.deepEqual(
+    normalizeNode(upstream.readMarkdownNode(upstreamNested, nestedChild.anchorId, options)),
+    normalizeNode(localReadMarkdownNode(localNested, nestedChild.anchorId)),
+    "inserted child has the same canonical coordinates",
+  );
+  assert.deepEqual(
+    upstream.listMarkdownChildren(upstreamNested, "node-a", options).map((node: { anchorId: string }) => node.anchorId),
+    localListMarkdownChildren(localNested, "node-a").map((node) => node.anchorId),
+    "all previous children and the new child survive",
+  );
+  for (const id of ["root", "node-a", "node-a1", "node-b"]) {
+    assert.deepEqual(upstream.resolveMarkdownAnchor(upstreamNested, id),
+      upstream.resolveMarkdownAnchor(localNested, id),
+      `original anchor ${id} remains at its expected coordinates`);
+  }
+  // The source is untouched on *both* sides of the insertion, byte for byte.
+  const insertionAt = localReadMarkdownNode(source, "node-a").end;
+  const insertLength = Buffer.byteLength(upstreamNested) - Buffer.byteLength(source);
+  assert.ok(insertLength > 0);
+  const originalPrefix = Buffer.from(source.slice(0, insertionAt), "utf8");
+  const originalSuffix = Buffer.from(source.slice(insertionAt), "utf8");
+  const generated = Buffer.from(upstreamNested, "utf8");
+  assert.ok(generated.subarray(0, originalPrefix.length).equals(originalPrefix),
+    "UTF-8 prefix outside insertion remains exact");
+  assert.ok(generated.subarray(originalPrefix.length + insertLength).equals(originalSuffix),
+    "UTF-8 suffix outside insertion remains exact");
+  assert.equal(upstream.readOwnedMarkdownBlock(upstreamNested, blockSpec)?.content,
+    upstream.readOwnedMarkdownBlock(source, blockSpec)?.content,
+    "owned metadata bytes remain exact");
+
+  const crlf = source.replace(/\n/g, "\r\n");
+  const crlfNested = upstream.insertMarkdownChild({
+    source: crlf, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
+  });
+  assert.equal(crlfNested, localInsertMarkdownChild({
+    source: crlf, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild,
+  }), "CRLF hybrid insertion is byte-identical");
+
+  assert.throws(() => upstream.insertMarkdownChild({
+    source, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild,
+  }), /not a canonical tree node/, "omitting options must retain strict behavior");
+  for (const mode of ["source", "generated"] as const) {
+    assert.throws(() => upstream.insertMarkdownChild({
+      source, mode, parentAnchorId: "node-a", child: nestedChild, options,
+    }), /read-only|not supported/, `mode ${mode} must forbid insertion`);
+  }
+  assert.throws(() => upstream.insertMarkdownChild({
+    source, mode: "hybrid", parentAnchorId: "node-a",
+    child: { ...nestedChild, anchorId: "node-a1" }, options,
+  }), /duplicated/, "existing child anchor ID cannot be reused");
+  for (const invalid of [
+    source.replace(endMarker, ""),
+    source.replace(beginMarker, ""),
+    source.replace(beginMarker, "__BEGIN__").replace(endMarker, beginMarker).replace("__BEGIN__", endMarker),
+    source.replace(beginMarker, `${beginMarker}\n${beginMarker}`),
+  ]) {
+    assert.throws(() => upstream.insertMarkdownChild({
+      source: invalid, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
+    }), /malformed owned block|end must follow begin/,
+    "transparent caller-owned region must fail closed on malformed markers");
+  }
+  const authored = source.replace(
+    [beginMarker, "> generated metadata", endMarker].join("\n"),
+    "ordinary authored text",
+  );
+  assert.throws(() => upstream.insertMarkdownChild({
+    source: authored, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
+  }), /not a canonical tree node/, "ordinary authored prose must not become transparent");
+
+  // Compile a real strict NodeNext consumer of the pinned public .d.mts.
+  // Dynamic JS import in this test does not by itself validate TypeScript API.
+  const consumer = resolve(tempRoot, "typed-consumer.mts");
+  writeFileSync(consumer, [
+    'import { insertMarkdownChild, type MarkdownStructureOptions } from "./repo-guard/dist/projection-api.mjs";',
+    'const options: MarkdownStructureOptions = { transparentOwnedBlocks: [{',
+    '  blockId: "REQ_A", beginMarker: "<!-- begin -->", endMarker: "<!-- end -->",',
+    '}] };',
+    'const source: string = "<a id=\\"root\\"></a>\\n# Root\\n";',
+    'const args = { source, mode: "hybrid" as const, parentAnchorId: "root",',
+    '  child: { anchorId: "child", title: "Child" } };',
+    'const strict: string = insertMarkdownChild(args);',
+    'const transparent: string = insertMarkdownChild({ ...args, options });',
+    'void [strict, transparent];',
+    '// @ts-expect-error transparency must be a typed block list, not a string',
+    'insertMarkdownChild({ ...args, options: { transparentOwnedBlocks: "not-an-array" } });',
+  ].join("\n"));
+  run(process.execPath, [
+    resolve("node_modules/typescript/bin/tsc"),
+    "--noEmit", "--strict", "--exactOptionalPropertyTypes",
+    "--noUncheckedIndexedAccess", "--skipLibCheck",
+    "--module", "NodeNext", "--moduleResolution", "NodeNext",
+    "--target", "ES2022", consumer,
+  ]);
+  console.log("MDDB_INSERT_HYBRID_DIFFERENTIAL=PASS");
+  console.log("MDDB_INSERT_STRICT_NODENEXT=PASS");
 
   const updatedLocal = localReplaceOwnedMarkdownSection({
     source,
