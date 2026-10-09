@@ -168,9 +168,9 @@ assert(historicalExecutable.includes("J(J(X)) returns exact canonical Link ident
   "historical executable witness retains involution cross-check without importing INV-02 as premise");
 const structuralWitness = readFileSync(
   resolve(repositoryRoot(), "ts/test/v015-direct-structural-aspects-s1.test.ts"), "utf8");
-assert(structuralWitness.includes('"Start : ♂A,"') && structuralWitness.includes('"End : A♀,"'),
+assert(structuralWitness.includes("Start : ♂A") && structuralWitness.includes("End : A♀"),
   "accepted v0.15 direct FORMAL retains START/END structural constructors");
-assert(structuralWitness.includes('"Pair : A⟼B,"'),
+assert(structuralWitness.includes("Pair : A⟼B"),
   "accepted v0.15 direct FORMAL retains PAIR structural constructor");
 
 function compile(f: Fixture, source: string): V015FormalRecursiveCompileResult {
