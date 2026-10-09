@@ -89,7 +89,7 @@ function renderEvidenceItem(item: TheoremProjectionEvidence): string[] {
 }
 
 function renderEvidence(theorem: TheoremProjectionTheorem): string[] {
-  const lines = ["### Доказательная база"];
+  const lines = ["#### Доказательная база"];
   for (const lane of LANE_ORDER) {
     const authority = theorem.evidence[lane][0];
     const role = authority?.role ?? "";
@@ -127,7 +127,7 @@ function renderEvidence(theorem: TheoremProjectionTheorem): string[] {
 
 function renderAssurance(theorem: TheoremProjectionTheorem): string[] {
   const lines = [
-    "### Подтверждение",
+    "#### Подтверждение",
     "- **Внешнее подтверждение Lean4:**",
     ...list(theorem.externalAssurance.lean4).map((line) => `  ${line}`),
     "- **Внешнее подтверждение Rocq:**",
@@ -160,12 +160,12 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
   const formal = theorem.formalV015;
   if (formal.migrationStatus === "NOT_MIGRATED") {
     return [
-      "### Формальная запись FORMAL v0.15",
+      "#### Формальная запись FORMAL v0.15",
       "- **Статус миграции:** `NOT_MIGRATED`.",
     ];
   }
   return [
-    "### Формальная запись FORMAL v0.15",
+    "#### Формальная запись FORMAL v0.15",
     `- **Статус миграции:** ${inlineCode(formal.migrationStatus)}.`,
     `- **Замкнутость доказательного артефакта:** ${inlineCode(formal.proofClosure ?? "UNKNOWN")}.`,
     ...(formal.formalArtifactKind === null
@@ -225,7 +225,7 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
 function renderCardHeader(theorem: TheoremProjectionTheorem): string[] {
   return [
     `<a id="theorem-${theorem.id.toLowerCase()}"></a> <!-- якорь теоремы -->`,
-    `## Теорема ${theorem.id}`,
+    `### Теорема ${theorem.id}`,
     "",
     `**Статус:** текущая теорема; нативная классификация: ${theorem.nativeAssurance === null ? "нет" : inlineCode(theorem.nativeAssurance.classification)}.`,
     `**Происхождение:** ${theorem.origin === null ? "—" : inlineCode(theorem.origin)}.  `,
@@ -261,7 +261,7 @@ function renderScopeSection(theorem: TheoremProjectionTheorem): string[] {
 
 function renderRelationsSection(theorem: TheoremProjectionTheorem): string[] {
   return [
-    "### Связи и предпосылки",
+    "#### Связи и предпосылки",
     "",
     "**Ссылки на принятые законы:**",
     ...list(theorem.lawRefs),
@@ -284,7 +284,7 @@ function renderRelationsSection(theorem: TheoremProjectionTheorem): string[] {
 
 function renderProvenanceSection(theorem: TheoremProjectionTheorem): string[] {
   const lines = [
-    "### Происхождение данных",
+    "#### Происхождение данных",
     `- Исходный индекс теорем v0.14: ${repositoryLink(theorem.provenance.currentIndex)}.`,
     `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
     `- Авторитет ролей доказательных каналов: ${repositoryLink(theorem.provenance.laneAuthority)}.`,
