@@ -223,7 +223,7 @@ try {
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(upstream.resolveMarkdownAnchor(upstreamNested, id),
       upstream.resolveMarkdownAnchor(expectedNested, id),
-      \`original anchor \${id} remains at expected coordinates\`);
+      `original anchor ${id} remains at expected coordinates`);
   }
   // The source is untouched on *both* sides of the insertion, byte for byte.
   const insertionAt = localReadMarkdownNode(source, "node-a").end;
