@@ -83,15 +83,16 @@ assert.ok(!report.blockers.some((issue) => issue.includes("stale/tampered formul
   "current source SHA and independently rediscovered formula candidates must be exact");
 assert.ok(!report.blockers.some((issue) => issue.includes("FORMAL authority-classification mismatch")),
   "accepted theorem/notation sources must remain explicitly FORMAL");
-assert.equal(report.ready, report.blockers.length === 0);\nassert.equal(report.ready, true, "Author-accepted final migration manifest must close the strict documentation gate");
+assert.equal(report.ready, report.blockers.length === 0);
+assert.equal(report.ready, true, "Author-accepted final migration manifest must close the strict documentation gate");
 if (report.theorems.missing.length > 0 || report.formulas.pending > 0) {
   assert.equal(report.ready, false, "incomplete FORMAL migration cannot pass document acceptance");
 }
 if (report.theorems.missing.length > 0) assert.ok(report.blockers.some((item) => item.includes("missing FORMAL theorem projections")));
 if (report.formulas.pending > 0) assert.ok(report.blockers.some((item) => item.includes("unverified current documentation formula candidates")));
 assert.ok(report.blockers.every((item) => typeof item === "string" && item.length > 0));
-// Future-GREEN regression: this is a synthetic *completed* machine-verified
-// state. The current live repository remains RED until real witnesses exist.
+// Terminal-GREEN regression: this synthetic completed state proves the gate remains reachable
+// independently of the now Author-accepted live COMPLETE_VERIFIED repository state.
 const ids = Array.from({ length: 21 }, (_, i) => "T-" + (i + 1));
 const complete = {
   acceptedRelease: true,
@@ -270,5 +271,6 @@ assert.equal(inspectV015SecondaryLedgerRow(
   [primaryWitness, secondPrimaryWitness],
 ).pending, true, "mixed review is bound to the exact whole source line");
 
-console.log("MTS v0.15 documentation acceptance: release=ACCEPTED normative=48/48 strict=NOT_GREEN " +
-  "theoremPending=" + report.theorems.missing.length + " formulaPending=" + report.formulas.pending);
+console.log("MTS v0.15 documentation acceptance: release=ACCEPTED normative=48/48 strict=" +
+  (report.ready ? "GREEN" : "NOT_GREEN") + " theoremPending=" + report.theorems.missing.length +
+  " formulaPending=" + report.formulas.pending);
