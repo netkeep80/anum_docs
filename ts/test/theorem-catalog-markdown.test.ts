@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 
 import {
   THEOREM_CATALOG_PATH,
+  THEOREM_PRESENTATION_PROFILES,
+  renderTheoremCardMarkdown,
   renderTheoremCatalogMarkdown,
 } from "../src/tooling/theorem-catalog-markdown.js";
 import {
@@ -83,6 +85,61 @@ function main(): void {
     model.theorems.map((theorem) => theorem.id.toLowerCase()),
     "every current theorem appears exactly once and in current inventory order",
   );
+
+  assert.equal(
+    model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length,
+    21,
+    "current accepted v0.15 theorem projection must remain 21/21 FORMAL-migrated",
+  );
+  for (const theorem of model.theorems) {
+    const cards = THEOREM_PRESENTATION_PROFILES.map((profile) =>
+      renderTheoremCardMarkdown(theorem, profile),
+    );
+    assert.equal(new Set(cards).size, 3, theorem.id + ": presentation profiles must have distinct section order");
+    assert.ok(
+      section(first, theorem.id).startsWith(renderTheoremCardMarkdown(theorem, "reference")),
+      theorem.id + ": default catalog card must remain the reference profile byte-prefix",
+    );
+    for (const card of cards) {
+      for (const value of [
+        theorem.id,
+        theorem.statement,
+        String(theorem.scope),
+        String(theorem.exclusions),
+        theorem.formalV015.migrationStatus,
+        theorem.formalV015.formalStatement ?? "",
+        ...theorem.lawRefs,
+        ...theorem.assumptions,
+        ...theorem.formalPremises,
+        ...theorem.dependsOn,
+        ...theorem.formalV015.formalPremises,
+        ...theorem.formalV015.formalDependencies,
+        ...theorem.formalV015.formalDomain,
+        ...theorem.formalV015.formalExistentialDomain,
+        ...theorem.formalV015.formalNonPremises,
+      ]) {
+        if (value) assert.ok(card.includes(value), theorem.id + ": profile lost " + value);
+      }
+      for (const lane of ["typescript", "lean4", "coq", "mtsNative", "aprover"] as const) {
+        for (const evidence of theorem.evidence[lane]) {
+          assert.ok(card.includes(evidence.path), theorem.id + "/" + lane + ": profile lost evidence path");
+          assert.ok(card.includes(evidence.proofAuthority),
+            theorem.id + "/" + lane + ": profile lost proof authority");
+        }
+      }
+      for (const path of [
+        theorem.provenance.currentIndex,
+        theorem.provenance.formalOverlay,
+        theorem.provenance.laneAuthority,
+        theorem.provenance.externalAssurance,
+        theorem.provenance.nativeAssurance,
+        theorem.provenance.semanticLawInventory,
+        ...theorem.provenance.evidenceRecords,
+      ]) {
+        assert.ok(card.includes(path), theorem.id + ": profile lost provenance " + path);
+      }
+    }
+  }
 
   for (const theorem of model.theorems) {
     const card = section(first, theorem.id);
@@ -229,6 +286,34 @@ function main(): void {
     "EXE-02 statement migration must not fabricate native evidence",
   );
   assert.match(exe02, /Нативное подтверждение:\*\* нет/i);
+
+  const sourceTheorem = model.theorems[0];
+  assert.ok(sourceTheorem !== undefined);
+  const syntheticMissing = {
+    ...sourceTheorem,
+    formalV015: {
+      ...sourceTheorem.formalV015,
+      migrationStatus: "NOT_MIGRATED",
+      proofClosure: null,
+      formalArtifactKind: null,
+      formalStatement: null,
+      formalPremises: [],
+      formalDependencies: [],
+      formalDomain: [],
+      formalExistentialDomain: [],
+      formalNonPremises: [],
+      formalSourcePath: null,
+      nativeClassification: null,
+      kernelLaw: null,
+      nativeIndependent: null,
+      aproverStatus: null,
+    },
+  };
+  for (const profile of THEOREM_PRESENTATION_PROFILES) {
+    const card = renderTheoremCardMarkdown(syntheticMissing, profile);
+    assert.match(card, /NOT_MIGRATED/);
+    assert.match(card, /Формальная запись FORMAL v0\.15/);
+  }
 
   const tracked = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
   assert.equal(tracked, first, "tracked theorem catalog must equal deterministic renderer output");
