@@ -24,8 +24,8 @@ assert.equal(report.prose.files, 11, "full current markdown surface includes POR
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 0, "all 21 prose observations are now source-bound reviewed or verified");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
-assert.equal(report.lexical.candidates, 481, "lexical discovery records include the generated FND-03, FND-05 and INV-01 FORMAL statement rows");
-assert.equal(report.lexical.unreviewed, 0, "all 481 broad lexical rows are now source-bound reviewed, verified FORMAL, or span-reviewed mixed");
+assert.equal(report.lexical.candidates, 484, "lexical discovery includes INV-01 FORMAL statement plus generated theorem-card binding metadata");
+assert.equal(report.lexical.unreviewed, 0, "all 484 broad lexical rows are now source-bound reviewed, verified FORMAL, or span-reviewed mixed");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {

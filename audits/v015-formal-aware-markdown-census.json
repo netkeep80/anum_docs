@@ -63,18 +63,18 @@
   ],
   "counts": {
     "currentFiles": 11,
-    "candidates": 481,
+    "candidates": 484,
     "unreviewed": 0,
     "byContext": {
       "fenced": 310,
       "prose": 5,
       "diagram": 1,
       "table": 34,
-      "inline": 131
+      "inline": 134
     },
     "byToken": {
       "LINK_DIRECTION": 194,
-      "CONTEXT_NAME_OR_BINDING": 71,
+      "CONTEXT_NAME_OR_BINDING": 74,
       "DIAGRAM_OR_IMAGE": 1,
       "ROOT_ASPECT": 23,
       "START_END_ASPECT": 30,
@@ -7444,6 +7444,51 @@
       ],
       "reviewSourceSha256": "98ab26955ee9e649f6476470f6686766c3e7ee1e6cd126c141b19e063b7c6f3b",
       "reviewBasis": "Exact INV-01 theorem-catalog FORMAL line is covered by the append-stable theorem-statement verifier and B23 finite-Grounded structural inversion owner; no mixed NON_FORMAL span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6071884474"
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "line": 1017,
+      "source": "  - `Grounded:x`",
+      "reviewSourceSha256": "a20cb7b18d63ef9b4af812bd2a63f9d3fe1dbd130e74a065fc1f6c59626ebaa2",
+      "context": "inline",
+      "tokens": [
+        "CONTEXT_NAME_OR_BINDING"
+      ],
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-card row is proof/binding/scope/evidence metadata; the canonical FORMAL theorem statement is tracked separately as its own source candidate.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6071884474"
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "line": 1022,
+      "source": "  - `x : Link`",
+      "reviewSourceSha256": "93bb13c8631f491ebe6739798b44428d73118ebf634c8d24e9fcb7522c9a733d",
+      "context": "inline",
+      "tokens": [
+        "CONTEXT_NAME_OR_BINDING"
+      ],
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-card row is proof/binding/scope/evidence metadata; the canonical FORMAL theorem statement is tracked separately as its own source candidate.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6071884474"
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "line": 1024,
+      "source": "  - `y : Link`",
+      "reviewSourceSha256": "df9fca73ac067bf7232ad36a57051ca2dc4b13cdf824ade1b2f1a335e3ac10bb",
+      "context": "inline",
+      "tokens": [
+        "CONTEXT_NAME_OR_BINDING"
+      ],
+      "classification": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "verification": "REVIEWED_NON_FORMAL",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "reviewBasis": "This generated theorem-card row is proof/binding/scope/evidence metadata; the canonical FORMAL theorem statement is tracked separately as its own source candidate.",
       "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6071884474"
     },
     {
