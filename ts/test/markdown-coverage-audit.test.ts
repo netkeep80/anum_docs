@@ -52,6 +52,18 @@ same(JSON.stringify(again), JSON.stringify(report), "coverage audit is determini
 const acceptedFixture = [{ id: "V15-TEST-01", group: "TEST", state: "COMPONENT_GREEN", summary: "Accepted test" }];
 const acceptedRow = '| <a id="mts-v015-v15-test-01"></a>`V15-TEST-01` | `TEST` | `COMPONENT_GREEN` | Accepted test |';
 same(auditAcceptedV015RequirementRows(acceptedRow, acceptedFixture), 1, "strict v0.15 row projection");
+const acceptedEnglishSpanRow = acceptedRow.replace("Accepted test", '<span lang="en">Accepted test</span>');
+same(auditAcceptedV015RequirementRows(acceptedEnglishSpanRow, acceptedFixture), 1, "explicit English presentation span preserves exact normative source");
+throws(
+  () => auditAcceptedV015RequirementRows(acceptedEnglishSpanRow.replace("Accepted test", "Altered assertion"), acceptedFixture),
+  "differs",
+  "semantic mutation inside explicit language span fails closed",
+);
+throws(
+  () => auditAcceptedV015RequirementRows(acceptedEnglishSpanRow.replace("</span>", ""), acceptedFixture),
+  "differs",
+  "malformed explicit language span fails closed",
+);
 throws(() => auditAcceptedV015RequirementRows("", acceptedFixture), "incomplete", "missing v0.15 normative row fails closed");
 throws(() => auditAcceptedV015RequirementRows(acceptedRow + "\n" + acceptedRow, acceptedFixture), "duplicate", "duplicate normative projection fails closed");
 throws(() => auditAcceptedV015RequirementRows(acceptedRow.replace("Accepted test", "Altered assertion"), acceptedFixture), "differs", "semantic source mutation fails closed");

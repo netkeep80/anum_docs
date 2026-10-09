@@ -180,6 +180,11 @@ export function auditMarkdownDocument(args: {
  * current FORMAL Markdown projection, and no extraneous V15 IDs are injected.
  * Inherited V14 blocks are deliberately checked separately, as provenance.
  */
+function normalizeProjectedV015Summary(summary: string): string {
+  const explicitEnglish = summary.match(/^<span lang="en">([\s\S]*)<\/span>$/);
+  return explicitEnglish?.[1] ?? summary;
+}
+
 export function auditAcceptedV015RequirementRows(
   markdown: string,
   accepted: readonly Readonly<{ id: string; group: string; state: string; summary: string }>[],
@@ -203,7 +208,7 @@ export function auditAcceptedV015RequirementRows(
     const actual = rows.get(req.id);
     if (!actual) fail("current normative requirement missing: " + req.id);
     if (actual.group !== req.group || actual.state !== req.state ||
-        actual.summary !== req.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")) {
+        normalizeProjectedV015Summary(actual.summary) !== req.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")) {
       fail("current normative requirement projection differs from accepted source: " + req.id);
     }
   }
