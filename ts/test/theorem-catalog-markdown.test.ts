@@ -52,13 +52,26 @@ function main(): void {
   const migratedCount = model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length;
   assert.ok(first.includes("`FORMAL v0.15`: `" + migratedCount + "` / `" + model.theorems.length + "`"),
     "theorem catalog must disclose measured, not inferred, FORMAL migration coverage");
-  assert.ok(first.includes("| ID | `FORMAL v0.15` | Исходная формулировка v0.14 (историческое свидетельство) |"),
-    "historical v0.14 theorem statement must not be presented as current FORMAL");
+  assert.ok(first.includes("| ID | `FORMAL v0.15` | `proofClosure` | `Lean4 / Rocq` | `MTS-native` | `aprover` | `TypeScript` |"),
+    "summary must be a compact evidence/status matrix");
+  assert.ok(!first.includes("| ID | `FORMAL v0.15` | Исходная формулировка v0.14"),
+    "wide duplicated historical-statement summary must stay removed");
+  const summaryStart = first.indexOf("## Сводка");
+  const cardsStart = first.indexOf("## Теоремы", summaryStart + 1);
+  assert.ok(summaryStart >= 0 && cardsStart > summaryStart);
+  const summary = first.slice(summaryStart, cardsStart);
   for (const item of model.theorems) {
     const statusRow = "| [" + item.id + "](#theorem-" + item.id.toLowerCase() + ") | `" +
-      item.formalV015.migrationStatus + "` |";
-    assert.ok(first.includes(statusRow), item.id + ": exact theorem FORMAL migration status visible in catalog");
+      item.formalV015.migrationStatus + "` | `" + (item.formalV015.proofClosure ?? "UNKNOWN") + "` | " +
+      item.evidence.lean4.length + " / " + item.evidence.coq.length + " | " +
+      item.evidence.mtsNative.length + " | " + item.evidence.aprover.length + " | " +
+      item.evidence.typescript.length + " |";
+    assert.ok(summary.includes(statusRow), item.id + ": compact measured status row");
+    assert.ok(!summary.includes(item.statement), item.id + ": full historical statement must not bloat summary");
+    assert.ok(first.includes(item.statement), item.id + ": full historical statement must remain in theorem card");
   }
+  assert.match(summary, /TypeScript.*исполняемых свидетелей.*не доказательств/is);
+  assert.match(summary, /aprover.*независимых повторных прогонов/is);
 
   assert.match(first, /theorems\/formal-v0\.15\.json/);
   assert.match(first, /## Кандидатные доказательства MTS v0\.15/);
