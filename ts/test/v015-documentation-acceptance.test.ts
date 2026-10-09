@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { scanV015FormalLexicalSurface } from "../src/tooling/v015-markdown-prose-audit.js";
 import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, inspectV015GeneratedTheoremProjection, inspectV015SecondaryLedgerRow, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
 import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "../src/tooling/theorem-catalog-markdown.js";
@@ -32,7 +32,7 @@ assert.equal(report.lexical.unreviewed, 0,
   "frozen reviewed lexical evidence remains closed while generated projection is checked structurally");
 
 const theoremProjectionModel = loadRepositoryTheoremProjectionModel(root);
-const trackedTheoremCatalog = readFileSync(resolve(root, "..", THEOREM_CATALOG_PATH), "utf8");
+const trackedTheoremCatalog = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
 const renderedTheoremCatalog = renderTheoremCatalogMarkdown(theoremProjectionModel);
 const generatedProjection = inspectV015GeneratedTheoremProjection(
   theoremProjectionModel,
