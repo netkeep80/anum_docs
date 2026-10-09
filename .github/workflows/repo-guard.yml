@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # repo-guard exact consumer pin: accepted fixes through large-diff boundary (#650/#653)
+      # repo-guard exact consumer pin: state-replacement + linked-issue + large-diff fixes (#640/#650/#653)
       - name: Run repo-guard
         id: repo_guard
         uses: netkeep80/repo-guard@8ee0ed9d6da56c93132e9ad6fda8d1c62c33fd34
