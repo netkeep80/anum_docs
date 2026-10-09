@@ -67,20 +67,6 @@ function list(values: readonly string[], empty = "нет"): string[] {
   return values.length ? values.map((value) => `- ${inlineCode(value)}`) : [`- ${empty}`];
 }
 
-function evidenceSummary(theorem: TheoremProjectionTheorem, lane: TheoremProjectionEvidenceLane): string {
-  const count = theorem.evidence[lane].length;
-  if (lane === "typescript") return count ? `${count} исполняемых свидетельств` : "—";
-  if (lane === "lean4" || lane === "coq") return count ? `${count} внешних проверок` : "—";
-  if (lane === "mtsNative") return count ? `${count} нативных записей доказательств` : "—";
-  return count ? `${count} независимых повторных прогонов` : "—";
-}
-
-function nativeStatus(theorem: TheoremProjectionTheorem): string {
-  return theorem.nativeAssurance === null
-    ? "текущая; нативная классификация — отсутствует"
-    : `текущая; нативная классификация ${theorem.nativeAssurance.classification}`;
-}
-
 function renderEvidenceItem(item: TheoremProjectionEvidence): string[] {
   const lines = [
     `  - ${repositoryLink(item.path)} — роль ${inlineCode(item.role)}; доказательный авторитет ${inlineCode(item.proofAuthority)}.`,
