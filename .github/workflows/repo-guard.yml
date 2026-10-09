@@ -35,14 +35,3 @@ jobs:
         run: |
           echo "repo-guard result: ${{ steps.repo_guard.outputs.result }}" >> "$GITHUB_STEP_SUMMARY"
           echo "${{ steps.repo_guard.outputs.summary }}" >> "$GITHUB_STEP_SUMMARY"
-
-      # Temporary diagnostics for exact-head RG fail; remove before merge.
-      - name: Dump repo-guard violation diagnostics
-        if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          ACTION_ROOT="${RUNNER_WORKSPACE%/*}/_actions/netkeep80/repo-guard"
-          CLI="$(find "$ACTION_ROOT" -type f -path '*/dist/repo-guard.mjs' -print -quit)"
-          if [ -z "$CLI" ]; then echo 'Diagnostic CLI not found'; exit 0; fi
-          node "$CLI" --repo-root "$GITHUB_WORKSPACE" --enforcement blocking check-pr --format json || true
