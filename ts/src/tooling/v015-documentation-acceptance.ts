@@ -5,6 +5,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { findRepositoryRoot } from "./docs-sync.js";
+import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
+import {
+  loadRepositoryTheoremProjectionModel,
+  type TheoremProjectionModel,
+} from "./theorem-projection-model.js";
 import { scanV015FormalLexicalSurface, scanV015MarkdownProse } from "./v015-markdown-prose-audit.js";
 
 type Obj = Record<string, unknown>;
@@ -26,6 +31,65 @@ function field(value: Obj, name: string): string {
 }
 function read(root: string, path: string): Obj {
   return record(JSON.parse(readFileSync(resolve(root, path), "utf8")) as unknown, path);
+}
+
+export interface V015GeneratedTheoremProjectionInspection {
+  readonly theoremCards: number;
+  readonly formalStatements: number;
+  readonly issues: readonly string[];
+}
+
+function exactOccurrenceCount(text: string, needle: string): number {
+  if (needle.length === 0) return 0;
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const found = text.indexOf(needle, offset);
+    if (found < 0) return count;
+    count++;
+    offset = found + needle.length;
+  }
+}
+
+export function inspectV015GeneratedTheoremProjection(
+  model: TheoremProjectionModel,
+  trackedMarkdown: string,
+  renderedMarkdown: string,
+): V015GeneratedTheoremProjectionInspection {
+  const issues: string[] = [];
+  if (trackedMarkdown !== renderedMarkdown) {
+    issues.push("generated theorem catalog differs from deterministic ProjectionModel renderer");
+  }
+  const expectedIds = model.theorems.map((theorem) => theorem.id.toLowerCase());
+  const actualIds = [...trackedMarkdown.matchAll(/<a id="theorem-([^"]+)"><\/a>/g)]
+    .map((match) => match[1]!);
+  if (JSON.stringify(actualIds) !== JSON.stringify(expectedIds)) {
+    issues.push("generated theorem card identity/order mismatch");
+  }
+  let formalStatements = 0;
+  for (const theorem of model.theorems) {
+    if (!trackedMarkdown.includes(theorem.statement)) {
+      issues.push("generated theorem catalog lost exact historical statement: " + theorem.id);
+    }
+    if (theorem.formalV015.migrationStatus !== "FORMAL_MIGRATED") continue;
+    const statement = theorem.formalV015.formalStatement;
+    if (statement === null) {
+      issues.push("FORMAL_MIGRATED theorem has no exact FORMAL statement: " + theorem.id);
+      continue;
+    }
+    const block = "~~~text\n" + statement + "\n~~~";
+    const count = exactOccurrenceCount(trackedMarkdown, block);
+    if (count !== 1) {
+      issues.push("generated theorem FORMAL statement occurrence count " + count + ": " + theorem.id);
+    } else {
+      formalStatements++;
+    }
+  }
+  return Object.freeze({
+    theoremCards: actualIds.length,
+    formalStatements,
+    issues: Object.freeze(issues),
+  });
 }
 
 export const FORMAL_V015_ROLES = new Set([
@@ -296,6 +360,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const formalSet = new Set(formalIds);
   const missing = historicalIds.filter((id) => !formalSet.has(id));
   const invalidOverlayIds = allOverlayIds.filter((id) => !historicalIds.includes(id));
+  const generatedTheoremCatalogPath = THEOREM_CATALOG_PATH;
   const inventory = read(root, "audits/v015-formula-candidate-inventory.json");
   const candidates = list(inventory.candidates, "formula candidates");
   const indexedFiles = list(inventory.files, "formula source files");
@@ -321,12 +386,12 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     const gitBlobSha = createHash("sha1")
       .update("blob " + Buffer.byteLength(source, "utf8") + "\0")
       .update(source, "utf8").digest("hex");
-    if (gitBlobSha !== field(file, "blobSha")) {
-      inventoryIntegrityIssues.push("source SHA drift: " + path);
-    }
     const lines = source.split(/\r?\n/);
     sourceLines.set(path, lines);
-    if (lines.length !== file.lineCount) {
+    if (path !== generatedTheoremCatalogPath && gitBlobSha !== field(file, "blobSha")) {
+      inventoryIntegrityIssues.push("source SHA drift: " + path);
+    }
+    if (path !== generatedTheoremCatalogPath && lines.length !== file.lineCount) {
       inventoryIntegrityIssues.push("source line count drift: " + path);
     }
   }
@@ -344,6 +409,7 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     const end = candidate.endLine;
     if (candidateIds.has(id)) inventoryIntegrityIssues.push("duplicate formula candidate ID: " + id);
     candidateIds.add(id);
+    if (path === generatedTheoremCatalogPath) continue;
     if (lines === undefined || !Number.isInteger(begin) || !Number.isInteger(end) ||
         (begin as number) < 1 || (end as number) < (begin as number)) {
       inventoryIntegrityIssues.push("invalid formula source coordinates: " + id);
@@ -395,9 +461,11 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
       }
     }
   }
-  if (discovered.length !== candidates.length) {
-    inventoryIntegrityIssues.push("unindexed source expressions: discovered=" +
-      discovered.length + " declared=" + candidates.length);
+  const authoredDiscovered = discovered.filter((entry) => entry.path !== generatedTheoremCatalogPath);
+  const authoredCandidates = candidates.filter((entry) => field(entry, "path") !== generatedTheoremCatalogPath);
+  if (authoredDiscovered.length !== authoredCandidates.length) {
+    inventoryIntegrityIssues.push("unindexed authored source expressions: discovered=" +
+      authoredDiscovered.length + " declared=" + authoredCandidates.length);
   }
   const occurrenceKey = (
     path: unknown,
@@ -406,9 +474,9 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     kind: unknown,
     source: unknown,
   ): string => JSON.stringify([path, startLine, endLine, kind, source]);
-  const discoveredOccurrences = discovered.map((entry) =>
+  const discoveredOccurrences = authoredDiscovered.map((entry) =>
     occurrenceKey(entry.path, entry.startLine, entry.endLine, entry.kind, entry.source)).sort();
-  const declaredOccurrences = candidates.map((entry) =>
+  const declaredOccurrences = authoredCandidates.map((entry) =>
     occurrenceKey(entry.path, entry.startLine, entry.endLine, entry.kind, entry.source)).sort();
   if (JSON.stringify(discoveredOccurrences) !== JSON.stringify(declaredOccurrences)) {
     inventoryIntegrityIssues.push("expression inventory occurrence-set mismatch");
@@ -604,8 +672,11 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   for (let i = 0; i < Math.min(proseFiles.length, prose.files.length); i++) {
     const expected = proseFiles[i]!;
     const actual = prose.files[i]!;
-    if (expected.path !== actual.path || expected.blobSha !== actual.blobSha ||
-        expected.lineCount !== actual.lineCount) proseIntegrity.push("prose source drift: " + actual.path);
+    if (expected.path !== actual.path ||
+        (actual.path !== generatedTheoremCatalogPath &&
+         (expected.blobSha !== actual.blobSha || expected.lineCount !== actual.lineCount))) {
+      proseIntegrity.push("prose source drift: " + actual.path);
+    }
   }
   for (let i = 0; i < Math.min(indexedProse.length, prose.observations.length); i++) {
     const expected = indexedProse[i]!;
@@ -626,17 +697,24 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const lexicalRows = list(lexicalLedger.candidates, "FORMAL lexical candidates");
   const lexicalFiles = list(lexicalLedger.files, "FORMAL lexical sources");
   const lexicalIssues: string[] = [...lexical.unregistered.map((path) => "unregistered Markdown source: " + path)];
-  if (lexicalFiles.length !== lexical.files.length || lexicalRows.length !== lexical.observations.length)
-    lexicalIssues.push("FORMAL-aware file universe or candidate count drift");
+  const authoredLexicalRows = lexicalRows.filter((entry) => field(entry, "path") !== generatedTheoremCatalogPath);
+  const authoredLexicalObservations = lexical.observations.filter((entry) => entry.path !== generatedTheoremCatalogPath);
+  if (lexicalFiles.length !== lexical.files.length ||
+      authoredLexicalRows.length !== authoredLexicalObservations.length) {
+    lexicalIssues.push("FORMAL-aware authored file universe or candidate count drift");
+  }
   for (let i = 0; i < Math.min(lexicalFiles.length, lexical.files.length); i++) {
     const actual = lexical.files[i]!;
     const pinned = lexicalFiles[i]!;
-    if (pinned.path !== actual.path || pinned.blobSha !== actual.blobSha ||
-        pinned.lineCount !== actual.lineCount) lexicalIssues.push("FORMAL-aware source blob drift: " + actual.path);
+    if (pinned.path !== actual.path ||
+        (actual.path !== generatedTheoremCatalogPath &&
+         (pinned.blobSha !== actual.blobSha || pinned.lineCount !== actual.lineCount))) {
+      lexicalIssues.push("FORMAL-aware source blob drift: " + actual.path);
+    }
   }
-  for (let i = 0; i < Math.min(lexicalRows.length, lexical.observations.length); i++) {
-    const actual = lexical.observations[i]!;
-    const pinned = lexicalRows[i]!;
+  for (let i = 0; i < Math.min(authoredLexicalRows.length, authoredLexicalObservations.length); i++) {
+    const actual = authoredLexicalObservations[i]!;
+    const pinned = authoredLexicalRows[i]!;
     if (pinned.path !== actual.path || pinned.line !== actual.line ||
         pinned.source !== actual.source || pinned.context !== actual.context ||
         JSON.stringify(pinned.tokens) !== JSON.stringify(actual.tokens))
@@ -647,6 +725,17 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
   const lexicalPending = lexicalReviews.filter((review) => review.pending);
   for (const review of lexicalReviews) if (review.defect) sourceClassificationIssues.push(review.defect);
   if (lexicalIssues.length > 0) inventoryIntegrityIssues.push(...lexicalIssues);
+  const theoremProjectionModel = loadRepositoryTheoremProjectionModel(root);
+  const trackedTheoremCatalog = readFileSync(resolve(root, generatedTheoremCatalogPath), "utf8");
+  const renderedTheoremCatalog = renderTheoremCatalogMarkdown(theoremProjectionModel);
+  const generatedProjection = inspectV015GeneratedTheoremProjection(
+    theoremProjectionModel,
+    trackedTheoremCatalog,
+    renderedTheoremCatalog,
+  );
+  if (generatedProjection.issues.length > 0) {
+    inventoryIntegrityIssues.push(...generatedProjection.issues);
+  }
   const manifest = read(root, "audits/v015-current-documentation-migration.json");
   const blockers = evaluateV015DocumentationCompletion({
     acceptedRelease,
