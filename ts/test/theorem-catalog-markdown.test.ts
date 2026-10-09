@@ -44,11 +44,11 @@ function main(): void {
     /генерируемая человекочитаемая проекция.*не является.*источником.*доказательной.*истины/is,
     "catalog must disclose derived/no-proof-authority status",
   );
-  assert.match(first, /доказательный overlay в принятой FORMAL v0\.15/i);
+  assert.match(first, /Доказательная проекция в принятой `FORMAL v0\.15`:/i);
   const migratedCount = model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length;
-  assert.ok(first.includes("FORMAL v0.15: `" + migratedCount + "` / `" + model.theorems.length + "`"),
+  assert.ok(first.includes("`FORMAL v0.15`: `" + migratedCount + "` / `" + model.theorems.length + "`"),
     "theorem catalog must disclose measured, not inferred, FORMAL migration coverage");
-  assert.ok(first.includes("| ID | FORMAL v0.15 | Исходная формулировка v0.14 (историческое evidence) |"),
+  assert.ok(first.includes("| ID | `FORMAL v0.15` | Исходная формулировка v0.14 (историческое свидетельство) |"),
     "historical v0.14 theorem statement must not be presented as current FORMAL");
   for (const item of model.theorems) {
     const statusRow = "| [" + item.id + "](#theorem-" + item.id.toLowerCase() + ") | `" +
