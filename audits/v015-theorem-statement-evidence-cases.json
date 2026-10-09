@@ -138,6 +138,27 @@
         "NATIVE_PROOF=NOT_CLAIMED",
         "APROVER_ACCEPT=NOT_CLAIMED"
       ]
+    },
+    {
+      "id": "F0205",
+      "theoremId": "INV-01",
+      "source": "INV01_STATEMENT : INV01_PREMISES->INV01_CONCLUSION",
+      "formalSourcePath": "ts/test/v015-inv01-formal-statement-candidate-b23.test.ts",
+      "testBlobSha": "b1284ff16ba6a6ab52989207c02f47e747b59bb7",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "outputMarkers": [
+        "MTS v0.15 B23 INV-01 FORMAL statement:",
+        "MIGRATION_STATUS=FORMAL_MIGRATED",
+        "FORMAL_PREMISES=4_A1+F2F3+RECURSIVE_DOMAIN+GROUNDED_X",
+        "PAIR_CASE=REVERSED_RECURSIVE_POLES",
+        "UNIQUE_TOTAL=STRUCTURAL_CLAIM",
+        "ALL_LINK_TOTALITY=NOT_CLAIMED",
+        "PRESENTATION_RENAME=SEMANTICALLY_STABLE",
+        "JSON_J1=EXACT",
+        "NATIVE_PROOF=NOT_CLAIMED",
+        "APROVER_ACCEPT=NOT_CLAIMED"
+      ]
     }
   ]
 }

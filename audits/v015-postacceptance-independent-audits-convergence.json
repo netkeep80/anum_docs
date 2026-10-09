@@ -92,9 +92,9 @@
     },
     {
       "id": "P1-THEOREMS",
-      "status": "BLOCKED_12_NOT_MIGRATED",
-      "finding": "9/21 theorem FORMAL source statements migrated; 12 remain",
-      "remediation": "Five dependency-wave backlog remains pinned; FND-03 and FND-05 are statement-only migrations with historical Lean4/Rocq evidence unchanged and no native/aprover promotion.",
+      "status": "BLOCKED_11_NOT_MIGRATED",
+      "finding": "10/21 theorem FORMAL source statements migrated; 11 remain",
+      "remediation": "Four dependency waves remain pinned; FND-03, FND-05 and INV-01 are statement-only migrations with historical Lean4/Rocq evidence unchanged and no native/aprover promotion.",
       "sources": [
         "audits/v015-theorem-formal-migration-backlog.json"
       ]
