@@ -269,7 +269,7 @@ try {
     ["README.md", "M_t -> Γ(M_t) -> M_(t+1)", "M_t -> legacy_exec(M_t)"],
     ["docs/Словарь терминов МТС.md", "requirements/mts-v0.15.json", "requirements/mts-v0.14.json"],
     ["docs/specs/Пучки связей.md", "В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:", "В старом API фигурные скобки только метанотация:"],
-    ["docs/theory/Теоремы МТС.md", "Доказательный overlay в принятой FORMAL v0.15:", "Кандидатная проекция FORMAL:"],
+    ["docs/theory/Теоремы МТС.md", "Доказательная проекция в принятой `FORMAL v0.15`:", "Кандидатная проекция FORMAL:"],
   ] as const) {
     const file = resolve(tempRoot, path);
     const content = readFileSync(file, "utf8");
