@@ -352,7 +352,7 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "> Семантический нормативный источник текущего выпуска — [принятый контракт v0.15](../../contracts/mts-contract-v0.15.json); исходный доказательный источник теорем остаётся версионным. Этот файл — только производная проекция.",
     "",
     `Исходный принятый реестр теорем: ${repositoryLink(model.sourceInventory)}. Версия доказательного реестра: ${inlineCode(model.mtsVersion)}.`,
-    `Доказательная проекция в принятой `FORMAL v0.15`: ${repositoryLink(model.formalOverlay)}. Статус миграции доказательств: ${inlineCode(model.formalCandidateVersion)}; не статус выпуска МТС.`,
+    "Доказательная проекция в принятой `FORMAL v0.15`: " + repositoryLink(model.formalOverlay) + ". Статус миграции доказательств: " + inlineCode(model.formalCandidateVersion) + "; не статус выпуска МТС.",
     "",
     "## Сводка",
     "",
