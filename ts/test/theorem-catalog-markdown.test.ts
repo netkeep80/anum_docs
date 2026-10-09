@@ -5,6 +5,8 @@ import { resolve } from "node:path";
 import {
   THEOREM_CATALOG_PATH,
   THEOREM_PRESENTATION_PROFILES,
+  THEOREM_PRESENTATION_PROFILE_BY_SURFACE,
+  theoremPresentationProfileForSurface,
   renderTheoremCardMarkdown,
   renderTheoremCatalogMarkdown,
 } from "../src/tooling/theorem-catalog-markdown.js";
@@ -85,6 +87,15 @@ function main(): void {
     model.theorems.map((theorem) => theorem.id.toLowerCase()),
     "every current theorem appears exactly once and in current inventory order",
   );
+
+  assert.deepEqual(THEOREM_PRESENTATION_PROFILE_BY_SURFACE, {
+    "theory-foundations": "academic",
+    "catalog-glossary": "reference",
+    "observatory-audit": "evidence-first",
+  });
+  assert.equal(theoremPresentationProfileForSurface("theory-foundations"), "academic");
+  assert.equal(theoremPresentationProfileForSurface("catalog-glossary"), "reference");
+  assert.equal(theoremPresentationProfileForSurface("observatory-audit"), "evidence-first");
 
   assert.equal(
     model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length,
@@ -313,6 +324,58 @@ function main(): void {
     const card = renderTheoremCardMarkdown(syntheticMissing, profile);
     assert.match(card, /NOT_MIGRATED/);
     assert.match(card, /Формальная запись FORMAL v0\.15/);
+  }
+
+  const openConditional = model.theorems.find((item) => item.id === "FND-08");
+  assert.ok(openConditional !== undefined);
+  for (const profile of THEOREM_PRESENTATION_PROFILES) {
+    const card = renderTheoremCardMarkdown(openConditional, profile);
+    assert.match(card, /OPEN_CONDITIONAL/);
+    assert.match(card, /NOT_RECORDED/);
+  }
+
+  const noNative = model.theorems.find((item) => item.id === "FND-01");
+  assert.ok(noNative !== undefined);
+  for (const profile of THEOREM_PRESENTATION_PROFILES) {
+    const card = renderTheoremCardMarkdown(noNative, profile);
+    assert.match(card, /Нативное подтверждение:\*\* нет/i);
+    assert.match(card, /зарегистрированных нативных записей доказательств:\s*0/i);
+  }
+
+  const longStatement =
+    "Длинная проверочная формулировка без сокращения: " +
+    Array.from({ length: 32 }, (_, index) => "сегмент-" + String(index + 1).padStart(2, "0")).join(" / ");
+  const denseDependencies = Array.from({ length: 24 }, (_, index) => "SYN-DEP-" + String(index + 1).padStart(2, "0"));
+  const denseFormalDependencies = Array.from(
+    { length: 16 },
+    (_, index) => "SYN-FORMAL-DEP-" + String(index + 1).padStart(2, "0"),
+  );
+  const syntheticDense = {
+    ...sourceTheorem,
+    statement: longStatement,
+    dependsOn: denseDependencies,
+    formalV015: {
+      ...sourceTheorem.formalV015,
+      formalDependencies: denseFormalDependencies,
+    },
+  };
+  for (const profile of THEOREM_PRESENTATION_PROFILES) {
+    const card = renderTheoremCardMarkdown(syntheticDense, profile);
+    assert.ok(card.includes(longStatement), profile + ": long statement must remain exact and untruncated");
+    for (const dependency of denseDependencies) {
+      assert.ok(card.includes(dependency), profile + ": dense theorem dependency lost " + dependency);
+    }
+    for (const dependency of denseFormalDependencies) {
+      assert.ok(card.includes(dependency), profile + ": dense FORMAL dependency lost " + dependency);
+    }
+  }
+
+  const previewTheorem = model.theorems.find((item) => item.id === "FND-01");
+  assert.ok(previewTheorem !== undefined);
+  for (const profile of THEOREM_PRESENTATION_PROFILES) {
+    console.log("\nMTS_PRESENTATION_PREVIEW_BEGIN " + profile);
+    console.log(renderTheoremCardMarkdown(previewTheorem, profile));
+    console.log("MTS_PRESENTATION_PREVIEW_END " + profile);
   }
 
   const tracked = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
