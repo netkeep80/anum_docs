@@ -179,7 +179,6 @@
       ],
       "prerequisites": [
         "FND-05",
-        "FND-13",
         "INV-01"
       ],
       "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
