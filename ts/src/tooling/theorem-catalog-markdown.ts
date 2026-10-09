@@ -11,6 +11,11 @@ import type {
 
 export const THEOREM_CATALOG_PATH = "docs/theory/Теоремы МТС.md";
 
+export type TheoremPresentationProfile = "academic" | "reference" | "evidence-first";
+export const THEOREM_PRESENTATION_PROFILES: readonly TheoremPresentationProfile[] =
+  Object.freeze(["academic", "reference", "evidence-first"]);
+
+
 const LANE_ORDER: readonly TheoremProjectionEvidenceLane[] = [
   "typescript",
   "lean4",
@@ -212,8 +217,8 @@ function renderFormalV015(theorem: TheoremProjectionTheorem): string[] {
   ];
 }
 
-function renderCard(theorem: TheoremProjectionTheorem): string {
-  const lines = [
+function renderCardHeader(theorem: TheoremProjectionTheorem): string[] {
+  return [
     `<a id="theorem-${theorem.id.toLowerCase()}"></a> <!-- якорь теоремы -->`,
     `## Теорема ${theorem.id}`,
     "",
@@ -221,13 +226,21 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     `**Происхождение:** ${theorem.origin === null ? "—" : inlineCode(theorem.origin)}.  `,
     `**Волна:** ${theorem.wave === null ? "—" : inlineCode(theorem.wave)}.`,
     "",
+  ];
+}
+
+function renderStatementSection(theorem: TheoremProjectionTheorem): string[] {
+  return [
     "**Исходная формулировка (историческое свидетельство `v0.14`, не `FORMAL v0.15`):**",
     "~~~text",
     theorem.statement,
     "~~~",
     "",
-    ...renderFormalV015(theorem),
-    "",
+  ];
+}
+
+function renderScopeSection(theorem: TheoremProjectionTheorem): string[] {
+  return [
     "**Область действия:**",
     "~~~text",
     String(theorem.scope),
@@ -238,6 +251,11 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     String(theorem.exclusions),
     "~~~",
     "",
+  ];
+}
+
+function renderRelationsSection(theorem: TheoremProjectionTheorem): string[] {
+  return [
     "### Связи и предпосылки",
     "",
     "**Ссылки на принятые законы:**",
@@ -256,10 +274,11 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
         )
       : ["- нет"]),
     "",
-    ...renderEvidence(theorem),
-    "",
-    ...renderAssurance(theorem),
-    "",
+  ];
+}
+
+function renderProvenanceSection(theorem: TheoremProjectionTheorem): string[] {
+  const lines = [
     "### Происхождение данных",
     `- Исходный индекс теорем v0.14: ${repositoryLink(theorem.provenance.currentIndex)}.`,
     `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
@@ -274,7 +293,40 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
       lines.push(`  - ${repositoryLink(path)}.`);
     }
   }
+  return lines;
+}
+
+function orderedCardSections(
+  theorem: TheoremProjectionTheorem,
+  profile: TheoremPresentationProfile,
+): readonly string[][] {
+  const statement = renderStatementSection(theorem);
+  const formal = [...renderFormalV015(theorem), ""];
+  const scope = renderScopeSection(theorem);
+  const relations = renderRelationsSection(theorem);
+  const evidence = [...renderEvidence(theorem), ""];
+  const assurance = [...renderAssurance(theorem), ""];
+  const provenance = renderProvenanceSection(theorem);
+  if (profile === "academic") {
+    return [statement, scope, formal, relations, evidence, assurance, provenance];
+  }
+  if (profile === "evidence-first") {
+    return [evidence, assurance, statement, formal, scope, relations, provenance];
+  }
+  return [statement, formal, scope, relations, evidence, assurance, provenance];
+}
+
+export function renderTheoremCardMarkdown(
+  theorem: TheoremProjectionTheorem,
+  profile: TheoremPresentationProfile = "reference",
+): string {
+  const lines = [...renderCardHeader(theorem)];
+  for (const section of orderedCardSections(theorem, profile)) lines.push(...section);
   return lines.join("\n");
+}
+
+function renderCard(theorem: TheoremProjectionTheorem): string {
+  return renderTheoremCardMarkdown(theorem, "reference");
 }
 
 function renderCandidateProofCard(proof: V015CandidateProofProjection): string {
