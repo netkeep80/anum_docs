@@ -203,6 +203,19 @@
       ],
       "formalSourcePath": "ts/test/v015-inv01-formal-statement-candidate-b23.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-04",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND04_STATEMENT : FND04_PREMISES->FND04_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-03"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

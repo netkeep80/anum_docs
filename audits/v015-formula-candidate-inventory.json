@@ -27,8 +27,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "cd8e12b2167809dc7f98b765ec281e016b937882",
-      "lineCount": 2582
+      "blobSha": "0fb225f660b1f70d5c84604bba6d72814d30a3ef",
+      "lineCount": 2595
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -58,8 +58,8 @@
   ],
   "counts": {
     "files": 10,
-    "candidates": 205,
-    "fences": 111,
+    "candidates": 206,
+    "fences": 112,
     "inline": 94
   },
   "acceptanceRules": [
@@ -893,1224 +893,6 @@
       "role": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
       "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
       "reviewBasis": "Inherited v0.14 chirality/gauge/Nat mathematical equality or contextual transport expression (document section explicitly scoped to v0.14 or V14-L law), not executable FORMAL v0.15 Link-identity source; original historical evidence preserved."
-    },
-    {
-      "id": "F0055",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 17,
-      "endLine": 17,
-      "kind": "inline-code",
-      "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-02",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0056",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 18,
-      "endLine": 18,
-      "kind": "inline-code",
-      "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-13",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0057",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 20,
-      "endLine": 20,
-      "kind": "inline-code",
-      "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-04",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0058",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 23,
-      "endLine": 23,
-      "kind": "inline-code",
-      "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-07",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0059",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 24,
-      "endLine": 24,
-      "kind": "inline-code",
-      "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-08",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0060",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 26,
-      "endLine": 26,
-      "kind": "inline-code",
-      "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "INV-01",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0061",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 27,
-      "endLine": 27,
-      "kind": "inline-code",
-      "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "INV-02",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0062",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 33,
-      "endLine": 33,
-      "kind": "inline-code",
-      "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "CTX-03",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0063",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 60,
-      "endLine": 60,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-01",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0063",
-          "formalSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
-          "semanticAnetSha256": "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0064",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 115,
-      "endLine": 115,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0065",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 120,
-      "endLine": 120,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0066",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 155,
-      "endLine": 155,
-      "kind": "fence",
-      "language": "text",
-      "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-02",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0067",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 165,
-      "endLine": 165,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-02",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0067",
-          "formalSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
-          "semanticAnetSha256": "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0068",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 210,
-      "endLine": 210,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0069",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 215,
-      "endLine": 215,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0070",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 256,
-      "endLine": 256,
-      "kind": "fence",
-      "language": "text",
-      "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-13",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0071",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 266,
-      "endLine": 266,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-13",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0071",
-          "formalSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
-          "semanticAnetSha256": "94dd33cc30f2a55bb1f7b187c89990c3f050309f0e1d3069c20d506f04bd8cbf",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0072",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 318,
-      "endLine": 318,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0073",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 323,
-      "endLine": 323,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0203",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 375,
-      "endLine": 375,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND03_STATEMENT : FND03_PREMISES->FND03_CONCLUSION",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-03",
-      "reviewBasis": "Exact migrated FND-03 FORMAL statement is bounded to accepted one-Link/root-basis requirements and its executable B21 owner. Statement/source/denotation/mapping only; historical Lean4/Rocq proof authority is unchanged and no native/aprover proof is claimed.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "32e0bacb882a7b1ed5363e6b6f7a7b6431697547e7e73d52c65cd95aa032d61e",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "FND-03 migration registers a theorem statement/mapping artifact; its owner test proves exact root-basis denotation, accepted requirement binding, presentation-rename stability and J1 parity without claiming native proof.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0203",
-          "formalSourceSha256": "32e0bacb882a7b1ed5363e6b6f7a7b6431697547e7e73d52c65cd95aa032d61e",
-          "semanticAnetSha256": "1ee7fb49ac3fe76e91f155cbaca60e1942a7ec23622399e00ff481e4fa8c81aa",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
-        }
-      }
-    },
-    {
-      "id": "F0074",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 419,
-      "endLine": 419,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0075",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 424,
-      "endLine": 424,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0076",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 459,
-      "endLine": 459,
-      "kind": "fence",
-      "language": "text",
-      "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-04",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0077",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 495,
-      "endLine": 495,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0078",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 500,
-      "endLine": 500,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0204",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 546,
-      "endLine": 546,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND05_STATEMENT : FND05_DOMAIN_GUARDS->FND05_CONCLUSION",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-05",
-      "reviewBasis": "Exact migrated FND-05 FORMAL statement is bounded to the historical finite Grounded / ROOT-decomposable theorem boundary and executable B22 owner. Domain guards remain structural antecedents; statement/source/denotation/mapping only, with historical Lean4/Rocq proof authority unchanged and no native/aprover proof claimed.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "e9dfedc0b8a4e5ed943c3f79b362335120a7ddd99b0a1f1a0e6763819b868494",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "FND-05 migration registers a theorem statement/mapping artifact. B22 checks finite/Grounded domain guards, exists-unique structural payload, fresh-Memory wire parity, presentation-rename stability, J1 parity and negative domain/uniqueness mutations without claiming native proof.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0204",
-          "formalSourceSha256": "e9dfedc0b8a4e5ed943c3f79b362335120a7ddd99b0a1f1a0e6763819b868494",
-          "semanticAnetSha256": "6d5f6f46b93b992a417a76dbca52a5c1ff9fc740cfe18742ed4189ff6baa82a9",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
-        }
-      }
-    },
-    {
-      "id": "F0079",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 590,
-      "endLine": 590,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0080",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 595,
-      "endLine": 595,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0081",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 668,
-      "endLine": 668,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0082",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 673,
-      "endLine": 673,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0083",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 708,
-      "endLine": 708,
-      "kind": "fence",
-      "language": "text",
-      "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-07",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0084",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 718,
-      "endLine": 718,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-07",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0084",
-          "formalSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
-          "semanticAnetSha256": "4e367ad2c0657f4374721225ce0aeb82939f6021da76236740a27f29d39c759e",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0085",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 741,
-      "endLine": 741,
-      "kind": "inline-code",
-      "source": "F2F3OneSidedExistence for structural L = O⟼C",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0086",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 759,
-      "endLine": 759,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0087",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 764,
-      "endLine": 764,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0088",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 793,
-      "endLine": 793,
-      "kind": "inline-code",
-      "source": "L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0089",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 819,
-      "endLine": 819,
-      "kind": "fence",
-      "language": "text",
-      "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "FND-08",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0090",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 829,
-      "endLine": 829,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-08",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0090",
-          "formalSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
-          "semanticAnetSha256": "fb610912423b26659fd29795d5bb9311f040755a3f89bd590ae4aa2e4fc3cf29",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0091",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 843,
-      "endLine": 843,
-      "kind": "fence",
-      "language": "text",
-      "source": "Do not collapse NO_ADMITTED_RELATION into explicit ZERO; ambient Link existence is not admission authority; selected-Theory admission must not be reclassified as CurrentScopeMember/ContextualRule merely to reuse FND-07 composition; ContextualScopeCompositionLaw is not an FND-08 reaction premise; Produced output is not the whole successor because unmatched current members survive; extensional Next=Active does not imply quiescence; no unrestricted host rewrite/global substitution, host RuleKind, multivalued-function primitive or result-cardinality opcode is implied.",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0092",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 870,
-      "endLine": 870,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0093",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 875,
-      "endLine": 875,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0094",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 922,
-      "endLine": 922,
-      "kind": "fence",
-      "language": "text",
-      "source": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "FND-09",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0094",
-          "formalSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
-          "semanticAnetSha256": "5ae0ddc9fb7c387afd9c68382a83c67ba1d379bcd129d7295c2fdebc8d7ef359",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0095",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 960,
-      "endLine": 960,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0096",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 965,
-      "endLine": 965,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0097",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1000,
-      "endLine": 1000,
-      "kind": "fence",
-      "language": "text",
-      "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "INV-01",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0098",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1069,
-      "endLine": 1069,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0099",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1074,
-      "endLine": 1074,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0100",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1109,
-      "endLine": 1109,
-      "kind": "fence",
-      "language": "text",
-      "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "INV-02",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0101",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1155,
-      "endLine": 1155,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0102",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1160,
-      "endLine": 1160,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0103",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1231,
-      "endLine": 1231,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0104",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1236,
-      "endLine": 1236,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0105",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1308,
-      "endLine": 1308,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0106",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1313,
-      "endLine": 1313,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0107",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1390,
-      "endLine": 1390,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0108",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1395,
-      "endLine": 1395,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0109",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1471,
-      "endLine": 1471,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0110",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1476,
-      "endLine": 1476,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0111",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1552,
-      "endLine": 1552,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0112",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1557,
-      "endLine": 1557,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0113",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1592,
-      "endLine": 1592,
-      "kind": "fence",
-      "language": "text",
-      "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
-      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "sourceArtifact": "theorems/current-v0.14.json",
-      "sourceTheoremId": "CTX-03",
-      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
-    },
-    {
-      "id": "F0114",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1637,
-      "endLine": 1637,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0115",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1642,
-      "endLine": 1642,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0116",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1700,
-      "endLine": 1700,
-      "kind": "fence",
-      "language": "text",
-      "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
-      "role": "FORMAL_V015_THEOREM_STATEMENT",
-      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
-      "sourceArtifact": "theorems/formal-v0.15.json",
-      "sourceTheoremId": "EXE-02",
-      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
-      "semanticEvidence": {
-        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
-        "acceptedFormalVersion": "v0.15",
-        "formalSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
-        "executionApplicability": "NOT_APPLICABLE",
-        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
-        "grammar": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_GRAMMAR"
-        },
-        "denotation": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_DENOTATION"
-        },
-        "semanticLinks": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
-        },
-        "theoremMapping": {
-          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
-          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
-          "testCase": "THEOREM_STAGE_MAPPING"
-        },
-        "machineReceipt": {
-          "profile": "mts-v015-theorem-statement-evidence/v0.1",
-          "outcome": "PASS",
-          "caseId": "F0116",
-          "formalSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
-          "semanticAnetSha256": "d6d9114f7acab454b2f607ee419623b4acf3ab98c9da16b46c1593af1d15566a",
-          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
-          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
-          "ciRun": "37840620817",
-          "ciJob": "113528751647"
-        }
-      }
-    },
-    {
-      "id": "F0117",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1749,
-      "endLine": 1749,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0118",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1754,
-      "endLine": 1754,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0119",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1830,
-      "endLine": 1830,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0120",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1835,
-      "endLine": 1835,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0121",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1910,
-      "endLine": 1910,
-      "kind": "inline-code",
-      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0122",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1915,
-      "endLine": 1915,
-      "kind": "inline-code",
-      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
-      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
-    },
-    {
-      "id": "F0123",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2068,
-      "endLine": 2068,
-      "kind": "inline-code",
-      "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0124",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2297,
-      "endLine": 2297,
-      "kind": "inline-code",
-      "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0125",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2498,
-      "endLine": 2498,
-      "kind": "inline-code",
-      "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
-    },
-    {
-      "id": "F0126",
-      "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2531,
-      "endLine": 2531,
-      "kind": "inline-code",
-      "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
-      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
-      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
-      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
     },
     {
       "id": "F0127",
@@ -3238,10 +2020,862 @@
       "reviewBasis": "DEFERRED != REJECTED is lifecycle-status vocabulary, not MTS Link identity equality or FORMAL expression."
     },
     {
+      "id": "F0055",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 17,
+      "endLine": 17,
+      "kind": "inline-code",
+      "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0056",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 18,
+      "endLine": 18,
+      "kind": "inline-code",
+      "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0057",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 20,
+      "endLine": 20,
+      "kind": "inline-code",
+      "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-04",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0058",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 23,
+      "endLine": 23,
+      "kind": "inline-code",
+      "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0059",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 24,
+      "endLine": 24,
+      "kind": "inline-code",
+      "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0060",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 26,
+      "endLine": 26,
+      "kind": "inline-code",
+      "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-01",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0061",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 27,
+      "endLine": 27,
+      "kind": "inline-code",
+      "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0062",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 33,
+      "endLine": 33,
+      "kind": "inline-code",
+      "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "CTX-03",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0063",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 60,
+      "endLine": 60,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND01_STATEMENT : FND01_PREMISES->FND01_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-01",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0063",
+          "formalSourceSha256": "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb",
+          "semanticAnetSha256": "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0064",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 115,
+      "endLine": 115,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0065",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 120,
+      "endLine": 120,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0066",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 155,
+      "endLine": 155,
+      "kind": "fence",
+      "language": "text",
+      "source": "Full self-closure X = X ⟼ X is unique in the accepted foundation and determines R.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0067",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 165,
+      "endLine": 165,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND02_STATEMENT : FND02_PREMISES->FND02_RULE",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-02",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0067",
+          "formalSourceSha256": "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355",
+          "semanticAnetSha256": "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0068",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 210,
+      "endLine": 210,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0069",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 215,
+      "endLine": 215,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0070",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 256,
+      "endLine": 256,
+      "kind": "fence",
+      "language": "text",
+      "source": "On the accepted finite R-grounded semantic Link domain, Link identity is determined by ordered poles: x = y iff start(x) = start(y) and finish(x) = finish(y). Constructor injectivity form(A,B) = form(C,D) iff A = C and B = D follows directly from the primitive projection laws.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-13; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0071",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 266,
+      "endLine": 266,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND13_STATEMENT : FND13_PREMISES->FND13_RULES",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-13",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0071",
+          "formalSourceSha256": "2ac9e8521c4d46c497897131dc53873aba9e6798f14ded66239ff072acf2b804",
+          "semanticAnetSha256": "94dd33cc30f2a55bb1f7b187c89990c3f050309f0e1d3069c20d506f04bd8cbf",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0072",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 318,
+      "endLine": 318,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0073",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 323,
+      "endLine": 323,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0203",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 375,
+      "endLine": 375,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND03_STATEMENT : FND03_PREMISES->FND03_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-03",
+      "reviewBasis": "Exact migrated FND-03 FORMAL statement is bounded to accepted one-Link/root-basis requirements and its executable B21 owner. Statement/source/denotation/mapping only; historical Lean4/Rocq proof authority is unchanged and no native/aprover proof is claimed.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "32e0bacb882a7b1ed5363e6b6f7a7b6431697547e7e73d52c65cd95aa032d61e",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "FND-03 migration registers a theorem statement/mapping artifact; its owner test proves exact root-basis denotation, accepted requirement binding, presentation-rename stability and J1 parity without claiming native proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0203",
+          "formalSourceSha256": "32e0bacb882a7b1ed5363e6b6f7a7b6431697547e7e73d52c65cd95aa032d61e",
+          "semanticAnetSha256": "1ee7fb49ac3fe76e91f155cbaca60e1942a7ec23622399e00ff481e4fa8c81aa",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
+    },
+    {
+      "id": "F0074",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 419,
+      "endLine": 419,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0075",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 424,
+      "endLine": 424,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0076",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 459,
+      "endLine": 459,
+      "kind": "fence",
+      "language": "text",
+      "source": "U = C ⟼ O is an ordinary PAIR-derived representative and not a fifth self-incidence class.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-04",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-04; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0077",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 508,
+      "endLine": 508,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0078",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 513,
+      "endLine": 513,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0204",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 559,
+      "endLine": 559,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND05_STATEMENT : FND05_DOMAIN_GUARDS->FND05_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-05",
+      "reviewBasis": "Exact migrated FND-05 FORMAL statement is bounded to the historical finite Grounded / ROOT-decomposable theorem boundary and executable B22 owner. Domain guards remain structural antecedents; statement/source/denotation/mapping only, with historical Lean4/Rocq proof authority unchanged and no native/aprover proof claimed.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "e9dfedc0b8a4e5ed943c3f79b362335120a7ddd99b0a1f1a0e6763819b868494",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "FND-05 migration registers a theorem statement/mapping artifact. B22 checks finite/Grounded domain guards, exists-unique structural payload, fresh-Memory wire parity, presentation-rename stability, J1 parity and negative domain/uniqueness mutations without claiming native proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0204",
+          "formalSourceSha256": "e9dfedc0b8a4e5ed943c3f79b362335120a7ddd99b0a1f1a0e6763819b868494",
+          "semanticAnetSha256": "6d5f6f46b93b992a417a76dbca52a5c1ff9fc740cfe18742ed4189ff6baa82a9",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
+    },
+    {
+      "id": "F0079",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 603,
+      "endLine": 603,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0080",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 608,
+      "endLine": 608,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0081",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 681,
+      "endLine": 681,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0082",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 686,
+      "endLine": 686,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0083",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 721,
+      "endLine": 721,
+      "kind": "fence",
+      "language": "text",
+      "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-07; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0084",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 731,
+      "endLine": 731,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-07",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0084",
+          "formalSourceSha256": "c73af6577fa8b995f83401777498af7a24dc9697cc6fa4174b8b346418e85efe",
+          "semanticAnetSha256": "4e367ad2c0657f4374721225ce0aeb82939f6021da76236740a27f29d39c759e",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0085",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 754,
+      "endLine": 754,
+      "kind": "inline-code",
+      "source": "F2F3OneSidedExistence for structural L = O⟼C",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0086",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 772,
+      "endLine": 772,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0087",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 777,
+      "endLine": 777,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0088",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 806,
+      "endLine": 806,
+      "kind": "inline-code",
+      "source": "L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0089",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 832,
+      "endLine": 832,
+      "kind": "fence",
+      "language": "text",
+      "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for FND-08; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0090",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 842,
+      "endLine": 842,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-08",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0090",
+          "formalSourceSha256": "cf8aee8d965e2dca0a8613eaa13cc7c44430801291da10c1d4a7f3cac57b1b1c",
+          "semanticAnetSha256": "fb610912423b26659fd29795d5bb9311f040755a3f89bd590ae4aa2e4fc3cf29",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0091",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 856,
+      "endLine": 856,
+      "kind": "fence",
+      "language": "text",
+      "source": "Do not collapse NO_ADMITTED_RELATION into explicit ZERO; ambient Link existence is not admission authority; selected-Theory admission must not be reclassified as CurrentScopeMember/ContextualRule merely to reuse FND-07 composition; ContextualScopeCompositionLaw is not an FND-08 reaction premise; Produced output is not the whole successor because unmatched current members survive; extensional Next=Active does not imply quiescence; no unrestricted host rewrite/global substitution, host RuleKind, multivalued-function primitive or result-cardinality opcode is implied.",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0092",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 883,
+      "endLine": 883,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0093",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 888,
+      "endLine": 888,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0094",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 935,
+      "endLine": 935,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-09",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0094",
+          "formalSourceSha256": "536764d9b930207e9cde8bbb473ea83c952e80548e64316945b6b7016db7c067",
+          "semanticAnetSha256": "5ae0ddc9fb7c387afd9c68382a83c67ba1d379bcd129d7295c2fdebc8d7ef359",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0095",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 973,
+      "endLine": 973,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0096",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 978,
+      "endLine": 978,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0097",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1013,
+      "endLine": 1013,
+      "kind": "fence",
+      "language": "text",
+      "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-01",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-01; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
       "id": "F0205",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1011,
-      "endLine": 1011,
+      "startLine": 1024,
+      "endLine": 1024,
       "kind": "fence",
       "language": "text",
       "source": "INV01_STATEMENT : INV01_PREMISES->INV01_CONCLUSION",
@@ -3285,18 +2919,433 @@
           "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
         }
       }
+    },
+    {
+      "id": "F0098",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1082,
+      "endLine": 1082,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0099",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1087,
+      "endLine": 1087,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0100",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1122,
+      "endLine": 1122,
+      "kind": "fence",
+      "language": "text",
+      "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "INV-02",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for INV-02; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0101",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1168,
+      "endLine": 1168,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0102",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1173,
+      "endLine": 1173,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0103",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1244,
+      "endLine": 1244,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0104",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1249,
+      "endLine": 1249,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0105",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1321,
+      "endLine": 1321,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0106",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1326,
+      "endLine": 1326,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0107",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1403,
+      "endLine": 1403,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0108",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1408,
+      "endLine": 1408,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0109",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1484,
+      "endLine": 1484,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0110",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1489,
+      "endLine": 1489,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0111",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1565,
+      "endLine": 1565,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0112",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1570,
+      "endLine": 1570,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0113",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1605,
+      "endLine": 1605,
+      "kind": "fence",
+      "language": "text",
+      "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
+      "role": "NON_FORMAL_HISTORICAL_THEOREM_STATEMENT",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "sourceArtifact": "theorems/current-v0.14.json",
+      "sourceTheoremId": "CTX-03",
+      "reviewBasis": "Exact historical accepted v0.14 theorem statement for CTX-03; generated catalog labels this provenance as historical, not current native FORMAL. Full migration audited separately."
+    },
+    {
+      "id": "F0114",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1650,
+      "endLine": 1650,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0115",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1655,
+      "endLine": 1655,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0116",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1713,
+      "endLine": 1713,
+      "kind": "fence",
+      "language": "text",
+      "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "EXE-02",
+      "reviewBasis": "Exact already-migrated FORMAL theorem statement verified against its overlay mapping and pinned executable theorem-owner test. This verifies source/denotation/mapping only; proofClosure, artifact kind and aprover status are unchanged.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "The documentation candidate is a theorem statement/mapping artifact; its owned executable theorem test is run by the bounded verifier, while A-memory reaction replay is not the proof-status authority for this statement.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0116",
+          "formalSourceSha256": "4d79474df7c37b58172aae10980e1b4a5501f2c78ab362769bf2aa021eed8265",
+          "semanticAnetSha256": "d6d9114f7acab454b2f607ee419623b4acf3ab98c9da16b46c1593af1d15566a",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b",
+          "evidenceCommit": "71d272fefc28ed02e1f62594c6e1d0f3a12a3695",
+          "ciRun": "37840620817",
+          "ciJob": "113528751647"
+        }
+      }
+    },
+    {
+      "id": "F0117",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1762,
+      "endLine": 1762,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0118",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1767,
+      "endLine": 1767,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0119",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1843,
+      "endLine": 1843,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0120",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1848,
+      "endLine": 1848,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0121",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1923,
+      "endLine": 1923,
+      "kind": "inline-code",
+      "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0122",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1928,
+      "endLine": 1928,
+      "kind": "inline-code",
+      "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
+      "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Toolchain binary/version/digest pin in the generated theorem evidence block. It contains '=' inside digest metadata, not an MTS equality or FORMAL expression."
+    },
+    {
+      "id": "F0123",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 2081,
+      "endLine": 2081,
+      "kind": "inline-code",
+      "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0124",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 2310,
+      "endLine": 2310,
+      "kind": "inline-code",
+      "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0125",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 2511,
+      "endLine": 2511,
+      "kind": "inline-code",
+      "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0126",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 2544,
+      "endLine": 2544,
+      "kind": "inline-code",
+      "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
+      "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
+      "denotation": "NOT_APPLICABLE_FORMAL_SOURCE",
+      "reviewBasis": "Generated theorem catalog evidence/proof boundary commentary (premises, external proof candidate or verifier note), not a native FORMAL expression; no proof acceptance status implied."
+    },
+    {
+      "id": "F0206",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 470,
+      "endLine": 470,
+      "kind": "fence",
+      "source": "FND04_STATEMENT : FND04_PREMISES->FND04_CONCLUSION",
+      "language": "text",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-04",
+      "reviewBasis": "Exact migrated FND-04 FORMAL statement is bounded to the accepted root-basis U=C->O topology and executable B24 owner. PAIR-locality is checked structurally, so U reuses the existing PAIR class rather than introducing a fifth self-incidence class; historical Lean4/Rocq proof authority is unchanged and no native/aprover proof is claimed.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "1a5f9297a72e56695974f4ea3d6f7bde98fca75090d3c5911ba899952888e245",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "FND-04 migration registers a theorem statement/mapping artifact. B24 checks exact U=C->O denotation, PAIR-local non-self topology, FND-03 dependency, accepted one-Link/four-case boundaries, presentation-rename stability, fresh-Memory wire parity, J1 parity and negative reversal/conclusion mutations without claiming native proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0206",
+          "formalSourceSha256": "1a5f9297a72e56695974f4ea3d6f7bde98fca75090d3c5911ba899952888e245",
+          "semanticAnetSha256": "c40aa3be89b307fe0e2a6dfa725c799c835db7de7d8967a537e5953d97a06130",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
     }
   ],
   "classification": {
-    "policy": "All 205 heuristic fenced/inline candidates have explicit roles. The 20 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
+    "policy": "All 206 heuristic fenced/inline candidates have explicit roles. The 21 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
-    "acceptedFormalDenotationsVerified": 20,
-    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 10/21 and proof closure remains independently classified.",
+    "acceptedFormalDenotationsVerified": 21,
+    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 11/21 and proof closure remains independently classified.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
     "reviewedNonFormalCount": 185,
     "unverifiedDenotationCount": 0,
-    "verifiedFormalCount": 20
+    "verifiedFormalCount": 21
   }
 }
