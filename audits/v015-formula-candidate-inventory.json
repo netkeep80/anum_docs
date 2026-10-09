@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "README.md",
-      "blobSha": "0a9e9056cd998c407f8c82dfeaa11b742e07ab06",
+      "blobSha": "cfdc04ab968d5c5f125694216b1220a11690f50b",
       "lineCount": 187
     },
     {
@@ -17,22 +17,22 @@
     },
     {
       "path": "docs/theory/Основания МТС.md",
-      "blobSha": "057ff79ffa14b5e8b11530f3686fff9df3401110",
+      "blobSha": "7b3e4e56bacade9efe2369c93002139ca41c9cf2",
       "lineCount": 328
     },
     {
       "path": "docs/theory/Система аксиом МТС.md",
-      "blobSha": "05497e5e15cf1d5bd0f6ac9b5304682fe618a305",
+      "blobSha": "2c9d86389c17be273c64b53cb7d09ede166e427d",
       "lineCount": 307
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "07f623089ff93ce4c11cd84f12263e9a4657a322",
+      "blobSha": "afe973d434da5a4034ec7b30ad2744e3b4ca025e",
       "lineCount": 2794
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
-      "blobSha": "c417257a05cc0db28a7e085cd14c36aa64793971",
+      "blobSha": "c48a29e681cdec7dafb73b2491bfe9252600d3e9",
       "lineCount": 218
     },
     {
@@ -42,17 +42,17 @@
     },
     {
       "path": "docs/specs/Апамять и управление сетью связей.md",
-      "blobSha": "7f6f47c569e3106499186c8e67acd54b55a3ab9f",
+      "blobSha": "1e564d426b407312f38a921039824bff6548d973",
       "lineCount": 632
     },
     {
       "path": "docs/specs/Пучки связей.md",
-      "blobSha": "29c355e5beceb72f8fe5ec2e8b295f3351fd02a6",
+      "blobSha": "d688ff717c40fd7498217839e6c7be99c32c48dd",
       "lineCount": 352
     },
     {
       "path": "docs/Словарь терминов МТС.md",
-      "blobSha": "6eeddfbd90b34260c95b73561d0be0e987af30d1",
+      "blobSha": "367ea3bb58d56d118dac413bd40bdc55ff63f30c",
       "lineCount": 694
     }
   ],
