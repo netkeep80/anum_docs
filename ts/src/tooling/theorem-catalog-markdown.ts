@@ -431,12 +431,16 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
       " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную `FORMAL`-формулировку; утверждения без зарегистрированной `FORMAL`-формулировки, если они есть, имеют статус " +
       inlineCode("NOT_MIGRATED") + ". Это не меняет принятый выпуск v0.15 и не повышает доказательный статус.",
     "",
-    "| ID | `FORMAL v0.15` | Исходная формулировка v0.14 (историческое свидетельство) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
-    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    "В сводке показаны только навигация и измеримые состояния. Полные формулировки, границы, доказательные записи и provenance находятся в карточках ниже.",
+    "",
+    "`Lean4 / Rocq` — число внешних перекрёстных проверок; `MTS-native` — число нативных записей доказательств; `aprover` — число независимых повторных прогонов; `TypeScript` — число исполняемых свидетелей, а не доказательств.",
+    "",
+    "| ID | `FORMAL v0.15` | `proofClosure` | `Lean4 / Rocq` | `MTS-native` | `aprover` | `TypeScript` |",
+    "| --- | --- | --- | ---: | ---: | ---: | ---: |",
   ];
   for (const theorem of model.theorems) {
     lines.push(
-      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(theorem.formalV015.migrationStatus)} | ${inlineCode(tableCell(theorem.statement))} | ${tableCell(nativeStatus(theorem))} | ${evidenceSummary(theorem, "lean4")} | ${evidenceSummary(theorem, "coq")} | ${evidenceSummary(theorem, "mtsNative")} | ${evidenceSummary(theorem, "typescript")} |`,
+      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(theorem.formalV015.migrationStatus)} | ${inlineCode(theorem.formalV015.proofClosure ?? "UNKNOWN")} | ${theorem.evidence.lean4.length} / ${theorem.evidence.coq.length} | ${theorem.evidence.mtsNative.length} | ${theorem.evidence.aprover.length} | ${theorem.evidence.typescript.length} |`,
     );
   }
   lines.push("", "## Теоремы", "");
