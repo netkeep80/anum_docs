@@ -229,6 +229,38 @@
       ],
       "formalSourcePath": "ts/test/v015-inv03-formal-statement-candidate-b25.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-02",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV02_STATEMENT : INV02_PREMISES->INV02_CONCLUSION",
+      "formalPremises": [
+        "A1RecursiveSeparation",
+        "F2F3GroundedNormalization",
+        "F2F3OneSidedExistence",
+        "RecursiveInversionDomain",
+        "Grounded:x"
+      ],
+      "formalDependencies": [
+        "INV-01",
+        "FND-13"
+      ],
+      "formalDomain": [
+        "x : Link"
+      ],
+      "formalExistentialDomain": [
+        "y : Link",
+        "z : Link"
+      ],
+      "formalNonPremises": [
+        "all-Link totality",
+        "global arbitrary-Link normalization",
+        "non-Grounded distinct-node cycles"
+      ],
+      "formalSourcePath": "ts/test/v015-inv02-formal-statement-candidate-b26.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }
