@@ -278,6 +278,23 @@
       ],
       "formalSourcePath": "ts/test/v015-inv04-formal-statement-candidate-b27.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-06",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND06_STATEMENT : FND06_DOMAIN_GUARDS->FND06_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-05"
+      ],
+      "formalNonPremises": [
+        "Memory handles/addresses/object identity",
+        "semantic materialization authority"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

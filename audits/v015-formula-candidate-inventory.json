@@ -27,8 +27,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "74fb3bea718e02ad4d68dfca7ad702b7febb9ff8",
-      "lineCount": 2651
+      "blobSha": "81416f9b5307f5f276417f272dd38290eb8b86c1",
+      "lineCount": 2667
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -58,8 +58,8 @@
   ],
   "counts": {
     "files": 10,
-    "candidates": 209,
-    "fences": 115,
+    "candidates": 210,
+    "fences": 116,
     "inline": 94
   },
   "acceptanceRules": [
@@ -2603,8 +2603,8 @@
     {
       "id": "F0081",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 681,
-      "endLine": 681,
+      "startLine": 697,
+      "endLine": 697,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2614,8 +2614,8 @@
     {
       "id": "F0082",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 686,
-      "endLine": 686,
+      "startLine": 702,
+      "endLine": 702,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2625,8 +2625,8 @@
     {
       "id": "F0083",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 721,
-      "endLine": 721,
+      "startLine": 737,
+      "endLine": 737,
       "kind": "fence",
       "language": "text",
       "source": "Accepted contextual truth separates three roles: L=O⟼C is the root truth-value aspect, current K⟼A is the Context-specific truth witness, and current K⟼A plus current A⟼B propagates to current K⟼B under the accepted A16 Scope-composition law.",
@@ -2639,8 +2639,8 @@
     {
       "id": "F0084",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 731,
-      "endLine": 731,
+      "startLine": 747,
+      "endLine": 747,
       "kind": "fence",
       "language": "text",
       "source": "FND07_STATEMENT : TARGET_PREMISES->TARGET_CONCLUSION",
@@ -2691,8 +2691,8 @@
     {
       "id": "F0085",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 754,
-      "endLine": 754,
+      "startLine": 770,
+      "endLine": 770,
       "kind": "inline-code",
       "source": "F2F3OneSidedExistence for structural L = O⟼C",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -2702,8 +2702,8 @@
     {
       "id": "F0086",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 772,
-      "endLine": 772,
+      "startLine": 788,
+      "endLine": 788,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2713,8 +2713,8 @@
     {
       "id": "F0087",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 777,
-      "endLine": 777,
+      "startLine": 793,
+      "endLine": 793,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2724,8 +2724,8 @@
     {
       "id": "F0088",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 806,
-      "endLine": 806,
+      "startLine": 822,
+      "endLine": 822,
       "kind": "inline-code",
       "source": "L=O⟼C structural replay is not an independent proof that PAIR topology implies the semantic truth role",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -2735,8 +2735,8 @@
     {
       "id": "F0089",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 832,
-      "endLine": 832,
+      "startLine": 848,
+      "endLine": 848,
       "kind": "fence",
       "language": "text",
       "source": "Generalized relational reaction separates selected-Theory admission/match from emitted image: from current K ⟼ {A_i}, every admitted applicable positive emission contributes K ⟼ B, unmatched current members survive, an explicitly matched empty image remains distinct from no match, and reaction occurrence remains distinct from extensional successor membership so active identity is not quiescence.",
@@ -2749,8 +2749,8 @@
     {
       "id": "F0090",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 842,
-      "endLine": 842,
+      "startLine": 858,
+      "endLine": 858,
       "kind": "fence",
       "language": "text",
       "source": "FND08_STATEMENT : TARGET_PREMISES->G_RESULT",
@@ -2801,8 +2801,8 @@
     {
       "id": "F0091",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 856,
-      "endLine": 856,
+      "startLine": 872,
+      "endLine": 872,
       "kind": "fence",
       "language": "text",
       "source": "Do not collapse NO_ADMITTED_RELATION into explicit ZERO; ambient Link existence is not admission authority; selected-Theory admission must not be reclassified as CurrentScopeMember/ContextualRule merely to reuse FND-07 composition; ContextualScopeCompositionLaw is not an FND-08 reaction premise; Produced output is not the whole successor because unmatched current members survive; extensional Next=Active does not imply quiescence; no unrestricted host rewrite/global substitution, host RuleKind, multivalued-function primitive or result-cardinality opcode is implied.",
@@ -2813,8 +2813,8 @@
     {
       "id": "F0092",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 883,
-      "endLine": 883,
+      "startLine": 899,
+      "endLine": 899,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2824,8 +2824,8 @@
     {
       "id": "F0093",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 888,
-      "endLine": 888,
+      "startLine": 904,
+      "endLine": 904,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2835,8 +2835,8 @@
     {
       "id": "F0094",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 935,
-      "endLine": 935,
+      "startLine": 951,
+      "endLine": 951,
       "kind": "fence",
       "language": "text",
       "source": "FND09_STATEMENT : TARGET_PREMISES->G_RESULT",
@@ -2887,8 +2887,8 @@
     {
       "id": "F0095",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 973,
-      "endLine": 973,
+      "startLine": 989,
+      "endLine": 989,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2898,8 +2898,8 @@
     {
       "id": "F0096",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 978,
-      "endLine": 978,
+      "startLine": 994,
+      "endLine": 994,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2909,8 +2909,8 @@
     {
       "id": "F0097",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1013,
-      "endLine": 1013,
+      "startLine": 1029,
+      "endLine": 1029,
       "kind": "fence",
       "language": "text",
       "source": "Recursive inversion J is defined directly on Link structure by J(A ⟼ B) = J(B) ⟼ J(A), with exact treatment of self-incidence cases.",
@@ -2923,8 +2923,8 @@
     {
       "id": "F0205",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1024,
-      "endLine": 1024,
+      "startLine": 1040,
+      "endLine": 1040,
       "kind": "fence",
       "language": "text",
       "source": "INV01_STATEMENT : INV01_PREMISES->INV01_CONCLUSION",
@@ -2972,8 +2972,8 @@
     {
       "id": "F0098",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1082,
-      "endLine": 1082,
+      "startLine": 1098,
+      "endLine": 1098,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2983,8 +2983,8 @@
     {
       "id": "F0099",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1087,
-      "endLine": 1087,
+      "startLine": 1103,
+      "endLine": 1103,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -2994,8 +2994,8 @@
     {
       "id": "F0100",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1122,
-      "endLine": 1122,
+      "startLine": 1138,
+      "endLine": 1138,
       "kind": "fence",
       "language": "text",
       "source": "Recursive inversion is involutive on its stated domain: J(J(X)) = X.",
@@ -3008,8 +3008,8 @@
     {
       "id": "F0101",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1195,
-      "endLine": 1195,
+      "startLine": 1211,
+      "endLine": 1211,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3019,8 +3019,8 @@
     {
       "id": "F0102",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1200,
-      "endLine": 1200,
+      "startLine": 1216,
+      "endLine": 1216,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3030,8 +3030,8 @@
     {
       "id": "F0103",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1284,
-      "endLine": 1284,
+      "startLine": 1300,
+      "endLine": 1300,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3041,8 +3041,8 @@
     {
       "id": "F0104",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1289,
-      "endLine": 1289,
+      "startLine": 1305,
+      "endLine": 1305,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3052,8 +3052,8 @@
     {
       "id": "F0105",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1377,
-      "endLine": 1377,
+      "startLine": 1393,
+      "endLine": 1393,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3063,8 +3063,8 @@
     {
       "id": "F0106",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1382,
-      "endLine": 1382,
+      "startLine": 1398,
+      "endLine": 1398,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3074,8 +3074,8 @@
     {
       "id": "F0107",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1459,
-      "endLine": 1459,
+      "startLine": 1475,
+      "endLine": 1475,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3085,8 +3085,8 @@
     {
       "id": "F0108",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1464,
-      "endLine": 1464,
+      "startLine": 1480,
+      "endLine": 1480,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3096,8 +3096,8 @@
     {
       "id": "F0109",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1540,
-      "endLine": 1540,
+      "startLine": 1556,
+      "endLine": 1556,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3107,8 +3107,8 @@
     {
       "id": "F0110",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1545,
-      "endLine": 1545,
+      "startLine": 1561,
+      "endLine": 1561,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3118,8 +3118,8 @@
     {
       "id": "F0111",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1621,
-      "endLine": 1621,
+      "startLine": 1637,
+      "endLine": 1637,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3129,8 +3129,8 @@
     {
       "id": "F0112",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1626,
-      "endLine": 1626,
+      "startLine": 1642,
+      "endLine": 1642,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3140,8 +3140,8 @@
     {
       "id": "F0113",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1661,
-      "endLine": 1661,
+      "startLine": 1677,
+      "endLine": 1677,
       "kind": "fence",
       "language": "text",
       "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
@@ -3154,8 +3154,8 @@
     {
       "id": "F0114",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1706,
-      "endLine": 1706,
+      "startLine": 1722,
+      "endLine": 1722,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3165,8 +3165,8 @@
     {
       "id": "F0115",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1711,
-      "endLine": 1711,
+      "startLine": 1727,
+      "endLine": 1727,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3176,8 +3176,8 @@
     {
       "id": "F0116",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1769,
-      "endLine": 1769,
+      "startLine": 1785,
+      "endLine": 1785,
       "kind": "fence",
       "language": "text",
       "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
@@ -3228,8 +3228,8 @@
     {
       "id": "F0117",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1818,
-      "endLine": 1818,
+      "startLine": 1834,
+      "endLine": 1834,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3239,8 +3239,8 @@
     {
       "id": "F0118",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1823,
-      "endLine": 1823,
+      "startLine": 1839,
+      "endLine": 1839,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3250,8 +3250,8 @@
     {
       "id": "F0119",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1899,
-      "endLine": 1899,
+      "startLine": 1915,
+      "endLine": 1915,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3261,8 +3261,8 @@
     {
       "id": "F0120",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1904,
-      "endLine": 1904,
+      "startLine": 1920,
+      "endLine": 1920,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3272,8 +3272,8 @@
     {
       "id": "F0121",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1979,
-      "endLine": 1979,
+      "startLine": 1995,
+      "endLine": 1995,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3283,8 +3283,8 @@
     {
       "id": "F0122",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1984,
-      "endLine": 1984,
+      "startLine": 2000,
+      "endLine": 2000,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3294,8 +3294,8 @@
     {
       "id": "F0123",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2137,
-      "endLine": 2137,
+      "startLine": 2153,
+      "endLine": 2153,
       "kind": "inline-code",
       "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3305,8 +3305,8 @@
     {
       "id": "F0124",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2366,
-      "endLine": 2366,
+      "startLine": 2382,
+      "endLine": 2382,
       "kind": "inline-code",
       "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3316,8 +3316,8 @@
     {
       "id": "F0125",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2567,
-      "endLine": 2567,
+      "startLine": 2583,
+      "endLine": 2583,
       "kind": "inline-code",
       "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3327,8 +3327,8 @@
     {
       "id": "F0126",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2600,
-      "endLine": 2600,
+      "startLine": 2616,
+      "endLine": 2616,
       "kind": "inline-code",
       "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3338,8 +3338,8 @@
     {
       "id": "F0207",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1246,
-      "endLine": 1246,
+      "startLine": 1262,
+      "endLine": 1262,
       "kind": "fence",
       "source": "INV03_STATEMENT : INV03_PREMISES->INV03_CONCLUSION",
       "language": "text",
@@ -3387,8 +3387,8 @@
     {
       "id": "F0208",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1133,
-      "endLine": 1133,
+      "startLine": 1149,
+      "endLine": 1149,
       "kind": "fence",
       "language": "text",
       "source": "INV02_STATEMENT : INV02_PREMISES->INV02_CONCLUSION",
@@ -3436,8 +3436,8 @@
     {
       "id": "F0209",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1335,
-      "endLine": 1335,
+      "startLine": 1351,
+      "endLine": 1351,
       "kind": "fence",
       "language": "text",
       "source": "INV04_STATEMENT : INV04_PREMISES->INV04_CONCLUSION",
@@ -3481,18 +3481,67 @@
           "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
         }
       }
+    },
+    {
+      "id": "F0210",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 654,
+      "endLine": 654,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND06_STATEMENT : FND06_DOMAIN_GUARDS->FND06_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-06",
+      "reviewBasis": "Exact migrated FND-06 FORMAL statement is bounded to historical fresh-Memory transport invariance and executable B28 owner. It requires same-semantic projection plus Grounded source, preserves canonical recursive statement identity across fresh allocation noise and presentation rename, and leaves materialization/native/aprover authority unclaimed.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "e1bb790745a602ecf5c1fa1ae96f0bf774ecbbe21783a8a2cc46b1c799667f7a",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "FND-06 migration registers a theorem statement/mapping artifact. B28 checks same-semantic and Grounded domain guards, shared canonical recursive-description code, fresh-Memory allocation-noise parity, presentation-rename stability, exact J1 round-trip and negative guard/code mutations without claiming materialization or native/aprover proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0210",
+          "formalSourceSha256": "e1bb790745a602ecf5c1fa1ae96f0bf774ecbbe21783a8a2cc46b1c799667f7a",
+          "semanticAnetSha256": "a2e858f237726762c66876ac49b9f6567c290174a73fbbf65be689d3685b8d1c",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
     }
   ],
   "classification": {
-    "policy": "All 209 heuristic fenced/inline candidates have explicit roles. The 24 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
+    "policy": "All 210 heuristic fenced/inline candidates have explicit roles. The 25 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
-    "acceptedFormalDenotationsVerified": 24,
-    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 14/21 and proof closure remains independently classified.",
+    "acceptedFormalDenotationsVerified": 25,
+    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 15/21 and proof closure remains independently classified.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
     "reviewedNonFormalCount": 185,
     "unverifiedDenotationCount": 0,
-    "verifiedFormalCount": 24
+    "verifiedFormalCount": 25
   }
 }
