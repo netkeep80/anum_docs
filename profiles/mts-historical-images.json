@@ -1,0 +1,171 @@
+{
+  "schema": "mts-historical-images-protection/v0.1",
+  "ownerIssue": 2080,
+  "origin": "AUTHOR_DESIGNATED_HISTORICAL",
+  "protectedSince": "2026-10-08",
+  "pin": {
+    "repository": "netkeep80/anum_docs",
+    "acceptedBaselineCommit": "813a1569300b241a3b70eb282eecd8231db15e4b"
+  },
+  "status": "PERMANENT_HISTORICAL_RESEARCH_ASSETS_DO_NOT_DELETE",
+  "rules": {
+    "delete": "FORBIDDEN",
+    "rename": "FORBIDDEN",
+    "overwrite": "FORBIDDEN",
+    "compressInPlace": "FORBIDDEN",
+    "replaceWithGeneratedDiagram": "FORBIDDEN",
+    "reuseAsReadOnlyReference": "ALLOWED",
+    "createNewDerivedAsset": "ALLOWED_OUTSIDE_ORIGINALS",
+    "sourceHistory": "MUST_RETAIN"
+  },
+  "scope": "Every pre-existing image blob in pics/ at accepted baseline. The 29 images are Author-designated historical sources regardless of present Markdown references. README banner in docs/assets is outside this roster.",
+  "assetCount": 29,
+  "totalBytes": 12292726,
+  "assets": [
+    {
+      "path": "pics/64ачисла.jpg",
+      "sizeBytes": 1023897,
+      "gitBlobSha1": "81ca1e40384ca81febcc5bb7220c5975f08af84b"
+    },
+    {
+      "path": "pics/абиты и формы связей.jpg",
+      "sizeBytes": 207298,
+      "gitBlobSha1": "583c47e977df1f1dd5af383c3f8145eafab86a90"
+    },
+    {
+      "path": "pics/асеть2 в памяти.jpg",
+      "sizeBytes": 31074,
+      "gitBlobSha1": "c6e2b94d932fa992ed471046618df3995e36fdc3"
+    },
+    {
+      "path": "pics/ачисла.jpg",
+      "sizeBytes": 863421,
+      "gitBlobSha1": "27c7f8670e3317a295ba5e0015bfbfecc0630554"
+    },
+    {
+      "path": "pics/ачисла2.jpg",
+      "sizeBytes": 1453471,
+      "gitBlobSha1": "7b876da4a911049495669c4f85b2228d8956fc99"
+    },
+    {
+      "path": "pics/ачисло3.jpg",
+      "sizeBytes": 531501,
+      "gitBlobSha1": "b546ba967e19194c35788a2bdc6ea1333255c9e2"
+    },
+    {
+      "path": "pics/Безымянный.jpg",
+      "sizeBytes": 870096,
+      "gitBlobSha1": "1f10711d81207da433ce5ccc25f7bcae344d629d"
+    },
+    {
+      "path": "pics/верёвки.jpg",
+      "sizeBytes": 1023508,
+      "gitBlobSha1": "8ffffcd8b9a848cac83c41215dcfdd476412ada5"
+    },
+    {
+      "path": "pics/вложенная асеть2.jpg",
+      "sizeBytes": 943806,
+      "gitBlobSha1": "65a4345bd067270cd9e5d90079eb93cc5cd9d3fe"
+    },
+    {
+      "path": "pics/десериализация.jpg",
+      "sizeBytes": 779537,
+      "gitBlobSha1": "0bb6fd87cb1b5def5cf15e1ba634ea2a462d7d99"
+    },
+    {
+      "path": "pics/Количество и протяженность.jpg",
+      "sizeBytes": 204434,
+      "gitBlobSha1": "3047e97c13fca77e7955a0d293d156b64d5bc7d2"
+    },
+    {
+      "path": "pics/мтс1.jpg",
+      "sizeBytes": 115982,
+      "gitBlobSha1": "52089814e7e689c572dd79ba6c00c5aee068e6b7"
+    },
+    {
+      "path": "pics/Новый точечный рисунок (2).jpg",
+      "sizeBytes": 280636,
+      "gitBlobSha1": "17398f732dcc112b9c1443f1cc1a6162e12c201a"
+    },
+    {
+      "path": "pics/описание асети2.jpg",
+      "sizeBytes": 137866,
+      "gitBlobSha1": "805309d2558665123d614a6507524898b5734ec5"
+    },
+    {
+      "path": "pics/пример_ачисла.jpg",
+      "sizeBytes": 49893,
+      "gitBlobSha1": "833574d45aec0ad19b5d5375f055bfcc110d3a7a"
+    },
+    {
+      "path": "pics/различие.jpg",
+      "sizeBytes": 543223,
+      "gitBlobSha1": "6e4e0afcfe5664ba507e064cec992058ffa9ba00"
+    },
+    {
+      "path": "pics/Роли связи.jpg",
+      "sizeBytes": 183773,
+      "gitBlobSha1": "cc3631222f61d4815d5e9080e741ea7b1ab037e1"
+    },
+    {
+      "path": "pics/роли.jpg",
+      "sizeBytes": 1091497,
+      "gitBlobSha1": "28bed2bb5ef80fcf99aad81b120951f45c602b1e"
+    },
+    {
+      "path": "pics/роли2.jpg",
+      "sizeBytes": 193062,
+      "gitBlobSha1": "b104dbc3542b03ed68232a7e213a3f90eedc2f2b"
+    },
+    {
+      "path": "pics/связь-ачисло.jpg",
+      "sizeBytes": 88284,
+      "gitBlobSha1": "bd0cf552606492541314819fedace3885a99819c"
+    },
+    {
+      "path": "pics/сосед-начальник.jpg",
+      "sizeBytes": 160776,
+      "gitBlobSha1": "827b45521cddc473d6828e4a1d345601dd66d3c5"
+    },
+    {
+      "path": "pics/ссылка.jpg",
+      "sizeBytes": 181573,
+      "gitBlobSha1": "efed95d3c2be1a07e751c845638d0e5a1253e2f0"
+    },
+    {
+      "path": "pics/Формализация нотации ачисел.jpg",
+      "sizeBytes": 905488,
+      "gitBlobSha1": "b3d8cb6f4f00a6375c416e1c67be6dd522b42318"
+    },
+    {
+      "path": "pics/IMG_1736.jpg",
+      "sizeBytes": 115850,
+      "gitBlobSha1": "34fb7823d00dab612e43564192919f5da538718c"
+    },
+    {
+      "path": "pics/mts_link_primitives.png",
+      "sizeBytes": 98019,
+      "gitBlobSha1": "d3bb660f0296c62e97018105d98b5608a5f1a039"
+    },
+    {
+      "path": "pics/mts_link_primitives.svg",
+      "sizeBytes": 2698,
+      "gitBlobSha1": "ddfa50714fa1e4a948d4ae28171118b53b7a81b5"
+    },
+    {
+      "path": "pics/mts_root_aset.png",
+      "sizeBytes": 108753,
+      "gitBlobSha1": "209f7e35ccd65b41759aa6b62af3279ecdadbecf"
+    },
+    {
+      "path": "pics/mts_root_aset.svg",
+      "sizeBytes": 3674,
+      "gitBlobSha1": "c9e6c6b820d82d6b35339cb0f2c647f18ca9a6a6"
+    },
+    {
+      "path": "pics/pic1.jpg",
+      "sizeBytes": 99636,
+      "gitBlobSha1": "0de8dd228eb445cf082aad98ea4f3daa3d5d1c52"
+    }
+  ]
+}
