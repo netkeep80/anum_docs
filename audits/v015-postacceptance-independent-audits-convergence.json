@@ -92,9 +92,9 @@
     },
     {
       "id": "P1-THEOREMS",
-      "status": "BLOCKED_2_NOT_MIGRATED",
-      "finding": "19/21 theorem FORMAL source statements migrated; 2 remain",
-      "remediation": "Wave 3 contains only INV-07 and Wave 4 contains CTX-03; completed migrations remain statement-only with historical Lean4/Rocq evidence unchanged and no native/aprover promotion.",
+      "status": "BLOCKED_1_NOT_MIGRATED",
+      "finding": "20/21 theorem FORMAL source statements migrated; CTX-03 remains",
+      "remediation": "One dependency wave remains pinned; FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04, FND-06, FND-11, INV-05, FND-12, INV-06 and INV-07 are statement-only migrations with historical Lean4/Rocq evidence unchanged and no native/aprover promotion.",
       "sources": [
         "audits/v015-theorem-formal-migration-backlog.json"
       ]

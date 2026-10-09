@@ -386,6 +386,27 @@
       ],
       "formalSourcePath": "ts/test/v015-inv06-formal-statement-candidate-b32.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-07",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV07_STATEMENT : INV07_PREMISES->INV07_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-02",
+        "INV-04",
+        "INV-05"
+      ],
+      "formalNonPremises": [
+        "Foundation-global absolute orientation",
+        "observer semantic primitive",
+        "prover Type/Prop/Record semantic authority",
+        "global arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-inv07-formal-statement-candidate-b33.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }
