@@ -603,8 +603,8 @@ export function checkCurrentReleasePolicy(root: string): readonly string[] {
     issues.push("docs/specs/Пучки связей.md: inherited v0.13 query API mislabeled current normative surface");
   }
   const theoremCatalog = readFileSync(resolve(root, "docs/theory/Теоремы МТС.md"), "utf8");
-  if (!theoremCatalog.includes("Доказательный overlay в принятой FORMAL v0.15:") ||
-      !theoremCatalog.includes("Статус миграции доказательств: \`v0.15-candidate\`; не статус выпуска MTS.")) {
+  if (!theoremCatalog.includes("Доказательная проекция в принятой `FORMAL v0.15`:") ||
+      !theoremCatalog.includes("Статус миграции доказательств: \`v0.15-candidate\`; не статус выпуска МТС.")) {
     issues.push("docs/theory/Теоремы МТС.md: accepted release cannot be conflated with proof migration");
   }
   return issues;
