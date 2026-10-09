@@ -399,13 +399,17 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     inventoryIntegrityIssues.push("unindexed source expressions: discovered=" +
       discovered.length + " declared=" + candidates.length);
   }
-  const occurrenceKey = (entry: {
-    path: unknown; kind: unknown; source: unknown; startLine: unknown; endLine: unknown;
-  }): string => JSON.stringify([
-    entry.path, entry.startLine, entry.endLine, entry.kind, entry.source,
-  ]);
-  const discoveredOccurrences = discovered.map(occurrenceKey).sort();
-  const declaredOccurrences = candidates.map(occurrenceKey).sort();
+  const occurrenceKey = (
+    path: unknown,
+    startLine: unknown,
+    endLine: unknown,
+    kind: unknown,
+    source: unknown,
+  ): string => JSON.stringify([path, startLine, endLine, kind, source]);
+  const discoveredOccurrences = discovered.map((entry) =>
+    occurrenceKey(entry.path, entry.startLine, entry.endLine, entry.kind, entry.source)).sort();
+  const declaredOccurrences = candidates.map((entry) =>
+    occurrenceKey(entry.path, entry.startLine, entry.endLine, entry.kind, entry.source)).sort();
   if (JSON.stringify(discoveredOccurrences) !== JSON.stringify(declaredOccurrences)) {
     inventoryIntegrityIssues.push("expression inventory occurrence-set mismatch");
   }
