@@ -23,7 +23,16 @@ const historicalText = read("theorems/current-v0.14.json");
 const formalText = read("theorems/formal-v0.15.json");
 const historical = JSON.parse(historicalText).theorems as {
   id: string; statement: string; lawRefs: string[]; dependsOn: string[]; formalPremises: string[] }[];
-const migrated = JSON.parse(formalText).entries as { id: string }[];
+const migrated = JSON.parse(formalText).entries as {
+  id: string;
+  migrationStatus?: string;
+  proofClosure?: string;
+  formalArtifactKind?: string;
+  formalStatement?: string;
+  formalDependencies?: string[];
+  formalSourcePath?: string;
+  aproverStatus?: string;
+}[];
 assert.equal(backlog.schema, "mts-v015-theorem-formal-migration-backlog/v0.1");
 assert.equal(backlog.sourceInventoryBlobSha, blobSha(historicalText), "pinned historical theorem source");
 assert.equal(backlog.sourceOverlayBlobSha, blobSha(formalText), "pinned current FORMAL theorem overlay");
@@ -66,17 +75,41 @@ for (const [index, wave] of backlog.migrationWaves.entries()) {
   for (const id of wave.ids) handled.add(id);
 }
 assert.deepEqual(new Set(ordered), new Set(remaining.map((item) => item.id)));
-const fnd04 = backlog.migrationsRequired.find((item) => item.id === "FND-04") as typeof backlog.migrationsRequired[number] & {
-  existingPartialEvidence: { kind: string; formalSourceFragment: string; sourcePath: string; sourceBlobSha: string; limitation: string };
-};
-assert.ok(fnd04?.existingPartialEvidence, "FND-04 partial witness mapping is recorded");
-assert.equal(fnd04.existingPartialEvidence.kind, "FORMAL_ROOT_BASIS_BINDING_WITNESS_ONLY");
-const witnessBytes = read(fnd04.existingPartialEvidence.sourcePath);
-assert.equal(blobSha(witnessBytes), fnd04.existingPartialEvidence.sourceBlobSha, "FND-04 source witness pinned exactly");
-assert.ok(witnessBytes.includes('"' + fnd04.existingPartialEvidence.formalSourceFragment + '"'),
-  "FND-04 binding fragment actually appears in native FORMAL test");
-assert.equal(fnd04.proposedFormalStatement, null, "partial witness does not qualify as theorem FORMAL migration");
-assert.ok(fnd04.existingPartialEvidence.limitation.includes("Do not set FORMAL_MIGRATED"));
+const fnd04 = backlog.migrationsRequired.find((item) => item.id === "FND-04") as
+  | (typeof backlog.migrationsRequired[number] & {
+      existingPartialEvidence: {
+        kind: string;
+        formalSourceFragment: string;
+        sourcePath: string;
+        sourceBlobSha: string;
+        limitation: string;
+      };
+    })
+  | undefined;
+if (fnd04 !== undefined) {
+  assert.ok(fnd04.existingPartialEvidence, "unmigrated FND-04 partial witness mapping is recorded");
+  assert.equal(fnd04.existingPartialEvidence.kind, "FORMAL_ROOT_BASIS_BINDING_WITNESS_ONLY");
+  const witnessBytes = read(fnd04.existingPartialEvidence.sourcePath);
+  assert.equal(blobSha(witnessBytes), fnd04.existingPartialEvidence.sourceBlobSha,
+    "FND-04 source witness pinned exactly");
+  assert.ok(witnessBytes.includes('"' + fnd04.existingPartialEvidence.formalSourceFragment + '"'),
+    "FND-04 binding fragment actually appears in native FORMAL test");
+  assert.equal(fnd04.proposedFormalStatement, null,
+    "partial witness does not qualify as theorem FORMAL migration");
+  assert.ok(fnd04.existingPartialEvidence.limitation.includes("Do not set FORMAL_MIGRATED"));
+} else {
+  const migratedFnd04 = migrated.find((item) => item.id === "FND-04");
+  assert.ok(migratedFnd04, "migrated FND-04 overlay exists after partial-witness retirement");
+  assert.equal(migratedFnd04.migrationStatus, "FORMAL_MIGRATED");
+  assert.equal(migratedFnd04.proofClosure, "NO_PROOF_ARTIFACT");
+  assert.equal(migratedFnd04.formalArtifactKind, "STATEMENT_ONLY");
+  assert.equal(migratedFnd04.formalStatement,
+    "FND04_STATEMENT : FND04_PREMISES->FND04_CONCLUSION");
+  assert.deepEqual(migratedFnd04.formalDependencies, ["FND-03"]);
+  assert.equal(migratedFnd04.formalSourcePath,
+    "ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts");
+  assert.equal(migratedFnd04.aproverStatus, "NOT_RECORDED");
+}
 
 if (remaining.length) assert.equal(backlog.status, "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY");
 console.log("v0.15 theorem FORMAL migration: inventory locked; migrated=" +
