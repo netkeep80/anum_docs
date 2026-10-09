@@ -402,6 +402,44 @@
         "NATIVE_PROOF=NOT_CLAIMED",
         "APROVER_ACCEPT=NOT_CLAIMED"
       ]
+    },
+    {
+      "id": "F0214",
+      "theoremId": "INV-06",
+      "source": "INV06_STATEMENT : INV06_PREMISES->INV06_CONCLUSION",
+      "formalSourcePath": "ts/test/v015-inv06-formal-statement-candidate-b32.test.ts",
+      "testBlobSha": "55eb0956898f31d4e7cff02a8ecbb89cc4c60e11",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "outputMarkers": [
+        "MTS v0.15 B32 INV-06 FORMAL statement:",
+        "MIGRATION_STATUS=FORMAL_MIGRATED",
+        "FORMAL_ARTIFACT_KIND=STATEMENT_ONLY",
+        "FORMAL_PREMISES=0",
+        "FORMAL_DEPENDENCIES=INV-03+INV-04+INV-05",
+        "ROOT_BASIS_JR=R",
+        "ROOT_BASIS_JO=C",
+        "ROOT_BASIS_JC=O",
+        "ROOT_BASIS_JL=L",
+        "ROOT_BASIS_JU=U",
+        "ORIENTATION=CONTEXT_RELATIVE",
+        "ROOT_BASIS_ONTOLOGY_DATATYPE=NOT_CLAIMED",
+        "FOUNDATION_GLOBAL_ABSOLUTE_START=NOT_CLAIMED",
+        "OBSERVER_AUTHORITY=NOT_CLAIMED",
+        "FULL_THEORY_AUTOMORPHISM=NOT_CLAIMED",
+        "GLOBAL_ARBITRARY_LINK_NORMALIZATION=NOT_IMPORTED",
+        "PRESENTATION_RENAME=SEMANTICALLY_STABLE",
+        "FRESH_MEMORY_WIRE_PARITY=GREEN",
+        "JSON_J1=EXACT",
+        "ROOT_FIXED_MUTATION=DIFF",
+        "O_TO_C_MUTATION=DIFF",
+        "C_TO_O_MUTATION=DIFF",
+        "L_FIXED_MUTATION=DIFF",
+        "U_FIXED_MUTATION=DIFF",
+        "HISTORICAL_EXTERNAL_PROOF=UNCHANGED",
+        "NATIVE_PROOF=NOT_CLAIMED",
+        "APROVER_ACCEPT=NOT_CLAIMED"
+      ]
     }
   ]
 }

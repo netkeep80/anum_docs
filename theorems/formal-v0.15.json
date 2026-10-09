@@ -364,6 +364,28 @@
       ],
       "formalSourcePath": "ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-06",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV06_STATEMENT : INV06_PREMISES->INV06_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-03",
+        "INV-04",
+        "INV-05"
+      ],
+      "formalNonPremises": [
+        "RootBasis ontology datatype",
+        "Foundation-global absolute START side",
+        "observer orientation authority",
+        "full-Theory automorphism",
+        "global arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-inv06-formal-statement-candidate-b32.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }
