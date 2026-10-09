@@ -1,0 +1,326 @@
+{
+  "schema": "mts-v015-markdown-prose-lexical-inventory/v0.1",
+  "ownerIssue": 1951,
+  "scope": "All current versioned Markdown plus generated theorem catalog, including PORTFOLIO.md; excludes only two immutable docs/research sources. Broader prose/table lexical heuristic, independent of fenced/inline scanner; not an exhaustive grammar proof.",
+  "status": "UNREVIEWED_PLAIN_TEXT_EXPRESSIONS_BLOCK_ACCEPTANCE",
+  "files": [
+    {
+      "path": "PORTFOLIO.md",
+      "blobSha": "31556c0ee6d7c62ac4a307abcb28027a9059314f",
+      "lineCount": 32
+    },
+    {
+      "path": "README.md",
+      "blobSha": "cfdc04ab968d5c5f125694216b1220a11690f50b",
+      "lineCount": 187
+    },
+    {
+      "path": "docs/CONTRIBUTING.md",
+      "blobSha": "255078edaec6f912a27944a250439b8ced26750e",
+      "lineCount": 452
+    },
+    {
+      "path": "docs/specs/Апамять и управление сетью связей.md",
+      "blobSha": "1e564d426b407312f38a921039824bff6548d973",
+      "lineCount": 632
+    },
+    {
+      "path": "docs/specs/Ачисла и сериализация.md",
+      "blobSha": "c98dea83f8a874eafdde68cb99942d36732bfc68",
+      "lineCount": 272
+    },
+    {
+      "path": "docs/specs/Пучки связей.md",
+      "blobSha": "d688ff717c40fd7498217839e6c7be99c32c48dd",
+      "lineCount": 352
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "blobSha": "c48a29e681cdec7dafb73b2491bfe9252600d3e9",
+      "lineCount": 218
+    },
+    {
+      "path": "docs/theory/Основания МТС.md",
+      "blobSha": "7b3e4e56bacade9efe2369c93002139ca41c9cf2",
+      "lineCount": 328
+    },
+    {
+      "path": "docs/theory/Система аксиом МТС.md",
+      "blobSha": "2c9d86389c17be273c64b53cb7d09ede166e427d",
+      "lineCount": 307
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "blobSha": "afe973d434da5a4034ec7b30ad2744e3b4ca025e",
+      "lineCount": 2794
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "blobSha": "367ea3bb58d56d118dac413bd40bdc55ff63f30c",
+      "lineCount": 694
+    }
+  ],
+  "counts": {
+    "files": 11,
+    "observations": 21,
+    "unreviewed": 0
+  },
+  "observations": [
+    {
+      "path": "README.md",
+      "line": 84,
+      "source": "В принятой v0.15 действует одна структурная реакция Γ над семантической `ANet`. Схема принятой [нотации `FORMAL`](docs/specs/Формальная%20нотация%20МТС.md):",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "925290540d6e081d868b8d3883397c1cbe6d71672a538bbb9bc6d79019a894ec",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345"
+    },
+    {
+      "path": "docs/specs/Апамять и управление сетью связей.md",
+      "line": 22,
+      "source": "Принятая МТС v0.15 наследует из v0.14 одну онтологию `Link`, структурное тождество и `Context`, а универсальную реакцию Γ задаёт своим текущим контрактом. Полный `portable` `runtime` `boundary` задаётся отдельным `execution` `profile`.",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "f27f51f284b5bb160972cd694668da9863919e196bcaf334e780ce887c80cd3a",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345"
+    },
+    {
+      "path": "docs/specs/Апамять и управление сетью связей.md",
+      "line": 109,
+      "source": "Разделы 6–17 ниже сохраняют примеры отдельно управляемого профиля апамяти 0.1.0. Их стрелочная метанотация (`K ⟼ A`, `A ⟼ [B]`) **не является исходной грамматикой FORMAL v0.15**; нынешний синтаксис и допускаемая универсальная Γ задаются [принятой спецификацией](Формальная%20нотация%20МТС.md).",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source prose review shares the same semantic adjudication as the corresponding reviewed broad lexical row: This prose explicitly marks the arrow snippets as historical execution-profile notation and refers current Γ semantics to the accepted v0.15 specification.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "0cd2ff65fbed5891fad7802e0861045ebd9660fe68d938cb98c0cbb2f92aa46a",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 128,
+      "source": "| <a id=\"mts-v015-v15-auth-01\"></a>`V15-AUTH-01` | `AUTH` | `COMPONENT_GREEN` | <span lang=\"en\">One v0.15 execution-core semantic authority path: universal FORMAL and canonical JSON converge to the same native source ANet, then shared resolution/denotation/compiler/Γ execution/projection; no consumer-specific host semantic path is authoritative.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "5f299f8c320956abaee94881080d7df640a93cd2de272616e508fa0a73dc4655",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 140,
+      "source": "| <a id=\"mts-v015-v15-name-01\"></a>`V15-NAME-01` | `NAME` | `COMPONENT_GREEN` | <span lang=\"en\">Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source prose review shares the same semantic adjudication as the corresponding reviewed broad lexical row: Generated V15-NAME-01 requirement-summary prose; :A/R:A are explanatory mentions, while normative authority remains the accepted requirement model.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "47563ae55e8089049aa725820ccbbd05a777249474e3b54043f2c3726b5f96df",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 147,
+      "source": "| <a id=\"mts-v015-v15-and-02\"></a>`V15-AND-02` | `AND` | `VERTICAL_GREEN` | <span lang=\"en\">Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "c8e040d44db2746b316246e0188b62a13c35e3c3c43d7bc2ae6fd5815938909b",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 149,
+      "source": "| <a id=\"mts-v015-v15-and-04\"></a>`V15-AND-04` | `AND` | `VERTICAL_GREEN` | <span lang=\"en\">Author-gated strict Boolean NOT/OR/XOR reuse the exact same FORMAL/JSON source model, semantic Theory->Rule discovery, zero-role Rule topology, generic Γ-compatible execution path and generic frozen-backend lowering as approved AND; no operator-specific semantic/runtime path is permitted.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source prose review shares the same semantic adjudication as the corresponding reviewed broad lexical row: Generated V15-AND-04 requirement-summary prose; Theory->Rule is explanatory vocabulary, not parser input.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "6c8e9b6e1b681369e400fc2513fb28adc2be97bdda71e092aa2f34f348f58af7",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 152,
+      "source": "| <a id=\"mts-v015-v15-gamma-01\"></a>`V15-GAMMA-01` | `GAMMA` | `COMPONENT_GREEN` | <span lang=\"en\">One repeated universal Γ is the shared v0.15 semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This generated row is normative requirement prose from the accepted model; the lexical hit is terminology or a pipeline arrow, not standalone FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "e59b5e840e53b3eee025c4b5a56a020db38c0abf49f0950a2d2ef98622c8e9bb",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169"
+    },
+    {
+      "path": "docs/specs/Формальная нотация МТС.md",
+      "line": 155,
+      "source": "| <a id=\"mts-v015-v15-json-04\"></a>`V15-JSON-04` | `JSON` | `COMPONENT_GREEN` | <span lang=\"en\">JSON arrays lower canonically to ExactSequence of already-denoted element Links; []=R. R-rooted fold F_R is a separate derived projection, not the positional/execution carrier.</span> |",
+      "classification": "NON_FORMAL_NORMATIVE_REQUIREMENT_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source prose review shares the same semantic adjudication as the corresponding reviewed broad lexical row: Generated V15-JSON-04 requirement-summary prose; []=R is compact explanatory metanotation, not a standalone FORMAL source occurrence.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "68c7f44aef6a5af5af4011b3d0cbd7b5dc9ad46ef730e3b615d298522adf2b3a",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820"
+    },
+    {
+      "path": "docs/theory/Основания МТС.md",
+      "line": 133,
+      "source": "Историческая доказательная линия обобщённой реакции сформирована в **v0.13** и сохранена v0.14. **В текущей принятой `FORMAL` v0.15 исполнение определяется одной структурной реакцией Γ** и правилом `Rule = V -> (Antecedent -> ExactSequence(Image...))`; запись ниже — не самостоятельная грамматика текущей `FORMAL`.",
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "status": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "primaryCandidateIds": [
+        "F0031"
+      ],
+      "reviewSourceSha256": "e43bedc21a8798bfe08b67ecfe32db608fb8615a613b14438c00650ce654ab9b",
+      "reviewBasis": "Exact prose occurrence is covered by an independently verified semantic-metamodel primary receipt; surrounding prose introduces no competing primary source span.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
+    },
+    {
+      "path": "docs/theory/Основания МТС.md",
+      "line": 327,
+      "source": "Этот результат v0.14 сохранён в принятой v0.15: одна онтология **`Link`**, контекстная ориентация и различение структурных и последовательностных представлений. Текущая v0.15 дополнительно задаёт Γ и [принятую FORMAL-нотацию](../specs/Формальная%20нотация%20МТС.md).",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "ecdbf54974243790748a40d6da5268c06135e52a80b0379145b6246c5e7d7c64",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345"
+    },
+    {
+      "path": "docs/theory/Система аксиом МТС.md",
+      "line": 7,
+      "source": "Слово «аксиома» в названии историческое. **A0–A20 не являются 21 независимой аксиомой.** Ниже перечислены 14 унаследованных законов `V14-L1…V14-L14` с исходными зависимостями; они не исчерпывают принятую v0.15, включая `FORMAL`, `ANet` и Γ.",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This row explains an accepted semantic concept in natural language; the lexical hit is a named concept/role, not a standalone FORMAL source expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "0839e92f7719cebc009221cdac1d520ba71965f164445ec3fdfdd5c36faa4c9e",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345"
+    },
+    {
+      "path": "docs/theory/Система аксиом МТС.md",
+      "line": 83,
+      "source": "> `Nat` `starts` at U `and` `uses` `uniform` `successor` N⟼L; `Degree` `remains` a `separate` `scale` `starting` at L.",
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The N⟼L successor expression is inherited v0.14 mathematical Nat metanotation, not accepted FORMAL v0.15 source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "3bdaf3c2c7ab9cdbcf899758b6786eacff2c9ba8569e52dfdd735555b620d257",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169"
+    },
+    {
+      "path": "docs/theory/Система аксиом МТС.md",
+      "line": 201,
+      "source": "В текущей v0.15 аналогичная исполнительная роль описывается `Rule = V -> (Antecedent -> ExactSequence(Image...))` и одной реакцией Γ, с пустым результатом `ExactSequence([])`. Эта ссылка не переносит старый синтаксис фигурных скобок в принятую грамматику FORMAL. Историческая краткая запись **не должна отождествлять отсутствие образа с отсутствием допущенного перехода**. Для полного закона реакции сохраняется различие, закреплённое V14-L4:",
+      "classification": "FORMAL_V015_SEMANTIC_METAMODEL",
+      "status": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "primaryCandidateIds": [
+        "F0048"
+      ],
+      "reviewSourceSha256": "595445609c37b25db6e5c342da81d8f184164876f57dd0e91a6f4e58589aaf9d",
+      "reviewBasis": "Exact prose occurrence is covered by an independently verified semantic-metamodel primary receipt; surrounding prose introduces no competing primary source span.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6068419481"
+    },
+    {
+      "path": "docs/theory/Система аксиом МТС.md",
+      "line": 233,
+      "source": "> A4': `objective` `chirality` Ω={W,J(W)} `exists` `before` `any` `observer` `and` J²=Id; an `oriented` `Context` K `carries` `one` of `two` `Link-native` `one-sided` `self-incidence` `markers`, `deriving` χ(K) `and` `local` START_K/END_K `roles`. `Relative` `frame` `transport` g_AB `lies` in {Id,J}, `composes` as Z2, `and` `semantic` `laws` `are` `covariant`; no `Foundation-global` `selected` W, `ExactSequence`, `host` `boolean`, or `four` `primitive` `opcodes` `are` `orientation` `authority`.",
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: This chirality/orientation formula is inherited v0.14 mathematical metanotation used to explain the accepted structure, not executable FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "150845af612cf74e5858864e7871050848869eb3c6497fdc80f6da4d85f7930a",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065897169"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 127,
+      "source": "`Link` `Theory` ⟼ `relation`, делающий `grounded` `relation` доступным выбранной `Theory`.",
+      "classification": "NON_FORMAL_SEMANTIC_EXPLANATORY_PROSE",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source prose review shares the same semantic adjudication as the corresponding reviewed broad lexical row: Glossary natural-language definition of Theory admission/availability; the arrow glyph is relational explanation, not standalone FORMAL source.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820",
+      "reviewSourceSha256": "bd40a2eb42283df6a94e28d314848aab61f7aea112c3217322be1c6f2a17b126",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067701820"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 189,
+      "source": "Историческая реляционная **метазапись v0.14** «K ⟼ A» обозначает актуальность A в `Context` K при выбранной `Theory`. Это пояснение контекстной истины, **не** исходный синтаксис FORMAL v0.15.",
+      "classification": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The glossary explicitly labels K-to-A as historical v0.14 relational metanotation rather than current FORMAL source syntax.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "2d0900268d4b2d462b80a7c43f6d01986bb547ce5556a7da1244e94e946cbf0a",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 297,
+      "source": "Унаследованная математическая **метазапись v0.14**: <span lang=\"zxx\">N0=U; Succ(N)=N⟼L</span>. Здесь знак равенства определяет шкалу `Nat` в метатеории, а не вызывает вычисление идентичности `Link` в `FORMAL` v0.15.",
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The glossary explicitly identifies this Nat equation/successor expression as inherited v0.14 mathematical metanotation, not FORMAL Link identity.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "c75f3d28ed1768c893ab07046cf8b09ae1a1e87aa4748dd7efe477acd25a28e3",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 383,
+      "source": "Полный `logical` `transition` `semantic` `state` → `successor` по выбранной `Theory`/`profile`.",
+      "classification": "NON_FORMAL_DERIVED_QUERY_METANOTATION",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The state-to-successor arrow is explanatory process shorthand in glossary prose, not a Link-construction FORMAL expression.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "0949a8c15d2edf36c6ac68899eae2b797c14c5ecfc91fad7ba710952c4bd2ebe",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065872345"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 625,
+      "source": "Объективная Z2-структура Ω={W,J(W)} до `observer`; `Context` выбирает локальную `orientation`, не создавая `chirality`. Формула Ω={W,J(W)} — историческая математическая метазапись хиральности, **не** исполняемое FORMAL-выражение.",
+      "classification": "NON_FORMAL_INHERITED_V014_MATHEMATICAL_NOTATION",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The glossary explicitly identifies the chirality equation as historical mathematical metanotation and not executable FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "810fbd52d1c35e7c9592a9b7bf709192f554642d191c137f37f2ce015a6c2ee0",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472"
+    },
+    {
+      "path": "docs/Словарь терминов МТС.md",
+      "line": 655,
+      "source": "Запись `Theory` ⟼ `Rule`/`Relation` — историческая реляционная **метасхема допуска**. Текущая `FORMAL` v0.15 выражает допуск через принятую структурную форму `Rule` с `ExactSequence` результата и универсальную реакцию Γ; прежняя стрелка здесь не является исходным программным синтаксисом.",
+      "classification": "NON_FORMAL_HISTORICAL_RELATIONAL_METASCHEME",
+      "status": "REVIEWED_NON_FORMAL",
+      "note": "Broader free-text/Markdown table lexical discovery; not present in legacy fenced/inline candidate inventory. Classify historical prose vs real current FORMAL and provide evidence before acceptance.",
+      "reviewBasis": "Exact-source crosswalk from reviewed FORMAL-aware lexical census: The glossary explicitly labels Theory-to-Rule as a historical admission metascheme and contrasts it with current FORMAL.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6066000104",
+      "reviewSourceSha256": "1f6cde47cf486089b968eb3c62017f41a9c32342ca2fa1cc535d66397addccae",
+      "lexicalReviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065722472"
+    }
+  ]
+}

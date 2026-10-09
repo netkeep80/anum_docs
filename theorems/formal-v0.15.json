@@ -145,6 +145,295 @@
       ],
       "formalSourcePath": "ts/test/v015-fnd01-formal-statement-b18.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-03",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND03_STATEMENT : FND03_PREMISES->FND03_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-01",
+        "FND-02"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-05",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND05_STATEMENT : FND05_DOMAIN_GUARDS->FND05_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-01",
+        "FND-02"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-01",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV01_STATEMENT : INV01_PREMISES->INV01_CONCLUSION",
+      "formalPremises": [
+        "A1RecursiveSeparation",
+        "F2F3OneSidedExistence",
+        "RecursiveInversionDomain",
+        "Grounded:x"
+      ],
+      "formalDependencies": [
+        "FND-01",
+        "FND-02"
+      ],
+      "formalDomain": [
+        "x : Link"
+      ],
+      "formalExistentialDomain": [
+        "y : Link"
+      ],
+      "formalNonPremises": [
+        "INV-02",
+        "all-Link totality",
+        "non-Grounded distinct-node cycles"
+      ],
+      "formalSourcePath": "ts/test/v015-inv01-formal-statement-candidate-b23.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-04",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND04_STATEMENT : FND04_PREMISES->FND04_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-03"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-03",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV03_STATEMENT : INV03_PREMISES->INV03_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-01"
+      ],
+      "formalSourcePath": "ts/test/v015-inv03-formal-statement-candidate-b25.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-02",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV02_STATEMENT : INV02_PREMISES->INV02_CONCLUSION",
+      "formalPremises": [
+        "A1RecursiveSeparation",
+        "F2F3GroundedNormalization",
+        "F2F3OneSidedExistence",
+        "RecursiveInversionDomain",
+        "Grounded:x"
+      ],
+      "formalDependencies": [
+        "INV-01",
+        "FND-13"
+      ],
+      "formalDomain": [
+        "x : Link"
+      ],
+      "formalExistentialDomain": [
+        "y : Link",
+        "z : Link"
+      ],
+      "formalNonPremises": [
+        "all-Link totality",
+        "global arbitrary-Link normalization",
+        "non-Grounded distinct-node cycles"
+      ],
+      "formalSourcePath": "ts/test/v015-inv02-formal-statement-candidate-b26.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-04",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV04_STATEMENT : INV04_PREMISES->INV04_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-01"
+      ],
+      "formalNonPremises": [
+        "Foundation-global absolute START",
+        "representation order authority"
+      ],
+      "formalSourcePath": "ts/test/v015-inv04-formal-statement-candidate-b27.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-06",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND06_STATEMENT : FND06_DOMAIN_GUARDS->FND06_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "FND-05"
+      ],
+      "formalNonPremises": [
+        "Memory handles/addresses/object identity",
+        "semantic materialization authority"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-11",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND11_STATEMENT : FND11_PREMISES->FND11_CONCLUSION",
+      "formalPremises": [
+        "AcceptedV014RepresentationDefinitions",
+        "FND05Canonicality"
+      ],
+      "formalDependencies": [
+        "FND-05"
+      ],
+      "formalNonPremises": [
+        "global recursive structure/Q isomorphism",
+        "representation-strength ranking",
+        "host representation classifier semantic authority",
+        "shorter-source global dominance"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-05",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV05_STATEMENT : INV05_PREMISES->INV05_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-01",
+        "INV-02",
+        "INV-04"
+      ],
+      "formalNonPremises": [
+        "independent pair-preservation axiom",
+        "global arbitrary-Link extensionality",
+        "host inverse function",
+        "codec/handle identity",
+        "representation order authority"
+      ],
+      "formalSourcePath": "ts/test/v015-inv05-formal-statement-candidate-b30.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-12",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND12_STATEMENT : FND12_PREMISES->FND12_CONCLUSION",
+      "formalPremises": [
+        "AcceptedRepresentationLayerBoundary",
+        "FND01LinkOnlyStructure",
+        "FND11RepresentationSeparation"
+      ],
+      "formalDependencies": [
+        "FND-01",
+        "FND-11"
+      ],
+      "formalNonPremises": [
+        "host Type inequality",
+        "host layer enum or Bool flag",
+        "identity/representation-strength ranking",
+        "representation/source object identity as Link requirement",
+        "second semantic carrier premise"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-06",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV06_STATEMENT : INV06_PREMISES->INV06_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-03",
+        "INV-04",
+        "INV-05"
+      ],
+      "formalNonPremises": [
+        "RootBasis ontology datatype",
+        "Foundation-global absolute START side",
+        "observer orientation authority",
+        "full-Theory automorphism",
+        "global arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-inv06-formal-statement-candidate-b32.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-07",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV07_STATEMENT : INV07_PREMISES->INV07_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-02",
+        "INV-04",
+        "INV-05"
+      ],
+      "formalNonPremises": [
+        "Foundation-global absolute orientation",
+        "observer semantic primitive",
+        "prover Type/Prop/Record semantic authority",
+        "global arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-inv07-formal-statement-candidate-b33.test.ts",
+      "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "CTX-03",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "CTX03_STATEMENT : CTX03_PREMISES->CTX03_CONCLUSION",
+      "formalPremises": [
+        "A1RecursiveSeparation",
+        "F2F3GroundedNormalization",
+        "F2F3OneSidedExistence",
+        "RecursiveInversionDomain"
+      ],
+      "formalDependencies": [
+        "INV-02",
+        "INV-07"
+      ],
+      "formalNonPremises": [
+        "Foundation-global selected W",
+        "ExactSequence orientation authority",
+        "host Frame/Gauge/Bool orientation authority",
+        "raw InR/OutR presence as orientation authority",
+        "four primitive opcodes as orientation authority",
+        "stronger arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

@@ -5,6 +5,7 @@ import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mt
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
+import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
 import { loadRepositoryTheoremProjectionModel } from "./theorem-projection-model.js";
 import { FORMAL_NOTATION_V015_TARGET_PATH, renderFormalNotationV015Markdown } from "./formal-notation-v015-markdown.js";
@@ -25,10 +26,10 @@ export const CURRENT_DOC_SIZE_SURFACE = [
 ] as const;
 
 export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 115677,
-  baselineLines: 3404,
-  baselineWords: 16009,
-  hardCeilingCodePoints: 116951,
+  baselineCodePoints: 134667,
+  baselineLines: 3442,
+  baselineWords: 18703,
+  hardCeilingCodePoints: 135948,
 });
 
 export interface DocumentationSizeMeasurement {
@@ -529,6 +530,86 @@ export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   return changed.sort();
 }
 
+/**
+ * Guard the current release policy against reverting to a pre-acceptance
+ * release label. This is a deliberately narrow D1 gate; full FORMAL formula
+ * conformance and v0.15 normative projection coverage are tracked by #1951.
+ */
+export function checkCurrentReleasePolicy(root: string): readonly string[] {
+  const path = "docs/CONTRIBUTING.md";
+  const source = readFileSync(resolve(root, path), "utf8");
+  const issues: string[] = [];
+  if (!source.includes("mts-doc-version: v0.15")) {
+    issues.push(path + ": missing current v0.15 marker");
+  }
+  if (!source.includes("## 6. Текущая документация описывает принятую МТС v0.15")) {
+    issues.push(path + ": current-documentation authority not v0.15");
+  }
+  if (/v0\.14/.test(source)) {
+    issues.push(path + ": v0.14 found in current contribution policy");
+  }
+  for (const [documentPath, exactAuthority] of [
+    ["docs/theory/Основания МТС.md", "[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+    ["docs/theory/Система аксиом МТС.md", "[контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+  ] as const) {
+    const document = readFileSync(resolve(root, documentPath), "utf8");
+    if (!document.includes("mts-doc-version: v0.15") || !document.includes(exactAuthority)) {
+      issues.push(documentPath + ": accepted v0.15 normative authority missing");
+    }
+  }
+  const readme = readFileSync(resolve(root, "README.md"), "utf8");
+  if (
+    !readme.includes("Rule = V -> (Antecedent -> ExactSequence(Image...))") ||
+    !readme.includes("M_t -> Γ(M_t) -> M_(t+1)") ||
+    readme.includes("K ⟼ {A}\n{A} ⟼ {B}")
+  ) {
+    issues.push("README.md: current execution description must use accepted v0.15 Γ/FORMAL, not legacy MP shortcut");
+  }
+  const glossary = readFileSync(resolve(root, "docs/Словарь терминов МТС.md"), "utf8");
+  for (const exact of [
+    "Историческая реляционная **метазапись v0.14**",
+    "Унаследованная математическая **метазапись v0.14**",
+    "историческая математическая метазапись хиральности",
+    "историческая реляционная **метасхема допуска**",
+  ]) {
+    if (!glossary.includes(exact)) issues.push("docs/Словарь терминов МТС.md: unscoped older glyph formula " + exact);
+  }
+  if (!glossary.includes("1. \`Current\` \`name\` выбирается по \`terminology\` \`projection\` в \`requirements/mts-v0.15.json\`.")) {
+    issues.push("docs/Словарь терминов МТС.md: current terminology must use v0.15 registry");
+  }
+  // Historical v0.14 positive-image sketches are valuable evidence,
+  // but their braces and ZERO pseudocode must not impersonate v0.15 FORMAL.
+  const foundation = readFileSync(resolve(root, "docs/theory/Основания МТС.md"), "utf8");
+  if (!foundation.includes("**Историческая схема** положительного образа v0.14") ||
+      !foundation.includes("`A:{}` в принятой FORMAL v0.15 означает") ||
+      foundation.includes("A -> {}      успешный пустой образ")) {
+    issues.push("docs/theory/Основания МТС.md: inherited MP/ZERO pseudocode misrepresented as current FORMAL");
+  }
+  const axioms = readFileSync(resolve(root, "docs/theory/Система аксиом МТС.md"), "utf8");
+  if (!axioms.includes("**Историческая метасхема v0.14**") ||
+      !axioms.includes("пустым результатом `ExactSequence([])`")) {
+    issues.push("docs/theory/Система аксиом МТС.md: historical V14-L11 not separated from current Γ/FORMAL");
+  }
+  const amemory = readFileSync(resolve(root, "docs/specs/Апамять и управление сетью связей.md"), "utf8");
+  if (!amemory.includes("**не является исходной грамматикой FORMAL v0.15**") ||
+      !amemory.includes("**псевдокод профиля 0.1.0**")) {
+    issues.push("docs/specs/Апамять и управление сетью связей.md: legacy profile arrows lack FORMAL authority boundary");
+  }
+  const bundles = readFileSync(resolve(root, "docs/specs/Пучки связей.md"), "utf8");
+  if (!bundles.includes("В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:")) {
+    issues.push("docs/specs/Пучки связей.md: accepted FORMAL context/bundle syntax must be distinguished from derived query meta-notation");
+  }
+  if (bundles.includes("только текущую поверхность v0.13")) {
+    issues.push("docs/specs/Пучки связей.md: inherited v0.13 query API mislabeled current normative surface");
+  }
+  const theoremCatalog = readFileSync(resolve(root, "docs/theory/Теоремы МТС.md"), "utf8");
+  if (!theoremCatalog.includes("Доказательная проекция в принятой `FORMAL v0.15`:") ||
+      !theoremCatalog.includes("Статус миграции доказательств: \`v0.15-candidate\`; не статус выпуска МТС.")) {
+    issues.push("docs/theory/Теоремы МТС.md: accepted release cannot be conflated with proof migration");
+  }
+  return issues;
+}
+
 function main(): void {
   const root = findRepositoryRoot();
   const mode = process.argv[2] ?? "--check";
@@ -538,6 +619,8 @@ function main(): void {
     return;
   }
   if (mode !== "--check") fail(`unknown mode ${mode}; expected --check or --write`);
+  const policyIssues = checkCurrentReleasePolicy(root);
+  if (policyIssues.length) fail(`current release policy mismatch: ${policyIssues.join("; ")}`);
   const stale = checkRepositoryDocs(root);
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
@@ -556,6 +639,12 @@ function main(): void {
   const historicalV013Provenance = auditHistoricalV013FoundationProvenance(root);
   if (historicalV013Provenance.issues.length) {
     fail(`нарушена historical v0.13 foundation provenance baseline: ${historicalV013Provenance.issues.map((entry) => entry.message).join("; ")}`);
+  }
+  const markdownCoverage = buildMarkdownCoverageAudit(root);
+  if (markdownCoverage.contract === "mts-contract/v0.15" &&
+      (markdownCoverage.summary.currentNormativeRequirementCount !== 48 ||
+       markdownCoverage.summary.currentNormativeProjectedCount !== 48)) {
+    fail("current v0.15 normative Markdown requirement projection incomplete");
   }
   const size = measureRepositoryCurrentDocumentationSize(root);
   if (!currentDocumentationSizeWithinBudget(size)) {

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   Memory, ensureRootBasis, type LinkHandle, type RootBasis,
 } from "../src/memory.js";
@@ -130,6 +132,17 @@ function runGate(
 
 {
   const f=fixture(), r=compile(f);
+  const canonicalRootDefinitions = source.split("\n").slice(0, 5).join("\n");
+  const foundationDoc = readFileSync(resolve(process.cwd(), "..", "docs/theory/Основания МТС.md"), "utf8");
+  assert(
+    foundationDoc.includes("```text\n" + canonicalRootDefinitions + "\n```"),
+    "the current foundation document includes the exact native FORMAL root-basis source compiled by B10",
+  );
+  for (const [name,expected] of [
+    ["R", "8"], ["O", "98"], ["C", "68"], ["L", "19868"], ["U", "16898"],
+  ] as const) {
+    same(dec.decode(entry(f,r,name).wire),expected, name + " root basis wire matches documented codec");
+  }
   same(value(f,r,"EQ_TRUE"),f.basis.L,"R=R returns exact L");
   same(value(f,r,"EQ_ALIAS"),f.basis.L,"different names same Link return L");
   same(value(f,r,"EQ_FALSE"),f.basis.U,"distinct Links return exact U");

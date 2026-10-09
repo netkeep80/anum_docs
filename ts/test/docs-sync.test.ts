@@ -9,6 +9,7 @@ import {
   PROJECTION_START,
   SEMANTIC_LAW_OWNER_BY_ID,
   checkProjectionText,
+  checkCurrentReleasePolicy,
   checkRepositoryDocs,
   checkRepositorySemanticLawDocumentation,
   findRepositoryRoot,
@@ -46,6 +47,8 @@ expectThrow(
 );
 
 const repositoryRoot = findRepositoryRoot();
+assert.deepEqual(checkCurrentReleasePolicy(repositoryRoot), [], "v0.15 current contribution policy must be internally consistent");
+
 const projection = loadCurrentProjection(repositoryRoot);
 assert.equal(projection.currentContract, "mts-contract/v0.15");
 assert.equal(projection.previousContract, "mts-contract/v0.14");
@@ -66,6 +69,36 @@ assert.ok(!rendered.includes("Корневой базис:"), "release projectio
 assert.ok(!rendered.includes("Строковый носитель:"), "release projection must not duplicate subject specs");
 assert.ok(rendered.includes(PROJECTION_START));
 assert.ok(rendered.includes(PROJECTION_END));
+
+const acceptedRequirements = JSON.parse(readFileSync(resolve(repositoryRoot, "requirements/mts-v0.15.json"), "utf8")) as {
+  accepted: boolean;
+  requirements: { id: string; mandatory: boolean; group: string; state: string; summary: string }[];
+};
+assert.equal(acceptedRequirements.accepted, true);
+const formalCurrentDoc = readFileSync(resolve(repositoryRoot, "docs/specs/Формальная нотация МТС.md"), "utf8");
+const requiredEntries = acceptedRequirements.requirements.filter((item) => item.mandatory !== false);
+assert.equal(requiredEntries.length, 48, "accepted normative registry must be explicit");
+assert.ok(formalCurrentDoc.includes("## 9a. Нормативный реестр требований v0.15"));
+for (const requirement of requiredEntries) {
+  const anchor = '<a id="mts-v015-' + requirement.id.toLowerCase() + '"></a>';
+  assert.equal(formalCurrentDoc.split(anchor).length - 1, 1, requirement.id + " must be projected exactly once");
+  assert.ok(formalCurrentDoc.includes(requirement.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")),
+    requirement.id + " normative summary must come from source");
+}
+
+const theoremCatalogSource = readFileSync(resolve(repositoryRoot, "docs/theory/Теоремы МТС.md"), "utf8");
+assert.ok(
+  theoremCatalogSource.includes("[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"),
+  "current theorem projection must identify accepted v0.15 semantic authority",
+);
+assert.ok(
+  theoremCatalogSource.includes("Статус миграции доказательств: `v0.15-candidate`; не статус выпуска МТС."),
+  "candidate proof migration must not be conflated with MTS release acceptance",
+);
+assert.ok(
+  !theoremCatalogSource.includes("не принимает `MTS v0.15`"),
+  "external candidate proofs must not falsely deny accepted v0.15 release",
+);
 
 const readmeSource = readFileSync(resolve(repositoryRoot, "README.md"), "utf8");
 assert.equal(
@@ -187,6 +220,7 @@ try {
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
+  copy("docs/CONTRIBUTING.md");
   copy("repo-policy.json");
   copy("contracts/mts-contract-v0.14.json");
   copy("contracts/mts-conformance-v0.14.json");
@@ -200,6 +234,66 @@ try {
   for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
   for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
+
+  const contributingPath = resolve(tempRoot, "docs/CONTRIBUTING.md");
+  const currentPolicy = readFileSync(contributingPath, "utf8");
+  assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  writeFileSync(contributingPath, currentPolicy.replace(
+    "## 6. Текущая документация описывает принятую МТС v0.15",
+    "## 6. Текущая документация описывает `current` `MTS` v0.14",
+  ), "utf8");
+  assert.ok(
+    checkCurrentReleasePolicy(tempRoot).length > 0,
+    "D1 negative: outdated v0.14 current policy must fail closed",
+  );
+  writeFileSync(contributingPath, currentPolicy, "utf8");
+  assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  
+  for (const [path, authority] of [
+    ["docs/theory/Основания МТС.md", "[принятый контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+    ["docs/theory/Система аксиом МТС.md", "[контракт v0.15](../../contracts/mts-contract-v0.15.json)"],
+  ] as const) {
+    const fullPath = resolve(tempRoot, path);
+    const original = readFileSync(fullPath, "utf8");
+    assert.ok(original.includes(authority), path + " must identify current v0.15 authority");
+    writeFileSync(fullPath, original.replace(authority, "[контракт v0.14](../../contracts/mts-contract-v0.14.json)"), "utf8");
+    assert.ok(
+      checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)),
+      path + ": D2 negative authority downgrade must fail closed",
+    );
+    writeFileSync(fullPath, original, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
+
+  for (const [path, authority, bad] of [
+    ["README.md", "M_t -> Γ(M_t) -> M_(t+1)", "M_t -> legacy_exec(M_t)"],
+    ["docs/Словарь терминов МТС.md", "requirements/mts-v0.15.json", "requirements/mts-v0.14.json"],
+    ["docs/specs/Пучки связей.md", "В принятой FORMAL v0.15 фигурные скобки имеют отдельные роли:", "В старом API фигурные скобки только метанотация:"],
+    ["docs/theory/Теоремы МТС.md", "Доказательная проекция в принятой `FORMAL v0.15`:", "Кандидатная проекция FORMAL:"],
+  ] as const) {
+    const file = resolve(tempRoot, path);
+    const content = readFileSync(file, "utf8");
+    assert.ok(content.includes(authority), path + " current source must carry v0.15 authority");
+    writeFileSync(file, content.replace(authority, bad), "utf8");
+    assert.ok(checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)), path + " downgrade must fail docs-check");
+    writeFileSync(file, content, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
+
+  for (const [path, required, downgrade] of [
+    ["docs/theory/Основания МТС.md", "**Историческая схема** положительного образа v0.14", "Форма положительного образа v0.15"],
+    ["docs/theory/Система аксиом МТС.md", "**Историческая метасхема v0.14**", "Нативная форма v0.15"],
+    ["docs/specs/Апамять и управление сетью связей.md", "**псевдокод профиля 0.1.0**", "принятая FORMAL v0.15"],
+  ] as const) {
+    const location = resolve(tempRoot, path);
+    const original = readFileSync(location, "utf8");
+    assert.ok(original.includes(required), path + " must explicitly scope legacy notation");
+    writeFileSync(location, original.replace(required, downgrade), "utf8");
+    assert.ok(checkCurrentReleasePolicy(tempRoot).some((issue) => issue.includes(path)),
+      path + " must fail if v0.14/v0.15 source grammar boundary is erased");
+    writeFileSync(location, original, "utf8");
+    assert.deepEqual(checkCurrentReleasePolicy(tempRoot), []);
+  }
 
   const brokenPath = resolve(tempRoot, CANONICAL_DOCS[0]);
   writeFileSync(brokenPath, readFileSync(brokenPath, "utf8").replace("mts-contract/v0.15", "mts-contract/v0.X"), "utf8");

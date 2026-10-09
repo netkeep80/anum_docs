@@ -47,6 +47,11 @@ export interface MarkdownCoverageSummary {
   readonly canonicalNodeCount: number;
   readonly nonCanonicalAnchorCount: number;
   readonly requirementCount: number;
+  /** Accepted current normative records indexed, not historical V14 owned blocks. */
+  readonly currentNormativeRequirementCount: number;
+  readonly currentNormativeProjectedCount: number;
+  /** Historical inherited v0.14 law/repository blocks retained by owner. */
+  readonly inheritedV014RequirementCount: number;
   readonly requirementBackedSectionCount: number;
   readonly ownedBlockCount: number;
   readonly unanchoredHeadingCount: number;
@@ -170,11 +175,69 @@ export function auditMarkdownDocument(args: {
   });
 }
 
+/**
+ * Validate that every accepted v0.15 requirement has one and only one
+ * current FORMAL Markdown projection, and no extraneous V15 IDs are injected.
+ * Inherited V14 blocks are deliberately checked separately, as provenance.
+ */
+function normalizeProjectedV015Summary(summary: string): string {
+  const explicitEnglish = summary.match(/^<span lang="en">([\s\S]*)<\/span>$/);
+  return explicitEnglish?.[1] ?? summary;
+}
+
+export function auditAcceptedV015RequirementRows(
+  markdown: string,
+  accepted: readonly Readonly<{ id: string; group: string; state: string; summary: string }>[],
+): number {
+  const rows = new Map<string, { group: string; state: string; summary: string }>();
+  const pattern = /^\| <a id="mts-v015-([a-z0-9-]+)"><\/a>`(V15-[A-Z0-9-]+)` \| `([^`]+)` \| `([^`]+)` \| (.*) \|$/gmu;
+  for (const match of markdown.matchAll(pattern)) {
+    const [, anchor, id, group, state, summary] = match;
+    if (id === undefined || anchor === undefined || group === undefined || state === undefined || summary === undefined) {
+      fail("malformed accepted v0.15 requirement row");
+    }
+    if (anchor !== id.toLowerCase() || rows.has(id)) {
+      fail("duplicate/mismatched v0.15 normative requirement anchor: " + id);
+    }
+    rows.set(id, { group, state, summary });
+  }
+  if (rows.size !== accepted.length) {
+    fail("accepted v0.15 normative rows incomplete: " + rows.size + "/" + accepted.length);
+  }
+  for (const req of accepted) {
+    const actual = rows.get(req.id);
+    if (!actual) fail("current normative requirement missing: " + req.id);
+    if (actual.group !== req.group || actual.state !== req.state ||
+        normalizeProjectedV015Summary(actual.summary) !== req.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")) {
+      fail("current normative requirement projection differs from accepted source: " + req.id);
+    }
+  }
+  return rows.size;
+}
+
 export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit {
   const currentIr = loadMtsSemanticIr(root);
-  const projectionIr = currentIr.schema === "mts-requirement-registry/v0.3"
+  // V14 is retained solely as inherited law-block provenance. It is not
+  // a fallback authority for accepted v0.15 current requirements.
+  const isV015 = currentIr.schema === "mts-requirement-registry/v0.3";
+  const historicalOwnerIr = isV015
     ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
     : currentIr;
+  let projectedV015Count = 0;
+  if (isV015) {
+    const registry = JSON.parse(readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8")) as {
+      requirements: { id: string; group: string; state: string; summary: string; mandatory: boolean }[];
+    };
+    const accepted = registry.requirements.filter((item) => item.mandatory !== false);
+    if (accepted.length !== currentIr.requirements.length) {
+      fail("accepted v0.15 semantic IR and normative source requirement set differ");
+    }
+    projectedV015Count = auditAcceptedV015RequirementRows(
+      readFileSync(resolve(root, "docs/specs/Формальная нотация МТС.md"), "utf8"),
+      accepted,
+    );
+  }
+  const projectionIr = historicalOwnerIr;
   const proseMaterializationPending =
     projectionIr.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
   const documents = Object.keys(projectionIr.documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
@@ -214,6 +277,9 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     canonicalNodeCount: documents.reduce((sum, document) => sum + document.canonicalNodeCount, 0),
     nonCanonicalAnchorCount: documents.reduce((sum, document) => sum + document.nonCanonicalAnchorIds.length, 0),
     requirementCount: projectionIr.requirements.length + projectionIr.repositoryRequirements.length,
+    currentNormativeRequirementCount: isV015 ? currentIr.requirements.length : projectionIr.requirements.length,
+    currentNormativeProjectedCount: isV015 ? projectedV015Count : projectionIr.requirements.length,
+    inheritedV014RequirementCount: isV015 ? projectionIr.requirements.length + projectionIr.repositoryRequirements.length : 0,
     requirementBackedSectionCount: sections.filter((section) => section.knowledgeClass === "requirements-backed").length,
     ownedBlockCount: documents.reduce((sum, document) => sum + document.ownedBlockCount, 0),
     unanchoredHeadingCount: sections.filter((section) => section.anchorId === null).length,
@@ -224,8 +290,8 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
   return Object.freeze({
     schema: "mts-markdown-coverage/v0.1",
     contract: currentIr.contract,
-    projectionState: currentIr.schema === "mts-requirement-registry/v0.3"
-      ? "V015_ACCEPTED_V014_MARKDOWN_COMPATIBILITY_PENDING_1951"
+    projectionState: isV015
+      ? "V015_ACCEPTED_48_NORMATIVE_ROWS_PROJECTED_FORMULA_MIGRATION_PENDING_1951"
       : projectionIr.projectionState,
     proseMaterializationPending,
     documents: Object.freeze(documents),

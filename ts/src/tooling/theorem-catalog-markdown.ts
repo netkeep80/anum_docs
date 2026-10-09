@@ -221,7 +221,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     `**Происхождение:** ${theorem.origin === null ? "—" : inlineCode(theorem.origin)}.  `,
     `**Волна:** ${theorem.wave === null ? "—" : inlineCode(theorem.wave)}.`,
     "",
-    "**Исходная формулировка:**",
+    "**Исходная формулировка (историческое свидетельство `v0.14`, не `FORMAL v0.15`):**",
     "~~~text",
     theorem.statement,
     "~~~",
@@ -261,7 +261,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     ...renderAssurance(theorem),
     "",
     "### Происхождение данных",
-    `- Текущий индекс теорем: ${repositoryLink(theorem.provenance.currentIndex)}.`,
+    `- Исходный индекс теорем v0.14: ${repositoryLink(theorem.provenance.currentIndex)}.`,
     `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
     `- Авторитет ролей доказательных каналов: ${repositoryLink(theorem.provenance.laneAuthority)}.`,
     `- Внешнее подтверждение: ${repositoryLink(theorem.provenance.externalAssurance)}.`,
@@ -319,7 +319,7 @@ function renderCandidateProofSection(model: TheoremProjectionModel): string {
     "## Кандидатные доказательства MTS v0.15",
     "",
     "> Этот раздел является генерируемой проекцией кандидатных внешних доказательств.",
-    "> Он не изменяет принятый реестр из 21 теорем " + inlineCode("MTS v0.14") + ", не принимает " + inlineCode("MTS v0.15") + " и не является " + inlineCode("MTS-native/aprover") + " доказательством.",
+    "> Он не изменяет исходный реестр 21 теорем " + inlineCode("MTS v0.14") + ", не повышает доказательную authority принятой " + inlineCode("MTS v0.15") + " и не является " + inlineCode("MTS-native/aprover") + " доказательством.",
     "> Источник статусов — отдельные манифесты Lean4/Rocq и машинные свидетельства; доказательный авторитет этого слоя — только " +
       inlineCode("external-cross-check-only") + ".",
     "",
@@ -349,19 +349,23 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "",
     "> **Генерируемая человекочитаемая проекция текущего реестра теорем МТС.**",
     "> Не является самостоятельным источником нормативной или доказательной истины.",
-    "> Семантический авторитет остаётся в принятых контрактах; доказательный авторитет определяется зарегистрированными каналами и подтверждениями. Этот Markdown — только производная проекция.",
+    "> Семантический нормативный источник текущего выпуска — [принятый контракт v0.15](../../contracts/mts-contract-v0.15.json); исходный доказательный источник теорем остаётся версионным. Этот файл — только производная проекция.",
     "",
-    `Источник принятого реестра: ${repositoryLink(model.sourceInventory)}. Версия: ${inlineCode(model.mtsVersion)}.`,
-    `Кандидатная проекция FORMAL: ${repositoryLink(model.formalOverlay)}. Версия: ${inlineCode(model.formalCandidateVersion)}.`,
+    `Исходный принятый реестр теорем: ${repositoryLink(model.sourceInventory)}. Версия доказательного реестра: ${inlineCode(model.mtsVersion)}.`,
+    "Доказательная проекция в принятой `FORMAL v0.15`: " + repositoryLink(model.formalOverlay) + ". Статус миграции доказательств: " + inlineCode(model.formalCandidateVersion) + "; не статус выпуска МТС.",
     "",
     "## Сводка",
     "",
-    "| ID | Исходная формулировка | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
-    "| --- | --- | --- | --- | --- | --- | --- |",
+    "`FORMAL v0.15`: " + inlineCode(String(model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length)) +
+      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную `FORMAL`-формулировку; утверждения без зарегистрированной `FORMAL`-формулировки, если они есть, имеют статус " +
+      inlineCode("NOT_MIGRATED") + ". Это не меняет принятый выпуск v0.15 и не повышает доказательный статус.",
+    "",
+    "| ID | `FORMAL v0.15` | Исходная формулировка v0.14 (историческое свидетельство) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
   ];
   for (const theorem of model.theorems) {
     lines.push(
-      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(tableCell(theorem.statement))} | ${tableCell(nativeStatus(theorem))} | ${evidenceSummary(theorem, "lean4")} | ${evidenceSummary(theorem, "coq")} | ${evidenceSummary(theorem, "mtsNative")} | ${evidenceSummary(theorem, "typescript")} |`,
+      `| [${theorem.id}](#theorem-${theorem.id.toLowerCase()}) | ${inlineCode(theorem.formalV015.migrationStatus)} | ${inlineCode(tableCell(theorem.statement))} | ${tableCell(nativeStatus(theorem))} | ${evidenceSummary(theorem, "lean4")} | ${evidenceSummary(theorem, "coq")} | ${evidenceSummary(theorem, "mtsNative")} | ${evidenceSummary(theorem, "typescript")} |`,
     );
   }
   lines.push("", "## Теоремы", "");
