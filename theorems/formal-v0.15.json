@@ -339,6 +339,31 @@
       ],
       "formalSourcePath": "ts/test/v015-inv05-formal-statement-candidate-b30.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-12",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND12_STATEMENT : FND12_PREMISES->FND12_CONCLUSION",
+      "formalPremises": [
+        "AcceptedRepresentationLayerBoundary",
+        "FND01LinkOnlyStructure",
+        "FND11RepresentationSeparation"
+      ],
+      "formalDependencies": [
+        "FND-01",
+        "FND-11"
+      ],
+      "formalNonPremises": [
+        "host Type inequality",
+        "host layer enum or Bool flag",
+        "identity/representation-strength ranking",
+        "representation/source object identity as Link requirement",
+        "second semantic carrier premise"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

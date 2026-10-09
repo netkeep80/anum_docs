@@ -27,8 +27,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "64f1f61a7c820908d22b42ca089c5506fbba1d9b",
-      "lineCount": 2707
+      "blobSha": "f3a892de8fd898be60f68b356af165a312a40778",
+      "lineCount": 2729
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -58,8 +58,8 @@
   ],
   "counts": {
     "files": 10,
-    "candidates": 212,
-    "fences": 118,
+    "candidates": 213,
+    "fences": 119,
     "inline": 94
   },
   "acceptanceRules": [
@@ -3272,8 +3272,8 @@
     {
       "id": "F0121",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2035,
-      "endLine": 2035,
+      "startLine": 2057,
+      "endLine": 2057,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3283,8 +3283,8 @@
     {
       "id": "F0122",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2040,
-      "endLine": 2040,
+      "startLine": 2062,
+      "endLine": 2062,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3294,8 +3294,8 @@
     {
       "id": "F0123",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2193,
-      "endLine": 2193,
+      "startLine": 2215,
+      "endLine": 2215,
       "kind": "inline-code",
       "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3305,8 +3305,8 @@
     {
       "id": "F0124",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2422,
-      "endLine": 2422,
+      "startLine": 2444,
+      "endLine": 2444,
       "kind": "inline-code",
       "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3316,8 +3316,8 @@
     {
       "id": "F0125",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2623,
-      "endLine": 2623,
+      "startLine": 2645,
+      "endLine": 2645,
       "kind": "inline-code",
       "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3327,8 +3327,8 @@
     {
       "id": "F0126",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2656,
-      "endLine": 2656,
+      "startLine": 2678,
+      "endLine": 2678,
       "kind": "inline-code",
       "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3628,18 +3628,67 @@
           "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
         }
       }
+    },
+    {
+      "id": "F0213",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 2006,
+      "endLine": 2006,
+      "kind": "fence",
+      "language": "text",
+      "source": "FND12_STATEMENT : FND12_PREMISES->FND12_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "FND-12",
+      "reviewBasis": "Exact migrated FND-12 FORMAL statement is bounded to accepted V14-L14 representation-layer semantics and executable B31 owner. It keeps Link as the sole semantic carrier while routing structural, recursive, representation/codec, byte-text and metanotation authority to that carrier; host type/enum/Bool/ranking and representation-object identity are not ontology authority.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "2b7231fd8e1f23acad1aa5006b0498ded9f033ee8cf1290d39f3e22528429c06",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "FND-12 migration registers a theorem statement/mapping artifact. B31 checks explicit V14-L14 representation-layer semantics, derived FND-01/FND-11 dependency witnesses, Link-only semantic authority for all upper layers, fresh-Memory wire parity, presentation-rename stability, exact J1 parity and four semantic/provenance mutations without claiming native/aprover proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0213",
+          "formalSourceSha256": "2b7231fd8e1f23acad1aa5006b0498ded9f033ee8cf1290d39f3e22528429c06",
+          "semanticAnetSha256": "25f18f2acffc7da2e6f21e80d496448f79514ef58e0486b8ba4a4507c2730834",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
     }
   ],
   "classification": {
-    "policy": "All 212 heuristic fenced/inline candidates have explicit roles. The 27 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
+    "policy": "All 213 heuristic fenced/inline candidates have explicit roles. The 28 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
-    "acceptedFormalDenotationsVerified": 27,
-    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 17/21 and proof closure remains independently classified.",
+    "acceptedFormalDenotationsVerified": 28,
+    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 18/21 and proof closure remains independently classified.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
     "reviewedNonFormalCount": 185,
     "unverifiedDenotationCount": 0,
-    "verifiedFormalCount": 27
+    "verifiedFormalCount": 28
   }
 }
