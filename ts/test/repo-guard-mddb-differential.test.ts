@@ -229,7 +229,7 @@ try {
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(upstream.resolveMarkdownAnchor(upstreamNested, id),
       upstream.resolveMarkdownAnchor(localNested, id),
-      \`original anchor \${id} remains at its expected coordinates\`);
+      `original anchor ${id} remains at its expected coordinates`);
   }
   // The source is untouched on *both* sides of the insertion, byte for byte.
   const insertionAt = localReadMarkdownNode(source, "node-a").end;
@@ -260,7 +260,7 @@ try {
   for (const mode of ["source", "generated"] as const) {
     assert.throws(() => upstream.insertMarkdownChild({
       source, mode, parentAnchorId: "node-a", child: nestedChild, options,
-    }), /read-only|not supported/, \`mode \${mode} must forbid insertion\`);
+    }), /read-only|not supported/, `mode ${mode} must forbid insertion`);
   }
   assert.throws(() => upstream.insertMarkdownChild({
     source, mode: "hybrid", parentAnchorId: "node-a",
@@ -269,8 +269,8 @@ try {
   for (const invalid of [
     source.replace(endMarker, ""),
     source.replace(beginMarker, ""),
-    source.replace(beginMarker, endMarker).replace(endMarker, beginMarker),
-    source.replace(beginMarker, \`\${beginMarker}\n\${beginMarker}\`),
+    source.replace(beginMarker, "__BEGIN__").replace(endMarker, beginMarker).replace("__BEGIN__", endMarker),
+    source.replace(beginMarker, `${beginMarker}\n${beginMarker}`),
   ]) {
     assert.throws(() => upstream.insertMarkdownChild({
       source: invalid, mode: "hybrid", parentAnchorId: "node-a", child: nestedChild, options,
