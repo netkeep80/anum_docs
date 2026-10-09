@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { scanV015FormalLexicalSurface } from "../src/tooling/v015-markdown-prose-audit.js";
-import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, inspectV015SecondaryLedgerRow, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
+import { assessV015DocumentationAcceptance, evaluateV015DocumentationCompletion, inspectV015GeneratedTheoremProjection, inspectV015SecondaryLedgerRow, isV015FormalRole, isV015NonFormalRole, v015RequiredEvidenceStages } from "../src/tooling/v015-documentation-acceptance.js";
+import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "../src/tooling/theorem-catalog-markdown.js";
+import { loadRepositoryTheoremProjectionModel } from "../src/tooling/theorem-projection-model.js";
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
 
 const root = findRepositoryRoot();
@@ -24,8 +26,58 @@ assert.equal(report.prose.files, 11, "full current markdown surface includes POR
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 0, "all 21 prose observations are now source-bound reviewed or verified");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
-assert.equal(report.lexical.candidates, 499, "lexical discovery includes the newly generated CTX-03 FORMAL theorem statement");
-assert.equal(report.lexical.unreviewed, 0, "all 499 broad lexical rows are now source-bound reviewed, verified FORMAL, or span-reviewed mixed");
+assert.equal(report.lexical.candidates, scanV015FormalLexicalSurface(root).observations.length,
+  "raw lexical occurrence count is diagnostic and follows the current rendered Markdown");
+assert.equal(report.lexical.unreviewed, 0,
+  "frozen reviewed lexical evidence remains closed while generated projection is checked structurally");
+
+const theoremProjectionModel = loadRepositoryTheoremProjectionModel(root);
+const trackedTheoremCatalog = readFileSync(resolve(root, "..", THEOREM_CATALOG_PATH), "utf8");
+const renderedTheoremCatalog = renderTheoremCatalogMarkdown(theoremProjectionModel);
+const generatedProjection = inspectV015GeneratedTheoremProjection(
+  theoremProjectionModel,
+  trackedTheoremCatalog,
+  renderedTheoremCatalog,
+);
+assert.deepEqual(generatedProjection.issues, []);
+assert.equal(generatedProjection.theoremCards, 21);
+assert.equal(generatedProjection.formalStatements, 21);
+
+const firstTheorem = theoremProjectionModel.theorems[0];
+assert.ok(firstTheorem !== undefined);
+const withoutFirstAnchor = trackedTheoremCatalog.replace(
+  `<a id="theorem-${firstTheorem.id.toLowerCase()}"></a>`,
+  "",
+);
+assert.ok(
+  inspectV015GeneratedTheoremProjection(
+    theoremProjectionModel,
+    withoutFirstAnchor,
+    renderedTheoremCatalog,
+  ).issues.some((issue) => issue.includes("card identity/order mismatch")),
+  "missing generated theorem card must fail closed",
+);
+const firstFormal = firstTheorem.formalV015.formalStatement;
+assert.ok(firstFormal !== null);
+const exactFormalBlock = "~~~text\n" + firstFormal + "\n~~~";
+const withoutFirstFormal = trackedTheoremCatalog.replace(exactFormalBlock, "~~~text\nBROKEN_FORMAL_STATEMENT\n~~~");
+assert.ok(
+  inspectV015GeneratedTheoremProjection(
+    theoremProjectionModel,
+    withoutFirstFormal,
+    renderedTheoremCatalog,
+  ).issues.some((issue) => issue.includes("FORMAL statement occurrence count 0")),
+  "missing/changed FORMAL theorem statement must fail closed",
+);
+const duplicatedFirstFormal = trackedTheoremCatalog + "\n" + exactFormalBlock + "\n";
+assert.ok(
+  inspectV015GeneratedTheoremProjection(
+    theoremProjectionModel,
+    duplicatedFirstFormal,
+    renderedTheoremCatalog,
+  ).issues.some((issue) => issue.includes("FORMAL statement occurrence count 2")),
+  "duplicated FORMAL theorem statement must fail closed",
+);
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {
