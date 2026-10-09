@@ -6364,7 +6364,7 @@
     {
       "path": "docs/theory/Теоремы МТС.md",
       "line": 32,
-      "source": "| [INV-07](#theorem-inv-07) | `NOT_MIGRATED` | `Objective chirality survives inversion: J reverses orientation while preserving the structural distinction between the two one-sided self-incidence classes.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 2 исполняемых свидетельств |",
+      "source": "| [INV-07](#theorem-inv-07) | `FORMAL_MIGRATED` | `Objective chirality survives inversion: J reverses orientation while preserving the structural distinction between the two one-sided self-incidence classes.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 2 исполняемых свидетельств |",
       "context": "table",
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
@@ -6374,7 +6374,7 @@
       "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
       "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
       "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
-      "reviewSourceSha256": "18d0f35fbd0a9a0f1224fbf08eb01dc485f25d4d910eda0e078f0ec16723cf0c"
+      "reviewSourceSha256": "19c51637538c0f46e86a5a556c04ae8f421c171324cf442f6a65359090141a50"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
