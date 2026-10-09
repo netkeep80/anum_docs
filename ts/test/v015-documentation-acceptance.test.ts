@@ -17,15 +17,15 @@ assert.equal(report.normative.expected, 48);
 assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
-assert.equal(report.formulas.total, 210);
-assert.equal(report.formulas.verified, 25, "all current primary FORMAL occurrences have bounded receipts, including fifteen migrated theorem statements");
+assert.equal(report.formulas.total, 211);
+assert.equal(report.formulas.verified, 26, "all current primary FORMAL occurrences have bounded receipts, including sixteen migrated theorem statements");
 assert.equal(report.formulas.pending, 0, "primary FORMAL source/denotation backlog is closed; missing theorem migrations remain separate blockers");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
 assert.equal(report.prose.observations, 21, "broader prose-lexical observations are separately tracked");
 assert.equal(report.prose.unreviewed, 0, "all 21 prose observations are now source-bound reviewed or verified");
 assert.equal(report.lexical.files, 11, "FORMAL-aware universe includes every current Markdown file");
-assert.equal(report.lexical.candidates, 493, "lexical discovery includes the newly generated FND-06 FORMAL theorem statement");
-assert.equal(report.lexical.unreviewed, 0, "all 493 broad lexical rows are now source-bound reviewed, verified FORMAL, or span-reviewed mixed");
+assert.equal(report.lexical.candidates, 494, "lexical discovery includes the newly generated FND-11 FORMAL theorem statement");
+assert.equal(report.lexical.unreviewed, 0, "all 494 broad lexical rows are now source-bound reviewed, verified FORMAL, or span-reviewed mixed");
 
 const lexicalFixture = mkdtempSync(join(tmpdir(), "mts-v015-markdown-"));
 try {

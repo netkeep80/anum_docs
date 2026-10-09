@@ -41,8 +41,8 @@
       "path": "docs/theory/Теоремы МТС.md",
       "kind": "formal-proof-status-ambiguity",
       "evidence": "v0.14 accepted theorem inventory and v0.15-candidate formal theorem overlay are presented together.",
-      "state": "15_OF_21_FORMAL_THEOREM_PROJECTIONS_6_MISSING",
-      "remediation": "Theorem generator and Markdown now show 15/21 after bounded FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04 and FND-06 statement migrations; original sources remain historical and 6 missing IDs remain version-pinned in audits/v015-theorem-formal-migration-backlog.json. No native/aprover proof status promoted."
+      "state": "16_OF_21_FORMAL_THEOREM_PROJECTIONS_5_MISSING",
+      "remediation": "Theorem generator and Markdown now show 16/21 after bounded FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04, FND-06 and FND-11 statement migrations; original sources remain historical and 5 missing IDs remain version-pinned in audits/v015-theorem-formal-migration-backlog.json. No native/aprover proof status promoted."
     },
     {
       "id": "DOC15-004",
@@ -56,9 +56,9 @@
       "id": "DOC15-005",
       "path": "audits/v015-formula-candidate-inventory.json",
       "kind": "formula-source-and-denotation-coverage",
-      "evidence": "Broad lexer originally found 968 line candidates; deterministic Markdown/HTML/prose noise removal produced the reviewed FORMAL-aware ledger. After FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04 and FND-06 generated statement migrations the current broad ledger has 493 exact-source rows; primary heuristic inventory has 210 operator-bearing candidates.",
-      "state": "PRIMARY_AND_SECONDARY_FORMULA_CENSUS_CLOSED_493_OF_493",
-      "remediation": "Primary FORMAL source/denotation is 25/25 verified; broad lexical 493/493 and prose 21/21 are fully classified/verified. Remaining documentation acceptance blocker is the separate 6-theorem FORMAL migration backlog plus final whole-repository audit."
+      "evidence": "Broad lexer originally found 968 line candidates; deterministic Markdown/HTML/prose noise removal produced the reviewed FORMAL-aware ledger. After FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04, FND-06 and FND-11 generated statement migrations the current broad ledger has 494 exact-source rows; primary heuristic inventory has 211 operator-bearing candidates.",
+      "state": "PRIMARY_AND_SECONDARY_FORMULA_CENSUS_CLOSED_494_OF_494",
+      "remediation": "Primary FORMAL source/denotation is 26/26 verified; broad lexical 494/494 and prose 21/21 are fully classified/verified. Remaining documentation acceptance blocker is the separate 5-theorem FORMAL migration backlog plus final whole-repository audit."
     },
     {
       "id": "DOC15-006",
@@ -89,33 +89,33 @@
     "Per-file migration evidence reviewed."
   ],
   "progress": {
-    "D1": "493_BROAD_LEXICAL_ROWS:CLOSED_457_REVIEWED_NON_FORMAL+34_VERIFIED_FORMAL_LINES+2_REVIEWED_MIXED+0_PENDING",
+    "D1": "494_BROAD_LEXICAL_ROWS:CLOSED_457_REVIEWED_NON_FORMAL+35_VERIFIED_FORMAL_LINES+2_REVIEWED_MIXED+0_PENDING",
     "D2": "ACCEPTED_V015_48_48_NORMATIVE_ROWS_META_EQUALITY_EXPLICIT",
-    "D3": "PRIMARY_FORMAL_25_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; PROSE_21_OF_21_CLOSED; LEXICAL_493_OF_493_CLOSED; 6_THEOREM_MIGRATIONS_OPEN",
+    "D3": "PRIMARY_FORMAL_26_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; PROSE_21_OF_21_CLOSED; LEXICAL_494_OF_494_CLOSED; 5_THEOREM_MIGRATIONS_OPEN",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
-    "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; THEOREM_STATEMENTS_15_PASS; PRIMARY_FORMAL_25_OF_25_VERIFIED",
-    "D6": "NOT_READY_ONLY_6_THEOREM_MIGRATIONS_PLUS_FINAL_REPOSITORY_AUDIT",
+    "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; THEOREM_STATEMENTS_16_PASS; PRIMARY_FORMAL_26_OF_26_VERIFIED",
+    "D6": "NOT_READY_ONLY_5_THEOREM_MIGRATIONS_PLUS_FINAL_REPOSITORY_AUDIT",
     "issue1951": "OPEN",
     "ci": "CI_SEPARATE_FROM_STRICT_DOCUMENTATION_ACCEPTANCE",
     "acceptedArtifactsModified": false
   },
   "twoIndependentAuditReview": "audits/v015-postacceptance-independent-audits-convergence.json",
   "currentDiscovery": {
-    "legacyFencedInline": 210,
+    "legacyFencedInline": 211,
     "legacyProse": 21,
-    "lexicalLineCandidates": 493,
+    "lexicalLineCandidates": 494,
     "allCurrentMarkdown": 11,
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "CLOSED_REVIEWED",
-    "notes": "Current formula/source census is closed after FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04 and FND-06 migrations: primary FORMAL 25/25 bounded-receipt verified; broad lexical 493/493 = 457 reviewed NON_FORMAL + 34 verified FORMAL lines + 2 span-level reviewed mixed lines; prose 21/21 resolved. Six theorem statements remain NOT_MIGRATED and historical proof status is unchanged.",
+    "notes": "Current formula/source census is closed after FND-03, FND-05, INV-01, FND-04, INV-03, INV-02, INV-04, FND-06 and FND-11 migrations: primary FORMAL 26/26 bounded-receipt verified; broad lexical 494/494 = 457 reviewed NON_FORMAL + 35 verified FORMAL lines + 2 span-level reviewed mixed lines; prose 21/21 resolved. Five theorem statements remain NOT_MIGRATED and historical proof status is unchanged.",
     "lexicalReviewedNonFormal": 457,
     "lexicalPending": 0,
     "pendingBreakdown": {},
-    "lexicalVerifiedFormalLines": 34,
+    "lexicalVerifiedFormalLines": 35,
     "proseReviewedNonFormal": 19,
     "prosePending": 0,
-    "primaryFormalVerified": 25,
+    "primaryFormalVerified": 26,
     "primaryFormalPending": 0,
     "primaryRoleCorrections": {
       "acceptedSemanticMetanotation": [

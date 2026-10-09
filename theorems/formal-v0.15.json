@@ -295,6 +295,28 @@
       ],
       "formalSourcePath": "ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "FND-11",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "FND11_STATEMENT : FND11_PREMISES->FND11_CONCLUSION",
+      "formalPremises": [
+        "AcceptedV014RepresentationDefinitions",
+        "FND05Canonicality"
+      ],
+      "formalDependencies": [
+        "FND-05"
+      ],
+      "formalNonPremises": [
+        "global recursive structure/Q isomorphism",
+        "representation-strength ranking",
+        "host representation classifier semantic authority",
+        "shorter-source global dominance"
+      ],
+      "formalSourcePath": "ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

@@ -3,11 +3,11 @@
   "ownerIssue": 1951,
   "sourceMainSha": "813a1569300b241a3b70eb282eecd8231db15e4b",
   "sourceInventoryBlobSha": "8e6b86b2d0daf8a51f4ab3462ee4bd1f36b783b9",
-  "sourceOverlayBlobSha": "102e016f032eab6985900209fe41c2a49c25bf5a",
+  "sourceOverlayBlobSha": "48130f69b375d777c82dae58a2c07117afe4f9fc",
   "acceptedVersion": "v0.15",
   "oldInventoryCount": 21,
-  "formalMigrationCount": 15,
-  "missingCount": 6,
+  "formalMigrationCount": 16,
+  "missingCount": 5,
   "status": "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY",
   "scope": "Provenance/reference migration manifest, NOT a new canonical FORMAL theorem source or proof verdict. Accepted v0.15 proof boundary remains untouched.",
   "migrationsRequired": [
@@ -92,26 +92,6 @@
       "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT"
     },
     {
-      "id": "FND-11",
-      "sourceInventory": "theorems/current-v0.14.json",
-      "sourceStatement": "Representation identities are separated: Anum is a rooted sequence representation family, ExactSequence preserves exact positional identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
-      "lawRefs": [
-        "V14-L13"
-      ],
-      "dependencies": [
-        "FND-05"
-      ],
-      "premises": [
-        "AcceptedV014RepresentationDefinitions",
-        "FND05Canonicality"
-      ],
-      "proposedFormalStatement": null,
-      "formalSemanticsEvidence": null,
-      "independentProofStatus": "UNCHANGED_HISTORICAL",
-      "migrationStatus": "BLOCKED_NOT_MIGRATED",
-      "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT"
-    },
-    {
       "id": "FND-12",
       "sourceInventory": "theorems/current-v0.14.json",
       "sourceStatement": "Under the accepted V14-L14 representation-layer boundary and the proved FND-01/FND-11 dependencies, structural roles and representation denotations remain over the sole semantic Link carrier; recursive structure, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity.",
@@ -137,13 +117,11 @@
   "migrationWaves": [
     {
       "wave": 1,
-      "ids": [
-        "FND-11"
-      ],
+      "ids": [],
       "prerequisites": [
         "FND-05"
       ],
-      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+      "state": "COMPLETE"
     },
     {
       "wave": 2,

@@ -52,8 +52,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "81416f9b5307f5f276417f272dd38290eb8b86c1",
-      "lineCount": 2667
+      "blobSha": "eb66a1539bac31e9728ed87a4736b72377c19a01",
+      "lineCount": 2686
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -63,18 +63,18 @@
   ],
   "counts": {
     "currentFiles": 11,
-    "candidates": 493,
+    "candidates": 494,
     "unreviewed": 0,
     "byContext": {
-      "fenced": 315,
+      "fenced": 316,
       "prose": 5,
       "diagram": 1,
       "table": 34,
       "inline": 138
     },
     "byToken": {
-      "LINK_DIRECTION": 199,
-      "CONTEXT_NAME_OR_BINDING": 83,
+      "LINK_DIRECTION": 200,
+      "CONTEXT_NAME_OR_BINDING": 84,
       "DIAGRAM_OR_IMAGE": 1,
       "ROOT_ASPECT": 23,
       "START_END_ASPECT": 30,
@@ -8226,7 +8226,26 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1915,
+      "line": 1885,
+      "source": "FND11_STATEMENT : FND11_PREMISES->FND11_CONCLUSION",
+      "context": "fenced",
+      "tokens": [
+        "LINK_DIRECTION",
+        "CONTEXT_NAME_OR_BINDING"
+      ],
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0211"
+      ],
+      "reviewSourceSha256": "f09e4f9a5ee562358352146a0d0a2139c125a83291d122263a632ccb81b6aebe",
+      "reviewBasis": "Exact FND-11 theorem-catalog FORMAL line is covered by the append-stable theorem-statement verifier and B29 representation-separation owner; no mixed NON_FORMAL span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6078565881"
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "line": 1934,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -8244,7 +8263,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1920,
+      "line": 1939,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8262,7 +8281,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1995,
+      "line": 2014,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -8280,7 +8299,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2000,
+      "line": 2019,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8298,7 +8317,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2111,
+      "line": 2130,
       "source": "- `does not collapse ExactSequence multiplicity such as [X,X] to [X]`",
       "context": "inline",
       "tokens": [
@@ -8313,7 +8332,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2153,
+      "line": 2172,
       "source": "- `the A->B->C witness state is verifier machinery, not MTS ontology`",
       "context": "inline",
       "tokens": [
@@ -8331,7 +8350,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2273,
+      "line": 2292,
       "source": "- `each exact-only generation preserves closure: every emitted Link is either the opaque input identity or belongs to the fixed exact support`",
       "context": "inline",
       "tokens": [
@@ -8346,7 +8365,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2310,
+      "line": 2329,
       "source": "- `empty role bundle: generic matcher succeeds iff antecedent identity holds and substitution is empty`",
       "context": "inline",
       "tokens": [
@@ -8361,7 +8380,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2382,
+      "line": 2401,
       "source": "- `the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness`",
       "context": "inline",
       "tokens": [
@@ -8379,7 +8398,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2519,
+      "line": 2538,
       "source": "- `ExactSequence([]) equals the declared root`",
       "context": "inline",
       "tokens": [
@@ -8394,7 +8413,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2583,
+      "line": 2602,
       "source": "- `decode(compile(semantic)) = semantic for the declared recursive profile`",
       "context": "inline",
       "tokens": [
@@ -8412,7 +8431,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2616,
+      "line": 2635,
       "source": "- `production ExactSequence read(materialize(values))=values on its declared canonical domain`",
       "context": "inline",
       "tokens": [
