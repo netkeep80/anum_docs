@@ -6414,7 +6414,7 @@
     {
       "path": "docs/theory/Теоремы МТС.md",
       "line": 35,
-      "source": "| [FND-11](#theorem-fnd-11) | `NOT_MIGRATED` | `Representation identities are separated: Anum is a rooted sequence representation family, ExactSequence preserves exact positional identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 4 исполняемых свидетельств |",
+      "source": "| [FND-11](#theorem-fnd-11) | `FORMAL_MIGRATED` | `Representation identities are separated: Anum is a rooted sequence representation family, ExactSequence preserves exact positional identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.` | текущая; нативная классификация — отсутствует | 1 внешних проверок | 1 внешних проверок | — | 4 исполняемых свидетельств |",
       "context": "table",
       "tokens": [
         "CONTEXT_NAME_OR_BINDING"
@@ -6424,7 +6424,7 @@
       "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
       "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
       "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
-      "reviewSourceSha256": "0da212e3646639d9d764fcf92632c91d32abf86b96a4bff09bdb16fafda6b573"
+      "reviewSourceSha256": "f8b6087607e4dd44570bf3b003f47791e8692e3f4548829135068072fd6d9cbb"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
