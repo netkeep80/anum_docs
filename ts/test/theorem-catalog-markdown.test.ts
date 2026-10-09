@@ -97,6 +97,28 @@ function main(): void {
   assert.equal(theoremPresentationProfileForSurface("catalog-glossary"), "reference");
   assert.equal(theoremPresentationProfileForSurface("observatory-audit"), "evidence-first");
 
+  const orderProbe = model.theorems.find((item) => item.id === "FND-01");
+  assert.ok(orderProbe !== undefined);
+  const academicOrder = renderTheoremCardMarkdown(orderProbe, "academic");
+  assert.ok(
+    academicOrder.indexOf("**Область действия:**") < academicOrder.indexOf("### Формальная запись FORMAL v0.15"),
+    "academic profile must explain scope before formal machinery",
+  );
+  const referenceOrder = renderTheoremCardMarkdown(orderProbe, "reference");
+  assert.ok(
+    referenceOrder.indexOf("### Формальная запись FORMAL v0.15") < referenceOrder.indexOf("**Область действия:**"),
+    "reference profile must expose canonical FORMAL before expanded scope",
+  );
+  const evidenceOrder = renderTheoremCardMarkdown(orderProbe, "evidence-first");
+  assert.ok(
+    evidenceOrder.indexOf("**Исходная формулировка") < evidenceOrder.indexOf("### Доказательная база"),
+    "evidence-first profile must identify the claim before presenting its evidence",
+  );
+  assert.ok(
+    evidenceOrder.indexOf("### Доказательная база") < evidenceOrder.indexOf("### Формальная запись FORMAL v0.15"),
+    "evidence-first profile must prioritize evidence immediately after the claim",
+  );
+
   assert.equal(
     model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length,
     21,
@@ -368,14 +390,6 @@ function main(): void {
     for (const dependency of denseFormalDependencies) {
       assert.ok(card.includes(dependency), profile + ": dense FORMAL dependency lost " + dependency);
     }
-  }
-
-  const previewTheorem = model.theorems.find((item) => item.id === "FND-01");
-  assert.ok(previewTheorem !== undefined);
-  for (const profile of THEOREM_PRESENTATION_PROFILES) {
-    console.log("\nMTS_PRESENTATION_PREVIEW_BEGIN " + profile);
-    console.log(renderTheoremCardMarkdown(previewTheorem, profile));
-    console.log("MTS_PRESENTATION_PREVIEW_END " + profile);
   }
 
   const tracked = readFileSync(resolve(root, THEOREM_CATALOG_PATH), "utf8");
