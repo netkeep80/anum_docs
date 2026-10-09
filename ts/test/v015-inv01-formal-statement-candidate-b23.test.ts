@@ -156,7 +156,7 @@ for (const path of ["proofs/evidence/INV-01/lean4.json", "proofs/evidence/INV-01
   same(JSON.stringify(evidence.dependencies), JSON.stringify(["FND-01", "FND-02"]),
     path + " dependencies");
   assert(evidence.notes?.includes("Prop-valued structural graph"), path + " structural relation boundary");
-  assert(evidence.notes?.includes("unique total"), path + " unique-total boundary");
+  assert(evidence.notes?.includes("total and functional") && evidence.notes?.includes("exactly one structural inverse"),\n    path + " unique-total boundary");
   assert(evidence.notes?.includes("not as a host enum"), path + " no host enum");
 }
 
