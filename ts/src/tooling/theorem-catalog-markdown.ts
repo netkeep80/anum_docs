@@ -357,7 +357,7 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "## Сводка",
     "",
     "FORMAL v0.15: " + inlineCode(String(model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length)) +
-      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную FORMAL-формулировку; остальные имеют статус " +
+      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную FORMAL-формулировку; утверждения без зарегистрированной FORMAL-формулировки, если они есть, имеют статус " +
       inlineCode("NOT_MIGRATED") + ". Это не меняет accepted v0.15 release и не повышает доказательную authority.",
     "",
     "| ID | FORMAL v0.15 | Исходная формулировка v0.14 (историческое evidence) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",

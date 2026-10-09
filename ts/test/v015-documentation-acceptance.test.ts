@@ -112,7 +112,7 @@ const complete = {
   contract: "mts-contract/v0.15",
 } as const;
 assert.deepEqual(evaluateV015DocumentationCompletion(complete), [],
-  "terminal state 21/21, 19 source-verified FORMAL + full evidence MUST be reachable");
+  "terminal state 21/21 theorem migrations + full evidence MUST be reachable");
 assert.ok(evaluateV015DocumentationCompletion({
   ...complete,
   evidenceDefects: ["F0001: missing semantic source/denotation/replay witness"],

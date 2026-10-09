@@ -118,6 +118,12 @@ if (fnd04 !== undefined) {
   assert.equal(migratedFnd04.aproverStatus, "NOT_RECORDED");
 }
 
-if (remaining.length) assert.equal(backlog.status, "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY");
+if (remaining.length) {
+  assert.equal(backlog.status, "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY");
+} else {
+  assert.equal(backlog.status, "COMPLETE_FORMAL_DOC_CONSISTENCY",
+    "zero remaining theorem migrations must record terminal COMPLETE status");
+}
 console.log("v0.15 theorem FORMAL migration: inventory locked; migrated=" +
-  migrated.length + "/" + historical.length + "; remaining=" + remaining.length + "; FULL_FORMAL_COVERAGE_NOT_CLAIMED");
+  migrated.length + "/" + historical.length + "; remaining=" + remaining.length +
+  "; FULL_FORMAL_COVERAGE=" + (remaining.length === 0 ? "COMPLETE" : "NOT_CLAIMED"));
