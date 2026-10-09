@@ -399,15 +399,18 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     inventoryIntegrityIssues.push("unindexed source expressions: discovered=" +
       discovered.length + " declared=" + candidates.length);
   }
-  for (let i = 0; i < Math.min(discovered.length, candidates.length); i++) {
-    const actual = discovered[i]!;
-    const expected = candidates[i]!;
-    if (actual.path !== expected.path || actual.kind !== expected.kind ||
-        actual.source !== expected.source || actual.startLine !== expected.startLine ||
-        actual.endLine !== expected.endLine) {
-      inventoryIntegrityIssues.push("expression inventory mismatch at index " + i);
-      break;
-    }
+  const occurrenceKey = (entry: {
+    path: unknown; kind: unknown; source: unknown; startLine: unknown; endLine: unknown;
+  }): string => JSON.stringify([
+    entry.path, entry.startLine, entry.endLine, entry.kind, entry.source,
+  ]);
+  const discoveredOccurrences = discovered.map(occurrenceKey).sort();
+  const declaredOccurrences = candidates.map(occurrenceKey).sort();
+  if (JSON.stringify(discoveredOccurrences) !== JSON.stringify(declaredOccurrences)) {
+    inventoryIntegrityIssues.push("expression inventory occurrence-set mismatch");
+  }
+  if (new Set(declaredOccurrences).size !== declaredOccurrences.length) {
+    inventoryIntegrityIssues.push("duplicate expression occurrence identity");
   }
   const reviewedNonFormal = candidates.filter((item) => isV015NonFormalRole(field(item, "role")) &&
     ["NOT_APPLICABLE_FORMAL_SOURCE", "NOT_APPLICABLE_PROCESS_DOCUMENTATION"].includes(field(item, "denotation")) &&
