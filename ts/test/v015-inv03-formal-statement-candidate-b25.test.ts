@@ -202,8 +202,8 @@ sameBytes(wire(first,compiled,"INV03_STATEMENT"),wire(renamedFixture,renamedComp
 }
 
 console.log([
-  "MTS v0.15 B25 INV-03 candidate FORMAL statement:",
-  "MIGRATION_STATUS=CANDIDATE_NOT_PROMOTED",
+  "MTS v0.15 B25 INV-03 FORMAL statement:",
+  "MIGRATION_STATUS=FORMAL_MIGRATED",
   "FORMAL_ARTIFACT_KIND=STATEMENT_ONLY",
   "FORMAL_PREMISES=0",
   "FORMAL_DEPENDENCIES=INV-01",

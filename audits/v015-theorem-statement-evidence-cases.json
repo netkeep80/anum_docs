@@ -181,6 +181,28 @@
         "NATIVE_PROOF=NOT_CLAIMED",
         "APROVER_ACCEPT=NOT_CLAIMED"
       ]
+    },
+    {
+      "id": "F0207",
+      "theoremId": "INV-03",
+      "source": "INV03_STATEMENT : INV03_PREMISES->INV03_CONCLUSION",
+      "formalSourcePath": "ts/test/v015-inv03-formal-statement-candidate-b25.test.ts",
+      "testBlobSha": "e0aa93a0e29b2bade7d49319dd38825d81548d10",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "outputMarkers": [
+        "MTS v0.15 B25 INV-03 FORMAL statement:",
+        "MIGRATION_STATUS=FORMAL_MIGRATED",
+        "FORMAL_PREMISES=0",
+        "FORMAL_DEPENDENCIES=INV-01",
+        "ROOT_FIXED_POINT=R_J_R",
+        "J_RELATION=LINK_NATIVE_STRUCTURAL_STATEMENT",
+        "PRESENTATION_RENAME=SEMANTICALLY_STABLE",
+        "JSON_J1=EXACT",
+        "ROOT_IMAGE_MUTATION=DIFF",
+        "NATIVE_PROOF=NOT_CLAIMED",
+        "APROVER_ACCEPT=NOT_CLAIMED"
+      ]
     }
   ]
 }
