@@ -532,6 +532,15 @@
       "ts/src/tooling/mts-compiler.ts",
       "ts/test/theorem-catalog-markdown.test.ts",
       "ts/test/docs-sync.test.ts"
+    ],
+    "historical-pics-readme": [
+      "pics/README.md"
+    ],
+    "historical-pics-manifest": [
+      "profiles/mts-historical-images.json"
+    ],
+    "historical-pics-test": [
+      "ts/test/historical-images-protection.test.ts"
     ]
   },
   "new_file_classes": {
@@ -543,6 +552,15 @@
     ],
     "theorem-catalog-test": [
       "ts/test/theorem-catalog-markdown.test.ts"
+    ],
+    "historical-pics-readme": [
+      "pics/README.md"
+    ],
+    "historical-pics-manifest": [
+      "profiles/mts-historical-images.json"
+    ],
+    "historical-pics-test": [
+      "ts/test/historical-images-protection.test.ts"
     ]
   },
   "change_profiles": {
@@ -573,6 +591,37 @@
         "max_new_docs": 1,
         "max_new_files": 3,
         "max_net_added_lines": 2300
+      }
+    },
+    "historical-preservation": {
+      "allow_surfaces": [
+        "historical-pics-readme",
+        "historical-pics-manifest",
+        "historical-pics-test"
+      ],
+      "require_surfaces": [
+        "historical-pics-readme",
+        "historical-pics-manifest",
+        "historical-pics-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "new_files": {
+        "allow_classes": [
+          "historical-pics-readme",
+          "historical-pics-manifest",
+          "historical-pics-test"
+        ],
+        "max_per_class": {
+          "historical-pics-readme": 1,
+          "historical-pics-manifest": 1,
+          "historical-pics-test": 1
+        },
+        "max_new_files": 3
+      },
+      "budgets": {
+        "max_new_docs": 1,
+        "max_new_files": 3,
+        "max_net_added_lines": 300
       }
     }
   }
