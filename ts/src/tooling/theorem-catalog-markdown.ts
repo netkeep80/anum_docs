@@ -15,6 +15,25 @@ export type TheoremPresentationProfile = "academic" | "reference" | "evidence-fi
 export const THEOREM_PRESENTATION_PROFILES: readonly TheoremPresentationProfile[] =
   Object.freeze(["academic", "reference", "evidence-first"]);
 
+export type TheoremPresentationSurfaceRole =
+  | "theory-foundations"
+  | "catalog-glossary"
+  | "observatory-audit";
+
+export const THEOREM_PRESENTATION_PROFILE_BY_SURFACE: Readonly<
+  Record<TheoremPresentationSurfaceRole, TheoremPresentationProfile>
+> = Object.freeze({
+  "theory-foundations": "academic",
+  "catalog-glossary": "reference",
+  "observatory-audit": "evidence-first",
+});
+
+export function theoremPresentationProfileForSurface(
+  surface: TheoremPresentationSurfaceRole,
+): TheoremPresentationProfile {
+  return THEOREM_PRESENTATION_PROFILE_BY_SURFACE[surface];
+}
+
 
 const LANE_ORDER: readonly TheoremProjectionEvidenceLane[] = [
   "typescript",
