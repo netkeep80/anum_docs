@@ -6359,7 +6359,7 @@
       "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
       "reviewBasis": "This generated theorem-catalog row is a reader/evidence summary or scope projection; the canonical FORMAL theorem source is emitted and tracked separately.",
       "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6065834914",
-      "reviewSourceSha256": "be9865d6f3c043ac404d1bc3914d72ccce9e0c3cae8eb8b12b79f81bec3e772d"
+      "reviewSourceSha256": "7fbe965a4191ed31405a159fdf4f6b2de32e5a19fc59c9c328e535d2d18ba02a"
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
