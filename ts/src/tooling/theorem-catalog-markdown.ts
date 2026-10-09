@@ -221,7 +221,7 @@ function renderCard(theorem: TheoremProjectionTheorem): string {
     `**Происхождение:** ${theorem.origin === null ? "—" : inlineCode(theorem.origin)}.  `,
     `**Волна:** ${theorem.wave === null ? "—" : inlineCode(theorem.wave)}.`,
     "",
-    "**Исходная формулировка (исторический v0.14 evidence, не FORMAL v0.15):**",
+    "**Исходная формулировка (историческое свидетельство `v0.14`, не `FORMAL v0.15`):**",
     "~~~text",
     theorem.statement,
     "~~~",
@@ -349,18 +349,18 @@ export function renderTheoremCatalogMarkdown(model: TheoremProjectionModel): str
     "",
     "> **Генерируемая человекочитаемая проекция текущего реестра теорем МТС.**",
     "> Не является самостоятельным источником нормативной или доказательной истины.",
-    "> Семантическая authority текущего выпуска — [принятый контракт MTS v0.15](../../contracts/mts-contract-v0.15.json); исходная теоремная доказательная authority остаётся версионной. Этот Markdown — только производная проекция.",
+    "> Семантический нормативный источник текущего выпуска — [принятый контракт v0.15](../../contracts/mts-contract-v0.15.json); исходный доказательный источник теорем остаётся версионным. Этот файл — только производная проекция.",
     "",
     `Исходный принятый реестр теорем: ${repositoryLink(model.sourceInventory)}. Версия доказательного реестра: ${inlineCode(model.mtsVersion)}.`,
-    `Доказательный overlay в принятой FORMAL v0.15: ${repositoryLink(model.formalOverlay)}. Статус миграции доказательств: ${inlineCode(model.formalCandidateVersion)}; не статус выпуска MTS.`,
+    `Доказательная проекция в принятой `FORMAL v0.15`: ${repositoryLink(model.formalOverlay)}. Статус миграции доказательств: ${inlineCode(model.formalCandidateVersion)}; не статус выпуска МТС.`,
     "",
     "## Сводка",
     "",
-    "FORMAL v0.15: " + inlineCode(String(model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length)) +
-      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную FORMAL-формулировку; утверждения без зарегистрированной FORMAL-формулировки, если они есть, имеют статус " +
-      inlineCode("NOT_MIGRATED") + ". Это не меняет accepted v0.15 release и не повышает доказательную authority.",
+    "`FORMAL v0.15`: " + inlineCode(String(model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length)) +
+      " / " + inlineCode(String(model.theorems.length)) + " исходных теоремных утверждений имеют зарегистрированную `FORMAL`-формулировку; утверждения без зарегистрированной `FORMAL`-формулировки, если они есть, имеют статус " +
+      inlineCode("NOT_MIGRATED") + ". Это не меняет принятый выпуск v0.15 и не повышает доказательный статус.",
     "",
-    "| ID | FORMAL v0.15 | Исходная формулировка v0.14 (историческое evidence) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
+    "| ID | `FORMAL v0.15` | Исходная формулировка v0.14 (историческое свидетельство) | Статус | `Lean4` | `Rocq` | `MTS-native` | `TypeScript` |",
     "| --- | --- | --- | --- | --- | --- | --- | --- |",
   ];
   for (const theorem of model.theorems) {
