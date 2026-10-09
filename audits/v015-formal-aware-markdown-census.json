@@ -52,8 +52,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "3b25196bee72124d7889080084093b56588ea6f2",
-      "lineCount": 2635
+      "blobSha": "74fb3bea718e02ad4d68dfca7ad702b7febb9ff8",
+      "lineCount": 2651
     },
     {
       "path": "docs/Словарь терминов МТС.md",
@@ -63,18 +63,18 @@
   ],
   "counts": {
     "currentFiles": 11,
-    "candidates": 491,
+    "candidates": 492,
     "unreviewed": 0,
     "byContext": {
-      "fenced": 313,
+      "fenced": 314,
       "prose": 5,
       "diagram": 1,
       "table": 34,
       "inline": 138
     },
     "byToken": {
-      "LINK_DIRECTION": 197,
-      "CONTEXT_NAME_OR_BINDING": 81,
+      "LINK_DIRECTION": 198,
+      "CONTEXT_NAME_OR_BINDING": 82,
       "DIAGRAM_OR_IMAGE": 1,
       "ROOT_ASPECT": 23,
       "START_END_ASPECT": 30,
@@ -7783,7 +7783,26 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1332,
+      "line": 1335,
+      "source": "INV04_STATEMENT : INV04_PREMISES->INV04_CONCLUSION",
+      "context": "fenced",
+      "tokens": [
+        "LINK_DIRECTION",
+        "CONTEXT_NAME_OR_BINDING"
+      ],
+      "classification": "FORMAL_V015_THEOREM_STATEMENT",
+      "verification": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "rationale": "FORMAL-aware lexer discovery; requires source/semantic classification, parser evidence or explicit historical/non-normative exception.",
+      "primaryCandidateIds": [
+        "F0209"
+      ],
+      "reviewSourceSha256": "5103de2fef6e17ba6df4cd658daa5981322869ed19b07a59cc8a141e8bbcc2ee",
+      "reviewBasis": "Exact INV-04 theorem-catalog FORMAL line is covered by the append-stable theorem-statement verifier and B27 two-sided one-sided-exchange owner; no mixed NON_FORMAL span overlaps this line.",
+      "reviewReference": "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6077806191"
+    },
+    {
+      "path": "docs/theory/Теоремы МТС.md",
+      "line": 1348,
       "source": "Declared recursive inversion domain; semantic START_K/END_K names remain Context-relative.",
       "context": "fenced",
       "tokens": [
@@ -7798,7 +7817,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1361,
+      "line": 1377,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -7816,7 +7835,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1366,
+      "line": 1382,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -7834,7 +7853,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1443,
+      "line": 1459,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -7852,7 +7871,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1448,
+      "line": 1464,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -7870,7 +7889,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1524,
+      "line": 1540,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -7888,7 +7907,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1529,
+      "line": 1545,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -7906,7 +7925,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1564,
+      "line": 1580,
       "source": "Objective chirality survives inversion: J reverses orientation while preserving the structural distinction between the two one-sided self-incidence classes.",
       "context": "fenced",
       "tokens": [
@@ -7921,7 +7940,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1605,
+      "line": 1621,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -7939,7 +7958,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1610,
+      "line": 1626,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -7957,7 +7976,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1645,
+      "line": 1661,
       "source": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
       "context": "fenced",
       "tokens": [
@@ -7977,7 +7996,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1690,
+      "line": 1706,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -7995,7 +8014,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1695,
+      "line": 1711,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8013,7 +8032,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1742,
+      "line": 1758,
       "source": "Semantic Link identity is structurally immutable: equality of formed Links preserves both ordered poles, and changing either pole denotes a distinct semantic Link. Rewrite/execution may replace selected membership or explicitly construct structurally substituted Links, but does not mutate an existing Link's poles in place.",
       "context": "fenced",
       "tokens": [
@@ -8028,7 +8047,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1753,
+      "line": 1769,
       "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
       "context": "fenced",
       "tokens": [
@@ -8047,7 +8066,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1758,
+      "line": 1774,
       "source": "  - `a : Link`",
       "context": "inline",
       "tokens": [
@@ -8062,7 +8081,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1760,
+      "line": 1776,
       "source": "  - `b : Link`",
       "context": "inline",
       "tokens": [
@@ -8077,7 +8096,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1762,
+      "line": 1778,
       "source": "  - `x : Link`",
       "context": "inline",
       "tokens": [
@@ -8092,7 +8111,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1763,
+      "line": 1779,
       "source": "  - `y : Link`",
       "context": "inline",
       "tokens": [
@@ -8107,7 +8126,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1764,
+      "line": 1780,
       "source": "  - `c : Link`",
       "context": "inline",
       "tokens": [
@@ -8122,7 +8141,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1765,
+      "line": 1781,
       "source": "  - `d : Link`",
       "context": "inline",
       "tokens": [
@@ -8137,7 +8156,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1802,
+      "line": 1818,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -8155,7 +8174,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1807,
+      "line": 1823,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8173,7 +8192,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1842,
+      "line": 1858,
       "source": "Representation identities are separated: Anum is a rooted sequence representation family, ExactSequence preserves exact positional identity distinct from fold denotation, the recursive Link codec is not Anum, Q is a versioned sequence codec/interpreter, and every local sequence origin is R.",
       "context": "fenced",
       "tokens": [
@@ -8188,7 +8207,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1883,
+      "line": 1899,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -8206,7 +8225,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1888,
+      "line": 1904,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8224,7 +8243,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1963,
+      "line": 1979,
       "source": "    - инструментарий: `Lean` — `v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4`.",
       "context": "inline",
       "tokens": [
@@ -8242,7 +8261,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 1968,
+      "line": 1984,
       "source": "    - инструментарий: `Rocq` — `V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7`.",
       "context": "inline",
       "tokens": [
@@ -8260,7 +8279,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2079,
+      "line": 2095,
       "source": "- `does not collapse ExactSequence multiplicity such as [X,X] to [X]`",
       "context": "inline",
       "tokens": [
@@ -8275,7 +8294,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2121,
+      "line": 2137,
       "source": "- `the A->B->C witness state is verifier machinery, not MTS ontology`",
       "context": "inline",
       "tokens": [
@@ -8293,7 +8312,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2241,
+      "line": 2257,
       "source": "- `each exact-only generation preserves closure: every emitted Link is either the opaque input identity or belongs to the fixed exact support`",
       "context": "inline",
       "tokens": [
@@ -8308,7 +8327,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2278,
+      "line": 2294,
       "source": "- `empty role bundle: generic matcher succeeds iff antecedent identity holds and substitution is empty`",
       "context": "inline",
       "tokens": [
@@ -8323,7 +8342,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2350,
+      "line": 2366,
       "source": "- `the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness`",
       "context": "inline",
       "tokens": [
@@ -8341,7 +8360,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2487,
+      "line": 2503,
       "source": "- `ExactSequence([]) equals the declared root`",
       "context": "inline",
       "tokens": [
@@ -8356,7 +8375,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2551,
+      "line": 2567,
       "source": "- `decode(compile(semantic)) = semantic for the declared recursive profile`",
       "context": "inline",
       "tokens": [
@@ -8374,7 +8393,7 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "line": 2584,
+      "line": 2600,
       "source": "- `production ExactSequence read(materialize(values))=values on its declared canonical domain`",
       "context": "inline",
       "tokens": [

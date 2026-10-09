@@ -261,6 +261,23 @@
       ],
       "formalSourcePath": "ts/test/v015-inv02-formal-statement-candidate-b26.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "INV-04",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "INV04_STATEMENT : INV04_PREMISES->INV04_CONCLUSION",
+      "formalPremises": [],
+      "formalDependencies": [
+        "INV-01"
+      ],
+      "formalNonPremises": [
+        "Foundation-global absolute START",
+        "representation order authority"
+      ],
+      "formalSourcePath": "ts/test/v015-inv04-formal-statement-candidate-b27.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }
