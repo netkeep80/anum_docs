@@ -20,10 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      # repo-guard exact state-replacement bugfix pin (repo-guard#640)
+      # repo-guard exact consumer pin: accepted fixes through large-diff boundary (#650/#653)
       - name: Run repo-guard
         id: repo_guard
-        uses: netkeep80/repo-guard@cd8ea38938444dc65d09601e350468768c7f7f0f
+        uses: netkeep80/repo-guard@8ee0ed9d6da56c93132e9ad6fda8d1c62c33fd34
         with:
           mode: check-pr
           enforcement: blocking
