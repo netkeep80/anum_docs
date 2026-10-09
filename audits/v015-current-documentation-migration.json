@@ -11,7 +11,7 @@
     "formalProjection": "profiles/mts-v015-formal-notation-projection.json",
     "kernel": "profiles/mts-v015-meta-interpreter-kernel.json"
   },
-  "state": "MACHINE_VERIFIED_AWAITING_AUTHOR_REVIEW",
+  "state": "COMPLETE_VERIFIED",
   "rules": [
     "Accepted v0.15 is the only normative target for current documents and FORMAL formulas.",
     "Do not modify immutable historical proof/release records or Author-approved FORMAL/JSON artifacts.",
@@ -94,9 +94,9 @@
     "D3": "PRIMARY_FORMAL_31_VERIFIED_0_PENDING+2_ROLE_CORRECTIONS; PROSE_21_OF_21_CLOSED; LEXICAL_499_OF_499_CLOSED; THEOREM_MIGRATIONS_21_OF_21_CLOSED",
     "D4": "GENERATOR_OWNER_UPDATED_AND_FORMAL_META_EQUALITY_REGENERATED",
     "D5": "STRICT_GATE_MULTI_PROFILE_RECEIPT_RECOMPUTATION; B20_5_PASS; ROOT_BASIS_F0028_PASS; SEMANTIC_METAMODEL_4_PASS; THEOREM_STATEMENTS_21_PASS; PRIMARY_FORMAL_31_OF_31_VERIFIED",
-    "D6": "MACHINE_AUDIT_COMPLETE_AWAITING_AUTHOR_REVIEW",
+    "D6": "COMPLETE_VERIFIED_AUTHOR_ACCEPTED",
     "issue1951": "OPEN",
-    "ci": "EXACT_HEAD_4F6A38_CI_10093_SUCCESS_OBSERVATORY_1552_SUCCESS_REPO_GUARD_SKIPPED_WHILE_DRAFT",
+    "ci": "PRE_AUTHOR_EXACT_HEAD_31662C_CI_10094_SUCCESS_OBSERVATORY_1553_SUCCESS_REPO_GUARD_SKIPPED_WHILE_DRAFT",
     "acceptedArtifactsModified": false
   },
   "twoIndependentAuditReview": "audits/v015-postacceptance-independent-audits-convergence.json",
@@ -108,7 +108,7 @@
     "immutableResearchExcluded": 2,
     "countsOverlap": true,
     "lexicalSemanticsStatus": "CLOSED_REVIEWED",
-    "notes": "Current formula/source census is closed after all bounded theorem statement migrations through CTX-03: primary FORMAL 31/31 bounded-receipt verified; broad lexical 499/499 = 457 reviewed NON_FORMAL + 40 verified FORMAL lines + 2 span-level reviewed mixed lines; prose 21/21 resolved. The theorem FORMAL migration backlog is 21/21 closed; historical proof status is unchanged and final whole-repository documentation audit remains.",
+    "notes": "Current formula/source census is closed after all bounded theorem statement migrations through CTX-03: primary FORMAL 31/31 bounded-receipt verified; broad lexical 499/499 = 457 reviewed NON_FORMAL + 40 verified FORMAL lines + 2 span-level reviewed mixed lines; prose 21/21 resolved. The theorem FORMAL migration backlog is 21/21 closed; historical proof status is unchanged; final whole-repository documentation audit is complete and the Author accepted the migration manifest.",
     "lexicalReviewedNonFormal": 457,
     "lexicalPending": 0,
     "pendingBreakdown": {},
@@ -159,10 +159,32 @@
       "state": "SKIPPED_DRAFT_NOT_COUNTED_AS_PASS"
     },
     "historicalRetention": "Explicitly version-scoped v0.14/research evidence may remain; no retained historical material is current v0.15 authority.",
-    "authorReview": "PENDING",
+    "authorReview": {
+      "state": "ACCEPTED",
+      "decision": "ACCEPT_MIGRATION_MANIFEST_1951",
+      "decisionEvidence": "netkeep80/anum_docs#1951 issuecomment-6082360200",
+      "acceptedAt": "2026-10-09",
+      "acceptedHead": "31662c095f54817d07b1fdb88568806f2a7e6f8d"
+    },
     "remainingBeforeMerge": [
-      "Author explicitly reviews/accepts this migration manifest.",
-      "After manifest becomes COMPLETE_VERIFIED, remove Draft and require an executed blocking repo-guard result on the exact ready-for-review head."
-    ]
+      "Run exact-head CI and Contract Observatory after COMPLETE_VERIFIED transition.",
+      "After those exact-head checks are GREEN, remove Draft.",
+      "Require an executed SUCCESS repo-guard blocking check on the exact ready-for-review head before merge."
+    ],
+    "preAuthorValidation": {
+      "evidenceHead": "31662c095f54817d07b1fdb88568806f2a7e6f8d",
+      "ci": {
+        "run": 10094,
+        "state": "SUCCESS"
+      },
+      "observatory": {
+        "run": 1553,
+        "state": "SUCCESS"
+      },
+      "repoGuard": {
+        "run": 4711,
+        "state": "SKIPPED_DRAFT_NOT_COUNTED_AS_PASS"
+      }
+    }
   }
 }
