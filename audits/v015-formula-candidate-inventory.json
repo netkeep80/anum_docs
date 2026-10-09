@@ -27,8 +27,8 @@
     },
     {
       "path": "docs/theory/Теоремы МТС.md",
-      "blobSha": "0c0fbc35d39aedcb923ddfdf8a07ca03fb7c0096",
-      "lineCount": 2770
+      "blobSha": "4d214ac51d667b417bc93117df46939fa13e6fc6",
+      "lineCount": 2794
     },
     {
       "path": "docs/specs/Формальная нотация МТС.md",
@@ -58,8 +58,8 @@
   ],
   "counts": {
     "files": 10,
-    "candidates": 215,
-    "fences": 121,
+    "candidates": 216,
+    "fences": 122,
     "inline": 94
   },
   "acceptanceRules": [
@@ -3154,8 +3154,8 @@
     {
       "id": "F0114",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1784,
-      "endLine": 1784,
+      "startLine": 1808,
+      "endLine": 1808,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3165,8 +3165,8 @@
     {
       "id": "F0115",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1789,
-      "endLine": 1789,
+      "startLine": 1813,
+      "endLine": 1813,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3176,8 +3176,8 @@
     {
       "id": "F0116",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1847,
-      "endLine": 1847,
+      "startLine": 1871,
+      "endLine": 1871,
       "kind": "fence",
       "language": "text",
       "source": "EXE02_STATEMENT : EXE02_PREMISES->EXE02_CLAUSES",
@@ -3228,8 +3228,8 @@
     {
       "id": "F0117",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1896,
-      "endLine": 1896,
+      "startLine": 1920,
+      "endLine": 1920,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3239,8 +3239,8 @@
     {
       "id": "F0118",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1901,
-      "endLine": 1901,
+      "startLine": 1925,
+      "endLine": 1925,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3250,8 +3250,8 @@
     {
       "id": "F0119",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1996,
-      "endLine": 1996,
+      "startLine": 2020,
+      "endLine": 2020,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3261,8 +3261,8 @@
     {
       "id": "F0120",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2001,
-      "endLine": 2001,
+      "startLine": 2025,
+      "endLine": 2025,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3272,8 +3272,8 @@
     {
       "id": "F0121",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2098,
-      "endLine": 2098,
+      "startLine": 2122,
+      "endLine": 2122,
       "kind": "inline-code",
       "source": "v4.34.1@5045d0056413266e57c625dcd7c365b10e377c52;linux-sha256=47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3283,8 +3283,8 @@
     {
       "id": "F0122",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2103,
-      "endLine": 2103,
+      "startLine": 2127,
+      "endLine": 2127,
       "kind": "inline-code",
       "source": "V9.2.0@adfbf1855c348766beb4b790dcc8ebc02f908f63;docker=sha256:61edd1ba7242c19b4261728c75437c1589d9383506ad2747f463a94c82857cf7",
       "role": "NON_FORMAL_PROOF_TOOLCHAIN_IDENTITY",
@@ -3294,8 +3294,8 @@
     {
       "id": "F0123",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2256,
-      "endLine": 2256,
+      "startLine": 2280,
+      "endLine": 2280,
       "kind": "inline-code",
       "source": "the A->B->C witness state is verifier machinery, not MTS ontology",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3305,8 +3305,8 @@
     {
       "id": "F0124",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2485,
-      "endLine": 2485,
+      "startLine": 2509,
+      "endLine": 2509,
       "kind": "inline-code",
       "source": "the selected direct-gauge execution boundary is C = END(R), while its mirror-gauge boundary is the corresponding START-side root witness",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3316,8 +3316,8 @@
     {
       "id": "F0125",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2686,
-      "endLine": 2686,
+      "startLine": 2710,
+      "endLine": 2710,
       "kind": "inline-code",
       "source": "decode(compile(semantic)) = semantic for the declared recursive profile",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3327,8 +3327,8 @@
     {
       "id": "F0126",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2719,
-      "endLine": 2719,
+      "startLine": 2743,
+      "endLine": 2743,
       "kind": "inline-code",
       "source": "production ExactSequence read(materialize(values))=values on its declared canonical domain",
       "role": "NON_FORMAL_THEOREM_EVIDENCE_COMMENTARY",
@@ -3534,8 +3534,8 @@
     {
       "id": "F0211",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 1947,
-      "endLine": 1947,
+      "startLine": 1971,
+      "endLine": 1971,
       "kind": "fence",
       "language": "text",
       "source": "FND11_STATEMENT : FND11_PREMISES->FND11_CONCLUSION",
@@ -3632,8 +3632,8 @@
     {
       "id": "F0213",
       "path": "docs/theory/Теоремы МТС.md",
-      "startLine": 2047,
-      "endLine": 2047,
+      "startLine": 2071,
+      "endLine": 2071,
       "kind": "fence",
       "language": "text",
       "source": "FND12_STATEMENT : FND12_PREMISES->FND12_CONCLUSION",
@@ -3775,18 +3775,67 @@
           "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
         }
       }
+    },
+    {
+      "id": "F0216",
+      "path": "docs/theory/Теоремы МТС.md",
+      "startLine": 1750,
+      "endLine": 1750,
+      "kind": "fence",
+      "language": "text",
+      "source": "CTX03_STATEMENT : CTX03_PREMISES->CTX03_CONCLUSION",
+      "role": "FORMAL_V015_THEOREM_STATEMENT",
+      "denotation": "VERIFIED_AGAINST_ACCEPTED_V015",
+      "sourceArtifact": "theorems/formal-v0.15.json",
+      "sourceTheoremId": "CTX-03",
+      "reviewBasis": "Exact migrated CTX-03 FORMAL statement is bounded to the accepted Context-relative chirality theorem and executable B34 owner. It preserves objective pre-observer chirality, Context-local START_K/END_K distinction and relational Z2 transport, while keeping Foundation-global orientation, ExactSequence, host Frame/Gauge/Bool, raw pole order, primitive-opcode and stronger arbitrary-Link normalization authority excluded.",
+      "semanticEvidence": {
+        "compilerVersion": "mts-v015-theorem-statement-evidence/v0.1",
+        "acceptedFormalVersion": "v0.15",
+        "formalSourceSha256": "85169d542d3653ae27a785f79dbbed225730f40cf82af5dfc82ab42744fc97af",
+        "executionApplicability": "NOT_APPLICABLE",
+        "executionRationale": "CTX-03 migration registers a theorem statement/mapping artifact. B34 checks objective pre-selection chirality, FORMAL DISTINCT witnesses, J² return, Context-local START_K/END_K roles, Id/J Z2 transport and composition, fresh-Memory wire parity, presentation-rename stability, exact J1 parity and six semantic mutations without claiming Foundation-global orientation or native/aprover proof.",
+        "grammar": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_GRAMMAR"
+        },
+        "denotation": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_DENOTATION"
+        },
+        "semanticLinks": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_SEMANTIC_LINKS"
+        },
+        "theoremMapping": {
+          "path": "ts/test/v015-theorem-statement-evidence-verifier.test.ts",
+          "gitBlobSha": "c59d29a1127c854fed3eb484fa390d50bd350ba5",
+          "testCase": "THEOREM_STAGE_MAPPING"
+        },
+        "machineReceipt": {
+          "profile": "mts-v015-theorem-statement-evidence/v0.1",
+          "outcome": "PASS",
+          "caseId": "F0216",
+          "formalSourceSha256": "85169d542d3653ae27a785f79dbbed225730f40cf82af5dfc82ab42744fc97af",
+          "semanticAnetSha256": "5c1b5f1e03e1563ee2f11e530f4741c9abf75ae6416165e3a91f17007dd001a4",
+          "runnerSourceSha256": "9c8716e3a96a9a66d9e12d68f42716c14f9a07b549c8510f4a60385ba0573a2b"
+        }
+      }
     }
   ],
   "classification": {
-    "policy": "All 215 heuristic fenced/inline candidates have explicit roles. The 30 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
+    "policy": "All 216 heuristic fenced/inline candidates have explicit roles. The 31 executable/current FORMAL specimens have bounded accepted-v0.15 denotation receipts; F0127/F0128 are generator-owned non-executable metanotation/syntax legend. Independent prose and broad lexical ledgers are closed separately.",
     "nonFormalProcessCount": 15,
     "unclassifiedCount": 0,
-    "acceptedFormalDenotationsVerified": 30,
-    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 20/21 and proof closure remains independently classified.",
+    "acceptedFormalDenotationsVerified": 31,
+    "scope": "This primary inventory is denotation-closed for its scanner scope; theorem FORMAL coverage is 21/21 and proof closure remains independently classified.",
     "nonFormalRepresentationCount": 9,
     "nonFormalGovernanceCount": 2,
     "reviewedNonFormalCount": 185,
     "unverifiedDenotationCount": 0,
-    "verifiedFormalCount": 30
+    "verifiedFormalCount": 31
   }
 }

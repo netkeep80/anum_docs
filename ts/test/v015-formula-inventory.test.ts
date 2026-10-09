@@ -19,10 +19,10 @@ const inventory = JSON.parse(readFileSync(resolve(root, "audits/v015-formula-can
 };
 assert.equal(inventory.schema, "mts-v015-current-doc-formula-candidate-inventory/v0.1");
 assert.equal(inventory.status, "CLASSIFIED_DENOTATION_VERIFIED_CURRENT_SCOPE");
-assert.equal(inventory.classification.acceptedFormalDenotationsVerified, 30);
+assert.equal(inventory.classification.acceptedFormalDenotationsVerified, 31);
 assert.equal(inventory.classification.reviewedNonFormalCount, 185);
 assert.equal(inventory.classification.unverifiedDenotationCount, 0);
-assert.equal(inventory.classification.verifiedFormalCount, 30);
+assert.equal(inventory.classification.verifiedFormalCount, 31);
 const candidate = /⟼|->|≡|∈|⇒|=|\{\}|\{[A-Za-zА-Яа-я, ]+\}|\bDen\(|\bJ\(/u;
 const actual: typeof inventory.candidates = [];
 for (const file of inventory.files) {
@@ -168,7 +168,7 @@ for (const entry of historicalStatements) {
 }
 const actualFormalStatements = inventory.candidates.filter((entry) =>
   entry.role === "FORMAL_V015_THEOREM_STATEMENT") as typeof historicalStatements;
-assert.equal(actualFormalStatements.length, 20, "current FORMAL overlay instances tracked individually");
+assert.equal(actualFormalStatements.length, 21, "current FORMAL overlay instances tracked individually");
 const expectedTheoremReceipts = new Map<string, readonly [string, string, string, string, string]>([
   ["F0063", ["FND-01", "67eff6eee442df4fa067a9cad0a39bf17d00c69ffd18d3d8597a94299a2d7afb", "b85b51f82cfd4c57d97633a82f7f80b5ff9c4691906434c48deb8b16fad65745", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
   ["F0067", ["FND-02", "498e0952d05cbed29e23e3cc7b20f5fbd96aa8ef85352e65774dbd5e786d8355", "1330bb0bc229e2e48c6a8b5132471dd8455273e6d74eb467f42f33d6d5cdbb3a", "N_A_FOR_KERNEL_REALIZATION", "KERNEL_REALIZATION"]],
@@ -190,6 +190,7 @@ const expectedTheoremReceipts = new Map<string, readonly [string, string, string
   ["F0213", ["FND-12", "2b7231fd8e1f23acad1aa5006b0498ded9f033ee8cf1290d39f3e22528429c06", "25f18f2acffc7da2e6f21e80d496448f79514ef58e0486b8ba4a4507c2730834", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
   ["F0214", ["INV-06", "a081ee707161af34ba3229e2efce1b52bb20ac44973b8a2e630c9368fd2e6675", "d4bc8827a6b4517696d4b528c2d9c35479a7ea0b65ee6d853ebe4c165d2b7d49", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
   ["F0215", ["INV-07", "9b02e6b6294223b35f75574855720cdc39e1a935f2802edf36b23c2ee33e0af4", "8824a0f0d4ecc5f503858bcda1fffe3dad035edee56f76bb5586091a15a5d239", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
+  ["F0216", ["CTX-03", "85169d542d3653ae27a785f79dbbed225730f40cf82af5dfc82ab42744fc97af", "5c1b5f1e03e1563ee2f11e530f4741c9abf75ae6416165e3a91f17007dd001a4", "NO_PROOF_ARTIFACT", "STATEMENT_ONLY"]],
 ] as const);
 for (const entry of actualFormalStatements) {
   assert.equal(entry.sourceArtifact, "theorems/formal-v0.15.json");
@@ -430,11 +431,11 @@ const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIF
 assert.equal(pending.length, 0, "remaining UNCLASSIFIED formula backlog stays explicit");
 assert.ok(pending.every((entry) => entry.denotation === "NOT_VERIFIED"), "unclassified formula must not claim semantic denotation");
 assert.equal(inventory.candidates.filter((entry) =>
-  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 30,
-  "all 30 executable/current FORMAL primary occurrences have bounded source/denotation receipts");
+  entry.role.startsWith("FORMAL_V015_") && entry.denotation === "VERIFIED_AGAINST_ACCEPTED_V015").length, 31,
+  "all 31 executable/current FORMAL primary occurrences have bounded source/denotation receipts");
 assert.equal(inventory.candidates.filter((entry) =>
   entry.role.startsWith("FORMAL_V015_") && entry.denotation === "NOT_VERIFIED").length, 0,
-  "primary FORMAL denotation backlog is closed independently of the 1 missing theorem migration");
+  "primary FORMAL denotation backlog is closed with all 21 theorem migrations complete");
 const verificationBacklog = inventory.candidates.filter((entry) =>
   entry.role === "UNCLASSIFIED" || entry.denotation === "NOT_VERIFIED");
 assert.equal(verificationBacklog.length, 0, "all primary formula candidates are classified and denotation-closed");
@@ -445,4 +446,4 @@ assert.ok(inventory.candidates.every((entry) => entry.role === "UNCLASSIFIED" ||
 
 
 console.log("v0.15 current formula candidate inventory: SNAPSHOT_GREEN " + actual.length +
-  " candidates; all 215 expressions scoped; 30 bounded FORMAL denotations verified; primary FORMAL denotation backlog=0; 1 theorem migration remains separate; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");
+  " candidates; all 216 expressions scoped; 31 bounded FORMAL denotations verified; primary FORMAL denotation backlog=0; theorem migrations=21/21; final whole-repository documentation audit remains separate; 2 accepted metanotation/legend fences non-executable; SEMANTIC_CONFORMANCE_NOT_YET_GREEN");

@@ -407,6 +407,33 @@
       ],
       "formalSourcePath": "ts/test/v015-inv07-formal-statement-candidate-b33.test.ts",
       "aproverStatus": "NOT_RECORDED"
+    },
+    {
+      "id": "CTX-03",
+      "migrationStatus": "FORMAL_MIGRATED",
+      "proofClosure": "NO_PROOF_ARTIFACT",
+      "formalArtifactKind": "STATEMENT_ONLY",
+      "formalStatement": "CTX03_STATEMENT : CTX03_PREMISES->CTX03_CONCLUSION",
+      "formalPremises": [
+        "A1RecursiveSeparation",
+        "F2F3GroundedNormalization",
+        "F2F3OneSidedExistence",
+        "RecursiveInversionDomain"
+      ],
+      "formalDependencies": [
+        "INV-02",
+        "INV-07"
+      ],
+      "formalNonPremises": [
+        "Foundation-global selected W",
+        "ExactSequence orientation authority",
+        "host Frame/Gauge/Bool orientation authority",
+        "raw InR/OutR presence as orientation authority",
+        "four primitive opcodes as orientation authority",
+        "stronger arbitrary-Link normalization"
+      ],
+      "formalSourcePath": "ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts",
+      "aproverStatus": "NOT_RECORDED"
     }
   ]
 }

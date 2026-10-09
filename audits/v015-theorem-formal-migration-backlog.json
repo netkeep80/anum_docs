@@ -6,35 +6,11 @@
   "sourceOverlayBlobSha": "1d46a642fb45111aa1fc98f7be1d2532253274e0",
   "acceptedVersion": "v0.15",
   "oldInventoryCount": 21,
-  "formalMigrationCount": 20,
-  "missingCount": 1,
-  "status": "INCOMPLETE_BLOCKS_FORMAL_DOC_CONSISTENCY",
+  "formalMigrationCount": 21,
+  "missingCount": 0,
+  "status": "COMPLETE_FORMAL_DOC_CONSISTENCY",
   "scope": "Provenance/reference migration manifest, NOT a new canonical FORMAL theorem source or proof verdict. Accepted v0.15 proof boundary remains untouched.",
-  "migrationsRequired": [
-    {
-      "id": "CTX-03",
-      "sourceInventory": "theorems/current-v0.14.json",
-      "sourceStatement": "Objective chirality Ω={W,J(W)} exists before observation; an oriented Context K selects χ(K), inducing local START_K/END_K roles, and relative frame transport g_AB∈{Id,J} composes as Z2.",
-      "lawRefs": [
-        "V14-L12"
-      ],
-      "dependencies": [
-        "INV-02",
-        "INV-07"
-      ],
-      "premises": [
-        "A1RecursiveSeparation",
-        "F2F3GroundedNormalization",
-        "F2F3OneSidedExistence",
-        "RecursiveInversionDomain"
-      ],
-      "proposedFormalStatement": null,
-      "formalSemanticsEvidence": null,
-      "independentProofStatus": "UNCHANGED_HISTORICAL",
-      "migrationStatus": "BLOCKED_NOT_MIGRATED",
-      "authorApproval": "REQUIRED_IF_NEW_LOGICAL_JSON_ARTIFACT"
-    }
-  ],
+  "migrationsRequired": [],
   "migrationWaves": [
     {
       "wave": 1,
@@ -69,14 +45,12 @@
     },
     {
       "wave": 4,
-      "ids": [
-        "CTX-03"
-      ],
+      "ids": [],
       "prerequisites": [
         "INV-02",
         "INV-07"
       ],
-      "state": "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE"
+      "state": "COMPLETE"
     }
   ],
   "acceptanceBoundary": "Waves are dependency ordering only; not semantic migration or proof authority. Each theorem needs approved FORMAL source plus compiler/denotation and recorded proof status."
