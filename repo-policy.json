@@ -391,30 +391,7 @@
       "max": 1000,
       "max_growth": 1,
       "count": "all_tracked",
-      "level": "blocking",
-      "ignore": [
-        "ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts",
-        "ts/test/v015-documentation-acceptance.test.ts",
-        "ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts",
-        "ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts",
-        "ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts",
-        "ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts",
-        "ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts",
-        "ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts",
-        "ts/test/v015-formula-inventory.test.ts",
-        "ts/test/v015-inv01-formal-statement-candidate-b23.test.ts",
-        "ts/test/v015-inv02-formal-statement-candidate-b26.test.ts",
-        "ts/test/v015-inv03-formal-statement-candidate-b25.test.ts",
-        "ts/test/v015-inv04-formal-statement-candidate-b27.test.ts",
-        "ts/test/v015-inv05-formal-statement-candidate-b30.test.ts",
-        "ts/test/v015-inv06-formal-statement-candidate-b32.test.ts",
-        "ts/test/v015-inv07-formal-statement-candidate-b33.test.ts",
-        "ts/test/v015-native-evidence-verifier.test.ts",
-        "ts/test/v015-root-basis-evidence-verifier.test.ts",
-        "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
-        "ts/test/v015-theorem-formal-backlog.test.ts",
-        "ts/test/v015-theorem-statement-evidence-verifier.test.ts"
-      ]
+      "level": "blocking"
     }
   ],
   "content_rules": [
@@ -555,28 +532,6 @@
       "ts/src/tooling/mts-compiler.ts",
       "ts/test/theorem-catalog-markdown.test.ts",
       "ts/test/docs-sync.test.ts"
-    ],
-    "v015-documentation-current-docs": [
-      "README.md",
-      "docs/CONTRIBUTING.md",
-      "docs/specs/**",
-      "docs/theory/**",
-      "docs/Словарь терминов МТС.md"
-    ],
-    "v015-documentation-audits": [
-      "audits/v015-*.json"
-    ],
-    "v015-documentation-formal-projection": [
-      "theorems/formal-v0.15.json"
-    ],
-    "v015-documentation-tooling": [
-      "ts/package.json",
-      "ts/src/tooling/**",
-      "ts/test/**"
-    ],
-    "v015-documentation-observatory": [
-      "web/contract-observatory/src/markdown-coverage-bridge.ts",
-      "web/contract-observatory/test/site.test.ts"
     ]
   },
   "new_file_classes": {
@@ -588,15 +543,6 @@
     ],
     "theorem-catalog-test": [
       "ts/test/theorem-catalog-markdown.test.ts"
-    ],
-    "v015-documentation-audit-artifact": [
-      "audits/v015-*.json"
-    ],
-    "v015-documentation-tooling-source": [
-      "ts/src/tooling/v015-*.ts"
-    ],
-    "v015-documentation-test": [
-      "ts/test/v015-*.test.ts"
     ]
   },
   "change_profiles": {
@@ -627,43 +573,6 @@
         "max_new_docs": 1,
         "max_new_files": 3,
         "max_net_added_lines": 2300
-      }
-    },
-    "documentation-migration": {
-      "allow_surfaces": [
-        "theorem-catalog-generated-doc",
-        "theorem-catalog-tooling",
-        "v015-documentation-current-docs",
-        "v015-documentation-audits",
-        "v015-documentation-formal-projection",
-        "v015-documentation-tooling",
-        "v015-documentation-observatory"
-      ],
-      "require_surfaces": [
-        "v015-documentation-current-docs",
-        "v015-documentation-audits",
-        "v015-documentation-formal-projection",
-        "v015-documentation-tooling",
-        "v015-documentation-observatory"
-      ],
-      "allow_unclassified_surfaces": false,
-      "new_files": {
-        "allow_classes": [
-          "v015-documentation-audit-artifact",
-          "v015-documentation-tooling-source",
-          "v015-documentation-test"
-        ],
-        "max_per_class": {
-          "v015-documentation-audit-artifact": 7,
-          "v015-documentation-tooling-source": 6,
-          "v015-documentation-test": 21
-        },
-        "max_new_files": 34
-      },
-      "budgets": {
-        "max_new_docs": 0,
-        "max_new_files": 34,
-        "max_net_added_lines": 24000
       }
     }
   }
