@@ -58,8 +58,15 @@ const handled = new Set(migratedIds);
 const ordered: string[] = [];
 for (const [index, wave] of backlog.migrationWaves.entries()) {
   assert.equal(wave.wave, index + 1, "migration wave number");
-  assert.equal(wave.state, "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE");
-  assert.ok(wave.ids.length > 0, "migration wave cannot be empty");
+  if (wave.ids.length === 0) {
+    assert.equal(wave.state, "COMPLETE",
+      "an exhausted migration wave must record terminal COMPLETE state");
+    assert.ok(wave.prerequisites.every((dep) => handled.has(dep)),
+      "completed-wave prerequisite provenance must refer only to already migrated theorems");
+    continue;
+  }
+  assert.equal(wave.state, "AWAITING_FORMAL_SOURCE_AND_DENOTATION_EVIDENCE",
+    "non-empty migration wave remains awaiting bounded FORMAL evidence");
   const expectedPrereqs = new Set<string>();
   for (const id of wave.ids) {
     assert.ok(!handled.has(id), id + " cannot be migrated twice");
