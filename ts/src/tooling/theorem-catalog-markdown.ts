@@ -285,6 +285,10 @@ function renderRelationsSection(theorem: TheoremProjectionTheorem): string[] {
 function renderProvenanceSection(theorem: TheoremProjectionTheorem): string[] {
   const lines = [
     "#### Происхождение данных",
+    "",
+    "<details>",
+    "<summary>Точные источники, реестры и записи доказательств</summary>",
+    "",
     `- Исходный индекс теорем v0.14: ${repositoryLink(theorem.provenance.currentIndex)}.`,
     `- Проекция FORMAL v0.15: ${repositoryLink(theorem.provenance.formalOverlay)}.`,
     `- Авторитет ролей доказательных каналов: ${repositoryLink(theorem.provenance.laneAuthority)}.`,
@@ -298,6 +302,7 @@ function renderProvenanceSection(theorem: TheoremProjectionTheorem): string[] {
       lines.push(`  - ${repositoryLink(path)}.`);
     }
   }
+  lines.push("", "</details>");
   return lines;
 }
 
