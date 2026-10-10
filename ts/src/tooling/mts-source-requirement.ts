@@ -39,20 +39,6 @@ export interface MtsSourceBoundary {
   domain: readonly string[];
 }
 
-export interface MtsSourceEditorialFinding {
-  id: string;
-  category: string;
-  quote: string;
-  diagnosisRu: string;
-}
-
-export interface MtsSourceEditorialReview {
-  status: "blocked";
-  authorApproval: "not-recorded";
-  findings: readonly MtsSourceEditorialFinding[];
-  proposedStatement: MtsSourceText;
-}
-
 export interface MtsSourceRequirement {
   id: string;
   schema: "mts-source-requirement/v0.1";
@@ -62,7 +48,6 @@ export interface MtsSourceRequirement {
   semanticChange: false;
   statement: MtsSourceStatement;
   clarification: MtsSourceText;
-  editorialReview: MtsSourceEditorialReview;
   normativeOrigin: {
     release: string;
     source: string;
@@ -203,59 +188,6 @@ function parseSourceText(value: unknown, label: string): MtsSourceText {
     authorApproval,
     authorDecision: parseAuthorDecision(raw.author_decision, authorApproval, label + ".author_decision"),
   };
-}
-
-function parseEditorialReview(
-  value: unknown,
-  statement: MtsSourceStatement,
-): MtsSourceEditorialReview {
-  const raw = object(value, "editorial_review");
-  exactFields(raw, ["status", "author_approval", "findings", "proposed_statement"], "editorial_review");
-  if (raw.status !== "blocked") {
-    fail("editorial_review.status must remain blocked while findings are unresolved");
-  }
-  if (raw.author_approval !== "not-recorded") {
-    fail("editorial_review.author_approval cannot be forged");
-  }
-  const entries = values(raw.findings, "editorial_review.findings");
-  if (entries.length === 0) fail("editorial_review.findings must not be empty");
-  const ids = new Set<string>();
-  const findings = entries.map((value, index) => {
-    const label = "editorial_review.findings[" + index + "]";
-    const finding = object(value, label);
-    exactFields(finding, ["id", "category", "quote", "diagnosis_ru"], label);
-    const id = string(finding.id, label + ".id");
-    if (!/^V14-L1-ED[0-9]{2}$/.test(id)) fail(label + ".id is invalid");
-    if (ids.has(id)) fail(label + ".id is duplicated");
-    ids.add(id);
-    const quote = string(finding.quote, label + ".quote");
-    if (countExact(statement.ru, quote) !== 1) {
-      fail(label + ".quote must occur exactly once in frozen source statement");
-    }
-    return Object.freeze({
-      id,
-      category: string(finding.category, label + ".category"),
-      quote,
-      diagnosisRu: string(finding.diagnosis_ru, label + ".diagnosis_ru"),
-    });
-  });
-  const proposedStatement = parseSourceText(
-    raw.proposed_statement,
-    "editorial_review.proposed_statement",
-  );
-  if (proposedStatement.sourceRole !== "editorial-proposal"
-    || proposedStatement.authorApproval !== "not-recorded") {
-    fail("editorial_review.proposed_statement must remain an unapproved editorial proposal");
-  }
-  if (proposedStatement.ru === statement.ru) {
-    fail("editorial_review.proposed_statement must differ from source text");
-  }
-  return Object.freeze({
-    status: "blocked" as const,
-    authorApproval: "not-recorded" as const,
-    findings: Object.freeze(findings),
-    proposedStatement,
-  });
 }
 
 function countExact(text: string, value: string): number {
@@ -431,7 +363,6 @@ export function parseMtsSourceRequirementText(
       "semantic_change",
       "statement",
       "clarification",
-      "editorial_review",
       "normative_origin",
       "scientific_boundary",
       "artifacts",
@@ -451,7 +382,6 @@ export function parseMtsSourceRequirementText(
   }
   const statement = parseStatement(raw.statement, root, path + ".statement");
   const clarification = parseSourceText(raw.clarification, path + ".clarification");
-  const editorialReview = parseEditorialReview(raw.editorial_review, statement);
   const normativeOrigin = parseNormativeOrigin(raw.normative_origin, root);
   const scientificBoundary = parseScientificBoundary(raw.scientific_boundary);
   const artifacts = parseArtifacts(raw.artifacts, root);
@@ -468,7 +398,6 @@ export function parseMtsSourceRequirementText(
     semanticChange: false,
     statement,
     clarification,
-    editorialReview,
     normativeOrigin,
     scientificBoundary,
     artifacts,
@@ -480,10 +409,6 @@ export function loadMtsSourceRequirement(root: string, path: string): MtsSourceR
 }
 
 export function renderMtsSourceRequirementReaderFragment(model: MtsSourceRequirement): string {
-  if (model.editorialReview.status === "blocked") {
-    fail("reader publication blocked by unresolved editorial review: "
-      + model.editorialReview.findings.map((item) => item.id).join(", "));
-  }
   const q = String.fromCharCode(96);
   const proposalLabel =
     model.clarification.authorApproval === "approved"
@@ -522,11 +447,6 @@ export function renderMtsSourceRequirementAuditFragment(model: MtsSourceRequirem
     "statement_author_approval=" + model.statement.authorApproval,
     "clarification_sha256=" + model.clarification.sha256,
     "clarification_author_approval=" + model.clarification.authorApproval,
-    "editorial_review_status=" + model.editorialReview.status,
-    "editorial_review_open_findings=" + model.editorialReview.findings.length,
-    "editorial_review_ids=" + model.editorialReview.findings.map((item) => item.id).join(","),
-    "proposed_statement_sha256=" + model.editorialReview.proposedStatement.sha256,
-    "proposed_statement_author_approval=" + model.editorialReview.proposedStatement.authorApproval,
     "normative_origin=" + model.normativeOrigin.source + "#/requiredSemanticLaws/" + model.normativeOrigin.recordId,
     "normative_english_sha256=" + model.normativeOrigin.englishSha256,
     "source=" + model.statement.source.path + "#" + model.statement.source.anchor,
