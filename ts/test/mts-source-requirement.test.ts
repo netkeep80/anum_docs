@@ -165,7 +165,7 @@ expectReject(
 expectReject(
   sourceText.replace(
     "blob_sha: 2c9d86389c17be273c64b53cb7d09ede166e427d",
-    "blob_sha: 0000000000000000000000000000000000000000",
+    "blob_sha: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   ),
   /source\.blob_sha mismatch/,
   "source file Git blob provenance must be exact",
