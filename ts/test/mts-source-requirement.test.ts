@@ -97,9 +97,9 @@ assert.deepEqual(definitions.entries.map((entry) => entry.kind), [
 ]);
 assert.ok(definitions.entries.every((entry) =>
   entry.authorApproval === "not-recorded" && entry.externalMetanotation));
-assert.ok(definitions.entries[1].ru.includes("не доказывают наличие вычислительного алгоритма"));
-assert.ok(definitions.entries[2].ru.includes("не самостоятельная теорема тотальности"));
-assert.ok(definitions.entries[4].ru.includes("существование двух различных"));
+assert.ok(definitions.entries[1]?.ru.includes("не доказывают наличие вычислительного алгоритма"));
+assert.ok(definitions.entries[2]?.ru.includes("не самостоятельная теорема тотальности"));
+assert.ok(definitions.entries[4]?.ru.includes("существование двух различных"));
 expectReject(
   sourceText.replace("reader-def-grounded", "reader-def-root"),
   /id duplicates reader-def-root/,
