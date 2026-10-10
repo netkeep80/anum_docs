@@ -81,10 +81,13 @@ export interface MtsReaderScienceStep {
   requires: readonly string[];
   premises: readonly string[];
   domain: readonly string[];
+  exclusions: readonly string[];
 }
 
 export interface MtsReaderScience {
+  schema: "mts-reader-science/v0.1";
   status: "proposed";
+  proofCheck: "declarations-only";
   publication: "blocked";
   authorApproval: "not-recorded";
   steps: readonly MtsReaderScienceStep[];
@@ -521,8 +524,9 @@ function parseReaderScience(
   root: string,
 ): MtsReaderScience {
   const raw = object(value, "reader_science");
-  exactFields(raw, ["status", "publication", "author_approval", "steps"], "reader_science");
-  if (raw.status !== "proposed" || raw.publication !== "blocked"
+  exactFields(raw, ["schema", "status", "proof_check", "publication", "author_approval", "steps"], "reader_science");
+  if (raw.schema !== "mts-reader-science/v0.1" || raw.proof_check !== "declarations-only"
+    || raw.status !== "proposed" || raw.publication !== "blocked"
     || raw.author_approval !== "not-recorded") {
     fail("reader_science must remain proposed, publication=blocked, author_approval=not-recorded");
   }
@@ -536,7 +540,7 @@ function parseReaderScience(
     const label = "reader_science.steps[" + index + "]";
     const entry = object(value, label);
     exactFields(entry,
-      ["id", "role", "source_entry", "quote", "bridge_ru", "proof_symbol", "requires", "premises", "domain"],
+      ["id", "role", "source_entry", "quote", "bridge_ru", "proof_symbol", "requires", "premises", "domain", "exclusions"],
       label);
     const id = string(entry.id, label + ".id");
     if (!/^[a-z][a-z0-9-]*$/.test(id) || ids.has(id)) {
@@ -580,6 +584,8 @@ function parseReaderScience(
     }
     const premises = strings(entry.premises, label + ".premises");
     const domain = strings(entry.domain, label + ".domain");
+    const exclusions = strings(entry.exclusions, label + ".exclusions");
+    if (new Set(exclusions).size !== exclusions.length) fail(label + ".exclusions must be unique");
     if (new Set(premises).size !== premises.length || domain.length === 0) {
       fail(label + ".premises must be unique and .domain nonempty");
     }
@@ -596,10 +602,13 @@ function parseReaderScience(
       requires: Object.freeze(requires),
       premises: Object.freeze(premises),
       domain: Object.freeze(domain),
+      exclusions: Object.freeze(exclusions),
     });
   });
   return Object.freeze({
+    schema: "mts-reader-science/v0.1" as const,
     status: "proposed" as const,
+    proofCheck: "declarations-only" as const,
     publication: "blocked" as const,
     authorApproval: "not-recorded" as const,
     steps: Object.freeze(parsed),
@@ -670,6 +679,9 @@ export function parseMtsSourceRequirementText(
   const artifacts = parseArtifacts(raw.artifacts, root);
   const readerDefinitions = raw.reader_definitions === undefined
     ? null : parseReaderDefinitions(raw.reader_definitions, root, artifacts);
+  if (readerDefinitions !== null && raw.reader_science === undefined) {
+    fail("reader_science must accompany reader_definitions");
+  }
   const readerScience = raw.reader_science === undefined
     ? null : parseReaderScience(raw.reader_science, readerDefinitions, root);
   if (!artifacts.some((artifact) => artifact.path === path)) {
@@ -742,6 +754,7 @@ export function renderMtsSourceRequirementAuditFragment(model: MtsSourceRequirem
     "clarification_sha256=" + model.clarification.sha256,
     "clarification_author_approval=" + model.clarification.authorApproval,
     "reader_science_nodes=" + (model.readerScience?.steps.length ?? 0),
+    "reader_science_proof_check=" + (model.readerScience?.proofCheck ?? "none"),
     "reader_science_publication=" + (model.readerScience?.publication ?? "none"),
     "reader_definitions_count=" + (model.readerDefinitions?.entries.length ?? 0),
     "reader_definitions_review=" + (model.readerDefinitions === null ? "none"
