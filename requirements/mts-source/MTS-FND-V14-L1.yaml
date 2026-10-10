@@ -72,5 +72,5 @@ artifacts:
     relations: [requires, implements]
   - path: ts/test/mts-source-requirement.test.ts
     relations: [requires, verifies]
-  - path: repo-policy.json
+  - path: ts/test/research-v013-semantic-dependency-projection-a9.test.ts\n    relations: [requires, verifies]\n  - path: repo-policy.json
     relations: [requires, implements]
