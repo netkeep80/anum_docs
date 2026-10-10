@@ -147,6 +147,64 @@ expectReject(
   "missing proof source must fail",
 );
 
+
+assert.ok(model.readerScience, "scientific Reader DAG must be part of the same YAML authority");
+const science = model.readerScience!;
+assert.equal(science.status, "proposed");
+assert.equal(science.publication, "blocked");
+assert.equal(science.authorApproval, "not-recorded");
+assert.equal(science.steps.length, 18);
+assert.deepEqual(science.steps.map((step) => step.id), [
+  "foundation", "incidence", "grounded", "distinction", "separation-a1",
+  "root-uniqueness", "one-sided-existence", "one-sided-realizability",
+  "grounded-normalization", "identity-by-poles", "inversion-domain",
+  "inversion-relation", "inversion-total", "inversion-involutive",
+  "chiral-classes", "chiral-orbit", "context-marker", "context-roles",
+]);
+const position = new Map(science.steps.map((step, index) => [step.id, index]));
+for (const [index, step] of science.steps.entries()) {
+  assert.ok(step.requires.every((dependency) => (position.get(dependency) ?? Infinity) < index));
+  assert.ok(step.sourceEntry !== null || step.bridgeRu !== null);
+}
+assert.equal(science.steps[5]?.role, "conditional-theorem");
+assert.deepEqual(science.steps[5]?.premises, ["A1RecursiveSeparation"]);
+assert.ok(science.steps[8]?.id === "grounded-normalization");
+assert.equal(science.steps[15]?.proofSymbol, "CTX_03_objective_chiral_orbit_before_context");
+assert.deepEqual(science.steps[17]?.premises, [
+  "A1RecursiveSeparation", "F2F3OneSidedExistence", "RecursiveInversionDomain",
+]);
+
+expectReject(
+  sourceText.replace("  publication: blocked", "  publication: ready"),
+  /reader_science must remain proposed, publication=blocked/,
+  "proposed science DAG cannot publish",
+);
+expectReject(
+  sourceText.replace('quote: "Во внешнем математическом интерфейсе Foundation', 'quote: "Текст вне оригинала Foundation'),
+  /quote is not unique in declared source_entry/,
+  "typed claim must have an exact owned source quote",
+);
+expectReject(
+  sourceText.replace("requires: [foundation]", "requires: [context-roles]"),
+  /requires must contain unique earlier reader-science IDs/,
+  "future reader node must not become an unannounced dependency",
+);
+expectReject(
+  sourceText.replace("proof_symbol: FND_02_unique_root", "proof_symbol: FakeClaim"),
+  /proof_symbol missing declared conditional-theorem/,
+  "a declared conditional theorem must exist in both proof languages",
+);
+expectReject(
+  sourceText.replace("role: conditional-theorem", "role: definition"),
+  /proof_symbol missing declared definition/,
+  "conditional theorem cannot masquerade as an ordinary definition",
+);
+expectReject(
+  sourceText.replace("    - id: context-marker", "    - id: foundation"),
+  /id is invalid or duplicated/,
+  "reader science nodes must have distinct identifiers",
+);
+
 assert.equal(model.normativeOrigin.release, "v0.14");
 assert.equal(model.normativeOrigin.recordId, "V14-L1");
 assert.equal(
@@ -202,6 +260,8 @@ assert.throws(
 
 const audit = renderMtsSourceRequirementAuditFragment(model);
 assert.ok(audit.includes("model_status=proposed"));
+assert.ok(audit.includes("reader_science_nodes=18"));
+assert.ok(audit.includes("reader_science_publication=blocked"));
 assert.ok(audit.includes("reader_definitions_count=5"));
 assert.ok(audit.includes("reader_definitions_review=2132#6103120355"));
 assert.ok(audit.includes("semantic_change=false"));
