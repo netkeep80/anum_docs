@@ -164,6 +164,22 @@ expectReject(
   "approval cannot be invented without an exact Author decision",
 );
 expectReject(
+  sourceText.replace(
+    "editorial_review:\n  status: blocked",
+    "orphaned_review:\n  status: blocked",
+  ),
+  /has unknown field "orphaned_review"/,
+  "reader-critical editorial review may not disappear or be renamed",
+);
+expectReject(
+  sourceText.replace(
+    "  author_approval: not-recorded\n  findings:",
+    "  author_approval: approved\n  findings:",
+  ),
+  /editorial_review.author_approval cannot be forged/,
+  "editorial review approval must not be silently promoted",
+);
+expectReject(
   sourceText.replace("  status: blocked", "  status: accepted"),
   /editorial_review.status must remain blocked/,
   "unresolved editorial review cannot be silently accepted",
