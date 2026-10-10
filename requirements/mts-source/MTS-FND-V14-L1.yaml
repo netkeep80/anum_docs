@@ -110,9 +110,9 @@ reader_definitions:
       domain: "Foundation, Связь x"
       ru: |-
         Grounded(F,x) — внешнее индуктивное свидетельство конечного обоснования структуры x. Для полюса, который совпадает с x, новая рекурсивная обязанность отсутствует; для каждого несовпадающего полюса требуется Grounded соответствующей Связи. Конечен доказательный объект, но это не запрет иных циклических структур Связей.
-        Это условие области применения отдельных теорем, а не самостоятельная теорема тотальности. Теорема FND_13_identity_by_poles утверждает для Grounded(F,x) и Grounded(F,y): x=y тогда и только тогда, когда совпадают полюса x и y; дополнительно предполагается F2F3GroundedNormalization(F), включая свойство complete. Другая теорема INV_01_recursive_inversion_total устанавливает существование структурного инверса для Grounded(F,x) при A1RecursiveSeparation(F), F2F3OneSidedExistence(F) и RecursiveInversionDomain(F,E); F2F3GroundedNormalization не является её предпосылкой. У каждой теоремы своя область и свой набор условий.
+        Это условие области применения отдельных теорем, а не самостоятельная теорема тотальности. Теорема FND_13_identity_by_poles утверждает для Grounded(F,x) и Grounded(F,y): x=y тогда и только тогда, когда совпадают полюса x и y; дополнительно предполагается внешний интерфейс F2F3GroundedNormalization(F), чьё свойство complete означает: равенство нормальных форм двух Grounded-связей влечёт равенство самих Связей. Другая теорема INV_01_recursive_inversion_total устанавливает существование структурного инверса для Grounded(F,x) при A1RecursiveSeparation(F), F2F3OneSidedExistence(F) и RecursiveInversionDomain(F,E); F2F3GroundedNormalization не является её предпосылкой. У каждой теоремы своя область и свой набор условий.
       prerequisites: [reader-def-local-decision]
-      proof_symbols: [Grounded, FND_13_identity_by_poles, INV_01_recursive_inversion_total]
+      proof_symbols: [Grounded, F2F3GroundedNormalization, FND_13_identity_by_poles, INV_01_recursive_inversion_total]
       external_metanotation: true
       author_approval: not-recorded
     - id: reader-premise-one-sided-existence
@@ -130,9 +130,10 @@ reader_definitions:
       domain: "Односторонние Связи, выбранный контекстный маркер и RecursiveInversionDomain"
       ru: |-
         ProperOneSided(x) означает StartOnly(x) или FinishOnly(x). Предикат SameChiralClass(m,x) означает принадлежность m и x одному из этих двух позиционных классов; OppositeChiralClass(m,x) — принадлежность противоположным классам. Это внешние отношения, не дополнительный тип Связей.
-        Внешний предикат ContextOrientationMarker(F,D,body,m) требует m=D.startForm(body) или m=D.endForm(body) для предъявленной RecursiveInversionDomain D, зависящей от F и E=F2F3OneSidedExistence(F); параметр E неявен в Lean, явен в Rocq. При A1RecursiveSeparation(F), E, D, body и таком выбранном m теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров: localStart того же класса, что m, и localEnd противоположного класса. Здесь K обозначает контекст с предъявленным допустимым ориентационным маркером; роли START_K и END_K относятся к этому выбору, а не к абсолютной ориентации всех Связей. Теорема не утверждает, что произвольный контекст автоматически имеет такой маркер.
+        Внешний интерфейс RecursiveInversionDomain(F,E) дополнительно задаёт рекурсивные односторонние формы startForm(a)=form(startForm(a),a) и endForm(a)=form(a,endForm(a), их совместимость с корнем R и LocalSelfDecision для Grounded-связей; это отдельная предпосылка, а не следствие одних законов Foundation.
+        Предикат ContextOrientationMarker(F,D,body,m) требует m=D.startForm(body) или m=D.endForm(body) для предъявленной RecursiveInversionDomain D, зависящей от F и E=F2F3OneSidedExistence(F); параметр E неявен в Lean, явен в Rocq. При A1RecursiveSeparation(F), E, D, body и таком выбранном m теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров: localStart того же класса, что m, и localEnd противоположного класса. Здесь K обозначает контекст с предъявленным допустимым ориентационным маркером; роли START_K и END_K относятся к этому выбору, а не к абсолютной ориентации всех Связей. Теорема не утверждает, что произвольный контекст автоматически имеет такой маркер.
       prerequisites: [reader-def-local-decision, reader-premise-one-sided-existence]
-      proof_symbols: [ProperOneSided, SameChiralClass, OppositeChiralClass, ContextOrientationMarker, ContextLocalStartRole, ContextLocalEndRole, CTX_03_context_selection_induces_local_roles]
+      proof_symbols: [ProperOneSided, SameChiralClass, OppositeChiralClass, RecursiveInversionDomain, ContextOrientationMarker, ContextLocalStartRole, ContextLocalEndRole, CTX_03_context_selection_induces_local_roles]
       external_metanotation: true
       author_approval: not-recorded
 
