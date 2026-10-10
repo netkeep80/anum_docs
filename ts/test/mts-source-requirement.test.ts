@@ -103,6 +103,15 @@ assert.ok(definitions.entries[1]?.ru.includes("FinishOnly(x)"));
 assert.ok(definitions.entries[1]?.ru.includes("PairLocal(x)"));
 assert.ok(definitions.entries[2]?.ru.includes("не самостоятельная теорема тотальности"));
 assert.ok(definitions.entries[4]?.ru.includes("существование двух различных"));
+assert.ok(definitions.entries[0]?.ru.includes("Здесь FullSelf(F,x) означает"));
+assert.ok(definitions.entries[0]?.proofSymbols.includes("FullSelf"));
+assert.ok(definitions.entries[1]?.proofSymbols.includes("StartOnly"));
+assert.ok(definitions.entries[1]?.proofSymbols.includes("FinishOnly"));
+assert.ok(definitions.entries[1]?.proofSymbols.includes("PairLocal"));
+assert.ok(definitions.entries[2]?.ru.includes("F2F3GroundedNormalization не является её предпосылкой"));
+assert.ok(definitions.entries[4]?.ru.includes("E неявен в Lean, явен в Rocq"));
+assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalStartRole"));
+assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalEndRole"));
 expectReject(
   sourceText.replace("reader-def-grounded", "reader-def-root"),
   /id duplicates reader-def-root/,
