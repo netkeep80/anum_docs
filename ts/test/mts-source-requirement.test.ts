@@ -112,6 +112,10 @@ assert.ok(definitions.entries[2]?.ru.includes("F2F3GroundedNormalization не я
 assert.ok(definitions.entries[4]?.ru.includes("E неявен в Lean, явен в Rocq"));
 assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalStartRole"));
 assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalEndRole"));
+assert.ok(definitions.entries[2]?.proofSymbols.includes("F2F3GroundedNormalization"));
+assert.ok(definitions.entries[2]?.ru.includes("равенство нормальных форм двух Grounded-связей"));
+assert.ok(definitions.entries[4]?.proofSymbols.includes("RecursiveInversionDomain"));
+assert.ok(definitions.entries[4]?.ru.includes("их совместимость с корнем R"));
 expectReject(
   sourceText.replace("reader-def-grounded", "reader-def-root"),
   /id duplicates reader-def-root/,
