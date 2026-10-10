@@ -127,6 +127,22 @@ function main(): void {
     );
   }
 
+  assert.equal(
+    headingLines.filter((line) => line === "<details>").length,
+    model.theorems.length,
+    "each theorem card must contain one collapsible provenance block",
+  );
+  assert.equal(
+    headingLines.filter((line) => line === "<summary>Точные источники, реестры и записи доказательств</summary>").length,
+    model.theorems.length,
+    "each provenance block must expose the same Russian summary label",
+  );
+  assert.equal(
+    headingLines.filter((line) => line === "</details>").length,
+    model.theorems.length,
+    "each collapsible provenance block must close exactly once",
+  );
+
   assert.deepEqual(THEOREM_PRESENTATION_PROFILE_BY_SURFACE, {
     "theory-foundations": "academic",
     "catalog-glossary": "reference",
@@ -173,6 +189,16 @@ function main(): void {
       theorem.id + ": default catalog card must remain the reference profile byte-prefix",
     );
     for (const card of cards) {
+      const provenanceHeading = card.indexOf("#### Происхождение данных");
+      const detailsOpen = card.indexOf("<details>", provenanceHeading);
+      const summaryLine = card.indexOf("<summary>Точные источники, реестры и записи доказательств</summary>", detailsOpen);
+      const detailsClose = card.indexOf("</details>", summaryLine);
+      assert.ok(provenanceHeading >= 0 && detailsOpen > provenanceHeading && summaryLine > detailsOpen && detailsClose > summaryLine,
+        theorem.id + ": provenance details hierarchy must be complete");
+      assert.ok(card.indexOf("**Исходная формулировка") < detailsOpen,
+        theorem.id + ": primary statement must remain visible before collapsible provenance");
+      assert.ok(card.indexOf("#### Доказательная база") < detailsOpen,
+        theorem.id + ": evidence boundary must remain visible before collapsible provenance");
       for (const value of [
         theorem.id,
         theorem.statement,
