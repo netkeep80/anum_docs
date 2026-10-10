@@ -137,6 +137,151 @@ reader_definitions:
       external_metanotation: true
       author_approval: not-recorded
 
+reader_science:
+  status: proposed
+  publication: blocked
+  author_approval: not-recorded
+  steps:
+    - id: foundation
+      role: definition
+      source_entry: reader-def-root
+      quote: "Во внешнем математическом интерфейсе Foundation заданы носитель Link"
+      proof_symbol: Foundation
+      requires: []
+      premises: []
+      domain: ["Foundation"]
+    - id: incidence
+      role: definition
+      source_entry: reader-def-local-decision
+      quote: "Для Связи x определены два локальных свойства"
+      proof_symbol: StartOnly
+      requires: [foundation]
+      premises: []
+      domain: ["Link"]
+    - id: grounded
+      role: definition
+      source_entry: reader-def-grounded
+      quote: "Grounded(F,x) — внешнее индуктивное свидетельство"
+      proof_symbol: Grounded
+      requires: [foundation, incidence]
+      premises: []
+      domain: ["Link"]
+    - id: distinction
+      role: definition
+      bridge_ru: "Distinguishable(F,x,y) — конечное индуктивное свидетельство рекурсивной различимости двух Связей; это внешний предикат, не новое Link-значение."
+      proof_symbol: Distinguishable
+      requires: [grounded]
+      premises: []
+      domain: ["Grounded"]
+    - id: separation-a1
+      role: premise
+      bridge_ru: "A1RecursiveSeparation(F) — дополнительная предпосылка: для двух Grounded-связей отсутствие конечного свидетельства Distinguishable влечёт их равенство; это не вывод из одних уравнений Foundation."
+      proof_symbol: A1RecursiveSeparation
+      requires: [distinction]
+      premises: []
+      domain: ["Grounded"]
+    - id: root-uniqueness
+      role: conditional-theorem
+      source_entry: reader-def-root
+      quote: "Единственность полностью самозамкнутой Связи утверждается отдельно:"
+      proof_symbol: FND_02_unique_root
+      requires: [incidence, separation-a1]
+      premises: [A1RecursiveSeparation]
+      domain: ["FullSelf"]
+    - id: one-sided-existence
+      role: premise
+      source_entry: reader-premise-one-sided-existence
+      quote: "F2F3OneSidedExistence(F) — отдельная предпосылка"
+      proof_symbol: F2F3OneSidedExistence
+      requires: [root-uniqueness]
+      premises: []
+      domain: ["Foundation"]
+    - id: one-sided-realizability
+      role: conditional-theorem
+      source_entry: reader-premise-one-sided-existence
+      quote: "Из неё совместно с законами Foundation выводятся StartOnly(u)"
+      proof_symbol: FND_01_grounded_realizability
+      requires: [one-sided-existence, grounded]
+      premises: [F2F3OneSidedExistence]
+      domain: ["constructed witnesses"]
+    - id: grounded-normalization
+      role: premise
+      source_entry: reader-def-grounded
+      quote: "дополнительно предполагается внешний интерфейс F2F3GroundedNormalization(F)"
+      proof_symbol: F2F3GroundedNormalization
+      requires: [grounded, one-sided-realizability]
+      premises: []
+      domain: ["Grounded"]
+    - id: identity-by-poles
+      role: conditional-theorem
+      source_entry: reader-def-grounded
+      quote: "Теорема FND_13_identity_by_poles утверждает"
+      proof_symbol: FND_13_identity_by_poles
+      requires: [grounded-normalization]
+      premises: [F2F3GroundedNormalization]
+      domain: ["Grounded(x), Grounded(y)"]
+    - id: inversion-domain
+      role: premise
+      source_entry: reader-def-context-relative-role
+      quote: "Внешний интерфейс RecursiveInversionDomain(F,E) дополнительно задаёт"
+      proof_symbol: RecursiveInversionDomain
+      requires: [one-sided-existence, grounded]
+      premises: []
+      domain: ["Foundation, E"]
+    - id: inversion-relation
+      role: definition
+      bridge_ru: "RecursiveInversion(F,D,x,y) — внешнее индуктивное отношение структурной инверсии, а не безусловная тотальная функция на всех Link."
+      proof_symbol: RecursiveInversion
+      requires: [inversion-domain, incidence]
+      premises: []
+      domain: ["Foundation, E, D"]
+    - id: inversion-total
+      role: conditional-theorem
+      source_entry: reader-def-grounded
+      quote: "Другая теорема INV_01_recursive_inversion_total устанавливает"
+      proof_symbol: INV_01_recursive_inversion_total
+      requires: [inversion-relation, separation-a1]
+      premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Grounded(x)"]
+    - id: inversion-involutive
+      role: conditional-theorem
+      bridge_ru: "INV_02_unique_total_involution: для Grounded(x) и предъявленных A1, N, E, D существует обратимая цепочка инверсии x→y→x; это условный реляционный результат, а не глобальная функция J."
+      proof_symbol: INV_02_unique_total_involution
+      requires: [inversion-total, grounded-normalization]
+      premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Grounded(x)"]
+    - id: chiral-classes
+      role: definition
+      source_entry: reader-def-context-relative-role
+      quote: "ProperOneSided(x) означает StartOnly(x) или FinishOnly(x)"
+      proof_symbol: SameChiralClass
+      requires: [incidence, inversion-relation]
+      premises: []
+      domain: ["ProperOneSided"]
+    - id: chiral-orbit
+      role: conditional-theorem
+      bridge_ru: "CTX_03_objective_chiral_orbit_before_context устанавливает существование двух разных взаимно инверсных односторонних Связей без выбора глобального W; существование зависит от A1, N, E и D."
+      proof_symbol: CTX_03_objective_chiral_orbit_before_context
+      requires: [chiral-classes, inversion-involutive]
+      premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Foundation"]
+    - id: context-marker
+      role: definition
+      source_entry: reader-def-context-relative-role
+      quote: "Предикат ContextOrientationMarker(F,D,body,m) требует"
+      proof_symbol: ContextOrientationMarker
+      requires: [chiral-orbit, inversion-domain]
+      premises: []
+      domain: ["body, selected marker"]
+    - id: context-roles
+      role: conditional-theorem
+      source_entry: reader-def-context-relative-role
+      quote: "теорема CTX_03_context_selection_induces_local_roles устанавливает"
+      proof_symbol: CTX_03_context_selection_induces_local_roles
+      requires: [context-marker, separation-a1]
+      premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["body, selected, ContextOrientationMarker"]
+
 scientific_boundary:
   logical_partition:
     theorem: FND_01_local_partition
