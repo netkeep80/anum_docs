@@ -78,13 +78,64 @@ assert.equal(acceptedRequirements.accepted, true);
 const formalCurrentDoc = readFileSync(resolve(repositoryRoot, "docs/specs/Формальная нотация МТС.md"), "utf8");
 const requiredEntries = acceptedRequirements.requirements.filter((item) => item.mandatory !== false);
 assert.equal(requiredEntries.length, 48, "accepted normative registry must be explicit");
-assert.ok(formalCurrentDoc.includes("## 9a. Нормативный реестр требований v0.15"));
-for (const requirement of requiredEntries) {
-  const anchor = '<a id="mts-v015-' + requirement.id.toLowerCase() + '"></a>';
-  assert.equal(formalCurrentDoc.split(anchor).length - 1, 1, requirement.id + " must be projected exactly once");
-  assert.ok(formalCurrentDoc.includes(requirement.summary.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")),
-    requirement.id + " normative summary must come from source");
+// Before #2122 presentation redesign, accepted metadata must survive losslessly.
+function assertFormalRegistryProjection(document: string): void {
+  const heading = "## 9a. Нормативный реестр требований v0.15";
+  const start = document.indexOf(heading);
+  const end = document.indexOf("\n## 10. ", start);
+  assert.ok(start >= 0 && end > start, "FORMAL registry must be a bounded section");
+  const section = document.slice(start, end);
+  assert.ok(!section.includes("<details>"),
+    "canonical normative wording must remain directly visible without disclosure");
+  const anchors = [...section.matchAll(/<a id="mts-v015-([^"]+)"><\/a>/g)];
+  assert.deepEqual(
+    anchors.map((item) => item[1]),
+    requiredEntries.map((item) => item.id.toLowerCase()),
+    "all 48 canonical IDs must remain in exact accepted order with no duplicates",
+  );
+  for (let i = 0; i < requiredEntries.length; i += 1) {
+    const source = requiredEntries[i]!;
+    const block = section.slice(anchors[i]!.index, anchors[i + 1]?.index ?? section.length);
+    const english = '<span lang="en">' + source.summary.replace(/\|/g, "\\|")
+      .replace(/\r?\n/g, " ") + "</span>";
+    const pos = block.indexOf(english);
+    assert.ok(pos >= 0 && block.indexOf(english, pos + 1) < 0,
+      source.id + ": exact accepted English wording must appear once within its own record");
+    const metadata = block.slice(0, pos);
+    assert.ok(metadata.includes("`" + source.id + "`"), source.id + ": ID missing");
+    assert.ok(metadata.includes("`" + source.group + "`"), source.id + ": group mismatch");
+    assert.ok(metadata.includes("`" + source.state + "`"), source.id + ": state mismatch");
+  }
 }
+assertFormalRegistryProjection(formalCurrentDoc);
+
+// Mutation falsifiers are evaluated only against copies of the generated view.
+const first = requiredEntries[0]!;
+const next = requiredEntries[1]!;
+const firstAnchor = '<a id="mts-v015-' + first.id.toLowerCase() + '"></a>';
+const nextAnchor = '<a id="mts-v015-' + next.id.toLowerCase() + '"></a>';
+assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(firstAnchor, "")),
+  "removing an accepted anchor must fail");
+assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(firstAnchor, firstAnchor + firstAnchor)),
+  "duplicating an accepted anchor must fail");
+const shuffled = formalCurrentDoc.replace(firstAnchor, "__REORDER_ANCHOR__")
+  .replace(nextAnchor, firstAnchor).replace("__REORDER_ANCHOR__", nextAnchor);
+assert.throws(() => assertFormalRegistryProjection(shuffled), "reordering accepted IDs must fail");
+const header = "| " + firstAnchor + "`" + first.id + "` | `" +
+  first.group + "` | `" + first.state + "` | ";
+assert.ok(formalCurrentDoc.includes(header), "baseline must contain first normative row");
+assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(header,
+  header.replace("`" + first.group + "`", "`WRONG_GROUP`"))),
+  "changing source group must fail");
+assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(header,
+  header.replace("`" + first.state + "`", "`WRONG_STATE`"))),
+  "changing source status must fail");
+const exactEnglish = '<span lang="en">' + first.summary.replace(/\|/g, "\\|")
+  .replace(/\r?\n/g, " ") + "</span>";
+assert.ok(formalCurrentDoc.includes(exactEnglish), "baseline must contain first source summary");
+assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(exactEnglish,
+  exactEnglish.replace("</span>", " [MUTATED]</span>"))),
+  "mutating original normative text must fail");
 
 const theoremCatalogSource = readFileSync(resolve(repositoryRoot, "docs/theory/Теоремы МТС.md"), "utf8");
 assert.ok(
