@@ -186,7 +186,7 @@ expectReject(
   "unowned or missing canonical text owner must fail",
 );
 expectReject(
-  sourceText.replace("      ru: |-", "      ru: []"),
+  sourceText.replace(/      ru: \|-\n        [^\n]+/, '      ru: ""'),
   /must be a non-empty string/,
   "atomic reader text cannot be replaced with an empty non-prose value",
 );
