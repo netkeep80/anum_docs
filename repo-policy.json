@@ -74,50 +74,6 @@
         "contracts/mts-conformance-v*.json",
         "cutover/typescript-c1-acceptance-v*.json"
       ]
-    },
-    "requirements-strict": {
-      "requirement_json_globs": [
-        "requirements/mts-source/*.json"
-      ],
-      "requirement_yaml_globs": [
-        "requirements/mts-source/*.yaml"
-      ],
-      "requirement_id_pattern": "MTS-[A-Z0-9-]+",
-      "closed_repository": false,
-      "code_reference_globs": [
-        "ts/src/**/*.ts",
-        "ts/test/**/*.ts"
-      ],
-      "doc_reference_globs": [
-        "README.md",
-        "docs/**/*.md",
-        "requirements/**/*.md"
-      ],
-      "strict_heading_docs": [
-        "requirements/mts-source/*.md"
-      ],
-      "evidence_surfaces": [
-        "ts/src/**",
-        "ts/test/**",
-        "docs/**"
-      ],
-      "changed_requirement_evidence_surfaces": [
-        "ts/src/**",
-        "ts/test/**"
-      ],
-      "affected_evidence_surfaces": [
-        "ts/src/**",
-        "ts/test/**",
-        "docs/**"
-      ],
-      "implementation_evidence_surfaces": [
-        "ts/src/**",
-        ".github/workflows/**"
-      ],
-      "verification_evidence_surfaces": [
-        "ts/test/**",
-        ".github/workflows/**"
-      ]
     }
   },
   "document_relations": {
@@ -133,6 +89,10 @@
       "v015-requirements": {
         "path": "requirements/mts-v0.15.json",
         "format": "json"
+      },
+      "mts-source-v14-l1": {
+        "path": "requirements/mts-source/MTS-FND-V14-L1.yaml",
+        "format": "yaml"
       }
     },
     "rules": [
@@ -265,6 +225,90 @@
           "type": "string"
         },
         "value": "contracts/mts-contract-v0.15.json"
+      },
+      {
+        "id": "mts-source-v14-l1-id",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/id",
+          "type": "string"
+        },
+        "value": "MTS-FND-V14-L1"
+      },
+      {
+        "id": "mts-source-v14-l1-schema",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/schema",
+          "type": "string"
+        },
+        "value": "mts-source-requirement/v0.1"
+      },
+      {
+        "id": "mts-source-v14-l1-status",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/model_status",
+          "type": "string"
+        },
+        "value": "proposed"
+      },
+      {
+        "id": "mts-source-v14-l1-no-semantic-delta",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/semantic_change",
+          "type": "boolean"
+        },
+        "value": false
+      },
+      {
+        "id": "mts-source-v14-l1-statement-unapproved",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/statement/author_approval",
+          "type": "string"
+        },
+        "value": "not-recorded"
+      },
+      {
+        "id": "mts-source-v14-l1-clarification-unapproved",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/clarification/author_approval",
+          "type": "string"
+        },
+        "value": "not-recorded"
+      },
+      {
+        "id": "mts-source-v14-l1-origin-record",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/normative_origin/record_id",
+          "type": "string"
+        },
+        "value": "V14-L1"
+      },
+      {
+        "id": "mts-source-v14-l1-origin-text-exact",
+        "kind": "scalar_equal",
+        "left": {
+          "document": "mts-source-v14-l1",
+          "pointer": "/normative_origin/english",
+          "type": "string"
+        },
+        "right": {
+          "document": "contract-conformance.previous.contract",
+          "pointer": "/requiredSemanticLaws/V14-L1",
+          "type": "string"
+        }
       }
     ]
   },
