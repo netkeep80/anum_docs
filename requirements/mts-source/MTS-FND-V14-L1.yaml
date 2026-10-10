@@ -1,0 +1,76 @@
+id: MTS-FND-V14-L1
+schema: mts-source-requirement/v0.1
+kind: foundation
+version_scope: post-v0.15-publication
+model_status: proposed
+semantic_change: false
+
+statement:
+  ru: |-
+    Первичен **`Link`**, а не четыре команды. Одна операция образования/канонизации `Link` допускает четыре и только четыре класса самоинцидентности относительно двух реляционно различимых позиций: `11/10/01/00`. До ориентации средние два образуют одну хиральную орбиту; имена `START_K/END_K` появляются только относительно ориентированного `Context` `K`.
+
+    `8/9/6/1` — рекурсивный структурный алфавит этих форм. Он не является алфавитом `Anum`, Q или физическим `ISA` процессора.
+  sha256: b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5
+  source_role: current-published-explanation
+  author_approval: not-recorded
+  source:
+    path: "docs/theory/Система аксиом МТС.md"
+    anchor: mts-v014-v14-l1
+    baseline_commit: c64b7e21340c6add248c8f380f3fef1292616ac6
+    blob_sha: 2c9d86389c17be273c64b53cb7d09ede166e427d
+
+clarification:
+  ru: |-
+    Записи `11/10/01/00` относятся к двум реляционно различимым полюсным позициям Link. В каждой позиции `1` означает, что соответствующий полюс совпадает с самой Link, а `0` — что не совпадает. Эти `0/1` являются внешними метаобозначениями ответа «нет/да» на два вопроса о самоинцидентности; они не вводят в МТС тип Bool, Nat или новые Link-значения.
+
+    Четыре комбинации являются четырьмя логически возможными и взаимно исключительными локальными случаями. Из одного такого разбиения не следует существование представителя каждого случая: реализуемость односторонних и парного случаев требует отдельного свидетельства `F2F3OneSidedExistence`; отождествление полностью самозамкнутого случая с ROOT использует `A1RecursiveSeparation`.
+  sha256: 5c8bd098e2a43c97386334330de4c0e3eb3ffa166a2d5adc27919bcf4189bafe
+  source_role: editorial-proposal
+  author_approval: not-recorded
+
+normative_origin:
+  release: v0.14
+  source: contracts/mts-contract-v0.14.json
+  record_id: V14-L1
+  english: |-
+    One Link ontology and one abstract Link-forming primitive induce exactly four self-incidence structural cases 11/10/01/00; after Context orientation these are named ROOT/START_K/END_K/PAIR and encoded by recursive 8/9/6/1, which is not the Anum/Q alphabet.
+  english_sha256: 3f54624df8e72ead62dce1f35a57f6190e69f544e2d640ba0a547ebf30c04910
+
+scientific_boundary:
+  logical_partition:
+    theorem: FND_01_local_partition
+    premises:
+      - LocalSelfDecision
+      - A1RecursiveSeparation
+  realizability:
+    theorem: FND_01_grounded_realizability
+    premises:
+      - F2F3OneSidedExistence
+  root_uniqueness:
+    theorem: FND_02_unique_root
+    premises:
+      - A1RecursiveSeparation
+  identity_by_poles:
+    theorem: FND_13_identity_by_poles
+    domain:
+      - Grounded
+    premises:
+      - F2F3GroundedNormalization.complete
+
+artifacts:
+  - path: requirements/mts-source/MTS-FND-V14-L1.yaml
+    relations: [requires]
+  - path: "docs/theory/Система аксиом МТС.md"
+    relations: [requires, documents]
+  - path: contracts/mts-contract-v0.14.json
+    relations: [requires, immutable]
+  - path: proofs/lean4/MtsFoundation.lean
+    relations: [requires, verifies]
+  - path: proofs/premise-classification-v0.14.json
+    relations: [requires, verifies]
+  - path: ts/src/tooling/mts-source-requirement.ts
+    relations: [requires, implements]
+  - path: ts/test/mts-source-requirement.test.ts
+    relations: [requires, verifies]
+  - path: repo-policy.json
+    relations: [requires, implements]
