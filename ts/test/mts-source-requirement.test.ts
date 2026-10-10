@@ -98,6 +98,9 @@ assert.deepEqual(definitions.entries.map((entry) => entry.kind), [
 assert.ok(definitions.entries.every((entry) =>
   entry.authorApproval === "not-recorded" && entry.externalMetanotation));
 assert.ok(definitions.entries[1]?.ru.includes("не доказывают наличие вычислительного алгоритма"));
+assert.ok(definitions.entries[1]?.ru.includes("StartOnly(x)"));
+assert.ok(definitions.entries[1]?.ru.includes("FinishOnly(x)"));
+assert.ok(definitions.entries[1]?.ru.includes("PairLocal(x)"));
 assert.ok(definitions.entries[2]?.ru.includes("не самостоятельная теорема тотальности"));
 assert.ok(definitions.entries[4]?.ru.includes("существование двух различных"));
 expectReject(
