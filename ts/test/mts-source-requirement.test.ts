@@ -77,6 +77,61 @@ assert.equal(
 assert.ok(model.editorialReview.proposedStatement.ru.includes("LocalSelfDecision"));
 assert.ok(!model.editorialReview.proposedStatement.ru.includes("четыре команды"));
 
+
+assert.ok(model.readerDefinitions, "reader definitions should be typed within the single source owner");
+const definitions = model.readerDefinitions!;
+assert.equal(definitions.reviewEvidence.issue, 2132);
+assert.equal(definitions.reviewEvidence.comment, 6103120355);
+assert.deepEqual(definitions.proofSources, [
+  "proofs/lean4/MtsFoundation.lean",
+  "proofs/coq/MtsFoundation.v",
+]);
+assert.deepEqual(definitions.entries.map((entry) => entry.id), [
+  "reader-def-root",
+  "reader-def-local-decision",
+  "reader-def-grounded",
+  "reader-premise-one-sided-existence",
+  "reader-def-context-relative-role",
+]);
+assert.deepEqual(definitions.entries.map((entry) => entry.kind), [
+  "definition", "definition", "definition", "premise", "definition",
+]);
+assert.ok(definitions.entries.every((entry) =>
+  entry.authorApproval === "not-recorded" && entry.externalMetanotation));
+assert.ok(definitions.entries[1].ru.includes("не доказывают наличие вычислительного алгоритма"));
+assert.ok(definitions.entries[2].ru.includes("не самостоятельная теорема тотальности"));
+assert.ok(definitions.entries[4].ru.includes("существование двух различных"));
+expectReject(
+  sourceText.replace("reader-def-grounded", "reader-def-root"),
+  /id duplicates reader-def-root/,
+  "duplicate reader definition IDs must fail",
+);
+expectReject(
+  sourceText.replace("prerequisites: [reader-def-root]", "prerequisites: [reader-def-grounded]"),
+  /prerequisites must be unique, declared earlier reader IDs/,
+  "forward reader dependencies must fail",
+);
+expectReject(
+  sourceText.replace("proof_symbols: [root_full_self", "proof_symbols: [MissingProofSymbol"),
+  /reference missing symbol MissingProofSymbol/,
+  "invented external theorem references must fail",
+);
+expectReject(
+  sourceText.replace("external_metanotation: true", "external_metanotation: false"),
+  /must remain external_metanotation=true/,
+  "reader definitions cannot become executable FORMAL claims",
+);
+expectReject(
+  sourceText.replace("      author_approval: not-recorded", "      author_approval: approved"),
+  /author_approval=not-recorded/,
+  "unapproved definition must not gain author approval",
+);
+expectReject(
+  sourceText.replace("    - proofs/coq/MtsFoundation.v", "    - proofs/coq/Missing.v"),
+  /must reference a verified artifact/,
+  "missing proof source must fail",
+);
+
 assert.equal(model.normativeOrigin.release, "v0.14");
 assert.equal(model.normativeOrigin.recordId, "V14-L1");
 assert.equal(
