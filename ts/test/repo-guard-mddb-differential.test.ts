@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import {
   listMarkdownAnchorIds as localListMarkdownAnchorIds,
+  listOwnedMarkdownBlockIds as localListOwnedMarkdownBlockIds,
+  listRepositoryMarkdownSurface,
   listMarkdownChildren as localListMarkdownChildren,
   listMarkdownSections as localListMarkdownSections,
   readMarkdownNode as localReadMarkdownNode,
@@ -15,7 +17,7 @@ import {
   resolveMarkdownAnchor as localResolveMarkdownAnchor,
 } from "../src/tooling/markdown-section-adapter.js";
 
-const REPO_GUARD_SHA = "c7d50c439f3e9c9c195f7870ef17f5098d94b824";
+const REPO_GUARD_SHA = "10f04af309fcb512dff3d690f595926472c52f40";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -360,6 +362,60 @@ try {
 
   assert.equal(localListMarkdownAnchorIds(source).includes("fake"), false);
   assert.equal(upstream.listMarkdownAnchorIds(source).includes("fake"), false);
+
+  // Compare the public v3.2.3 API against the actual tracked Markdown
+  // corpus, not just the synthetic canonical-tree fixture above. No writes.
+  const repositoryRoot = [process.cwd(), resolve(process.cwd(), "..")].find(
+    (candidate) => existsSync(resolve(candidate, "repo-policy.json")),
+  );
+  assert.ok(repositoryRoot !== undefined, "real-document parity requires the checked-out repository");
+  const realSurfaces = listRepositoryMarkdownSurface(repositoryRoot);
+  assert.ok(realSurfaces.length >= 10, "real-document parity corpus must contain current reader surfaces");
+  let checkedAnchors = 0;
+  let checkedBlocks = 0;
+  let checkedSections = 0;
+  for (const path of realSurfaces) {
+    const actualSource = readFileSync(resolve(repositoryRoot, path), "utf8");
+    const ownedIds = localListOwnedMarkdownBlockIds(actualSource);
+    const actualOptions = {
+      transparentOwnedBlocks: ownedIds.map((id) => ({
+        blockId: id,
+        beginMarker: `<!-- мтс:требование:${id}:начало -->`,
+        endMarker: `<!-- мтс:требование:${id}:конец -->`,
+      })),
+    };
+    const localAnchors = localListMarkdownAnchorIds(actualSource);
+    assert.deepEqual(upstream.listMarkdownAnchorIds(actualSource), localAnchors,
+      `${path}: real stable anchor inventory differs`);
+    for (const id of localAnchors) {
+      assert.deepEqual(
+        normalizeAddress(upstream.resolveMarkdownAnchor(actualSource, id)),
+        normalizeAddress(localResolveMarkdownAnchor(actualSource, id)),
+        `${path}/${id}: real anchor address differs`,
+      );
+      checkedAnchors += 1;
+    }
+    const localSections = localListMarkdownSections(actualSource).map(normalizeSection);
+    const publicSections = upstream.listMarkdownSections(actualSource, actualOptions).map(normalizeSection);
+    assert.deepEqual(publicSections, localSections,
+      `${path}: real sections, heading paths and byte ranges differ`);
+    for (const section of publicSections) {
+      assert.equal(actualSource.slice(section.start, section.end), section.content,
+        `${path}: reported section content differs from exact source bytes`);
+    }
+    checkedSections += publicSections.length;
+    for (const block of actualOptions.transparentOwnedBlocks) {
+      assert.deepEqual(
+        upstream.readOwnedMarkdownBlock(actualSource, block),
+        localReadOwnedMarkdownBlock(actualSource, block.blockId),
+        `${path}/${block.blockId}: real MTS owned-block byte identity differs`,
+      );
+      checkedBlocks += 1;
+    }
+  }
+  console.log(
+    `MDDB_REAL_DOCS_DIFFERENTIAL=PASS files=${realSurfaces.length} anchors=${checkedAnchors} sections=${checkedSections} ownedBlocks=${checkedBlocks}`,
+  );
 
   console.log(
     `repo-guard MDDB differential passed against exact SHA ${REPO_GUARD_SHA}`,
