@@ -83,7 +83,7 @@ export interface MtsReaderScienceStep {
 }
 
 export interface MtsReaderScience {
-  schema: "mts-reader-science/v0.1";
+  schema: "mts-reader-science/v0.2";
   status: "proposed";
   proofCheck: "declarations-only";
   publication: "blocked";
