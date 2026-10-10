@@ -53,6 +53,23 @@ export interface MtsSourceEditorialReview {
   proposedStatement: MtsSourceText;
 }
 
+export interface MtsReaderDefinition {
+  id: string;
+  kind: "definition" | "premise";
+  domain: string;
+  ru: string;
+  prerequisites: readonly string[];
+  proofSymbols: readonly string[];
+  externalMetanotation: true;
+  authorApproval: "not-recorded";
+}
+
+export interface MtsReaderDefinitions {
+  reviewEvidence: { issue: number; comment: number };
+  proofSources: readonly string[];
+  entries: readonly MtsReaderDefinition[];
+}
+
 export interface MtsSourceRequirement {
   id: string;
   schema: "mts-source-requirement/v0.1";
@@ -71,6 +88,7 @@ export interface MtsSourceRequirement {
     englishSha256: string;
   };
   scientificBoundary: Readonly<Record<string, MtsSourceBoundary>>;
+  readerDefinitions: MtsReaderDefinitions | null;
   artifacts: readonly {
     path: string;
     relations: readonly MtsSourceRelation[];
@@ -395,6 +413,85 @@ function parseArtifacts(
   }));
 }
 
+function parseReaderDefinitions(
+  value: unknown,
+  root: string,
+  artifacts: MtsSourceRequirement["artifacts"],
+): MtsReaderDefinitions {
+  const raw = object(value, "reader_definitions");
+  exactFields(raw, ["review_evidence", "proof_sources", "entries"], "reader_definitions");
+  const review = object(raw.review_evidence, "reader_definitions.review_evidence");
+  exactFields(review, ["issue", "comment"], "reader_definitions.review_evidence");
+  const reviewEvidence = {
+    issue: integer(review.issue, "reader_definitions.review_evidence.issue"),
+    comment: integer(review.comment, "reader_definitions.review_evidence.comment"),
+  };
+  const proofSources = strings(raw.proof_sources, "reader_definitions.proof_sources")
+    .map((path, index) => repositoryPath(path, "reader_definitions.proof_sources[" + index + "]"));
+  if (proofSources.length === 0 || new Set(proofSources).size !== proofSources.length) {
+    fail("reader_definitions.proof_sources must be nonempty and unique");
+  }
+  const proofs = proofSources.map((path) => {
+    if (!artifacts.some((a) => a.path === path && a.relations.includes("verifies"))) {
+      fail("reader_definitions.proof_sources must reference a verified artifact: " + path);
+    }
+    return { path, text: readFileSync(resolve(root, path), "utf8") };
+  });
+  const ids = new Set<string>();
+  const rawEntries = values(raw.entries, "reader_definitions.entries");
+  if (rawEntries.length === 0) fail("reader_definitions.entries must not be empty");
+  const entries = rawEntries.map((item, index) => {
+    const label = "reader_definitions.entries[" + index + "]";
+    const entry = object(item, label);
+    exactFields(entry,
+      ["id", "kind", "domain", "ru", "prerequisites", "proof_symbols", "external_metanotation", "author_approval"],
+      label);
+    const id = string(entry.id, label + ".id");
+    const kind = string(entry.kind, label + ".kind");
+    if ((kind !== "definition" && kind !== "premise") ||
+        !/^reader-(def|premise)-[a-z0-9-]+$/.test(id) ||
+        (kind === "definition" && !id.startsWith("reader-def-")) ||
+        (kind === "premise" && !id.startsWith("reader-premise-"))) {
+      fail(label + ".id/kind is invalid");
+    }
+    if (ids.has(id)) fail(label + ".id duplicates " + id);
+    const prerequisites = strings(entry.prerequisites, label + ".prerequisites");
+    if (new Set(prerequisites).size !== prerequisites.length ||
+        prerequisites.some((dependency) => !ids.has(dependency))) {
+      fail(label + ".prerequisites must be unique, declared earlier reader IDs");
+    }
+    const proofSymbols = strings(entry.proof_symbols, label + ".proof_symbols");
+    if (proofSymbols.length === 0 || new Set(proofSymbols).size !== proofSymbols.length) {
+      fail(label + ".proof_symbols must be nonempty and unique");
+    }
+    for (const symbol of proofSymbols) {
+      if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(symbol)) fail(label + ".proof_symbols has invalid symbol");
+      const pattern = new RegExp("(^|\\n)\\s*(?:theorem|def|inductive|structure|lemma|Theorem|Lemma|Definition|Inductive|Record)\\s+" + symbol + "\\b");
+      for (const proof of proofs) {
+        if (!pattern.test(proof.text)) fail(label + ".proof_symbols reference missing symbol " + symbol + " in " + proof.path);
+      }
+    }
+    if (entry.external_metanotation !== true || entry.author_approval !== "not-recorded") {
+      fail(label + " must remain external_metanotation=true and author_approval=not-recorded");
+    }
+    ids.add(id);
+    return Object.freeze({
+      id, kind: kind as "definition" | "premise",
+      domain: string(entry.domain, label + ".domain"),
+      ru: string(entry.ru, label + ".ru"),
+      prerequisites: Object.freeze(prerequisites),
+      proofSymbols: Object.freeze(proofSymbols),
+      externalMetanotation: true as const,
+      authorApproval: "not-recorded" as const,
+    });
+  });
+  return Object.freeze({
+    reviewEvidence: Object.freeze(reviewEvidence),
+    proofSources: Object.freeze(proofSources),
+    entries: Object.freeze(entries),
+  });
+}
+
 function parseYaml(text: string, path: string): unknown {
   const document = parseDocument(text, {
     prettyErrors: true,
@@ -434,6 +531,7 @@ export function parseMtsSourceRequirementText(
       "editorial_review",
       "normative_origin",
       "scientific_boundary",
+      "reader_definitions",
       "artifacts",
     ],
     path,
@@ -455,6 +553,8 @@ export function parseMtsSourceRequirementText(
   const normativeOrigin = parseNormativeOrigin(raw.normative_origin, root);
   const scientificBoundary = parseScientificBoundary(raw.scientific_boundary);
   const artifacts = parseArtifacts(raw.artifacts, root);
+  const readerDefinitions = raw.reader_definitions === undefined
+    ? null : parseReaderDefinitions(raw.reader_definitions, root, artifacts);
   if (!artifacts.some((artifact) => artifact.path === path)) {
     fail(path + " must own itself through artifacts");
   }
@@ -471,6 +571,7 @@ export function parseMtsSourceRequirementText(
     editorialReview,
     normativeOrigin,
     scientificBoundary,
+    readerDefinitions,
     artifacts,
   });
 }
@@ -522,6 +623,9 @@ export function renderMtsSourceRequirementAuditFragment(model: MtsSourceRequirem
     "statement_author_approval=" + model.statement.authorApproval,
     "clarification_sha256=" + model.clarification.sha256,
     "clarification_author_approval=" + model.clarification.authorApproval,
+    "reader_definitions_count=" + (model.readerDefinitions?.entries.length ?? 0),
+    "reader_definitions_review=" + (model.readerDefinitions === null ? "none"
+      : model.readerDefinitions.reviewEvidence.issue + "#" + model.readerDefinitions.reviewEvidence.comment),
     "editorial_review_status=" + model.editorialReview.status,
     "editorial_review_open_findings=" + model.editorialReview.findings.length,
     "editorial_review_ids=" + model.editorialReview.findings.map((item) => item.id).join(","),
