@@ -127,7 +127,7 @@ expectReject(
   "forward reader dependencies must fail",
 );
 expectReject(
-  sourceText.replace("proof_symbols: [root_full_self", "proof_symbols: [MissingProofSymbol"),
+  sourceText.replace("proof_symbols: [FullSelf, root_full_self", "proof_symbols: [MissingProofSymbol, root_full_self"),
   /reference missing symbol MissingProofSymbol/,
   "invented external theorem references must fail",
 );
