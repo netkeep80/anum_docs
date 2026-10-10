@@ -70,6 +70,26 @@ export interface MtsReaderDefinitions {
   entries: readonly MtsReaderDefinition[];
 }
 
+// Publication-scoped scientific claims; never accepted semantic authority.
+export interface MtsReaderScienceStep {
+  id: string;
+  role: "definition" | "premise" | "conditional-theorem";
+  sourceEntry: string | null;
+  quote: string | null;
+  bridgeRu: string | null;
+  proofSymbol: string;
+  requires: readonly string[];
+  premises: readonly string[];
+  domain: readonly string[];
+}
+
+export interface MtsReaderScience {
+  status: "proposed";
+  publication: "blocked";
+  authorApproval: "not-recorded";
+  steps: readonly MtsReaderScienceStep[];
+}
+
 export interface MtsSourceRequirement {
   id: string;
   schema: "mts-source-requirement/v0.1";
@@ -89,6 +109,7 @@ export interface MtsSourceRequirement {
   };
   scientificBoundary: Readonly<Record<string, MtsSourceBoundary>>;
   readerDefinitions: MtsReaderDefinitions | null;
+  readerScience: MtsReaderScience | null;
   artifacts: readonly {
     path: string;
     relations: readonly MtsSourceRelation[];
@@ -492,6 +513,99 @@ function parseReaderDefinitions(
   });
 }
 
+// Validates exact source anchoring and a topological *reading* order.
+// A proof declaration being present in two sources is NOT a proof attestation.
+function parseReaderScience(
+  value: unknown,
+  definitions: MtsReaderDefinitions | null,
+  root: string,
+): MtsReaderScience {
+  const raw = object(value, "reader_science");
+  exactFields(raw, ["status", "publication", "author_approval", "steps"], "reader_science");
+  if (raw.status !== "proposed" || raw.publication !== "blocked"
+    || raw.author_approval !== "not-recorded") {
+    fail("reader_science must remain proposed, publication=blocked, author_approval=not-recorded");
+  }
+  if (definitions === null) fail("reader_science requires reader_definitions source owner");
+  const owners = new Map(definitions.entries.map((entry) => [entry.id, entry.ru]));
+  const proofs = definitions.proofSources.map((path) => readFileSync(resolve(root, path), "utf8"));
+  const ids = new Set<string>();
+  const steps = values(raw.steps, "reader_science.steps");
+  if (steps.length === 0) fail("reader_science.steps must not be empty");
+  const parsed = steps.map((value, index) => {
+    const label = "reader_science.steps[" + index + "]";
+    const entry = object(value, label);
+    exactFields(entry,
+      ["id", "role", "source_entry", "quote", "bridge_ru", "proof_symbol", "requires", "premises", "domain"],
+      label);
+    const id = string(entry.id, label + ".id");
+    if (!/^[a-z][a-z0-9-]*$/.test(id) || ids.has(id)) {
+      fail(label + ".id is invalid or duplicated");
+    }
+    const role = string(entry.role, label + ".role");
+    if (role !== "definition" && role !== "premise" && role !== "conditional-theorem") {
+      fail(label + ".role is unknown");
+    }
+    const sourceEntry = entry.source_entry === undefined ? null
+      : string(entry.source_entry, label + ".source_entry");
+    const quote = entry.quote === undefined ? null : string(entry.quote, label + ".quote");
+    const bridgeRu = entry.bridge_ru === undefined ? null
+      : string(entry.bridge_ru, label + ".bridge_ru");
+    if ((sourceEntry === null) !== (quote === null) ||
+        (sourceEntry === null) === (bridgeRu === null)) {
+      fail(label + " must have either exact source_entry+quote or bridge_ru");
+    }
+    if (sourceEntry !== null && quote !== null) {
+      const original = owners.get(sourceEntry);
+      if (original === undefined || countExact(original, quote) !== 1) {
+        fail(label + ".quote is not unique in declared source_entry");
+      }
+    }
+    const proofSymbol = string(entry.proof_symbol, label + ".proof_symbol");
+    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(proofSymbol)) {
+      fail(label + ".proof_symbol is invalid");
+    }
+    const theorem = role === "conditional-theorem";
+    const pattern = new RegExp(
+      "(^|\\n)\\s*(?:" + (theorem ? "theorem|Theorem|Lemma" :
+        "def|Definition|inductive|Inductive|structure|Record") + ")\\s+" + proofSymbol + "\\b",
+    );
+    if (proofs.some((proof) => !pattern.test(proof))) {
+      fail(label + ".proof_symbol missing declared " + role + " in both proof languages");
+    }
+    const requires = strings(entry.requires, label + ".requires");
+    if (new Set(requires).size !== requires.length ||
+        requires.some((dependency) => !ids.has(dependency))) {
+      fail(label + ".requires must contain unique earlier reader-science IDs");
+    }
+    const premises = strings(entry.premises, label + ".premises");
+    const domain = strings(entry.domain, label + ".domain");
+    if (new Set(premises).size !== premises.length || domain.length === 0) {
+      fail(label + ".premises must be unique and .domain nonempty");
+    }
+    if (theorem && premises.length === 0) {
+      fail(label + ".conditional-theorem must state its additional premises");
+    }
+    if (!theorem && premises.length !== 0) {
+      fail(label + ".premises only belong to conditional-theorem");
+    }
+    ids.add(id);
+    return Object.freeze({
+      id, role: role as MtsReaderScienceStep["role"],
+      sourceEntry, quote, bridgeRu, proofSymbol,
+      requires: Object.freeze(requires),
+      premises: Object.freeze(premises),
+      domain: Object.freeze(domain),
+    });
+  });
+  return Object.freeze({
+    status: "proposed" as const,
+    publication: "blocked" as const,
+    authorApproval: "not-recorded" as const,
+    steps: Object.freeze(parsed),
+  });
+}
+
 function parseYaml(text: string, path: string): unknown {
   const document = parseDocument(text, {
     prettyErrors: true,
@@ -532,6 +646,7 @@ export function parseMtsSourceRequirementText(
       "normative_origin",
       "scientific_boundary",
       "reader_definitions",
+      "reader_science",
       "artifacts",
     ],
     path,
@@ -555,6 +670,8 @@ export function parseMtsSourceRequirementText(
   const artifacts = parseArtifacts(raw.artifacts, root);
   const readerDefinitions = raw.reader_definitions === undefined
     ? null : parseReaderDefinitions(raw.reader_definitions, root, artifacts);
+  const readerScience = raw.reader_science === undefined
+    ? null : parseReaderScience(raw.reader_science, readerDefinitions, root);
   if (!artifacts.some((artifact) => artifact.path === path)) {
     fail(path + " must own itself through artifacts");
   }
@@ -572,6 +689,7 @@ export function parseMtsSourceRequirementText(
     normativeOrigin,
     scientificBoundary,
     readerDefinitions,
+    readerScience,
     artifacts,
   });
 }
@@ -623,6 +741,8 @@ export function renderMtsSourceRequirementAuditFragment(model: MtsSourceRequirem
     "statement_author_approval=" + model.statement.authorApproval,
     "clarification_sha256=" + model.clarification.sha256,
     "clarification_author_approval=" + model.clarification.authorApproval,
+    "reader_science_nodes=" + (model.readerScience?.steps.length ?? 0),
+    "reader_science_publication=" + (model.readerScience?.publication ?? "none"),
     "reader_definitions_count=" + (model.readerDefinitions?.entries.length ?? 0),
     "reader_definitions_review=" + (model.readerDefinitions === null ? "none"
       : model.readerDefinitions.reviewEvidence.issue + "#" + model.readerDefinitions.reviewEvidence.comment),
