@@ -74,5 +74,3 @@ artifacts:
     relations: [requires, verifies]
   - path: ts/test/research-v013-semantic-dependency-projection-a9.test.ts
     relations: [requires, verifies]
-  - path: repo-policy.json
-    relations: [requires, implements]
