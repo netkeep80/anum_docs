@@ -209,7 +209,13 @@ function parseStatement(value: unknown, root: string, label: string): MtsSourceS
     ["ru", "sha256", "source_role", "author_approval", "author_decision", "source"],
     label,
   );
-  const base = parseSourceText(raw, label);
+  const base = parseSourceText({
+    ru: raw.ru,
+    sha256: raw.sha256,
+    source_role: raw.source_role,
+    author_approval: raw.author_approval,
+    author_decision: raw.author_decision,
+  }, label);
   const source = object(raw.source, label + ".source");
   exactFields(source, ["path", "anchor", "baseline_commit", "blob_sha"], label + ".source");
   const path = repositoryPath(source.path, label + ".source.path");
