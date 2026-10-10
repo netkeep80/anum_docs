@@ -156,8 +156,8 @@ expectReject(
 );
 expectReject(
   sourceText.replace(
-    "relations: [requires, verifies]\n  - path: ts/src/tooling/mts-source-requirement.ts",
-    "relations: [verifies]\n  - path: ts/src/tooling/mts-source-requirement.ts",
+    "  - path: ts/src/tooling/mts-source-requirement.ts\n    relations: [requires, implements]",
+    "  - path: ts/src/tooling/mts-source-requirement.ts\n    relations: [implements]",
   ),
   /must explicitly include requires/,
   "every explicit artifact relation set must include requires",
