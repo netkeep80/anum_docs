@@ -77,6 +77,65 @@ normative_origin:
     One Link ontology and one abstract Link-forming primitive induce exactly four self-incidence structural cases 11/10/01/00; after Context orientation these are named ROOT/START_K/END_K/PAIR and encoded by recursive 8/9/6/1, which is not the Anum/Q alphabet.
   english_sha256: 3f54624df8e72ead62dce1f35a57f6190e69f544e2d640ba0a547ebf30c04910
 
+reader_definitions:
+  review_evidence:
+    issue: 2132
+    comment: 6103120355
+  proof_sources:
+    - proofs/lean4/MtsFoundation.lean
+    - proofs/coq/MtsFoundation.v
+  entries:
+    - id: reader-def-root
+      kind: definition
+      domain: "Foundation"
+      ru: |-
+        Во внешней структуре Foundation заданы носитель Link, операции form, start, finish и выделенная Связь R. Уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R дают start(R)=R и finish(R)=R: корень полностью самозамкнут. Сама R является входом внешней модели, а не результатом построения из одних уравнений проекций.
+        Единственность полностью самозамкнутой Связи утверждается отдельно: FND_02_unique_root выводит FullSelf(x) ⇒ x=R при дополнительной предпосылке A1RecursiveSeparation.
+      prerequisites: []
+      proof_symbols: [root_full_self, FND_02_unique_root]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-local-decision
+      kind: definition
+      domain: "Foundation, конкретная Связь x"
+      ru: |-
+        Для Связи x определены два локальных свойства: start(x)=x и finish(x)=x. Записи 11, 10, 01 и 00 обозначают соответственно совпадение обоих полюсов, только первого, только второго и ни одного. Это внешние метазнаки, а не четыре вида сущностей МТС.
+        LocalSelfDecision(F,x) означает предъявленные логические свидетельства (start(x)=x ∨ start(x)≠x) и (finish(x)=x ∨ finish(x)≠x). Они позволяют конструктивно установить один из четырёх случаев для данного x, но не доказывают наличие вычислительного алгоритма для всех Links. Попарная несовместимость случаев не требует LocalSelfDecision; конструктивная исчерпываемость требует.
+      prerequisites: [reader-def-root]
+      proof_symbols: [LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-grounded
+      kind: definition
+      domain: "Foundation, Связь x"
+      ru: |-
+        Grounded(F,x) — внешнее индуктивное свидетельство конечного обоснования структуры x. Для полюса, который совпадает с x, новая рекурсивная обязанность отсутствует; для каждого несовпадающего полюса требуется Grounded соответствующей Связи. Конечен доказательный объект, но это не запрет иных циклических Links.
+        Это условие области применения отдельных теорем, а не самостоятельная теорема тотальности. FND_13_identity_by_poles устанавливает эквивалентность тождества двух Grounded-связей и равенства их полюсов при F2F3GroundedNormalization с complete. INV_01_recursive_inversion_total дополнительно требует A1RecursiveSeparation, F2F3OneSidedExistence и RecursiveInversionDomain. Дополнительные предпосылки указываются для каждой теоремы.
+      prerequisites: [reader-def-local-decision]
+      proof_symbols: [Grounded, FND_13_identity_by_poles, INV_01_recursive_inversion_total]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-premise-one-sided-existence
+      kind: premise
+      domain: "Foundation с дополнительным F2F3OneSidedExistence"
+      ru: |-
+        F2F3OneSidedExistence(F) — отдельная предпосылка внешней модели: существуют u и v такие, что u=form(u,R), v=form(R,v), u≠R и v≠R. Из неё совместно с законами Foundation выводятся StartOnly(u), FinishOnly(v), PairLocal(form(u,v)) и свидетельства Grounded для трёх построенных представителей (FND_01_grounded_realizability).
+        Эти представители не следуют из одного слабого интерфейса Foundation в данном доказательстве. Здесь не заявляется отдельное модельно-теоретическое доказательство независимости предпосылки от всей принятой МТС.
+      prerequisites: [reader-def-root, reader-def-local-decision, reader-def-grounded]
+      proof_symbols: [F2F3OneSidedExistence, FND_01_grounded_realizability]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-context-relative-role
+      kind: definition
+      domain: "Односторонние Связи, выбранный Context marker и RecursiveInversionDomain"
+      ru: |-
+        ProperOneSided(x) означает StartOnly(x) или FinishOnly(x). Предикат SameChiralClass(m,x) означает принадлежность m и x одному из этих двух позиционных классов; OppositeChiralClass(m,x) — принадлежность противоположным классам. Это внешние отношения, не дополнительный тип Связей.
+        ContextOrientationMarker(F,D,body,m) требует m=D.startForm(body) или m=D.endForm(body) для предъявленной RecursiveInversionDomain D. При A1RecursiveSeparation, F2F3OneSidedExistence, D и таком выбранном m теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров: localStart того же класса, что m, и localEnd противоположного класса. Роли START_K и END_K определяются только относительно выбора K; теорема не задаёт универсального абсолютного направления.
+      prerequisites: [reader-def-local-decision, reader-premise-one-sided-existence]
+      proof_symbols: [SameChiralClass, OppositeChiralClass, ContextOrientationMarker, CTX_03_context_selection_induces_local_roles]
+      external_metanotation: true
+      author_approval: not-recorded
+
 scientific_boundary:
   logical_partition:
     theorem: FND_01_local_partition
@@ -106,6 +165,8 @@ artifacts:
   - path: contracts/mts-contract-v0.14.json
     relations: [requires, immutable]
   - path: proofs/lean4/MtsFoundation.lean
+    relations: [requires, verifies]
+  - path: proofs/coq/MtsFoundation.v
     relations: [requires, verifies]
   - path: proofs/premise-classification-v0.14.json
     relations: [requires, verifies]
