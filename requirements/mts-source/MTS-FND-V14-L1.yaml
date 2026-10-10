@@ -172,7 +172,7 @@ reader_science:
     - id: separation-a1
       role: premise
       ru: |-
-        A1RecursiveSeparation(F) — отдельная предпосылка внешней математической модели. Она утверждает: для двух Связей x и y, каждая из которых имеет Grounded-свидетельство, отсутствие Distinguishable(F,x,y) влечёт x=y. A1 не выводится из одних равенств для операции form и проекций start/finish.
+        A1RecursiveSeparation(F) — отдельная предпосылка внешней математической модели. Она утверждает: для двух Связей x и y, каждая из которых имеет Grounded-свидетельство, отсутствие Distinguishable(F,x,y) влечёт x=y. В проверенных теоремах A1 предъявляется как самостоятельная предпосылка; доказательство её логической независимости от более слабого Foundation здесь не заявляется.
       proof_symbol: A1RecursiveSeparation
       requires: [distinction]
       premises: []
