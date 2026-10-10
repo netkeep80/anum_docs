@@ -72,7 +72,7 @@ assert.equal(model.editorialReview.proposedStatement.sourceRole, "editorial-prop
 assert.equal(model.editorialReview.proposedStatement.authorApproval, "not-recorded");
 assert.equal(
   model.editorialReview.proposedStatement.sha256,
-  "dd23ce6dd82c5f13205364dfd5a03e51ded3f1bc1c9b07ec6e8a6e819ec51040",
+  "cc2673338708ca4dd245e1aa2b894d51a4859359960037bf25c5d7445d2c71c9",
 );
 assert.ok(model.editorialReview.proposedStatement.ru.includes("LocalSelfDecision"));
 assert.ok(!model.editorialReview.proposedStatement.ru.includes("четыре команды"));
@@ -193,7 +193,7 @@ expectReject(
 );
 expectReject(
   sourceText.replace(
-    "dd23ce6dd82c5f13205364dfd5a03e51ded3f1bc1c9b07ec6e8a6e819ec51040",
+    "cc2673338708ca4dd245e1aa2b894d51a4859359960037bf25c5d7445d2c71c9",
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   ),
   /sha256 does not match exact UTF-8 ru text/,
