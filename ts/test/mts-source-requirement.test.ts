@@ -56,6 +56,26 @@ assert.ok(model.clarification.ru.includes("не следует существо�
 assert.ok(model.clarification.ru.includes(q + "F2F3OneSidedExistence" + q));
 assert.ok(model.clarification.ru.includes(q + "A1RecursiveSeparation" + q));
 
+assert.equal(model.editorialReview.status, "blocked");
+assert.equal(model.editorialReview.authorApproval, "not-recorded");
+assert.equal(model.editorialReview.findings.length, 6);
+assert.deepEqual(model.editorialReview.findings.map((item) => item.id), [
+  "V14-L1-ED01",
+  "V14-L1-ED02",
+  "V14-L1-ED03",
+  "V14-L1-ED04",
+  "V14-L1-ED05",
+  "V14-L1-ED06",
+]);
+assert.equal(model.editorialReview.proposedStatement.sourceRole, "editorial-proposal");
+assert.equal(model.editorialReview.proposedStatement.authorApproval, "not-recorded");
+assert.equal(
+  model.editorialReview.proposedStatement.sha256,
+  "dd23ce6dd82c5f13205364dfd5a03e51ded3f1bc1c9b07ec6e8a6e819ec51040",
+);
+assert.ok(model.editorialReview.proposedStatement.ru.includes("LocalSelfDecision"));
+assert.ok(!model.editorialReview.proposedStatement.ru.includes("четыре команды"));
+
 assert.equal(model.normativeOrigin.release, "v0.14");
 assert.equal(model.normativeOrigin.recordId, "V14-L1");
 assert.equal(
@@ -103,17 +123,21 @@ assert.deepEqual(
   ["requires", "verifies"],
 );
 
-const reader = renderMtsSourceRequirementReaderFragment(model);
-assert.ok(reader.includes("Редакционное уточнение — НЕ утверждено Автором"));
-assert.ok(reader.includes("logical_partition"));
-assert.ok(reader.includes("FND_01_grounded_realizability"));
-assert.ok(reader.includes("Grounded"));
+assert.throws(
+  () => renderMtsSourceRequirementReaderFragment(model),
+  /reader publication blocked by unresolved editorial review/,
+  "unresolved editorial findings must not become reader publication",
+);
 
 const audit = renderMtsSourceRequirementAuditFragment(model);
 assert.ok(audit.includes("model_status=proposed"));
 assert.ok(audit.includes("semantic_change=false"));
 assert.ok(audit.includes("statement_author_approval=not-recorded"));
 assert.ok(audit.includes("clarification_author_approval=not-recorded"));
+assert.ok(audit.includes("editorial_review_status=blocked"));
+assert.ok(audit.includes("editorial_review_open_findings=6"));
+assert.ok(audit.includes("V14-L1-ED01"));
+assert.ok(audit.includes("proposed_statement_author_approval=not-recorded"));
 assert.ok(audit.includes("contracts/mts-contract-v0.14.json#/requiredSemanticLaws/V14-L1"));
 
 expectReject(
@@ -138,6 +162,25 @@ expectReject(
   sourceText.replace("author_approval: not-recorded", "author_approval: approved"),
   /author_decision must be an object/,
   "approval cannot be invented without an exact Author decision",
+);
+expectReject(
+  sourceText.replace("  status: blocked", "  status: accepted"),
+  /editorial_review.status must remain blocked/,
+  "unresolved editorial review cannot be silently accepted",
+);
+expectReject(
+  sourceText.replace("quote: 'Первичен **" + q + "Link" + q + "**, а не четыре команды.'",
+    "quote: 'Несуществующая формулировка вне источника'"),
+  /quote must occur exactly once in frozen source statement/,
+  "every editorial finding must point to exact source words",
+);
+expectReject(
+  sourceText.replace(
+    "dd23ce6dd82c5f13205364dfd5a03e51ded3f1bc1c9b07ec6e8a6e819ec51040",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  ),
+  /sha256 does not match exact UTF-8 ru text/,
+  "unapproved replacement candidate drift must fail closed",
 );
 expectReject(
   "id: MTS-FND-V14-L1\n" + sourceText,
