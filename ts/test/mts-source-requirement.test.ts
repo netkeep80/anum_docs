@@ -77,7 +77,6 @@ assert.equal(
 assert.ok(model.editorialReview.proposedStatement.ru.includes("LocalSelfDecision"));
 assert.ok(!model.editorialReview.proposedStatement.ru.includes("четыре команды"));
 
-
 assert.ok(model.readerDefinitions, "reader definitions should be typed within the single source owner");
 const definitions = model.readerDefinitions!;
 assert.equal(definitions.reviewEvidence.issue, 2132);
@@ -187,6 +186,8 @@ assert.throws(
 
 const audit = renderMtsSourceRequirementAuditFragment(model);
 assert.ok(audit.includes("model_status=proposed"));
+assert.ok(audit.includes("reader_definitions_count=5"));
+assert.ok(audit.includes("reader_definitions_review=2132#6103120355"));
 assert.ok(audit.includes("semantic_change=false"));
 assert.ok(audit.includes("statement_author_approval=not-recorded"));
 assert.ok(audit.includes("clarification_author_approval=not-recorded"));
