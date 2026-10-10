@@ -68,6 +68,10 @@ artifacts:
     relations: [requires, verifies]
   - path: proofs/premise-classification-v0.14.json
     relations: [requires, verifies]
+  - path: ts/package.json
+    relations: [requires, implements]
+  - path: ts/package-lock.json
+    relations: [requires, implements]
   - path: ts/src/tooling/mts-source-requirement.ts
     relations: [requires, implements]
   - path: ts/test/mts-source-requirement.test.ts
