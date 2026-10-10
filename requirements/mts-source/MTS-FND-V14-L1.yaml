@@ -89,10 +89,10 @@ reader_definitions:
       kind: definition
       domain: "Foundation"
       ru: |-
-        Во внешнем математическом интерфейсе Foundation заданы носитель Link, формирующая операция form и выделенная Связь R; start и finish служат внешними проекциями полюсных позиций, а не самостоятельными примитивами МТС. Уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R дают start(R)=R и finish(R)=R: корень полностью самозамкнут. Сама R является входом внешней модели, а не результатом построения из одних уравнений проекций.
+        Во внешнем математическом интерфейсе Foundation заданы носитель Link, формирующая операция form и выделенная Связь R; start и finish служат внешними проекциями полюсных позиций, а не самостоятельными примитивами МТС. Уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R дают start(R)=R и finish(R)=R: корень полностью самозамкнут. Сама R является входом внешней модели, а не результатом построения из одних уравнений проекций. Здесь FullSelf(F,x) означает одновременное выполнение start(x)=x и finish(x)=x; при фиксированном F далее используется сокращение FullSelf(x).
         Единственность полностью самозамкнутой Связи утверждается отдельно: FND_02_unique_root выводит FullSelf(x) ⇒ x=R при дополнительной предпосылке A1RecursiveSeparation.
       prerequisites: []
-      proof_symbols: [root_full_self, FND_02_unique_root]
+      proof_symbols: [FullSelf, root_full_self, FND_02_unique_root]
       external_metanotation: true
       author_approval: not-recorded
     - id: reader-def-local-decision
@@ -102,7 +102,7 @@ reader_definitions:
         Для Связи x определены два локальных свойства: start(x)=x и finish(x)=x. Их сочетания обозначаются 11, 10, 01, 00: оба полюса совпадают с x, только первый, только второй, ни один. Соответствующие внешние предикаты: FullSelf(x) — оба совпадения; StartOnly(x) — start(x)=x и finish(x)≠x; FinishOnly(x) — start(x)≠x и finish(x)=x; PairLocal(x) — оба полюса не равны x. Это метаобозначения, а не четыре вида сущностей МТС.
         LocalSelfDecision(F,x) означает предъявленные логические свидетельства (start(x)=x ∨ start(x)≠x) и (finish(x)=x ∨ finish(x)≠x). Они позволяют конструктивно установить один из четырёх случаев для данного x, но не доказывают наличие вычислительного алгоритма для всех Связей. Попарная несовместимость случаев не требует LocalSelfDecision; конструктивная исчерпываемость требует.
       prerequisites: [reader-def-root]
-      proof_symbols: [LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive]
+      proof_symbols: [StartOnly, FinishOnly, PairLocal, LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive]
       external_metanotation: true
       author_approval: not-recorded
     - id: reader-def-grounded
@@ -110,7 +110,7 @@ reader_definitions:
       domain: "Foundation, Связь x"
       ru: |-
         Grounded(F,x) — внешнее индуктивное свидетельство конечного обоснования структуры x. Для полюса, который совпадает с x, новая рекурсивная обязанность отсутствует; для каждого несовпадающего полюса требуется Grounded соответствующей Связи. Конечен доказательный объект, но это не запрет иных циклических структур Связей.
-        Это условие области применения отдельных теорем, а не самостоятельная теорема тотальности. FND_13_identity_by_poles устанавливает эквивалентность тождества двух Grounded-связей и равенства их полюсов при F2F3GroundedNormalization с complete. INV_01_recursive_inversion_total дополнительно требует A1RecursiveSeparation, F2F3OneSidedExistence и RecursiveInversionDomain. Дополнительные предпосылки указываются для каждой теоремы.
+        Это условие области применения отдельных теорем, а не самостоятельная теорема тотальности. Теорема FND_13_identity_by_poles утверждает для Grounded(F,x) и Grounded(F,y): x=y тогда и только тогда, когда совпадают полюса x и y; дополнительно предполагается F2F3GroundedNormalization(F), включая свойство complete. Другая теорема INV_01_recursive_inversion_total устанавливает существование структурного инверса для Grounded(F,x) при A1RecursiveSeparation(F), F2F3OneSidedExistence(F) и RecursiveInversionDomain(F,E); F2F3GroundedNormalization не является её предпосылкой. У каждой теоремы своя область и свой набор условий.
       prerequisites: [reader-def-local-decision]
       proof_symbols: [Grounded, FND_13_identity_by_poles, INV_01_recursive_inversion_total]
       external_metanotation: true
@@ -130,9 +130,9 @@ reader_definitions:
       domain: "Односторонние Связи, выбранный контекстный маркер и RecursiveInversionDomain"
       ru: |-
         ProperOneSided(x) означает StartOnly(x) или FinishOnly(x). Предикат SameChiralClass(m,x) означает принадлежность m и x одному из этих двух позиционных классов; OppositeChiralClass(m,x) — принадлежность противоположным классам. Это внешние отношения, не дополнительный тип Связей.
-        ContextOrientationMarker(F,D,body,m) требует m=D.startForm(body) или m=D.endForm(body) для предъявленной RecursiveInversionDomain D. При A1RecursiveSeparation, F2F3OneSidedExistence, D и таком выбранном m теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров: localStart того же класса, что m, и localEnd противоположного класса. Роли START_K и END_K определяются только относительно выбора K; теорема не задаёт универсального абсолютного направления.
+        Внешний предикат ContextOrientationMarker(F,D,body,m) требует m=D.startForm(body) или m=D.endForm(body) для предъявленной RecursiveInversionDomain D, зависящей от F и E=F2F3OneSidedExistence(F); параметр E неявен в Lean, явен в Rocq. При A1RecursiveSeparation(F), E, D, body и таком выбранном m теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров: localStart того же класса, что m, и localEnd противоположного класса. Здесь K обозначает контекст с предъявленным допустимым ориентационным маркером; роли START_K и END_K относятся к этому выбору, а не к абсолютной ориентации всех Связей. Теорема не утверждает, что произвольный контекст автоматически имеет такой маркер.
       prerequisites: [reader-def-local-decision, reader-premise-one-sided-existence]
-      proof_symbols: [SameChiralClass, OppositeChiralClass, ContextOrientationMarker, CTX_03_context_selection_induces_local_roles]
+      proof_symbols: [ProperOneSided, SameChiralClass, OppositeChiralClass, ContextOrientationMarker, ContextLocalStartRole, ContextLocalEndRole, CTX_03_context_selection_induces_local_roles]
       external_metanotation: true
       author_approval: not-recorded
 
