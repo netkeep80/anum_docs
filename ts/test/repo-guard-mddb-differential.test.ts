@@ -375,7 +375,7 @@ try {
   let checkedBlocks = 0;
   let checkedSections = 0;
   for (const path of realSurfaces) {
-    const actualSource = readFileSync(resolve(repositoryRoot, path), "utf8");
+    const actualSource: string = readFileSync(resolve(repositoryRoot, path), "utf8");
     const ownedIds = localListOwnedMarkdownBlockIds(actualSource);
     const actualOptions = {
       transparentOwnedBlocks: ownedIds.map((id) => ({
