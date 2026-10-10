@@ -138,7 +138,9 @@ reader_definitions:
       author_approval: not-recorded
 
 reader_science:
+  schema: mts-reader-science/v0.1
   status: proposed
+  proof_check: declarations-only
   publication: blocked
   author_approval: not-recorded
   steps:
@@ -150,6 +152,7 @@ reader_science:
       requires: []
       premises: []
       domain: ["Foundation"]
+      exclusions: []
     - id: incidence
       role: definition
       source_entry: reader-def-local-decision
@@ -158,6 +161,7 @@ reader_science:
       requires: [foundation]
       premises: []
       domain: ["Link"]
+      exclusions: []
     - id: grounded
       role: definition
       source_entry: reader-def-grounded
@@ -166,13 +170,15 @@ reader_science:
       requires: [foundation, incidence]
       premises: []
       domain: ["Link"]
+      exclusions: []
     - id: distinction
       role: definition
       bridge_ru: "Distinguishable(F,x,y) — конечное индуктивное свидетельство рекурсивной различимости двух Связей; это внешний предикат, не новое Link-значение."
       proof_symbol: Distinguishable
       requires: [grounded]
       premises: []
-      domain: ["Grounded"]
+      domain: ["Link × Link"]
+      exclusions: []
     - id: separation-a1
       role: premise
       bridge_ru: "A1RecursiveSeparation(F) — дополнительная предпосылка: для двух Grounded-связей отсутствие конечного свидетельства Distinguishable влечёт их равенство; это не вывод из одних уравнений Foundation."
@@ -180,6 +186,7 @@ reader_science:
       requires: [distinction]
       premises: []
       domain: ["Grounded"]
+      exclusions: []
     - id: root-uniqueness
       role: conditional-theorem
       source_entry: reader-def-root
@@ -188,6 +195,7 @@ reader_science:
       requires: [incidence, separation-a1]
       premises: [A1RecursiveSeparation]
       domain: ["FullSelf"]
+      exclusions: ["not from Foundation alone"]
     - id: one-sided-existence
       role: premise
       source_entry: reader-premise-one-sided-existence
@@ -196,6 +204,7 @@ reader_science:
       requires: [root-uniqueness]
       premises: []
       domain: ["Foundation"]
+      exclusions: []
     - id: one-sided-realizability
       role: conditional-theorem
       source_entry: reader-premise-one-sided-existence
@@ -204,6 +213,7 @@ reader_science:
       requires: [one-sided-existence, grounded]
       premises: [F2F3OneSidedExistence]
       domain: ["constructed witnesses"]
+      exclusions: ["not from logical partition alone"]
     - id: grounded-normalization
       role: premise
       source_entry: reader-def-grounded
@@ -212,6 +222,7 @@ reader_science:
       requires: [grounded, one-sided-realizability]
       premises: []
       domain: ["Grounded"]
+      exclusions: []
     - id: identity-by-poles
       role: conditional-theorem
       source_entry: reader-def-grounded
@@ -220,6 +231,7 @@ reader_science:
       requires: [grounded-normalization]
       premises: [F2F3GroundedNormalization]
       domain: ["Grounded(x), Grounded(y)"]
+      exclusions: ["no claim for arbitrary ungrounded Links"]
     - id: inversion-domain
       role: premise
       source_entry: reader-def-context-relative-role
@@ -228,6 +240,7 @@ reader_science:
       requires: [one-sided-existence, grounded]
       premises: []
       domain: ["Foundation, E"]
+      exclusions: []
     - id: inversion-relation
       role: definition
       bridge_ru: "RecursiveInversion(F,D,x,y) — внешнее индуктивное отношение структурной инверсии, а не безусловная тотальная функция на всех Link."
@@ -235,6 +248,7 @@ reader_science:
       requires: [inversion-domain, incidence]
       premises: []
       domain: ["Foundation, E, D"]
+      exclusions: []
     - id: inversion-total
       role: conditional-theorem
       source_entry: reader-def-grounded
@@ -243,6 +257,7 @@ reader_science:
       requires: [inversion-relation, separation-a1]
       premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
       domain: ["Grounded(x)"]
+      exclusions: ["no totality on arbitrary ungrounded Links"]
     - id: inversion-involutive
       role: conditional-theorem
       bridge_ru: "INV_02_unique_total_involution: для Grounded(x) и предъявленных A1, N, E, D существует обратимая цепочка инверсии x→y→x; это условный реляционный результат, а не глобальная функция J."
@@ -250,6 +265,7 @@ reader_science:
       requires: [inversion-total, grounded-normalization]
       premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
       domain: ["Grounded(x)"]
+      exclusions: ["not a global primitive J function"]
     - id: chiral-classes
       role: definition
       source_entry: reader-def-context-relative-role
@@ -258,6 +274,7 @@ reader_science:
       requires: [incidence, inversion-relation]
       premises: []
       domain: ["ProperOneSided"]
+      exclusions: []
     - id: chiral-orbit
       role: conditional-theorem
       bridge_ru: "CTX_03_objective_chiral_orbit_before_context устанавливает существование двух разных взаимно инверсных односторонних Связей без выбора глобального W; существование зависит от A1, N, E и D."
@@ -265,6 +282,7 @@ reader_science:
       requires: [chiral-classes, inversion-involutive]
       premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
       domain: ["Foundation"]
+      exclusions: ["no globally selected W"]
     - id: context-marker
       role: definition
       source_entry: reader-def-context-relative-role
@@ -273,6 +291,7 @@ reader_science:
       requires: [chiral-orbit, inversion-domain]
       premises: []
       domain: ["body, selected marker"]
+      exclusions: []
     - id: context-roles
       role: conditional-theorem
       source_entry: reader-def-context-relative-role
@@ -281,6 +300,7 @@ reader_science:
       requires: [context-marker, separation-a1]
       premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
       domain: ["body, selected, ContextOrientationMarker"]
+      exclusions: ["no automatic orientation for arbitrary Context"]
 
 scientific_boundary:
   logical_partition:
