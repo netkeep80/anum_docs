@@ -57,7 +57,7 @@ export interface MtsReaderDefinition {
   id: string;
   kind: "definition" | "premise";
   domain: string;
-  ru: string;
+  scienceSteps: readonly string[];
   prerequisites: readonly string[];
   proofSymbols: readonly string[];
   externalMetanotation: true;
@@ -74,9 +74,7 @@ export interface MtsReaderDefinitions {
 export interface MtsReaderScienceStep {
   id: string;
   role: "definition" | "premise" | "conditional-theorem";
-  sourceEntry: string | null;
-  quote: string | null;
-  bridgeRu: string | null;
+  ru: string;
   proofSymbol: string;
   requires: readonly string[];
   premises: readonly string[];
@@ -468,7 +466,7 @@ function parseReaderDefinitions(
     const label = "reader_definitions.entries[" + index + "]";
     const entry = object(item, label);
     exactFields(entry,
-      ["id", "kind", "domain", "ru", "prerequisites", "proof_symbols", "external_metanotation", "author_approval"],
+      ["id", "kind", "domain", "science_steps", "prerequisites", "proof_symbols", "external_metanotation", "author_approval"],
       label);
     const id = string(entry.id, label + ".id");
     const kind = string(entry.kind, label + ".kind");
@@ -483,6 +481,10 @@ function parseReaderDefinitions(
     if (new Set(prerequisites).size !== prerequisites.length ||
         prerequisites.some((dependency) => !ids.has(dependency))) {
       fail(label + ".prerequisites must be unique, declared earlier reader IDs");
+    }
+    const scienceSteps = strings(entry.science_steps, label + ".science_steps");
+    if (scienceSteps.length === 0 || new Set(scienceSteps).size !== scienceSteps.length) {
+      fail(label + ".science_steps must be nonempty and unique");
     }
     const proofSymbols = strings(entry.proof_symbols, label + ".proof_symbols");
     if (proofSymbols.length === 0 || new Set(proofSymbols).size !== proofSymbols.length) {
@@ -502,7 +504,7 @@ function parseReaderDefinitions(
     return Object.freeze({
       id, kind: kind as "definition" | "premise",
       domain: string(entry.domain, label + ".domain"),
-      ru: string(entry.ru, label + ".ru"),
+      scienceSteps: Object.freeze(scienceSteps),
       prerequisites: Object.freeze(prerequisites),
       proofSymbols: Object.freeze(proofSymbols),
       externalMetanotation: true as const,
@@ -525,13 +527,19 @@ function parseReaderScience(
 ): MtsReaderScience {
   const raw = object(value, "reader_science");
   exactFields(raw, ["schema", "status", "proof_check", "publication", "author_approval", "steps"], "reader_science");
-  if (raw.schema !== "mts-reader-science/v0.1" || raw.proof_check !== "declarations-only"
+  if (raw.schema !== "mts-reader-science/v0.2" || raw.proof_check !== "declarations-only"
     || raw.status !== "proposed" || raw.publication !== "blocked"
     || raw.author_approval !== "not-recorded") {
     fail("reader_science must remain proposed, publication=blocked, author_approval=not-recorded");
   }
   if (definitions === null) fail("reader_science requires reader_definitions source owner");
-  const owners = new Map(definitions.entries.map((entry) => [entry.id, entry.ru]));
+  const owners = new Map<string, string>();
+  for (const group of definitions.entries) {
+    for (const stepId of group.scienceSteps) {
+      if (owners.has(stepId)) fail("reader_science step has multiple source owners: " + stepId);
+      owners.set(stepId, group.id);
+    }
+  }
   const proofs = definitions.proofSources.map((path) => readFileSync(resolve(root, path), "utf8"));
   const ids = new Set<string>();
   const steps = values(raw.steps, "reader_science.steps");
@@ -540,7 +548,7 @@ function parseReaderScience(
     const label = "reader_science.steps[" + index + "]";
     const entry = object(value, label);
     exactFields(entry,
-      ["id", "role", "source_entry", "quote", "bridge_ru", "proof_symbol", "requires", "premises", "domain", "exclusions"],
+      ["id", "role", "ru", "proof_symbol", "requires", "premises", "domain", "exclusions"],
       label);
     const id = string(entry.id, label + ".id");
     if (!/^[a-z][a-z0-9-]*$/.test(id) || ids.has(id)) {
@@ -550,21 +558,8 @@ function parseReaderScience(
     if (role !== "definition" && role !== "premise" && role !== "conditional-theorem") {
       fail(label + ".role is unknown");
     }
-    const sourceEntry = entry.source_entry === undefined ? null
-      : string(entry.source_entry, label + ".source_entry");
-    const quote = entry.quote === undefined ? null : string(entry.quote, label + ".quote");
-    const bridgeRu = entry.bridge_ru === undefined ? null
-      : string(entry.bridge_ru, label + ".bridge_ru");
-    if ((sourceEntry === null) !== (quote === null) ||
-        (sourceEntry === null) === (bridgeRu === null)) {
-      fail(label + " must have either exact source_entry+quote or bridge_ru");
-    }
-    if (sourceEntry !== null && quote !== null) {
-      const original = owners.get(sourceEntry);
-      if (original === undefined || countExact(original, quote) !== 1) {
-        fail(label + ".quote is not unique in declared source_entry");
-      }
-    }
+    if (!owners.has(id)) fail(label + ".id has no unique source-owned definition group");
+    const ru = string(entry.ru, label + ".ru");
     const proofSymbol = string(entry.proof_symbol, label + ".proof_symbol");
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(proofSymbol)) {
       fail(label + ".proof_symbol is invalid");
@@ -598,15 +593,18 @@ function parseReaderScience(
     ids.add(id);
     return Object.freeze({
       id, role: role as MtsReaderScienceStep["role"],
-      sourceEntry, quote, bridgeRu, proofSymbol,
+      ru, proofSymbol,
       requires: Object.freeze(requires),
       premises: Object.freeze(premises),
       domain: Object.freeze(domain),
       exclusions: Object.freeze(exclusions),
     });
   });
+  if (ids.size !== owners.size) {
+    fail("reader_science source-owned nodes do not match declared steps");
+  }
   return Object.freeze({
-    schema: "mts-reader-science/v0.1" as const,
+    schema: "mts-reader-science/v0.2" as const,
     status: "proposed" as const,
     proofCheck: "declarations-only" as const,
     publication: "blocked" as const,
@@ -715,6 +713,9 @@ export function renderMtsSourceRequirementReaderFragment(model: MtsSourceRequire
     fail("reader publication blocked by unresolved editorial review: "
       + model.editorialReview.findings.map((item) => item.id).join(", "));
   }
+  if (model.readerScience?.publication === "blocked") {
+    fail("reader publication blocked by unapproved atomic reader science");
+  }
   const q = String.fromCharCode(96);
   const proposalLabel =
     model.clarification.authorApproval === "approved"
@@ -754,6 +755,7 @@ export function renderMtsSourceRequirementAuditFragment(model: MtsSourceRequirem
     "clarification_sha256=" + model.clarification.sha256,
     "clarification_author_approval=" + model.clarification.authorApproval,
     "reader_science_nodes=" + (model.readerScience?.steps.length ?? 0),
+    "reader_science_text_authority=atomic-yaml",
     "reader_science_proof_check=" + (model.readerScience?.proofCheck ?? "none"),
     "reader_science_publication=" + (model.readerScience?.publication ?? "none"),
     "reader_definitions_count=" + (model.readerDefinitions?.entries.length ?? 0),

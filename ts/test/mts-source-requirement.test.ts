@@ -97,25 +97,12 @@ assert.deepEqual(definitions.entries.map((entry) => entry.kind), [
 ]);
 assert.ok(definitions.entries.every((entry) =>
   entry.authorApproval === "not-recorded" && entry.externalMetanotation));
-assert.ok(definitions.entries[1]?.ru.includes("не доказывают наличие вычислительного алгоритма"));
-assert.ok(definitions.entries[1]?.ru.includes("StartOnly(x)"));
-assert.ok(definitions.entries[1]?.ru.includes("FinishOnly(x)"));
-assert.ok(definitions.entries[1]?.ru.includes("PairLocal(x)"));
-assert.ok(definitions.entries[2]?.ru.includes("не самостоятельная теорема тотальности"));
-assert.ok(definitions.entries[4]?.ru.includes("существование двух различных"));
-assert.ok(definitions.entries[0]?.ru.includes("Здесь FullSelf(F,x) означает"));
-assert.ok(definitions.entries[0]?.proofSymbols.includes("FullSelf"));
-assert.ok(definitions.entries[1]?.proofSymbols.includes("StartOnly"));
-assert.ok(definitions.entries[1]?.proofSymbols.includes("FinishOnly"));
-assert.ok(definitions.entries[1]?.proofSymbols.includes("PairLocal"));
-assert.ok(definitions.entries[2]?.ru.includes("F2F3GroundedNormalization не является её предпосылкой"));
-assert.ok(definitions.entries[4]?.ru.includes("E неявен в Lean, явен в Rocq"));
-assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalStartRole"));
-assert.ok(definitions.entries[4]?.proofSymbols.includes("ContextLocalEndRole"));
-assert.ok(definitions.entries[2]?.proofSymbols.includes("F2F3GroundedNormalization"));
-assert.ok(definitions.entries[2]?.ru.includes("равенство нормальных форм двух Grounded-связей"));
-assert.ok(definitions.entries[4]?.proofSymbols.includes("RecursiveInversionDomain"));
-assert.ok(definitions.entries[4]?.ru.includes("их совместимость с корнем R"));
+assert.deepEqual(definitions.entries.map((entry) => entry.scienceSteps.length), [4, 1, 3, 2, 8]);
+const groupOwnership = definitions.entries.flatMap((entry) => entry.scienceSteps);
+assert.equal(new Set(groupOwnership).size, 18);
+assert.deepEqual(groupOwnership.slice(0, 4), [
+  "foundation", "distinction", "separation-a1", "root-uniqueness",
+]);
 expectReject(
   sourceText.replace("reader-def-grounded", "reader-def-root"),
   /id duplicates reader-def-root/,
@@ -150,7 +137,7 @@ expectReject(
 
 assert.ok(model.readerScience, "scientific Reader DAG must be part of the same YAML authority");
 const science = model.readerScience!;
-assert.equal(science.schema, "mts-reader-science/v0.1");
+assert.equal(science.schema, "mts-reader-science/v0.2");
 assert.equal(science.status, "proposed");
 assert.equal(science.proofCheck, "declarations-only");
 assert.equal(science.publication, "blocked");
@@ -166,7 +153,7 @@ assert.deepEqual(science.steps.map((step) => step.id), [
 const position = new Map(science.steps.map((step, index) => [step.id, index]));
 for (const [index, step] of science.steps.entries()) {
   assert.ok(step.requires.every((dependency) => (position.get(dependency) ?? Infinity) < index));
-  assert.ok(step.sourceEntry !== null || step.bridgeRu !== null);
+  assert.ok(step.ru.length > 100, "a scientific node owns full Russian prose");
 }
 assert.equal(science.steps[5]?.role, "conditional-theorem");
 assert.deepEqual(science.steps[5]?.premises, ["A1RecursiveSeparation"]);
@@ -194,9 +181,14 @@ expectReject(
   "proposed science DAG cannot publish",
 );
 expectReject(
-  sourceText.replace('quote: "Во внешнем математическом интерфейсе Foundation', 'quote: "Текст вне оригинала Foundation'),
-  /quote is not unique in declared source_entry/,
-  "typed claim must have an exact owned source quote",
+  sourceText.replace("      science_steps: [foundation, distinction", "      science_steps: [unknown, distinction"),
+  /id has no unique source-owned definition group|source-owned nodes do not match/,
+  "unowned or missing canonical text owner must fail",
+);
+expectReject(
+  sourceText.replace("      ru: |-", "      ru: []"),
+  /must be a non-empty string/,
+  "atomic reader text cannot be replaced with an empty non-prose value",
 );
 expectReject(
   sourceText.replace("requires: [foundation]", "requires: [context-roles]"),
@@ -275,6 +267,7 @@ assert.throws(
 const audit = renderMtsSourceRequirementAuditFragment(model);
 assert.ok(audit.includes("model_status=proposed"));
 assert.ok(audit.includes("reader_science_nodes=18"));
+assert.ok(audit.includes("reader_science_text_authority=atomic-yaml"));
 assert.ok(audit.includes("reader_science_proof_check=declarations-only"));
 assert.ok(audit.includes("reader_science_publication=blocked"));
 assert.ok(audit.includes("reader_definitions_count=5"));
