@@ -74,6 +74,50 @@
         "contracts/mts-conformance-v*.json",
         "cutover/typescript-c1-acceptance-v*.json"
       ]
+    },
+    "requirements-strict": {
+      "requirement_json_globs": [
+        "requirements/mts-source/*.json"
+      ],
+      "requirement_yaml_globs": [
+        "requirements/mts-source/*.yaml"
+      ],
+      "requirement_id_pattern": "MTS-[A-Z0-9-]+",
+      "closed_repository": false,
+      "code_reference_globs": [
+        "ts/src/**/*.ts",
+        "ts/test/**/*.ts"
+      ],
+      "doc_reference_globs": [
+        "README.md",
+        "docs/**/*.md",
+        "requirements/**/*.md"
+      ],
+      "strict_heading_docs": [
+        "requirements/mts-source/*.md"
+      ],
+      "evidence_surfaces": [
+        "ts/src/**",
+        "ts/test/**",
+        "docs/**"
+      ],
+      "changed_requirement_evidence_surfaces": [
+        "ts/src/**",
+        "ts/test/**"
+      ],
+      "affected_evidence_surfaces": [
+        "ts/src/**",
+        "ts/test/**",
+        "docs/**"
+      ],
+      "implementation_evidence_surfaces": [
+        "ts/src/**",
+        ".github/workflows/**"
+      ],
+      "verification_evidence_surfaces": [
+        "ts/test/**",
+        ".github/workflows/**"
+      ]
     }
   },
   "document_relations": {
