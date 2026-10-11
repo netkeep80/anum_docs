@@ -252,4 +252,50 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
+// R40 is the first independent prose audit, not proof or approval.
+// Keep all 42 reviewed opening atoms source-owned and preserve exact ordering.
+const r40Document = parseDocument(readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W1.yaml"), "utf8"),
+  { strict: true, uniqueKeys: true });
+assert.equal(r40Document.errors.length, 0, "R40 malformed source YAML");
+assert.equal(r40Document.warnings.length, 0, "R40 ambiguous source YAML");
+const r40 = r40Document.toJS({ maxAliasCount: 0 }) as {
+  schema: string; status: string; author_approval: string;
+  publication: string; coverage: string; review_count: number;
+  entries: {position: number; node: string; disposition: string;
+    scope_note_ru: string; publication_effect: string; review: string}[];
+  findings: {id: string; severity: string; first_use_consumer: string;
+    definition_node: string; state: string; remedy_ru: string}[];
+};
+assert.equal(r40.schema, "mts-reader-prose-audit/v0.1");
+assert.equal(r40.status, "proposed");
+assert.equal(r40.author_approval, "not-recorded");
+assert.equal(r40.publication, "blocked");
+assert.equal(r40.coverage, "opening-only");
+assert.equal(r40.review_count, 42);
+assert.equal(r40.entries.length, 42);
+assert.deepEqual(r40.entries.map(a => a.node), draft.openingSpine);
+assert.deepEqual(r40.entries.map(a => a.position), Array.from({length: 42}, (_, i) => i + 1));
+assert.equal(new Set(r40.entries.map(a => a.node)).size, 42);
+for (const entry of r40.entries) {
+  assert.ok(entry.scope_note_ru.length > 65, "R40 missing individual Russian scope " + entry.node);
+  assert.equal(entry.review, "individual-proposed");
+  assert.equal(entry.publication_effect, "blocked");
+}
+assert.equal(r40.findings.length, 7);
+assert.equal(new Set(r40.findings.map(x => x.id)).size, 7);
+for (const item of r40.findings) {
+  assert.ok(item.remedy_ru.length > 75, "R40 missing concrete correction " + item.id);
+  assert.equal(item.severity, "high" === item.severity ? "high" : "medium");
+  assert.ok(item.state === "proposed" || item.state === "corrected-in-draft");
+}
+assert.equal(r40.findings.find(x => x.id === "R40-05")?.state, "corrected-in-draft");
+assert.equal(index.get("g4:identity-by-poles"), 19,
+  "FND-13 after normalization, before inverter, now position 20");
+assert.ok(index.get("basis:L")! < index.get("concept:nat-first-use")!);
+assert.ok(index.get("basis:U")! < index.get("concept:exact-sequence-first-use")!);
+assert.ok(index.get("g7:recursive-codec")! < index.get("g7:q-codec")!);
+assert.ok(index.get("editorial:representation-boundary")! < index.get("g7:q-codec")!);
+console.log("R40: 42 original opening prose nodes individually reviewed, 7 actionable editorial findings; acceptance and publication BLOCKED.");
+
 console.log("G20: 119 nodes, 151 reader edges, 57 inherited source edges, 94 individually reviewed authored edges, 42-node academic spine, 251 individual review decisions incl 135 R39 redundant review entries, no publication, negative falsifiers GREEN.");
