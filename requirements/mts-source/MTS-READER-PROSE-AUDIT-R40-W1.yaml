@@ -48,7 +48,7 @@ entries:
   - position: 7
     node: "basis:R"
     disposition: retain
-    scope_note_ru: "Точное самозамкнутое уравнение R; не доказывать им FND-02 без A1."
+    scope_note_ru: "Точное самозамкнутое уравнение R выражает локальную корневую форму; не доказывать им единственность FND-02 без A1 и не приписывать универсальную экстенсиональность."
     publication_effect: blocked
     review: individual-proposed
   - position: 8
