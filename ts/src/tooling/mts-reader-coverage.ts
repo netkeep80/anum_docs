@@ -557,3 +557,103 @@ export function loadReaderG8(root: string): ReaderG8Plan {
     new Map(v015.map(row => [row.id, row.statement])),
   );
 }
+
+
+/** G9: computed science-owner presence, not a statement of scientific completeness or author acceptance. */
+export interface ReaderScienceOwnerPresence {
+  readonly id: string;
+  readonly release: "v0.14" | "v0.15";
+  readonly section: ReaderSection;
+  readonly atomicTextCount: number;
+  readonly sourceOwnerPaths: readonly string[];
+  readonly scienceSourceState: "proposed" | "not-started";
+  readonly completeScientificArgument: false;
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+}
+export interface ReaderScienceCensus {
+  readonly schema: "mts-reader-science-census/v0.1";
+  readonly acceptedIds: 62;
+  readonly proposedTextAtoms: number;
+  readonly withSourceOwnedAtoms: number;
+  readonly withoutSourceOwnedAtoms: number;
+  readonly authorApproved: 0;
+  readonly publicationReady: 0;
+  readonly rows: readonly ReaderScienceOwnerPresence[];
+}
+/** The only admissible inputs are independently source-parsed G4/G7/G8 models. */
+export function projectReaderScienceCensus(
+  coverage: ReaderCoveragePlan,
+  g4: ReturnType<typeof loadMtsSourceRequirement>,
+  g7: ReaderG7Plan,
+  g8: ReaderG8Plan,
+): ReaderScienceCensus {
+  if (coverage.rows.length !== 62 || coverage.rows.some(x => x.authorApproval !== "not-recorded" ||
+      x.publication !== "blocked" || x.release !== "v0.14" && x.release !== "v0.15")) {
+    fail("G9 accepted-law coverage or publication boundary changed");
+  }
+  if (g4.id !== "MTS-FND-V14-L1" || g4.modelStatus !== "proposed" ||
+      !g4.readerScience || g4.readerScience.status !== "proposed" ||
+      g4.readerScience.publication !== "blocked" || g4.readerScience.authorApproval !== "not-recorded" ||
+      g7.status !== "proposed" || g7.publication !== "blocked" || g7.authorApproval !== "not-recorded" ||
+      g8.status !== "proposed" || g8.publication !== "blocked" || g8.authorApproval !== "not-recorded") {
+    fail("G9 only collects proposed unapproved science owners");
+  }
+  const accepted = new Set(coverage.rows.map(x => x.id));
+  if (accepted.size !== 62) fail("G9 duplicate accepted ID in projection");
+  const entries = new Map<string, { count: number; paths: Set<string> }>();
+  const atomIds = new Set<string>();
+  const add = (id: string, sourcePath: string, atomId: string) => {
+    if (!accepted.has(id)) fail("G9 unknown accepted scientific owner " + id);
+    if (!atomId || atomIds.has(atomId)) fail("G9 duplicate/empty source atom ID " + atomId);
+    atomIds.add(atomId);
+    const owner = entries.get(id) ?? { count: 0, paths: new Set<string>() };
+    owner.count += 1;
+    owner.paths.add(sourcePath);
+    entries.set(id, owner);
+  };
+  for (const atom of g4.readerScience.steps) add("V14-L1", "requirements/mts-source/MTS-FND-V14-L1.yaml", atom.id);
+  for (const atom of g7.atoms) add(atom.acceptedId, READER_ATOMIC_V14_G7_PATH, atom.id);
+  for (const atom of g8.atoms) add(atom.acceptedId, READER_ATOMIC_V14_G8_PATH, atom.id);
+  const rows = coverage.rows.map(row => {
+    const owner = entries.get(row.id);
+    return Object.freeze({
+      id: row.id, release: row.release, section: row.proposedSection,
+      atomicTextCount: owner?.count ?? 0,
+      sourceOwnerPaths: Object.freeze(owner ? [...owner.paths].sort() : []),
+      scienceSourceState: owner ? "proposed" as const : "not-started" as const,
+      completeScientificArgument: false as const, authorApproval: "not-recorded" as const,
+      publication: "blocked" as const,
+    });
+  });
+  const total = rows.reduce((sum,row)=>sum + row.atomicTextCount, 0);
+  if (total !== atomIds.size) fail("G9 scientific text ID census not injective");
+  const withSourceOwnedAtoms = rows.filter(row=>row.atomicTextCount > 0).length;
+  return Object.freeze({
+    schema: "mts-reader-science-census/v0.1" as const,
+    acceptedIds: 62 as const,
+    proposedTextAtoms: total, withSourceOwnedAtoms,
+    withoutSourceOwnedAtoms: rows.length - withSourceOwnedAtoms,
+    authorApproved: 0 as const, publicationReady: 0 as const,
+    rows: Object.freeze(rows),
+  });
+}
+export function loadReaderScienceCensus(root: string): ReaderScienceCensus {
+  return projectReaderScienceCensus(
+    loadReaderCoverage(root),
+    loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    loadReaderG7(root), loadReaderG8(root),
+  );
+}
+export function renderReaderScienceCensus(census: ReaderScienceCensus): string {
+  return [
+    "schema=" + census.schema, "accepted_ids=" + census.acceptedIds,
+    "proposed_science_atoms=" + census.proposedTextAtoms,
+    "id_with_proposed_atoms=" + census.withSourceOwnedAtoms,
+    "id_without_proposed_atoms=" + census.withoutSourceOwnedAtoms,
+    "scientifically_complete_id=0", "author_approved=" + census.authorApproved,
+    "publication_ready=" + census.publicationReady,
+    ...census.rows.filter(x=>x.atomicTextCount > 0)
+      .map(x=>"source_owned." + x.id + "=" + x.atomicTextCount),
+  ].join("\n");
+}

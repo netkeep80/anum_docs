@@ -4,7 +4,8 @@ import { resolve } from "node:path";
 import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
 import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
-  loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8 }
+  loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
+  loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -226,3 +227,37 @@ assert.throws(() => g8Parser(g8Yaml.replace("  - id: glyph-map", "  - id: glyph-
 assert.throws(() => g8Parser(g8Yaml.replace("accepted_scope: [V14-L2, V14-L14]",
   "accepted_scope: [V14-L2]")), /scope mismatch/);
 console.log("G8: 12 exact-origin Russian atoms / two accepted v0.14 laws / no new ontology.");
+
+
+const g9 = loadReaderScienceCensus(root);
+assert.equal(g9.schema, "mts-reader-science-census/v0.1");
+assert.equal(g9.acceptedIds, 62);
+assert.equal(g9.proposedTextAtoms, 49);
+assert.equal(g9.withSourceOwnedAtoms, 7);
+assert.equal(g9.withoutSourceOwnedAtoms, 55);
+assert.equal(g9.authorApproved, 0);
+assert.equal(g9.publicationReady, 0);
+assert.equal(g9.rows.length, 62);
+assert.ok(g9.rows.every(row => row.publication === "blocked" &&
+  row.authorApproval === "not-recorded" && row.completeScientificArgument === false));
+assert.ok(g9.rows.filter(row => row.atomicTextCount > 0).every(row =>
+  row.scienceSourceState === "proposed" && row.sourceOwnerPaths.length > 0));
+assert.ok(g9.rows.filter(row => row.atomicTextCount === 0).every(row =>
+  row.scienceSourceState === "not-started" && row.sourceOwnerPaths.length === 0));
+assert.deepEqual(Object.fromEntries(g9.rows.filter(x => x.atomicTextCount > 0)
+  .map(x => [x.id,x.atomicTextCount])), {
+    "V14-L1": 20, "V14-L2": 6, "V14-L5": 3, "V14-L6": 4,
+    "V14-L12": 5, "V14-L13": 5, "V14-L14": 6,
+  });
+assert.ok(renderReaderScienceCensus(g9).includes("scientifically_complete_id=0"));
+assert.throws(()=>projectReaderScienceCensus(plan, g4, g7,
+  {...g8, authorApproval:"approved" as "not-recorded"}), /only collects proposed unapproved/);
+assert.throws(()=>projectReaderScienceCensus(plan, g4, {
+    ...g7, atoms: [...g7.atoms, {...g7.atoms[0]!, id:g8.atoms[0]!.id}],
+  },g8), /duplicate\/empty source atom ID/);
+assert.throws(()=>projectReaderScienceCensus(plan, g4, {
+    ...g7, atoms: [...g7.atoms, {...g7.atoms[0]!, id:"forged-owner", acceptedId:"V14-L99" as
+      typeof g7.atoms[0]["acceptedId"]}],
+  },g8), /unknown accepted scientific owner/);
+console.log("G9 computed source-owned science coverage " + g9.proposedTextAtoms + " atoms across " +
+  g9.withSourceOwnedAtoms + " accepted IDs, never publication-ready.");
