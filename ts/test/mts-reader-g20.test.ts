@@ -18,6 +18,10 @@ assert.equal(draft.edges, 307);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
+assert.equal(draft.openingSpine.length, 41);
+assert.deepEqual(draft.ordered.slice(0, 41).map(x => x.id), draft.openingSpine);
+assert.deepEqual(draft.ordered.slice(0, 3).map(x => x.id),
+  ["g4:foundation", "editorial:foundation-ontology", "g4:incidence"]);
 const originalSourceEdges = sources.reduce((sum, a) => sum + a.sourceRequires.length, 0);
 assert.equal(originalSourceEdges, 57, "G4:31 + G7:16 + G8:10 must remain source-authoritative");
 for (const source of sources) {
@@ -49,6 +53,16 @@ assert.equal(draft.authorApproval, "not-recorded");
 assert.equal(draft.completeness, "editorial-dependencies-unverified");
 assert.equal(draft.ordered.filter(x => x.sourceOwner === "G16").length, 5);
 const index = new Map(draft.ordered.map((x, i) => [x.id, i]));
+// Stable didactic opening: the five historical G16 replacement atoms are
+// distributed at their first meaningful positions, not left at the end.
+for (const [node, position] of [
+  ["editorial:foundation-ontology", 2],
+  ["editorial:local-self-classification", 6],
+  ["editorial:root-basis-witnesses", 18],
+  ["editorial:relative-chiral-orientation", 28],
+  ["editorial:representation-boundary", 38],
+] as const) assert.equal(index.get(node), position - 1, "late G16 first-use " + node);
+assert.equal(draft.ordered.slice(0, 41).filter(x => x.sourceOwner === "G11").length, 0);
 for (const node of draft.ordered) for (const dependency of node.readerRequires) {
   assert.ok(index.has(dependency), "dangling " + node.id + "->" + dependency);
   assert.ok(index.get(dependency)! < index.get(node.id)!, "out of order " + node.id);
@@ -68,6 +82,25 @@ const originalOrphan = "Первичен **" + String.fromCharCode(96) + "Link" 
   String.fromCharCode(96) + "**, а не четыре команды.";
 assert.ok(!preview.includes(originalOrphan));
 const parse = (text: string) => parseReaderG20(text, sources);
+const spineStart = original.indexOf("opening_spine:\n");
+const spineEnd = original.indexOf("\nnodes:\n", spineStart);
+assert.ok(spineStart >= 0 && spineEnd > spineStart);
+const authoredSpine = original.slice(spineStart, spineEnd);
+const editSpine = (modified: string): string => {
+  assert.notEqual(modified, authoredSpine, "no-op spine falsifier");
+  return original.slice(0, spineStart) + modified + original.slice(spineEnd);
+};
+assert.throws(() => parse(editSpine(authoredSpine.replace(
+  '  - "basis:C"', '  - "basis:O"'))), /invalid\/duplicate\/unknown 41-step opening spine/);
+assert.throws(() => parse(editSpine(authoredSpine.replace(
+  '  - "basis:C"', '  - "basis:absent"'))), /invalid\/duplicate\/unknown 41-step opening spine/);
+assert.throws(() => parse(editSpine(authoredSpine.replace(
+  '  - "editorial:relative-chiral-orientation"\n', ""))),
+  /invalid\/duplicate\/unknown 41-step opening spine/);
+assert.throws(() => parse(editSpine(authoredSpine.replace(
+  '  - "g4:incidence"\n  - "g4:local-decision"',
+  '  - "g4:local-decision"\n  - "g4:incidence"'))),
+  /opening spine dependency not previously introduced/);
 assert.throws(() => parse(original.replace("publication: blocked", "publication: ready")),
   /cannot upgrade G20/);
 assert.throws(() => parse(original.replace("completeness: editorial-dependencies-unverified",
@@ -117,4 +150,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 source-backed reader nodes, 307 edges, original 57 edges preserved, no publication, negative falsifiers GREEN.");
+console.log("G20: 119 source-backed nodes, 307 edges, 41-node academic spine, original 57 edges, no publication, negative falsifiers GREEN.");
