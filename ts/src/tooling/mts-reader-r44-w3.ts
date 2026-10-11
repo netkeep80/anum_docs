@@ -33,8 +33,8 @@ function parse(s:string):Obj{
 }
 function read(root:string,path:string):string {return readFileSync(resolve(root,path),"utf8");}
 function pin(path:string,sha:string):string {return "https://github.com/netkeep80/anum_docs/blob/"+sha+"/"+path;}
-export function parseReaderR44W3(source:string,root:string):ReaderR44W3{
-  const doc=parse(source);
+export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
+  const doc=parse(documentText);
   keys(doc,["schema","status","author_approval","publication","semantic_change","coverage",
     "accepted_registry","accepted_main_sha","proposed_source_sha","upstream_science","source_waves","historical_mp",
     "proof_scope","authority_boundary","reviews","unresolved_r40"],"R44-W3");
