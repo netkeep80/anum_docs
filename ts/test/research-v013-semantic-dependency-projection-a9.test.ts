@@ -1256,6 +1256,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r44-w6-cli.ts",
   // F01/F02/P01 reads pinned proofs to render non-authoritative scholarly context.
   "ts/src/tooling/mts-reader-review-f01-f02-p01.ts",
+  // F03–F05 scientific commentary only: no semantic runtime modifications.
+  "ts/src/tooling/mts-reader-review-f03-f04-f05.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
