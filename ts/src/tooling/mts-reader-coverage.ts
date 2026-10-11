@@ -1465,3 +1465,89 @@ export function renderReaderChapterCycleAudit(a:ReaderChapterCycleAudit):string{
     ]),
   ].join("\n");
 }
+
+
+/** G19: editorial *first-use* definitions, never complete proof replacements. */
+export const READER_EARLY_G19_PATH =
+  "requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml";
+export interface ReaderEarlyConcept {
+  readonly id:string;readonly acceptedId:string;readonly termRu:string;
+  readonly exactAcceptedQuote:string;readonly introductoryRu:string;
+  readonly noninferenceRu:string;readonly review:"pending";
+}
+export interface ReaderEarlyConcepts {
+  readonly schema:"mts-reader-early-concepts/v0.1";
+  readonly publication:"blocked";readonly authorApproval:"not-recorded";
+  readonly definitions:readonly ReaderEarlyConcept[];
+}
+export function parseReaderEarlyConcepts(text:string,
+  acceptedLaws:ReadonlyMap<string,string>,v14Contract:Record<string,unknown>):ReaderEarlyConcepts{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G19 invalid early-concepts YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G19 first-use definitions");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","reason","definitions"],"G19 first-use definitions");
+  if(raw.schema!=="mts-reader-early-concepts/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.reason!=="first-use-reader-clarification")
+    fail("G19 cannot promote glossary to accepted theory or publication");
+  const acceptedIds=["V15-TERM-01","V14-L6","V15-JSON-04","V15-JSON-02","V15-GAMMA-01"];
+  const ids=["anet-term","nat-first-use","exact-sequence-first-use",
+    "formal-json-first-use","gamma-first-use"];
+  if(!Array.isArray(raw.definitions)||raw.definitions.length!==ids.length)
+    fail("G19 requires five individually grounded definitions");
+  const definitions:ReaderEarlyConcept[]=raw.definitions.map((entry,i)=>{
+    const x=object(entry,"G19.definition");
+    exactFields(x,["id","accepted_id","term_ru","exact_accepted_quote",
+      "introductory_ru","noninference_ru","review"],"G19.definition");
+    if(x.id!==ids[i]||x.accepted_id!==acceptedIds[i]||x.review!=="pending"||
+       x.exact_accepted_quote!==acceptedLaws.get(acceptedIds[i]!)||
+       typeof x.term_ru!=="string"||x.term_ru.length<12||
+       typeof x.introductory_ru!=="string"||x.introductory_ru.length<190||
+       typeof x.noninference_ru!=="string"||x.noninference_ru.length<65)
+      fail("G19 duplicate/forged/missing source-owned first-use definition");
+    return Object.freeze({
+      id:x.id as string,acceptedId:x.accepted_id as string,termRu:x.term_ru,
+      exactAcceptedQuote:x.exact_accepted_quote as string,introductoryRu:x.introductory_ru,
+      noninferenceRu:x.noninference_ru,review:"pending" as const,
+    });
+  });
+  if(v14Contract.schema!=="mts-contract/v0.14"||v14Contract.accepted!==true)
+    fail("G19 v0.14 Nat source contract not accepted");
+  const nat=object(v14Contract.natTheory,"G19 Nat accepted facts");
+  const degree=object(v14Contract.connectivityDegreeTheory,"G19 Degree accepted facts");
+  if(nat.zero!=="N0 = U"||nat.successor!=="Succ(N) = N ⟼ L"||
+     degree.one!=="D1 = L")
+    fail("G19 Nat / Degree first-use authority drift");
+  return Object.freeze({
+    schema:"mts-reader-early-concepts/v0.1" as const,
+    publication:"blocked" as const,authorApproval:"not-recorded" as const,
+    definitions:Object.freeze(definitions),
+  });
+}
+export function loadReaderEarlyConcepts(root:string):ReaderEarlyConcepts{
+  const v14=loadMtsSemanticIr(root,"requirements/mts-v0.14.json").requirements;
+  const v15=loadMtsSemanticIr(root).requirements;
+  const laws=new Map([...v14,...v15].map(x=>[x.id,x.statement]));
+  return parseReaderEarlyConcepts(
+    readFileSync(resolve(root,READER_EARLY_G19_PATH),"utf8"),laws,
+    object(JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.14.json"),"utf8")),
+      "accepted v0.14 contract"));
+}
+export function loadReaderDraftWithEarlyConcepts(root:string):string{
+  const manuscript=loadReaderDraftWithFoundationOpening(root);
+  const intro=loadReaderEarlyConcepts(root);
+  if(intro.publication!=="blocked"||intro.authorApproval!=="not-recorded")
+    fail("G19 first-use concepts may not be published");
+  const firstChapter=manuscript.search(/^## /m);
+  if(firstChapter<0)fail("G19 no mathematical chapter in draft");
+  const glossary=[
+    "### Минимальные определения перед первым использованием","",
+    "Это краткие ориентиры, не замена полного нормативного изложения и доказательств.","",
+    ...intro.definitions.flatMap(x=>[
+      "**"+x.termRu+"** ("+x.acceptedId+"). "+x.introductoryRu,"",
+      "Граница: "+x.noninferenceRu+".","",
+    ]),
+  ].join("\n");
+  return manuscript.slice(0,firstChapter)+glossary+manuscript.slice(firstChapter);
+}

@@ -15,7 +15,8 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderReverseNormativeAudit, parseReaderReverseNormativeAudit, deriveReaderReverseNormativeEdges,
   renderReaderReverseNormativeAudit,
   loadReaderChapterCycleAudit, deriveReaderChapterCycles, parseReaderChapterCycleAudit,
-  renderReaderChapterCycleAudit }
+  renderReaderChapterCycleAudit,
+  loadReaderEarlyConcepts, parseReaderEarlyConcepts, loadReaderDraftWithEarlyConcepts }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -545,3 +546,42 @@ const normativeCycle={...plan,rows:plan.rows.map(x=>x.id==="V14-L1"?{
 assert.throws(()=>deriveReaderChapterCycles(normativeCycle,routes),
   /accepted law graph has a dependency cycle/);
 console.log("G18: two 5-chapter SCCs over 37 cross-chapter edges; no chapter-level DAG.");
+
+
+const g19Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml"),"utf8");
+const g19=loadReaderEarlyConcepts(root);
+assert.equal(g19.schema,"mts-reader-early-concepts/v0.1");
+assert.equal(g19.definitions.length,5);
+assert.deepEqual(g19.definitions.map(x=>x.acceptedId),[
+  "V15-TERM-01","V14-L6","V15-JSON-04","V15-JSON-02","V15-GAMMA-01",
+]);
+assert.ok(g19.definitions.every(x=>x.review==="pending" && x.introductoryRu.length>=190));
+assert.equal(g19.publication,"blocked");
+assert.equal(g19.authorApproval,"not-recorded");
+const g19Draft=loadReaderDraftWithEarlyConcepts(root);
+assert.ok(g19Draft.indexOf("### Минимальные определения перед первым использованием")>
+  g19Draft.indexOf("### Исходные обозначения корневого базиса"));
+assert.ok(g19Draft.indexOf("### Минимальные определения перед первым использованием")<
+  g19Draft.search(/^## /m));
+assert.equal((g19Draft.match(/^## /gm)??[]).length,13);
+assert.equal((g19Draft.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((g19Draft.match(/^#### /gm)??[]).length,104);
+const acceptedG19=new Map([...v14,...v15].map(x=>[x.id,x.statement]));
+const parse19=(txt:string,laws:ReadonlyMap<string,string>=acceptedG19,
+  contract=v14Contract)=>parseReaderEarlyConcepts(txt,laws,contract);
+assert.throws(()=>parse19(g19Source.replace("status: proposed","status: accepted")),
+  /cannot promote glossary to accepted theory or publication/);
+assert.throws(()=>parse19(g19Source.replace("publication: blocked","publication: ready")),
+  /cannot promote glossary to accepted theory or publication/);
+assert.throws(()=>parse19(g19Source.replace("    accepted_id: V15-TERM-01",
+  "    accepted_id: V15-ONTO-01")),/duplicate\/forged\/missing source-owned/);
+assert.throws(()=>parse19(g19Source,new Map([...acceptedG19].map(([id,law])=>
+  [id,id==="V15-TERM-01"?"forged":law]))),/duplicate\/forged\/missing source-owned/);
+assert.throws(()=>parse19(g19Source,acceptedG19,{
+  ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
+}),/Nat \/ Degree first-use authority drift/);
+assert.throws(()=>parse19(g19Source.replace("definitions:\n",
+  "definitions:\n  - id: false\n    id: false\n")),
+  /G19 invalid early-concepts YAML/);
+console.log("G19: five exact-source first-use terms with no promotion of 62 laws or 104 atoms.");
