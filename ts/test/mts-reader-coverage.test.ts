@@ -6,7 +6,8 @@ import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.
 import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
   loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
   loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
-  loadReaderV14G10, parseReaderV14G10 }
+  loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
+  projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -283,3 +284,38 @@ assert.throws(()=>p10(g10Source.replace("  - id: v14-l4","  - id: v14-l3")),
 assert.throws(()=>p10(g10Source.replace("  - id: v14-l3","  - id: v14-l3\n    id: v14-l3")),
  /G10 invalid YAML/);
 console.log("G10: 7 v0.14 Russian first-pass laws proposed, unverified and blocked.");
+
+const g11=loadReaderV15G11(root);
+const c11=projectReaderAllFirstPassCensus(g9,g10,g11);
+assert.equal(g11.atoms.length,48);
+assert.equal(new Set(g11.atoms.map(x=>x.acceptedId)).size,48);
+assert.ok(g11.atoms.every(x=>v15.find(y=>y.id===x.acceptedId)?.statement===x.sourceQuote));
+assert.equal(g11.publication,"blocked");
+assert.equal(g11.authorApproval,"not-recorded");
+assert.equal(g11.argumentCompleteness,"unverified");
+assert.equal(c11.acceptedIds,62);
+assert.equal(c11.idsWithProposedRussianText,62);
+assert.equal(c11.totalProposedRussianAtoms,104);
+assert.equal(c11.idWithoutSourceOwner,0);
+assert.equal(c11.scientificallyCompleteIds,0);
+assert.equal(c11.authorApprovedIds,0);
+assert.equal(c11.publicationReadyIds,0);
+assert.ok(renderReaderAllFirstPassCensus(c11).includes("publication_ready_ids=0"));
+const w11=READER_V15_G11_PATHS.map(path=>readFileSync(resolve(root,path),"utf8"));
+const laws11=new Map(v15.map(x=>[x.id,x.statement]));
+const parse11=(files:readonly string[],laws:ReadonlyMap<string,string>=laws11)=>
+  parseReaderV15G11(files,plan,laws);
+assert.throws(()=>parse11(w11.map((t,i)=>i===0?t.replace("status: proposed","status: accepted"):t)),
+ /unauthorized scientific\/author acceptance promotion/);
+assert.throws(()=>parse11(w11.map((t,i)=>i===1?t.replace("argument_completeness: unverified",
+ "argument_completeness: complete"):t)),/unauthorized scientific\/author acceptance promotion/);
+assert.throws(()=>parse11(w11.map((t,i)=>i===0?t.replace("    accepted_id: V15-TERM-01",
+  "    accepted_id: V14-L1"):t)),/unknown\/duplicate law or source ID/);
+assert.throws(()=>parse11(w11.map((t,i)=>i===2?t.replace("  - id: v15-ctx-02",
+  "  - id: v15-ctx-02\n    id: v15-ctx-02"):t)),/G11 invalid YAML/);
+assert.throws(()=>parse11(w11,new Map([...laws11].map(([k,v])=>
+  [k,k==="V15-TERM-01"?"tampered source":v]))),/source quote differs/);
+assert.throws(()=>projectReaderAllFirstPassCensus(g9,g10,{
+  ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!,acceptedId:"V14-L2"}]
+}),/duplicate\/foreign cross-source ID/);
+console.log("G11: 48 first-pass v0.15 source-owned Russian texts; 62/62 accepted ID owner presence, ZERO scientific completion.");

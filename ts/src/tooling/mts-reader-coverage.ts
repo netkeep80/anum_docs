@@ -718,3 +718,122 @@ export function loadReaderV14G10(root:string):ReaderV14G10{
     new Map(loadMtsSemanticIr(root,"requirements/mts-v0.14.json").requirements
       .map(x=>[x.id,x.statement])));
 }
+
+
+/** G11: all 48 v0.15 accepted laws have source-owned PROPOSED Russian explanatory first-pass text. */
+export const READER_V15_G11_PATHS=[
+ "requirements/mts-source/MTS-READER-V15-G11-W1.yaml",
+ "requirements/mts-source/MTS-READER-V15-G11-W2.yaml",
+ "requirements/mts-source/MTS-READER-V15-G11-W3.yaml",
+ "requirements/mts-source/MTS-READER-V15-G11-W4.yaml",
+] as const;
+export interface ReaderV15G11Atom {
+  readonly id:string; readonly acceptedId:string; readonly wave:string;
+  readonly sourceQuote:string; readonly ru:string; readonly domain:string;
+  readonly exclusions:readonly string[];
+  readonly publication:"blocked"; readonly authorApproval:"not-recorded";
+}
+export interface ReaderV15G11 {
+  readonly schema:"mts-reader-v15-all-first-pass/v0.1";
+  readonly status:"proposed"; readonly argumentCompleteness:"unverified";
+  readonly authorApproval:"not-recorded"; readonly publication:"blocked";
+  readonly scientificReview:"pending-individual-exp";
+  readonly proofCheck:"accepted-contract-only";
+  readonly atoms:readonly ReaderV15G11Atom[];
+}
+export function parseReaderV15G11(waves:readonly string[],
+  coverage:ReaderCoveragePlan,acceptedLaws:ReadonlyMap<string,string>):ReaderV15G11{
+  if(waves.length!==4)fail("G11 requires exactly four source-owner waves");
+  const ids=new Set<string>();const atoms:ReaderV15G11Atom[]=[];
+  const expected=new Set(coverage.rows.filter(x=>x.release==="v0.15").map(x=>x.id));
+  if(expected.size!==48)fail("G11 accepted v0.15 scope mismatch");
+  for(const [waveIndex,text] of waves.entries()){
+    const wave="W"+(waveIndex+1);
+    const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+    if(doc.errors.length||doc.warnings.length)fail("G11 invalid YAML in "+wave);
+    const raw=object(doc.toJS({maxAliasCount:0}),"G11 "+wave);
+    exactFields(raw,["schema","wave","status","author_approval","publication",
+      "argument_completeness","scientific_review","proof_check","atoms"],"G11 "+wave);
+    if(raw.schema!=="mts-reader-v15-wave/v0.1"||raw.wave!==wave||
+      raw.status!=="proposed"||raw.author_approval!=="not-recorded"||
+      raw.publication!=="blocked"||raw.argument_completeness!=="unverified"||
+      raw.scientific_review!=="pending-individual-exp"||raw.proof_check!=="accepted-contract-only")
+      fail("G11 unauthorized scientific/author acceptance promotion: "+wave);
+    if(!Array.isArray(raw.atoms)||raw.atoms.length!==12)
+      fail("G11 wave needs 12 individual science atoms");
+    for(const entry of raw.atoms){
+      const a=object(entry,"G11 atom");
+      exactFields(a,["id","accepted_id","source_quote","ru","domain","exclusions"],"G11 atom");
+      if(typeof a.id!=="string"||typeof a.accepted_id!=="string"||
+        a.id!==a.accepted_id.toLowerCase()||ids.has(a.id)||!expected.has(a.accepted_id))
+        fail("G11 unknown/duplicate law or source ID");
+      if(typeof a.source_quote!=="string"||a.source_quote!==acceptedLaws.get(a.accepted_id))
+        fail("G11 source quote differs from accepted registry");
+      if(typeof a.ru!=="string"||a.ru.length<145||
+        typeof a.domain!=="string"||!a.domain.trim()||
+        !Array.isArray(a.exclusions)||a.exclusions.length!==1||
+        typeof a.exclusions[0]!=="string"||a.exclusions[0].length<27)
+        fail("G11 incomplete Russian science text / exclusion");
+      ids.add(a.id);
+      atoms.push(Object.freeze({
+        id:a.id,acceptedId:a.accepted_id,wave,sourceQuote:a.source_quote,
+        ru:a.ru,domain:a.domain,exclusions:Object.freeze([...a.exclusions]),
+        authorApproval:"not-recorded" as const,publication:"blocked" as const,
+      }));
+    }
+  }
+  if(atoms.length!==48||ids.size!==48)fail("G11 incomplete 48-ID scientific source coverage");
+  return Object.freeze({
+    schema:"mts-reader-v15-all-first-pass/v0.1" as const,status:"proposed" as const,
+    argumentCompleteness:"unverified" as const,authorApproval:"not-recorded" as const,
+    publication:"blocked" as const,scientificReview:"pending-individual-exp" as const,
+    proofCheck:"accepted-contract-only" as const,atoms:Object.freeze(atoms),
+  });
+}
+export function loadReaderV15G11(root:string):ReaderV15G11{
+  const sources=READER_V15_G11_PATHS.map(path=>readFileSync(resolve(root,path),"utf8"));
+  const laws=loadMtsSemanticIr(root).requirements;
+  return parseReaderV15G11(sources,loadReaderCoverage(root),
+    new Map(laws.map(x=>[x.id,x.statement])));
+}
+export interface ReaderAllFirstPassCensus {
+  readonly schema:"mts-reader-62-first-pass/v0.1";
+  readonly acceptedIds:62;
+  readonly idsWithProposedRussianText:number;
+  readonly totalProposedRussianAtoms:number;
+  readonly idWithoutSourceOwner:number;
+  readonly scientificallyCompleteIds:0;
+  readonly authorApprovedIds:0;
+  readonly publicationReadyIds:0;
+}
+export function projectReaderAllFirstPassCensus(
+  baseline:ReaderScienceCensus,g10:ReaderV14G10,g11:ReaderV15G11
+):ReaderAllFirstPassCensus{
+  if(baseline.rows.length!==62||baseline.authorApproved!==0||
+     g10.publication!=="blocked"||g11.publication!=="blocked"||
+     g10.authorApproval!=="not-recorded"||g11.authorApproval!=="not-recorded")
+    fail("G11 unapproved first-pass source guard");
+  const ids=new Set(baseline.rows.filter(x=>x.atomicTextCount>0).map(x=>x.id));
+  for(const id of [...g10.atoms.map(x=>x.acceptedId),...g11.atoms.map(x=>x.acceptedId)]){
+    if(ids.has(id)||!baseline.rows.some(x=>x.id===id))fail("G11 duplicate/foreign cross-source ID");
+    ids.add(id);
+  }
+  return Object.freeze({
+    schema:"mts-reader-62-first-pass/v0.1" as const,acceptedIds:62 as const,
+    idsWithProposedRussianText:ids.size,
+    totalProposedRussianAtoms:baseline.proposedTextAtoms+g10.atoms.length+g11.atoms.length,
+    idWithoutSourceOwner:62-ids.size,scientificallyCompleteIds:0 as const,
+    authorApprovedIds:0 as const,publicationReadyIds:0 as const,
+  });
+}
+export function renderReaderAllFirstPassCensus(c:ReaderAllFirstPassCensus):string{
+  return [
+    "schema="+c.schema,"accepted_ids="+c.acceptedIds,
+    "ids_with_proposed_russian_text="+c.idsWithProposedRussianText,
+    "total_proposed_russian_atoms="+c.totalProposedRussianAtoms,
+    "id_without_source_owner="+c.idWithoutSourceOwner,
+    "scientifically_complete_ids="+c.scientificallyCompleteIds,
+    "author_approved_ids="+c.authorApprovedIds,
+    "publication_ready_ids="+c.publicationReadyIds,
+  ].join("\n");
+}
