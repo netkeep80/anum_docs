@@ -68,13 +68,13 @@ nodes:
     source_owner: G4
     source_atom: "local-decision"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:incidence"]
+    reader_requires: ["g4:incidence"]
     review: pending
   - id: "g4:local-exhaustiveness"
     source_owner: G4
     source_atom: "local-exhaustiveness"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:local-decision"]
+    reader_requires: ["g4:local-decision"]
     review: pending
   - id: "g4:grounded"
     source_owner: G4
@@ -86,229 +86,229 @@ nodes:
     source_owner: G4
     source_atom: "distinction"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:grounded"]
+    reader_requires: ["g4:grounded"]
     review: pending
   - id: "g4:separation-a1"
     source_owner: G4
     source_atom: "separation-a1"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:distinction"]
+    reader_requires: ["g4:distinction"]
     review: pending
   - id: "g4:root-uniqueness"
     source_owner: G4
     source_atom: "root-uniqueness"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:incidence", "g4:separation-a1"]
+    reader_requires: ["g4:incidence", "g4:separation-a1"]
     review: pending
   - id: "g4:one-sided-existence"
     source_owner: G4
     source_atom: "one-sided-existence"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:root-uniqueness"]
+    reader_requires: ["g4:root-uniqueness"]
     review: pending
   - id: "g4:one-sided-realizability"
     source_owner: G4
     source_atom: "one-sided-realizability"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:one-sided-existence", "g4:grounded"]
+    reader_requires: ["g4:one-sided-existence", "g4:grounded"]
     review: pending
   - id: "g4:grounded-normalization"
     source_owner: G4
     source_atom: "grounded-normalization"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:grounded", "g4:one-sided-realizability"]
+    reader_requires: ["g4:grounded", "g4:one-sided-realizability"]
     review: pending
   - id: "g4:identity-by-poles"
     source_owner: G4
     source_atom: "identity-by-poles"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:grounded-normalization"]
+    reader_requires: ["g4:grounded-normalization"]
     review: pending
   - id: "g4:inversion-domain"
     source_owner: G4
     source_atom: "inversion-domain"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:one-sided-existence", "g4:grounded"]
+    reader_requires: ["g4:one-sided-existence", "g4:grounded"]
     review: pending
   - id: "g4:inversion-relation"
     source_owner: G4
     source_atom: "inversion-relation"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:inversion-domain", "g4:incidence"]
+    reader_requires: ["g4:inversion-domain", "g4:incidence"]
     review: pending
   - id: "g4:inversion-total"
     source_owner: G4
     source_atom: "inversion-total"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:inversion-relation", "g4:separation-a1"]
+    reader_requires: ["g4:inversion-relation", "g4:separation-a1"]
     review: pending
   - id: "g4:inversion-involutive"
     source_owner: G4
     source_atom: "inversion-involutive"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:inversion-total", "g4:grounded-normalization"]
+    reader_requires: ["g4:inversion-total", "g4:grounded-normalization"]
     review: pending
   - id: "g4:chiral-classes"
     source_owner: G4
     source_atom: "chiral-classes"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:incidence", "g4:inversion-relation"]
+    reader_requires: ["g4:incidence", "g4:inversion-relation"]
     review: pending
   - id: "g4:chiral-orbit"
     source_owner: G4
     source_atom: "chiral-orbit"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:chiral-classes", "g4:inversion-involutive"]
+    reader_requires: ["g4:chiral-classes", "g4:inversion-involutive"]
     review: pending
   - id: "g4:context-marker"
     source_owner: G4
     source_atom: "context-marker"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:chiral-orbit", "g4:inversion-domain"]
+    reader_requires: ["g4:chiral-orbit", "g4:inversion-domain"]
     review: pending
   - id: "g4:context-roles"
     source_owner: G4
     source_atom: "context-roles"
     accepted_id: V14-L1
-    reader_requires: ["g4:foundation", "g4:context-marker", "g4:separation-a1"]
+    reader_requires: ["g4:context-marker", "g4:separation-a1"]
     review: pending
   - id: "g7:link-identity"
     source_owner: G7
     source_atom: "link-identity"
     accepted_id: V14-L5
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["concept:anet-term"]
     review: pending
   - id: "g7:link-rewrite"
     source_owner: G7
     source_atom: "link-rewrite"
     accepted_id: V14-L5
-    reader_requires: ["g4:foundation", "g7:link-identity"]
+    reader_requires: ["g7:link-identity"]
     review: pending
   - id: "g7:link-deletion-boundary"
     source_owner: G7
     source_atom: "link-deletion-boundary"
     accepted_id: V14-L5
-    reader_requires: ["g4:foundation", "g7:link-rewrite"]
+    reader_requires: ["g7:link-rewrite"]
     review: pending
   - id: "g7:nat-zero"
     source_owner: G7
     source_atom: "nat-zero"
     accepted_id: V14-L6
-    reader_requires: ["g4:foundation", "g7:link-identity", "concept:nat-first-use"]
+    reader_requires: ["g7:link-identity", "concept:nat-first-use"]
     review: pending
   - id: "g7:nat-successor"
     source_owner: G7
     source_atom: "nat-successor"
     accepted_id: V14-L6
-    reader_requires: ["g4:foundation", "g7:nat-zero", "concept:nat-first-use"]
+    reader_requires: ["g7:nat-zero", "concept:nat-first-use"]
     review: pending
   - id: "g7:degree-one"
     source_owner: G7
     source_atom: "degree-one"
     accepted_id: V14-L6
-    reader_requires: ["g4:foundation", "g7:nat-successor", "concept:nat-first-use"]
+    reader_requires: ["g7:nat-successor", "concept:nat-first-use"]
     review: pending
   - id: "g7:nat-degree-nonidentity"
     source_owner: G7
     source_atom: "nat-degree-nonidentity"
     accepted_id: V14-L6
-    reader_requires: ["g4:foundation", "g7:degree-one", "concept:nat-first-use"]
+    reader_requires: ["g7:degree-one", "concept:nat-first-use"]
     review: pending
   - id: "g7:anum-carrier"
     source_owner: G7
     source_atom: "anum-carrier"
     accepted_id: V14-L13
-    reader_requires: ["g4:foundation", "g7:link-identity"]
+    reader_requires: ["g7:link-identity"]
     review: pending
   - id: "g7:exact-sequence"
     source_owner: G7
     source_atom: "exact-sequence"
     accepted_id: V14-L13
-    reader_requires: ["g4:foundation", "g7:anum-carrier"]
+    reader_requires: ["g7:anum-carrier"]
     review: pending
   - id: "g7:recursive-codec"
     source_owner: G7
     source_atom: "recursive-codec"
     accepted_id: V14-L13
-    reader_requires: ["g4:foundation", "g7:exact-sequence"]
+    reader_requires: ["g7:exact-sequence"]
     review: pending
   - id: "g7:q-codec"
     source_owner: G7
     source_atom: "q-codec"
     accepted_id: V14-L13
-    reader_requires: ["g4:foundation", "g7:recursive-codec"]
+    reader_requires: ["g7:recursive-codec"]
     review: pending
   - id: "g7:sequence-origin"
     source_owner: G7
     source_atom: "sequence-origin"
     accepted_id: V14-L13
-    reader_requires: ["g4:foundation", "g7:exact-sequence"]
+    reader_requires: ["g7:exact-sequence"]
     review: pending
   - id: "g7:objective-orbit-qualified"
     source_owner: G7
     source_atom: "objective-orbit-qualified"
     accepted_id: V14-L12
-    reader_requires: ["g4:foundation", "g7:link-identity", "g4:chiral-orbit"]
+    reader_requires: ["g7:link-identity", "g4:chiral-orbit"]
     review: pending
   - id: "g7:context-marker-qualified"
     source_owner: G7
     source_atom: "context-marker-qualified"
     accepted_id: V14-L12
-    reader_requires: ["g4:foundation", "g7:objective-orbit-qualified", "g4:context-roles"]
+    reader_requires: ["g7:objective-orbit-qualified", "g4:context-roles"]
     review: pending
   - id: "g7:context-local-names"
     source_owner: G7
     source_atom: "context-local-names"
     accepted_id: V14-L12
-    reader_requires: ["g4:foundation", "g7:context-marker-qualified", "g4:context-roles"]
+    reader_requires: ["g7:context-marker-qualified", "g4:context-roles"]
     review: pending
   - id: "g7:relative-z2"
     source_owner: G7
     source_atom: "relative-z2"
     accepted_id: V14-L12
-    reader_requires: ["g4:foundation", "g7:context-local-names", "g4:context-roles"]
+    reader_requires: ["g7:context-local-names", "g4:context-roles"]
     review: pending
   - id: "g7:orientation-authority-boundary"
     source_owner: G7
     source_atom: "orientation-authority-boundary"
     accepted_id: V14-L12
-    reader_requires: ["g4:foundation", "g7:relative-z2", "g4:context-roles"]
+    reader_requires: ["g7:relative-z2", "g4:context-roles"]
     review: pending
   - id: "g8:glyph-map"
     source_owner: G8
     source_atom: "glyph-map"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g4:incidence"]
+    reader_requires: ["g4:incidence"]
     review: pending
   - id: "g8:positional-forms"
     source_owner: G8
     source_atom: "positional-forms"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g8:glyph-map", "g4:incidence"]
+    reader_requires: ["g8:glyph-map", "g4:incidence"]
     review: pending
   - id: "g8:grammar-explicit"
     source_owner: G8
     source_atom: "grammar-explicit"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g8:positional-forms", "g4:incidence"]
+    reader_requires: ["g8:positional-forms", "g4:incidence"]
     review: pending
   - id: "g8:reject-ambiguity"
     source_owner: G8
     source_atom: "reject-ambiguity"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g8:grammar-explicit", "g4:incidence"]
+    reader_requires: ["g8:grammar-explicit", "g4:incidence"]
     review: pending
   - id: "g8:no-implicit-associativity"
     source_owner: G8
     source_atom: "no-implicit-associativity"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g8:reject-ambiguity", "g4:incidence"]
+    reader_requires: ["g8:reject-ambiguity", "g4:incidence"]
     review: pending
   - id: "g8:v015-das-version-boundary"
     source_owner: G8
     source_atom: "v015-das-version-boundary"
     accepted_id: V14-L2
-    reader_requires: ["g4:foundation", "g8:no-implicit-associativity", "g4:incidence"]
+    reader_requires: ["g8:no-implicit-associativity", "g4:incidence"]
     review: pending
   - id: "g8:ontology-level"
     source_owner: G8
@@ -320,67 +320,67 @@ nodes:
     source_owner: G8
     source_atom: "recursive-level"
     accepted_id: V14-L14
-    reader_requires: ["g4:foundation", "g8:ontology-level", "g4:incidence"]
+    reader_requires: ["g8:ontology-level", "g4:incidence"]
     review: pending
   - id: "g8:codecs-level"
     source_owner: G8
     source_atom: "codecs-level"
     accepted_id: V14-L14
-    reader_requires: ["g4:foundation", "g8:recursive-level", "g4:incidence"]
+    reader_requires: ["g8:recursive-level", "g4:incidence"]
     review: pending
   - id: "g8:byte-text-level"
     source_owner: G8
     source_atom: "byte-text-level"
     accepted_id: V14-L14
-    reader_requires: ["g4:foundation", "g8:codecs-level", "g4:incidence"]
+    reader_requires: ["g8:codecs-level", "g4:incidence"]
     review: pending
   - id: "g8:symbolic-meta-level"
     source_owner: G8
     source_atom: "symbolic-meta-level"
     accepted_id: V14-L14
-    reader_requires: ["g4:foundation", "g8:byte-text-level", "g4:incidence"]
+    reader_requires: ["g8:byte-text-level", "g4:incidence"]
     review: pending
   - id: "g8:no-second-ontology"
     source_owner: G8
     source_atom: "no-second-ontology"
     accepted_id: V14-L14
-    reader_requires: ["g4:foundation", "g8:symbolic-meta-level", "g4:incidence"]
+    reader_requires: ["g8:symbolic-meta-level", "g4:incidence"]
     review: pending
   - id: "g10:v14-l3"
     source_owner: G10
     source_atom: "v14-l3"
     accepted_id: V14-L3
-    reader_requires: ["g4:foundation", "g7:q-codec"]
+    reader_requires: ["g7:q-codec"]
     review: pending
   - id: "g10:v14-l4"
     source_owner: G10
     source_atom: "v14-l4"
     accepted_id: V14-L4
-    reader_requires: ["g4:foundation", "g8:glyph-map"]
+    reader_requires: ["g8:glyph-map"]
     review: pending
   - id: "g10:v14-l7"
     source_owner: G10
     source_atom: "v14-l7"
     accepted_id: V14-L7
-    reader_requires: ["g4:foundation", "concept:exact-sequence-first-use", "concept:nat-first-use"]
+    reader_requires: ["concept:exact-sequence-first-use", "concept:nat-first-use"]
     review: pending
   - id: "g10:v14-l8"
     source_owner: G10
     source_atom: "v14-l8"
     accepted_id: V14-L8
-    reader_requires: ["g4:foundation", "concept:nat-first-use"]
+    reader_requires: ["concept:nat-first-use"]
     review: pending
   - id: "g10:v14-l9"
     source_owner: G10
     source_atom: "v14-l9"
     accepted_id: V14-L9
-    reader_requires: ["g4:foundation", "concept:nat-first-use"]
+    reader_requires: ["concept:nat-first-use"]
     review: pending
   - id: "g10:v14-l10"
     source_owner: G10
     source_atom: "v14-l10"
     accepted_id: V14-L10
-    reader_requires: ["g4:foundation", "concept:nat-first-use"]
+    reader_requires: ["concept:nat-first-use"]
     review: pending
   - id: "g10:v14-l11"
     source_owner: G10
@@ -398,13 +398,13 @@ nodes:
     source_owner: G11
     source_atom: "v15-auth-01"
     accepted_id: V15-AUTH-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-auth-02"
     source_owner: G11
     source_atom: "v15-auth-02"
     accepted_id: V15-AUTH-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-onto-01"
     source_owner: G11
@@ -416,7 +416,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-onto-02"
     accepted_id: V15-ONTO-02
-    reader_requires: ["g4:foundation", "concept:exact-sequence-first-use"]
+    reader_requires: ["concept:exact-sequence-first-use"]
     review: pending
   - id: "g11:v15-onto-03"
     source_owner: G11
@@ -428,7 +428,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-struct-01"
     accepted_id: V15-STRUCT-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-close-01"
     source_owner: G11
@@ -452,43 +452,43 @@ nodes:
     source_owner: G11
     source_atom: "v15-fresh-01"
     accepted_id: V15-FRESH-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-fresh-02"
     source_owner: G11
     source_atom: "v15-fresh-02"
     accepted_id: V15-FRESH-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-fresh-03"
     source_owner: G11
     source_atom: "v15-fresh-03"
     accepted_id: V15-FRESH-03
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-name-01"
     source_owner: G11
     source_atom: "v15-name-01"
     accepted_id: V15-NAME-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-json-01"
     source_owner: G11
     source_atom: "v15-json-01"
     accepted_id: V15-JSON-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-json-02"
     source_owner: G11
     source_atom: "v15-json-02"
     accepted_id: V15-JSON-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-json-03"
     source_owner: G11
     source_atom: "v15-json-03"
     accepted_id: V15-JSON-03
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-vert-01"
     source_owner: G11
@@ -506,67 +506,67 @@ nodes:
     source_owner: G11
     source_atom: "v15-and-01"
     accepted_id: V15-AND-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-and-02"
     source_owner: G11
     source_atom: "v15-and-02"
     accepted_id: V15-AND-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-and-03"
     source_owner: G11
     source_atom: "v15-and-03"
     accepted_id: V15-AND-03
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-and-04"
     source_owner: G11
     source_atom: "v15-and-04"
     accepted_id: V15-AND-04
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-ctx-01"
     source_owner: G11
     source_atom: "v15-ctx-01"
     accepted_id: V15-CTX-01
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["concept:anet-term"]
     review: pending
   - id: "g11:v15-ctx-02"
     source_owner: G11
     source_atom: "v15-ctx-02"
     accepted_id: V15-CTX-02
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["concept:anet-term"]
     review: pending
   - id: "g11:v15-gamma-01"
     source_owner: G11
     source_atom: "v15-gamma-01"
     accepted_id: V15-GAMMA-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-formal-proof-01"
     source_owner: G11
     source_atom: "v15-formal-proof-01"
     accepted_id: V15-FORMAL-PROOF-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-formal-proof-02"
     source_owner: G11
     source_atom: "v15-formal-proof-02"
     accepted_id: V15-FORMAL-PROOF-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-json-04"
     source_owner: G11
     source_atom: "v15-json-04"
     accepted_id: V15-JSON-04
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-stage-01"
     source_owner: G11
     source_atom: "v15-stage-01"
     accepted_id: V15-STAGE-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-stage-02"
     source_owner: G11
@@ -578,7 +578,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-fals-01"
     accepted_id: V15-FALS-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-gov-01"
     source_owner: G11
@@ -602,7 +602,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-corpus-01"
     accepted_id: V15-CORPUS-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:gamma-first-use"]
+    reader_requires: ["concept:anet-term", "concept:gamma-first-use"]
     review: pending
   - id: "g11:v15-gov-04"
     source_owner: G11
@@ -614,7 +614,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-docs-01"
     accepted_id: V15-DOCS-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-ready-01"
     source_owner: G11
@@ -626,7 +626,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-ready-02"
     accepted_id: V15-READY-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-ready-03"
     source_owner: G11
@@ -638,43 +638,43 @@ nodes:
     source_owner: G11
     source_atom: "v15-author-json-01"
     accepted_id: V15-AUTHOR-JSON-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-author-json-02"
     source_owner: G11
     source_atom: "v15-author-json-02"
     accepted_id: V15-AUTHOR-JSON-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-author-json-03"
     source_owner: G11
     source_atom: "v15-author-json-03"
     accepted_id: V15-AUTHOR-JSON-03
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-author-json-04"
     source_owner: G11
     source_atom: "v15-author-json-04"
     accepted_id: V15-AUTHOR-JSON-04
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-reg-01"
     source_owner: G11
     source_atom: "v15-reg-01"
     accepted_id: V15-REG-01
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-reg-02"
     source_owner: G11
     source_atom: "v15-reg-02"
     accepted_id: V15-REG-02
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-reg-03"
     source_owner: G11
     source_atom: "v15-reg-03"
     accepted_id: V15-REG-03
-    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
+    reader_requires: ["concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "basis:R"
     source_owner: G15
