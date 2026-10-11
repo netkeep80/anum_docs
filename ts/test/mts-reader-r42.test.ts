@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { loadReaderG42 } from "../src/tooling/mts-reader-g42.js";
+import { READER_R42_PATH, loadReaderR42, parseReaderR42, renderReaderR42Review } from "../src/tooling/mts-reader-r42.js";
+
+const root=resolve("..");
+const input=readFileSync(resolve(root,READER_R42_PATH),"utf8");
+const plan=loadReaderR42(root),g42=loadReaderG42(root);
+assert.equal(plan.chapters.length,10);
+assert.deepEqual(plan.chapters.map(x=>x.chapter),g42.chapters.map(x=>x.id));
+assert.equal(plan.findings.length,15);
+assert.equal(plan.findings.filter(x=>x.state==="open").length,9);
+assert.equal(plan.findings.filter(x=>x.state==="mitigated-await-rereview").length,5);
+assert.equal(plan.findings.filter(x=>x.state==="corrected-in-previous-draft").length,1);
+assert.deepEqual(plan.truth.map(x=>[x.case,x.image]),[
+  ["FF","ImageF"],["FT","ImageF"],["TF","ImageF"],["TT","ImageT"]]);
+assert.ok(plan.negativeRu.includes("не новый утверждённый JSON"));
+assert.ok(plan.forbiddenRu.includes("F_R"));
+const text=renderReaderR42Review(root);
+assert.ok(text.includes("ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА"));
+assert.equal((text.match(/^## /gm)??[]).length,13);
+assert.ok(text.includes("| TT | RuleTT | ImageT |"));
+assert.ok(text.includes("FRM-04"));
+for(const c of g42.chapters) assert.ok(text.includes("## "+c.id));
+const parse=(source:string)=>parseReaderR42(source,root);
+assert.throws(()=>parse(input.replace("publication: blocked","publication: ready")),/may neither self-approve/);
+assert.throws(()=>parse(input.replace("author_approval: not-recorded","author_approval: approved")),/may neither self-approve/);
+assert.throws(()=>parse(input.replace("scientific_review: requires-independent-author-review","scientific_review: completed")),/may neither self-approve/);
+assert.throws(()=>parse(input.replace("state: open\n    judgement_ru: \"Десять", "state: accepted\n    judgement_ru: \"Десять")),/inflate finding/);
+assert.throws(()=>parse(input.replace("formal_sha256: 4a5bc92e","formal_sha256: 5a5bc92e")),/approved external artifact bytes changed/);
+assert.throws(()=>parse(input.replace("image: ImageT, rule: RuleTT","image: ImageF, rule: RuleTT")),/not anchored in approved source/);
+assert.throws(()=>parse(input.replace("id: R40-15","id: R40-14")),/omit, duplicate or reorder/);
+assert.throws(()=>parse(input.replace("globally-injective-F_R","globally-injective-F_R-PROVED")),/proof boundary missing/);
+assert.throws(()=>parse(input+"\nstatus: accepted\n"),/malformed\/duplicate YAML/);
+console.log("R42: ten independently worded chapter reviews, 15 scoped R40 findings; SHA-pinned Author-approved AND and existing ExactSequence B7 read-only examples; proof/approval falsifiers GREEN.");

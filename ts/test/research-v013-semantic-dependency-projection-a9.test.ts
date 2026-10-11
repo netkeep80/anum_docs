@@ -1237,6 +1237,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-g20.ts",
   // #2132/G42: literary chapter projection and proof citations, no native runtime ownership.
   "ts/src/tooling/mts-reader-g42.ts",
+  // #2132/R42: editorial review/existing-evidence read-only projection; no native execution authority.
+  "ts/src/tooling/mts-reader-r42.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);

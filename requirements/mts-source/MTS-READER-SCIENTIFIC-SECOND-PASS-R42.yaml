@@ -1,0 +1,130 @@
+# R42: scientific editorial SECOND PASS, not a claim of accepted scientific completeness.
+schema: mts-reader-scientific-second-pass/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+scientific_review: requires-independent-author-review
+source_composition: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+prose_basis: R40-individual-119-of-119
+reviewed_scope: ten-G42-chapters-and-fifteen-R40-findings
+not_claimed: [accepted-new-theorems, proof-of-production-TypeScript, completion-of-all-prose-arguments, globally-injective-F_R]
+chapter_reviews:
+  - chapter: foundational-forms
+    evidence_nodes: [g4:foundation, editorial:foundation-ontology, basis:R, basis:L, basis:U]
+    assessment_ru: "Введение корректно различает Link, полюсные позиции и локальные формы, но соседние G4 и G16 объяснения повторяют исходное определение. Составление главы не является самостоятельным доказательством существования всех локальных представителей."
+    outstanding_ru: "Разделить вводное интуитивное определение и техническую область Foundation, сохранить оба source owners; примеры R/O/C/L/U привязывать к принятому корневому базису, а не к одной лишь комбинаторике четырёх случаев."
+    verdict: revision-required
+  - chapter: grounded-inverse-context
+    evidence_nodes: [g4:grounded-normalization, g4:identity-by-poles, g4:chiral-orbit, g4:context-roles]
+    assessment_ru: "FND-13 и CTX-03 имеют различные области условий. Тождество по полюсам требует двух Grounded-свидетелей и нормализации; объективная орбита предшествует относительной контекстной ориентации, которая дополнительно требует маркера."
+    outstanding_ru: "В академической проекции явно показывать FND-13 и обе теоремы CTX-03 с точными предпосылками, не переносить J²=Id за область доказанного и не делать любую асеть автоматически ориентированной."
+    verdict: revision-required
+  - chapter: representation-first-use
+    evidence_nodes: [concept:exact-sequence-first-use, g7:exact-sequence, g7:recursive-codec, editorial:representation-boundary]
+    assessment_ru: "G41 позволяет дать Q до первого сравнения Anum и рекурсивного кодека и сохранить точное определение G7. Однако ранний фрагмент Q присоединяется техническим извлечением блока к предыдущему атому g7:exact-sequence, а не несёт самостоятельную явную ссылку на владельца Q."
+    outstanding_ru: "Предъявить раннюю дефиницию Q как отдельный источник-атрибутированный раздел: V14-L13 / g7:q-codec; не смешивать Q с Q13/Q14 и не связывать тождество Link с декодированной строкой."
+    verdict: revision-required
+  - chapter: derived-and-context
+    evidence_nodes: [g7:nat-zero, g7:degree-one, g7:q-codec, g7:orientation-authority-boundary]
+    assessment_ru: "Принятые формулы N₀=U и D₁=L относятся к разным производным шкалам; равенство индексов не задаёт их тождества. Версионность Q и локальность χ(K) должны оставаться видимыми при соседстве этих тем."
+    outstanding_ru: "После первого определения Nat/Degree вернуть точные исходные пояснения к L/U по одному разу; доказать, что отложенная строка не оказалась ни потерянной, ни ошибочно приписанной авторству соседнего исходного атома."
+    verdict: revision-required
+  - chapter: grammar-and-historical-mp
+    evidence_nodes: [g8:no-implicit-associativity, g8:v015-das-version-boundary, g10:v14-l11]
+    assessment_ru: "Значение v0.14 implicitPairAssociativity=NONE является правилом грамматики, не теоремой о неассоциативности операции. Direct Sequential Association v0.15 задаёт правило чтения цепочки; обобщённый MP v0.13/v0.14 не является следствием v0.15 Γ."
+    outstanding_ru: "Показать рядом две точные записи скобок и области версий, а исторический переход MP→Γ расположить как смену нормативного профиля без обратного объявления v0.15 предпосылкой более ранних законов."
+    verdict: revision-required
+  - chapter: v015-ontology
+    evidence_nodes: [g11:v15-onto-01, g11:v15-onto-03, g11:v15-ctx-01, g11:v15-ctx-02]
+    assessment_ru: "Одна Link-онтология совместима с разными контекстными исполнительными ролями одной связи. Они возникают из выбранных структурных memberships в ANet, а не из host-указателя, названия или оформления FORMAL/JSON."
+    outstanding_ru: "Отделить исполнительный Context v0.15 от χ(K) в CTX-03 и не переводить технические названия ролей в дополнительные математические сорта."
+    verdict: revision-required
+  - chapter: v015-execution
+    evidence_nodes: [g11:v15-gamma-01, g11:v15-and-01, g11:v15-and-02, g11:v15-json-04]
+    assessment_ru: "Принятая Γ использует J0, снимок S1, построение S2 и атомарную публикацию. Утверждённый compact AND действительно имеет четыре zero-role правила, но NO_MATCH и отсутствие authority проверяются дополнительными исполняемыми тестами, а не следуют из одной таблицы."
+    outstanding_ru: "Сформировать наглядное предъявление FF/FT/TF/TT из точных compact-and FORMAL/JSON, отдельно привести тестовый NO_MATCH, затем показать []=R и позиционное отличие [F,T]/[T,F]/[F,F]. Не создавать или не менять нормативный JSON."
+    verdict: revision-required
+  - chapter: proof-and-refinement
+    evidence_nodes: [g11:v15-formal-proof-01, g11:v15-formal-proof-02]
+    assessment_ru: "FRM-03 проверяет трёхчленное соглашение DAS, не алгебраическую ассоциативность. FRM-04 доказана при инъективности ExactSequence и пустом корне; FRM-07 при перечисленных production refinement premises. Парные ссылки Lean4/Rocq являются свидетельствами модельных законов, не полной верификацией TypeScript."
+    outstanding_ru: "К каждому доказательному утверждению приводить точный символ Lean4, символ Rocq, предпосылки, exclusions, границу production replay. Не добавлять гипотетический контрпример к F_R без фактически проверенного свидетеля."
+    verdict: revision-required
+  - chapter: reproducibility-assurance
+    evidence_nodes: [g11:v15-auth-02, g11:v15-formal-proof-02, g11:v15-fals-01]
+    assessment_ru: "В текущей генерации статусы исполняемых регрессий отделены от математических утверждений, но сама риторика GREEN может ошибочно читаться как доказательство любых формул. Часть свидетелей относится к замороженной A-memory 0.175.0, не к любой последующей версии."
+    outstanding_ru: "Для каждой метки GREEN ссылаться на точную ревизию, входной артефакт и выполненный тест; SKIPPED или отсутствующий proof witness оставлять видимым как ограничение."
+    verdict: revision-required
+  - chapter: governance-and-history
+    evidence_nodes: [g11:v15-ready-03, g11:v15-author-json-01, g11:v15-reg-01]
+    assessment_ru: "Правило AUTHOR_REVIEW задавало переход v0.14→v0.15, но этот переход исторически уже завершён. Статус принятой модели нельзя выводить из успешного CI, а нынешние редакционные YAML и будущие JSON требуют собственных полномочий."
+    outstanding_ru: "Вводить два явно подписанных времени: историческую процедуру author cutover и текущий accepted baseline, привязанный к точному решению/merge; не изображать исторический cutover как ещё ожидаемый."
+    verdict: revision-required
+finding_reviews:
+  - id: R40-01
+    state: mitigated-await-rereview
+    judgement_ru: "Оригинальное объяснение L отложено G41 до g7:degree-one, но остаётся проверка академического положения и точного source attribution."
+  - id: R40-02
+    state: mitigated-await-rereview
+    judgement_ru: "Объяснение U отложено G41 до concept:nat-first-use; его ссылка на ExactSequence требует проверять также уже введённый concept:exact-sequence-first-use."
+  - id: R40-03
+    state: mitigated-await-rereview
+    judgement_ru: "Раннее Q дословно взято из g7:q-codec, но R42 требует самостоятельной явной идентификации принятого владельца V14-L13."
+  - id: R40-04
+    state: mitigated-await-rereview
+    judgement_ru: "editorial:representation-boundary следует после первого определения Q, но нуждается в заметной границе между кодеками, а не в названии вида Link."
+  - id: R40-05
+    state: corrected-in-previous-draft
+    judgement_ru: "FND-13 поставлена сразу после нормализации в G20; условие двух Grounded и неприменимость универсальной экстенсиональности сохраняются."
+  - id: R40-06
+    state: open
+    judgement_ru: "Десять глав G42 снимают часть технической монотонности, но внутри главы остались подписи ID и недостаточно математических связных выводов."
+  - id: R40-07
+    state: open
+    judgement_ru: "Два source-owned определения Foundation остаются соседними; композиция ещё не разделила учебное введение и доказательные условия."
+  - id: R40-08
+    state: mitigated-await-rereview
+    judgement_ru: "G41 ставит точный первый Q раньше g7:recursive-codec, не переписывая полный владелец; проверять буквальное соответствие и ID."
+  - id: R40-09
+    state: open
+    judgement_ru: "Описана граница implicitPairAssociativity=NONE и DAS, но в учебном сравнении ещё нет обеих точных группировок."
+  - id: R40-10
+    state: open
+    judgement_ru: "MP v0.13/v0.14 и Γ v0.15 находятся в одной главе, но сейчас отсутствует последовательное доказательное пояснение перехода."
+  - id: R40-11
+    state: open
+    judgement_ru: "Глава истории отделена, однако точная дата принятия v0.15 и merge SHA не выведены из записанного авторского источника."
+  - id: R40-12
+    state: open
+    judgement_ru: "Разделы онтологии, исполнения, проверок и управления теперь физически разделены; границы каждой из 48 v0.15 формулировок требуют отдельной рецензии."
+  - id: R40-13
+    state: open
+    judgement_ru: "Генератор G42 печатает FRM-03/04/07 и предпосылки, но для остальных фраз о доказанности нет полного theorem-ID-to-source-link inventory."
+  - id: R40-14
+    state: open
+    judgement_ru: "Одобренный compact AND содержит FF/FT/TF/TT; отсутствует генерируемый научный пример со ссылками на source/negative-test, созданный только из чтения."
+  - id: R40-15
+    state: open
+    judgement_ru: "B7 подтверждает []=R, [F,T]≠[T,F] и сохранение [F,F]; заявлять коллизию F_R без свидетельства нельзя."
+existing_example_sources:
+  compact_and:
+    formal: formal/v0.15/regression/compact-and.formal
+    formal_sha256: 4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3
+    json: formal/v0.15/regression/compact-and.json
+    json_sha256: cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941
+    acceptance_test: ts/test/v015-compact-and-approved-source-integrity.test.ts
+    execution_test: ts/test/v015-compact-and-role-bundle-a1.test.ts
+    truth_table:
+      - {case: FF, args: ArgsFF, image: ImageF, rule: RuleFF}
+      - {case: FT, args: ArgsFT, image: ImageF, rule: RuleFT}
+      - {case: TF, args: ArgsTF, image: ImageF, rule: RuleTF}
+      - {case: TT, args: ArgsTT, image: ImageT, rule: RuleTT}
+    extra_observation_ru: "Для [F,X] и [T,X], где X не является булевым носителем T/F, исполняемый тест проверяет NO_MATCH. Это тестовый негативный сценарий, не новый утверждённый JSON."
+  positional_sequences:
+    execution_test: ts/test/v015-formal-exact-sequence-b7.test.ts
+    observations:
+      - "EMPTY : [] даёт семантический R"
+      - "PAIR_FT : [F,T] и PAIR_TF : [T,F] сохраняют порядок и различимы"
+      - "DUP_FF : [F,F] сохраняет обе позиции и отличается от SINGLE_F : [F]"
+      - "LINK_FT : F->T не тождественен PAIR_FT : [F,T]"
+    forbidden_claim_ru: "Ни теорема об инъективности произвольного production codec, ни конкретная коллизия F_R не следуют из этих опытов."
