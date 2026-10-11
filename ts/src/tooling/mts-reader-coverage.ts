@@ -938,3 +938,63 @@ export function loadReaderDraftPreview(root:string):ReaderDraftPreview{
     loadReaderG7(root),loadReaderG8(root),g10,g11,
     projectReaderAllFirstPassCensus(census,g10,g11));
 }
+
+
+/** G13 closure is always pending until independently reviewed and explicitly Author accepted. */
+export const READER_SCIENCE_G13_PATH="requirements/mts-source/MTS-READER-SCIENCE-GATES-G13.yaml";
+export interface ReaderScienceClosureGate {
+  readonly id:string; readonly status:"pending";
+  readonly purposeRu:string; readonly evidenceRu:string; readonly trackedIn:string;
+}
+export interface ReaderScienceClosure {
+  readonly schema:"mts-reader-scientific-closure/v0.1";
+  readonly publication:"blocked"; readonly authorApproval:"not-recorded";
+  readonly gates:readonly ReaderScienceClosureGate[];
+}
+export function parseReaderScienceClosure(text:string,preview:ReaderDraftPreview):ReaderScienceClosure{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G13 invalid gate YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G13 science gates");
+  exactFields(raw,["schema","status","semantic_change","author_approval","publication","gates"],"G13");
+  if(raw.schema!=="mts-reader-scientific-closure/v0.1"||raw.status!=="proposed"||
+    raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+    raw.publication!=="blocked"||preview.publication!=="blocked"||
+    preview.acceptedLawCount!==62||preview.proposedParagraphCount!==104)
+    fail("G13 cannot approve scientific completeness or publication");
+  if(!Array.isArray(raw.gates)||raw.gates.length!==12)fail("G13 requires 12 independent blockers");
+  const names=new Set<string>();
+  const gates=raw.gates.map((entry,i)=>{
+    const x=object(entry,"G13.gates["+i+"]");
+    exactFields(x,["id","status","purpose_ru","evidence_ru","tracked_in"],"G13.gate");
+    if(typeof x.id!=="string"||!/^[a-z][a-z0-9-]+$/.test(x.id)||
+       names.has(x.id)||x.status!=="pending"||
+       typeof x.purpose_ru!=="string"||x.purpose_ru.length<95||
+       typeof x.evidence_ru!=="string"||x.evidence_ru.length<90||
+       typeof x.tracked_in!=="string"||!/^#[0-9]+$/.test(x.tracked_in))
+      fail("G13 missing, duplicated or falsely resolved scientific gate");
+    names.add(x.id);
+    return Object.freeze({id:x.id,status:"pending" as const,
+      purposeRu:x.purpose_ru,evidenceRu:x.evidence_ru,trackedIn:x.tracked_in});
+  });
+  return Object.freeze({schema:"mts-reader-scientific-closure/v0.1" as const,
+    publication:"blocked" as const,authorApproval:"not-recorded" as const,
+    gates:Object.freeze(gates)});
+}
+export function loadReaderScienceClosure(root:string):ReaderScienceClosure{
+  return parseReaderScienceClosure(
+    readFileSync(resolve(root,READER_SCIENCE_G13_PATH),"utf8"),
+    loadReaderDraftPreview(root));
+}
+export function renderReaderScienceClosure(x:ReaderScienceClosure):string{
+  return [
+    "# Научные блокировки изложения МТС",
+    "",
+    "**Статус: публикация запрещена; решения Автора отсутствуют.**",
+    "",
+    ...x.gates.flatMap(g=>[
+      "## "+g.id,"",g.purposeRu,"",
+      "Требуемое свидетельство: "+g.evidenceRu,"",
+      "Учет: "+g.trackedIn+". Статус: ожидает научного завершения.","",
+    ]),
+  ].join("\n");
+}

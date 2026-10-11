@@ -8,7 +8,8 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
   loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
   projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS,
-  loadReaderDraftPreview, projectReaderDraftPreview }
+  loadReaderDraftPreview, projectReaderDraftPreview,
+  loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -347,3 +348,21 @@ assert.throws(()=>projectReaderDraftPreview(plan,routes,g4,g7,g8,g10,{
  ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!}],
 },c11),/duplicate source text ownership/);
 console.log("G12: 13-section 62-law 104-atom deterministic unapproved Russian draft preview.");
+
+const g13Text=readFileSync(resolve(root,"requirements/mts-source/MTS-READER-SCIENCE-GATES-G13.yaml"),"utf8");
+const g13=loadReaderScienceClosure(root);
+assert.equal(g13.gates.length,12);
+assert.equal(new Set(g13.gates.map(x=>x.id)).size,12);
+assert.ok(g13.gates.every(x=>x.status==="pending"));
+assert.equal(g13.authorApproval,"not-recorded");
+assert.equal(g13.publication,"blocked");
+assert.ok(renderReaderScienceClosure(g13).includes("публикация запрещена"));
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("publication: blocked",
+ "publication: ready"),draft),/cannot approve/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("  - id: reader-dag",
+ "  - id: science-atomicity"),draft),/missing, duplicated or falsely resolved/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("    status: pending",
+ "    status: approved"),draft),/missing, duplicated or falsely resolved/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("  - id: reader-dag",
+ "  - id: reader-dag\n    id: reader-dag"),draft),/G13 invalid gate YAML/);
+console.log("G13: 12 unresolved science/publication blockers remain explicit and source-owned.");
