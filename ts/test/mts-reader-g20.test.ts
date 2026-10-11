@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { parseDocument } from "yaml";
 import {
   READER_G20_PATH, loadReaderG20, parseReaderG20, readerG20Sources,
   renderReaderG20Preview,
@@ -14,7 +15,7 @@ assert.equal(sources.length, 114);
 assert.equal(new Set(sources.map(x => x.id)).size, 114);
 assert.equal(draft.nodes.length, 119);
 assert.equal(draft.ordered.length, 119);
-assert.equal(draft.edges, 303);
+assert.equal(draft.edges, 286);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
@@ -22,6 +23,46 @@ assert.equal(draft.openingSpine.length, 41);
 assert.deepEqual(draft.ordered.slice(0, 41).map(x => x.id), draft.openingSpine);
 assert.deepEqual(draft.ordered.slice(0, 3).map(x => x.id),
   ["g4:foundation", "editorial:foundation-ontology", "g4:incidence"]);
+// R35 is an individually written proposal, not Author-approved science.
+// Strictly preserve every reviewed edge verdict against the current G20 DAG.
+const reviews = [
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W1.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W2.yaml",
+].map(path => {
+  const doc = parseDocument(readFileSync(resolve(root, path), "utf8"),
+    { strict: true, uniqueKeys: true });
+  assert.equal(doc.errors.length, 0, "invalid review YAML " + path);
+  assert.equal(doc.warnings.length, 0, "ambiguous review YAML " + path);
+  return doc.toJS({ maxAliasCount: 0 }) as {
+    schema: string; status: string; author_approval: string;
+    publication: string; review_count: number;
+    entries: {source: string; consumer: string; decision: string;
+      rationale_ru: string; limitation_ru: string; review_status: string}[];
+  };
+});
+assert.deepEqual(reviews.map(x => x.review_count), [40, 48]);
+const edgeReviews = reviews.flatMap(x => {
+  assert.equal(x.schema, "mts-reader-edge-review/v0.1");
+  assert.equal(x.status, "proposed");
+  assert.equal(x.author_approval, "not-recorded");
+  assert.equal(x.publication, "blocked");
+  assert.equal(x.entries.length, x.review_count);
+  return x.entries;
+});
+assert.equal(edgeReviews.length, 88, "87 old edges + one corrected CTX-03 edge");
+assert.equal(new Set(edgeReviews.map(x => x.source + "->" + x.consumer)).size, 88);
+assert.deepEqual(["keep", "remove", "replace"].map(v =>
+  edgeReviews.filter(x => x.decision === v).length), [66, 21, 1]);
+for (const item of edgeReviews) {
+  assert.equal(item.review_status, "proposed");
+  assert.ok(item.rationale_ru.trim().length > 35, "missing individual scientific reason");
+  assert.ok(item.limitation_ru.trim().length > 35, "missing individual falsifier/scope");
+  const owner = draft.nodes.find(n => n.id === item.consumer);
+  assert.ok(owner, "reviewed consumer missing from G20: " + item.consumer);
+  const linked = owner.readerRequires.includes(item.source);
+  assert.equal(linked, item.decision === "keep",
+    "R35 verdict differs from exact revised first-use edge: " + item.source + " -> " + item.consumer);
+}
 const originalSourceEdges = sources.reduce((sum, a) => sum + a.sourceRequires.length, 0);
 assert.equal(originalSourceEdges, 57, "G4:31 + G7:16 + G8:10 must remain source-authoritative");
 for (const source of sources) {
@@ -165,4 +206,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 source-backed nodes, 303 scientifically filtered edges, 41-node academic spine, original 57 edges, no publication, negative falsifiers GREEN.");
+console.log("G20: 119 nodes, 286 editorial edges, 41-node opening, 57 original edges, 88 proposed R35 reviews with 22 corrected decisions, no publication, falsifiers GREEN.");
