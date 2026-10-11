@@ -20,6 +20,8 @@ export interface ReaderG20Source {
   readonly atom: string;
   readonly acceptedId: string;
   readonly textRu: string;
+  /** Existing source-owner reader dependencies, not the external proof premises. */
+  readonly sourceRequires: readonly string[];
 }
 export interface ReaderG20Node {
   readonly id: string;
@@ -55,9 +57,11 @@ function fields(value: Record<string, unknown>, expected: readonly string[], whe
   }
 }
 function source(id: string, owner: ReaderG20Source["owner"], atom: string,
-                acceptedId: string, textRu: string): ReaderG20Source {
+                acceptedId: string, textRu: string,
+                sourceRequires: readonly string[] = []): ReaderG20Source {
   if (!textRu.trim()) fail("empty original source text " + id);
-  return Object.freeze({ id, owner, atom, acceptedId, textRu });
+  return Object.freeze({ id, owner, atom, acceptedId, textRu,
+    sourceRequires: Object.freeze([...sourceRequires]) });
 }
 /** Retrieve each text from its original strict, provenance-checked reader model. */
 export function readerG20Sources(root: string): readonly ReaderG20Source[] {
@@ -73,9 +77,12 @@ export function readerG20Sources(root: string): readonly ReaderG20Source[] {
     fail("G16 historical source was promoted");
   }
   const all: ReaderG20Source[] = [
-    ...g4.readerScience.steps.map(a => source("g4:" + a.id, "G4", a.id, "V14-L1", a.ru)),
-    ...g7.atoms.map(a => source("g7:" + a.id, "G7", a.id, a.acceptedId, a.ru)),
-    ...g8.atoms.map(a => source("g8:" + a.id, "G8", a.id, a.acceptedId, a.ru)),
+    ...g4.readerScience.steps.map(a => source("g4:" + a.id, "G4", a.id, "V14-L1", a.ru,
+      a.requires.map(id => "g4:" + id))),
+    ...g7.atoms.map(a => source("g7:" + a.id, "G7", a.id, a.acceptedId, a.ru,
+      a.requires.map(id => "g7:" + id))),
+    ...g8.atoms.map(a => source("g8:" + a.id, "G8", a.id, a.acceptedId, a.ru,
+      a.requires.map(id => "g8:" + id))),
     ...g10.atoms.map(a => source("g10:" + a.id, "G10", a.id, a.acceptedId, a.ru)),
     ...g11.atoms.map(a => source("g11:" + a.id, "G11", a.id, a.acceptedId, a.ru)),
     ...g15.symbols.map(a => source("basis:" + a.symbol, "G15", a.symbol,
@@ -154,6 +161,16 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
       EDITORIAL.some(id => !ids.has("editorial:" + id)) ||
       [...expected.keys()].some(id => !ids.has(id))) {
     fail("G20 source coverage or atomic G16 replacement incomplete");
+  }
+  // Source-owned G4/G7/G8 DAG edges must survive every later editorial merge.
+  // Their source is immutable for this G20 proposal; no inferred chapter edge
+  // or independently authored G20 list can silently erase an earlier premise.
+  const byId = new Map(nodes.map(node => [node.id, node]));
+  for (const original of sources) {
+    const expanded = byId.get(original.id);
+    if (!expanded || original.sourceRequires.some(id => !expanded.readerRequires.includes(id))) {
+      fail("source-owner reader dependency omitted: " + original.id);
+    }
   }
   const index = new Map(nodes.map((node, i) => [node.id, i]));
   const indegree = nodes.map(x => x.readerRequires.length);
