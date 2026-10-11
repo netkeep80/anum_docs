@@ -8,7 +8,7 @@ export const READER_G42_PATH = "requirements/mts-source/MTS-READER-ACADEMIC-COMP
 interface ReviewAtom { position: number; node: string; disposition: string; }
 interface Chapter {
   id: string; titleRu: string; bridgeRu: string; scopeRu: string; boundaryRu: string;
-  positions?: readonly number[]; dispositions?: readonly string[];
+  positions?: readonly number[] | undefined; dispositions?: readonly string[] | undefined;
   atomIds: readonly string[];
 }
 interface ProofCase {
@@ -114,7 +114,7 @@ export function parseReaderG42(source: string, root: string): ReaderG42Plan {
       const span=ch.positions;
       check(Array.isArray(span) && span.length===2 &&
         span.every(n=>Number.isInteger(n)),"G42 position span");
-      const [a,b]=span as number[];
+      const a = (span as number[])[0]!; const b = (span as number[])[1]!;
       check(a>=1 && b<=71 && a<=b,"G42 range must stay inside v0.14 71-entry review");
       selected=entries.filter(e=>e.position>=a && e.position<=b);
     } else {
