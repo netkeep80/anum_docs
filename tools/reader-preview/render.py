@@ -65,6 +65,44 @@ def html_from_markdown(markdown_path: Path, stylesheet: str):
     rendered = proc.stdout
     if "</head>" not in rendered:
         raise ValueError("Pandoc did not provide a complete HTML document")
+    # Pandoc's metadata title and generated h1 otherwise produce duplicate title pages.
+    rendered, title_blocks = re.subn(
+        r'<header id="title-block-header">[\s\S]*?</header>\s*', "", rendered, count=1
+    )
+    if title_blocks != 1:
+        raise ValueError("Expected exactly one Pandoc metadata title block")
+    toc = re.search(r'<nav id="TOC"[\s\S]*?</nav>', rendered)
+    if toc is None:
+        raise ValueError("Pandoc generated no navigable contents list")
+    rendered = rendered.replace(toc.group(0), "", 1)
+    cover = re.search(
+        r'<h1 id="[^"]+">[\s\S]*?</h1>\s*'
+        r'<p><strong>ПРЕДЛОЖЕНИЕ[\s\S]*?</strong></p>',
+        rendered,
+    )
+    if cover is None:
+        raise ValueError("Cannot locate unchanged blocked-publication cover")
+    rendered = rendered[:cover.end()] + "\n" + toc.group(0) + rendered[cover.end():]
+    # Only the ten numbered chapters and six appendices start on new PDF pages.
+    rendered, chapter_breaks = re.subn(
+        r'<h2 id="((?:[1-9]|10)-[^"]+|приложение-[^"]+)">',
+        r'<h2 class="chapter-break" id="\1">',
+        rendered,
+    )
+    if chapter_breaks != 16:
+        raise ValueError("Expected exactly ten chapters and six appendix breaks")
+    # Keep a small AND truth table intact, but allow the 119-row register to paginate.
+    compact_tables = 0
+    def mark_compact(match):
+        nonlocal compact_tables
+        table = match.group(0)
+        if table.count("<tr") <= 8:
+            compact_tables += 1
+            return table.replace("<table>", '<table class="compact-table">', 1)
+        return table
+    rendered = re.sub(r"<table>[\s\S]*?</table>", mark_compact, rendered)
+    if compact_tables != 1:
+        raise ValueError("Expected exactly one compact five-row AND example table")
     rendered = rendered.replace("</head>", "<style>\n" + stylesheet + "\n</style>\n</head>", 1)
     return rendered
 
@@ -124,7 +162,14 @@ def verify_pdf(path: Path):
     blank_pages = [i + 1 for i, text in enumerate(texts) if len(text.strip()) < 30]
     dimensions = sorted(set((round(float(p.mediabox.width)), round(float(p.mediabox.height))) for p in doc.pages))
     cyrillic = len(re.findall("[А-Яа-яЁё]", joined))
+    example_pages = [i + 1 for i, t in enumerate(texts)
+                     if "Пример на принятых источниках" in t]
+    table_pages = [i + 1 for i, t in enumerate(texts)
+                   if "RuleFF" in t and "RuleTT" in t]
     checks = {
+        "first_page_contains_title": "Метатеория Связей:" in texts[0],
+        "and_example_and_truth_table_same_page": example_pages == table_pages and len(example_pages) == 1,
+        "required_math_glyphs_present": all(x in joined for x in ("⟼", "Γ", "∞", "♂", "♀", "₀", "₁")),
         "page_count": len(doc.pages), "extracted_chars": print_chars,
         "cyrillic_chars": cyrillic, "pdf_links": pdf_links,
         "blank_or_near_blank_pages": blank_pages,
@@ -136,6 +181,10 @@ def verify_pdf(path: Path):
         raise ValueError("PDF extraction/length sanity failed: " + json.dumps(checks, ensure_ascii=False))
     if missing_required or replacement_chars:
         raise ValueError("Unicode/source-content loss: " + json.dumps(checks, ensure_ascii=False))
+    if not (checks["first_page_contains_title"] and
+            checks["and_example_and_truth_table_same_page"] and
+            checks["required_math_glyphs_present"]):
+        raise ValueError("Visual/mathematical layout regression: " + json.dumps(checks, ensure_ascii=False))
     if dimensions != [(595, 842)]:
         raise ValueError("Non-A4 PDF page geometry: " + str(dimensions))
     return checks
