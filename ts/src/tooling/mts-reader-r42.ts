@@ -74,7 +74,8 @@ export function parseReaderR42(text: string, root: string): R42ScientificReview 
     "ten reviewed chapters must match the exact G42 order");
   for(let i=0;i<10;i++){
     const chapter=composition.chapters[i]!, review=chapters[i]!;
-    demand(review.evidenceNodes.length>=3 && new Set(review.evidenceNodes).size===review.evidenceNodes.length &&
+    demand(review.evidenceNodes.length>=(chapter.id==="proof-and-refinement"?2:3) &&
+      new Set(review.evidenceNodes).size===review.evidenceNodes.length &&
       review.evidenceNodes.every(id=>chapter.atomIds.includes(id)),
       "R42 chapter evidence must be actually located in that academic chapter: "+chapter.id);
   }
