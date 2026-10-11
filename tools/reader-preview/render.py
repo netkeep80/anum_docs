@@ -83,14 +83,14 @@ def html_from_markdown(markdown_path: Path, stylesheet: str):
     if cover is None:
         raise ValueError("Cannot locate unchanged blocked-publication cover")
     rendered = rendered[:cover.end()] + "\n" + toc.group(0) + rendered[cover.end():]
-    # Only the ten numbered chapters and six appendices start on new PDF pages.
+    # Ten numbered chapters and five substantial appendices start new pages; short E follows D.
     rendered, chapter_breaks = re.subn(
-        r'<h2 id="((?:[1-9]|10)-[^"]+|приложение-[^"]+)">',
+        r'<h2 id="((?:[1-9]|10)-[^"]+|приложение-[абвгд]-[^"]+)">',
         r'<h2 class="chapter-break" id="\1">',
         rendered,
     )
-    if chapter_breaks != 16:
-        raise ValueError("Expected exactly ten chapters and six appendix breaks")
+    if chapter_breaks != 15:
+        raise ValueError("Expected ten chapters and five long appendix page starts; short E follows D")
     # Keep a small AND truth table intact, but allow the 119-row register to paginate.
     compact_tables = 0
     def mark_compact(match):
