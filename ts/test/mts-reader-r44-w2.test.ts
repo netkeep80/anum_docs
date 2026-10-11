@@ -30,6 +30,7 @@ assert.throws(()=>check(original.replace("scientific_coverage: six-targeted-clai
 assert.throws(()=>check(original.replace("proof_lean4: proofs/lean4/MtsFoundation.lean","proof_lean4: proofs/lean4/MtsExplicitModel.lean")),/cannot publish/);
 assert.throws(()=>check(original.replace("finding: R40-07","finding: R40-05")),/case identity\/scope changed/);
 assert.throws(()=>check(original.replace("prior_corrected: [R40-05]","prior_corrected: [R40-06]")),/may not close/);
-assert.throws(()=>check(original.replace("ContextOrientationMarker не требуется","ContextOrientationMarker всегда требуется")),/case scientific premises/);
+assert.throws(()=>check(original.replace("ContextOrientationMarker не требуется","ContextOrientationMarker всегда требуется")),/orbit may not require marker/);
+assert.throws(()=>check(original.replace("нет F2F3GroundedNormalization","требуется F2F3GroundedNormalization")),/context-selected roles must not import normalization/);
 assert.throws(()=>check(original+"\npublication: ready\n"),/malformed\/duplicate YAML/);
 console.log("R44-W2: six individually evidence-scoped mathematical reviews in read-only proposed manuscript; source G4/G7, accepted contract and Lean4/Rocq signatures guarded; no 119 science acceptance.");
