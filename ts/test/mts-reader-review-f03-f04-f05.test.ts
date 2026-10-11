@@ -12,12 +12,15 @@ const dossier=loadReaderF03F04F05(root);
 assert.equal(dossier.publication,"blocked");
 assert.deepEqual(dossier.pairs,["R/O","R/C","R/L","R/U","O/C","O/L","O/U","C/L","C/U","L/U"]);
 assert.deepEqual(dossier.obligations,["A1_INDEPENDENCE",
- "GLOBAL_POLE_EXTENTIONALITY","BASIS_PAIRWISE_KERNEL_LEMMA"]);
+ "GLOBAL_POLE_EXTENTIONALITY","BASIS_PAIRWISE_INDEPENDENT_REVIEW"]);
 assert.equal((dossier.basisMd.match(/^\| [ROCLU]\/[ROCLU] \|/gm)??[]).length,10);
 assert.ok(dossier.basisMd.includes("F2F3OneSidedExistence"));
 assert.ok(dossier.basisMd.includes("fnd13_form_injective"));
 assert.ok(dossier.basisMd.includes("N₁=form(U,L)≠D₁"));
 assert.ok(dossier.basisMd.includes("отдельная совместная Lean4/Rocq-лемма"));
+assert.ok(dossier.basisMd.includes("F03_basis_five_pairwise_distinct"));
+assert.ok(dossier.basisMd.includes("0437724bb54bb75b11c564d6b957f1f3cc3b954a"));
+assert.ok(dossier.basisMd.includes("38181572363"));
 assert.ok(dossier.groundedMd.includes("Distinguishable"));
 assert.ok(dossier.groundedMd.includes("fallback_cycle_not_grounded"));
 assert.ok(dossier.groundedMd.includes("LocalSelfDecision"));
@@ -52,6 +55,10 @@ assert.throws(()=>bad("master_issue: 2217","master_issue: 10"),/no authority/);
 assert.throws(()=>bad('pair: "L/U"','pair: "L/L"'),/basis equality\/inequality rationale/);
 assert.throws(()=>bad('reason: "fnd13_form_injective and O != C"','reason: "associativity"'),/basis equality\/inequality rationale/);
 assert.throws(()=>bad("A1_INDEPENDENCE","A1_PROVED"),/F05 open problems/);
+assert.throws(()=>bad("independent_review: pending","independent_review: approved"),/F03 proposed kernel evidence/);
+assert.throws(()=>bad("ci_run: 38181572363","ci_run: 0"),/F03 proposed kernel evidence/);
+assert.throws(()=>bad("premises: [Foundation, F2F3OneSidedExistence]","premises: [Foundation, A1]"),/F03 minimal proof premises/);
+assert.throws(()=>bad("2f64125d74ff7779893854a75479380b2df8049c","0000000000000000000000000000000000000000"),/F03 exact proof blob drift/);
 assert.throws(()=>bad("proofs/lean4/MtsFoundation.lean","proofs/coq/MtsFoundation.v"),/source path drift/);
 assert.throws(()=>bad("CONDITIONAL_DERIVATION_FROM_ACCEPTED_THEOREMS_NOT_NEW_KERNEL_CERTIFICATE","KERNEL_PROVED"),
  /not independently accepted kernel proof/);

@@ -1,4 +1,5 @@
 import {readFileSync} from "node:fs";
+import {createHash} from "node:crypto";
 import {resolve} from "node:path";
 import {parseDocument} from "yaml";
 import {loadReaderF01F02P01} from "./mts-reader-review-f01-f02-p01.js";
@@ -37,7 +38,7 @@ const pairReasons=["E.startRootNeRoot","E.finishRootNeRoot",
  "StartOnly(O) versus FinishOnly(C)","StartOnly(O) versus PairLocal(L)",
  "StartOnly(O) versus PairLocal(U)","FinishOnly(C) versus PairLocal(L)",
  "FinishOnly(C) versus PairLocal(U)","fnd13_form_injective and O != C"];
-const open=["A1_INDEPENDENCE","GLOBAL_POLE_EXTENTIONALITY","BASIS_PAIRWISE_KERNEL_LEMMA"];
+const open=["A1_INDEPENDENCE","GLOBAL_POLE_EXTENTIONALITY","BASIS_PAIRWISE_INDEPENDENT_REVIEW"];
 function guard(c:unknown,m:string):asserts c{if(!c)throw Error("mts-reader-F03-F05: "+m);}
 function rec(x:unknown,m:string):Row{guard(x!==null&&typeof x==="object"&&!Array.isArray(x),m+" mapping");return x as Row;}
 function exactKeys(r:Row,keys:readonly string[],m:string){
@@ -92,7 +93,28 @@ export function parseReaderF03F04F05(source:string,root:string):F03F05{
  symbols(ml,[...xSymbols,"explicit_fnd13_replay"],"Explicit model Lean");
  symbols(mc,[...xRocqSymbols,"explicit_fnd13_replay"],"Explicit model Rocq");
  const b=rec(d.basis,"F03"),g=rec(d.grounded,"F04"),i=rec(d.identity,"F05");
- exactKeys(b,["heading_ru","status",...f03,"table","lean_symbols","rocq_symbols"],"F03");
+ const kp=rec(b.kernel_candidate,"F03 kernel candidate");
+ exactKeys(kp,["status","symbol","lean","rocq","lean_blob_sha","rocq_blob_sha",
+  "exact_commit","ci_run","premises","independent_review","author_approval"],"F03 kernel candidate");
+ guard(kp.status==="kernel-compiled-candidate"&&
+  kp.symbol==="F03_basis_five_pairwise_distinct"&&
+  kp.lean==="proofs/lean4/MtsBasisFiveDistinct.lean"&&
+  kp.rocq==="proofs/coq/MtsBasisFiveDistinct.v"&&
+  kp.exact_commit==="0437724bb54bb75b11c564d6b957f1f3cc3b954a"&&kp.ci_run===38181572363&&
+  kp.independent_review==="pending"&&kp.author_approval==="not-recorded",
+  "F03 proposed kernel evidence cannot claim scientific/Author acceptance");
+ eqList(kp.premises,["Foundation","F2F3OneSidedExistence"],"F03 minimal proof premises");
+ const gitBlob=(source:string)=>{
+  const bytes=Buffer.from(source,"utf8");
+  return createHash("sha1").update("blob "+bytes.length+"\\0").update(bytes).digest("hex");
+ };
+ for(const [path,sha] of [[kp.lean,kp.lean_blob_sha],[kp.rocq,kp.rocq_blob_sha]]){
+  guard(typeof path==="string"&&typeof sha==="string"&&gitBlob(read(root,path))===sha,
+   "F03 exact proof blob drift");
+  symbols(read(root,path),["F03_basis_five_pairwise_distinct"],"F03 proof candidate");
+ }
+
+ exactKeys(b,["heading_ru","status",...f03,"table","lean_symbols","rocq_symbols","kernel_candidate"],"F03");
  exactKeys(g,["heading_ru",...f04,"lean_symbols","rocq_symbols","model_lean_symbols","model_rocq_symbols"],"F04");
  exactKeys(i,["heading_ru",...f05,"lean_symbols","rocq_symbols","open_obligations"],"F05");
  guard(b.status==="CONDITIONAL_DERIVATION_FROM_ACCEPTED_THEOREMS_NOT_NEW_KERNEL_CERTIFICATE",
@@ -119,6 +141,11 @@ export function parseReaderF03F04F05(source:string,root:string):F03F05{
   "| Пара разных Link | Точное основание различимости |",
   "|---|---|",...rows.map(x=>"| "+x.pair+" | "+x.reason+" |"),"",
   "**Граница доказательства:** отдельная совместная Lean4/Rocq-лемма для таблицы десяти пар пока не принята.","",
+  "**Новое внешнее kernel evidence (#2222, не принято Автором):** "+
+  "[Lean4](https://github.com/netkeep80/anum_docs/blob/0437724bb54bb75b11c564d6b957f1f3cc3b954a/proofs/lean4/MtsBasisFiveDistinct.lean) · "+
+  "[Rocq](https://github.com/netkeep80/anum_docs/blob/0437724bb54bb75b11c564d6b957f1f3cc3b954a/proofs/coq/MtsBasisFiveDistinct.v) · "+
+  "[CI](https://github.com/netkeep80/anum_docs/actions/runs/38181572363).","",
+  "**Проверка научного содержания:** независимо не завершена; предложенный статус и блокировка публикации сохранены.","",
   "[Foundation Lean4]("+link(files.foundation_lean)+") · [Rocq]("+link(files.foundation_rocq)+")",""
  ].join("\n");
  const groundedText=[

@@ -21,7 +21,7 @@ basis:
   equations_ru: "Непосредственно из E: O=form(O,R), C=form(R,C), O≠R, C≠R. Из законов проекций следуют start(O)=O, finish(O)=R, start(C)=R и finish(C)=C. Из этого O относится к StartOnly, C — к FinishOnly, тогда как L и U относятся к PairLocal; R — к FullSelf. Все эти локальные свойства подтверждаются отдельными леммами f2f3_start_root_pattern, f2f3_finish_root_pattern, f2f3_pair_pattern и f2f3_reverse_pair_pattern."
   proof_ru: "Десять различных пар показываются без A1 и без F2F3GroundedNormalization при условии E. R≠O и R≠C входят в E. R≠L и R≠U: R полностью самозамкнут, L/U ни в одном полюсе не самозамкнуты. O≠C: O удовлетворяет start(O)=O, а C удовлетворяет start(C)=R; равенство O=C влекло бы O=R. O≠L и O≠U: O имеет самозамкнутый start, а L/U не имеют. C≠L и C≠U: C имеет самозамкнутый finish, а L/U не имеют. L≠U: из form(O,C)=form(C,O) по fnd13_form_injective следовало бы O=C, что уже исключено."
   nat_degree_corollary_ru: "При принятых определениях шкал N₀=U, Succ(N)=form(N,L) и D₁=L получается N₁=form(U,L)≠D₁. Если предположить form(U,L)=L=form(O,C), то после применения тотальной проекции start обеих сторон получилось бы U=O. Но U удовлетворяет PairLocal и потому start(U)≠U, тогда как O удовлетворяет StartOnly и start(O)=O; следовательно U≠O. Утверждение требует существования двух односторонних представителей E и указанных определений шкал, но не требует общей инъективности произвольного кодека Anum и не доказывает всей арифметики Nat."
-  limit_ru: "Структурная категория PairLocal одна и та же для L и U, но эти Связи различны как элементы Link. Поэтому четыре локальных случая не являются перечислением всех Связей. Десять неравенств выше — прозрачный редакционный вывод из уже проверенных лемм, однако отдельная единая теорема для всей таблицы пока не предъявлена в принятом Lean4/Rocq. Нельзя рекламировать её как вновь сертифицированный kernel-proof."
+  limit_ru: "Структурная категория PairLocal одна и та же для L и U, но эти Связи различны как элементы Link. Поэтому четыре локальных случая не являются перечислением всех Связей. В научной ветке для #2222 новая единая теорема F03_basis_five_pairwise_distinct проверена ядрами Lean4/Rocq без новых глобальных аксиом в exact CI #38181572363. Этот новый внешний proof-кандидат ещё не принят автором, не включён в frozen baseline v0.15 и ожидает независимой математической рецензии; статус публикации остаётся blocked."
   model_ru: "В явной модели List Bool, уже предъявленной в F02, E=ExplicitOneSided и F=ExplicitFoundation дают конкретных O и C и тем самым L и U. Конструкция модельно-согласована; равенство иных рекурсивных неподвижных точек с этими представителями без A1 не утверждается."
   table:
     - { pair: "R/O", reason: "E.startRootNeRoot" }
@@ -34,6 +34,18 @@ basis:
     - { pair: "C/L", reason: "FinishOnly(C) versus PairLocal(L)" }
     - { pair: "C/U", reason: "FinishOnly(C) versus PairLocal(U)" }
     - { pair: "L/U", reason: "fnd13_form_injective and O != C" }
+  kernel_candidate:
+    status: kernel-compiled-candidate
+    symbol: F03_basis_five_pairwise_distinct
+    lean: proofs/lean4/MtsBasisFiveDistinct.lean
+    rocq: proofs/coq/MtsBasisFiveDistinct.v
+    lean_blob_sha: 2f64125d74ff7779893854a75479380b2df8049c
+    rocq_blob_sha: fbfe56265400db98abd4d524f2a2cc832ebb735f
+    exact_commit: 0437724bb54bb75b11c564d6b957f1f3cc3b954a
+    ci_run: 38181572363
+    premises: [Foundation, F2F3OneSidedExistence]
+    independent_review: pending
+    author_approval: not-recorded
   lean_symbols: [F2F3OneSidedExistence, f2f3_start_root_pattern, f2f3_finish_root_pattern, f2f3_pair_pattern, f2f3_reverse_pair_pattern, fnd13_form_injective, FND_04_u_is_ordinary_pair, INV_06_root_basis]
   rocq_symbols: [F2F3OneSidedExistence, f2f3_start_root_pattern, f2f3_finish_root_pattern, f2f3_pair_pattern, f2f3_reverse_pair_pattern, fnd13_form_injective, FND_04_u_is_ordinary_pair, INV_06_root_basis]
 grounded:
@@ -56,7 +68,7 @@ identity:
   fnd13_ru: "FND_13_identity_by_poles(F,N,gx,gy): для произвольных x,y с Grounded-свидетельствами gx,gy и N:F2F3GroundedNormalization(F) выполняется x=y ⇔ start(x)=start(y)∧finish(x)=finish(y). В обратном направлении применяются recursiveEquation для нормальных форм и complete для двух Grounded-связей. В списке аргументов этой теоремы отсутствуют A1 и FND-02: приписывать ей их как необходимые доказательные зависимости неверно."
   model_ru: "ExplicitGroundedNormalization на ExplicitFoundation выбирает NormalForm=ModelLink, compose=form, normalForm(x)=x. Уравнение декомпозиции доказывается после grounded_is_canonical: только Grounded элементы этой модели лежат в образе form. Поэтому explicit_fnd13_replay — конкретная инстанциация принятой условной FND-13, не утверждение глобальной нормализации неграундированных значений."
   counterexample_ru: "Вопрос независимости A1 от Foundation и вопрос о глобальной экстенсиональности вне Grounded требуют собственных контрмоделей или строгих следствий. Наличие explicit_a1 не даёт отрицательной модели; равно как отсутствие полной нормализации в аксиомах не доказывает её логической независимости. Эти вопросы помечены RESEARCH_OPEN, а не решены умолчанием."
-  open_ru: "Следующий доказательный этап — отдельные Lean4/Rocq-леммы об отношениях R/O/C/L/U, проверка модели Foundation без A1, разграничение локальной четырёхслучайной классификации и глобального типа Link, а также таблица точных положительных теорем с минимальными предпосылками. Нормативная v0.15 при этом не изменяется."
+  open_ru: "Парная лемма о десяти различиях R/O/C/L/U теперь имеет новое kernel evidence на научной ветке; её независимая математическая рецензия и авторская приёмка не завершены. Остались открытыми независимость A1 для общего Foundation, глобальная экстенсиональность вне Grounded и строгая модель ANet/ExactSequence/F_R. Нормативная v0.15 при этом не изменяется."
   lean_symbols: [fnd13_form_injective, FND_13_identity_by_poles, FND_02_unique_root, F2F3GroundedNormalization, explicit_fnd13_replay]
   rocq_symbols: [fnd13_form_injective, FND_13_identity_by_poles, FND_02_unique_root, F2F3GroundedNormalization, explicit_fnd13_replay]
-  open_obligations: [A1_INDEPENDENCE, GLOBAL_POLE_EXTENTIONALITY, BASIS_PAIRWISE_KERNEL_LEMMA]
+  open_obligations: [A1_INDEPENDENCE, GLOBAL_POLE_EXTENTIONALITY, BASIS_PAIRWISE_INDEPENDENT_REVIEW]
