@@ -292,6 +292,8 @@ assert.ok(g10.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Приня
 const c11=projectReaderAllFirstPassCensus(g9,g10,g11);
 assert.equal(g11.atoms.length,48);
 assert.ok(g11.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Принятая нормативная область")));
+assert.equal(new Set([...g10.atoms,...g11.atoms].map(x=>x.domain)).size,55);
+assert.ok([...g10.atoms,...g11.atoms].every(x=>!x.domain.includes(x.acceptedId)));
 assert.equal(new Set(g11.atoms.map(x=>x.acceptedId)).size,48);
 assert.ok(g11.atoms.every(x=>v15.find(y=>y.id===x.acceptedId)?.statement===x.sourceQuote));
 assert.equal(g11.publication,"blocked");
