@@ -9,7 +9,8 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
   projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS,
   loadReaderDraftPreview, projectReaderDraftPreview,
-  loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure }
+  loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure,
+  loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -375,3 +376,34 @@ assert.throws(()=>parse11(w11.map((x,i)=>i===0?x.replace(/    domain: "[^"]+"/,
   '    domain: "Принятая нормативная область V15-TERM-01"'):x)),
   /incomplete Russian science text/);
 console.log("G13: 12 unresolved science/publication blockers remain explicit and source-owned.");
+
+
+const v13Contract=JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.13.json"),"utf8"));
+const v14Contract=JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.14.json"),"utf8"));
+const g15Yaml=readFileSync(resolve(root,"requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml"),"utf8");
+const g15=loadReaderBootstrapNames(root);
+assert.deepEqual(g15.symbols.map(x=>x.symbol),["R","O","C","L","U"]);
+assert.ok(g15.symbols.every(x=>x.exactEquation===v13Contract.bootstrapBasis.definitions[x.symbol]));
+assert.equal(g15.authorApproval,"not-recorded");
+assert.equal(g15.publication,"blocked");
+const namedDraft=loadReaderDraftWithBootstrapPrelude(root);
+assert.ok(namedDraft.indexOf("### Исходные обозначения корневого базиса")<
+  namedDraft.indexOf("## Первичная онтология"));
+assert.ok(namedDraft.includes("N₀=U, D₁=L"));
+assert.equal((namedDraft.match(/^## /gm)??[]).length,13);
+assert.equal((namedDraft.match(/^### V1[45]-/gm)??[]).length,62);
+const p15=(txt:string,v13=v13Contract,v14=v14Contract)=>
+  parseReaderBootstrapNames(txt,v13,v14);
+assert.throws(()=>p15(g15Yaml.replace("status: proposed","status: accepted")),
+  /cannot forge inherited basis/);
+assert.throws(()=>p15(g15Yaml.replace('exact_equation: "R = R ⟼ R"',
+  'exact_equation: "R = O ⟼ R"')),/missing\/forged name/);
+assert.throws(()=>p15(g15Yaml,{
+  ...v13Contract,
+  bootstrapBasis:{...v13Contract.bootstrapBasis,definitions:{
+    ...v13Contract.bootstrapBasis.definitions,U:"U = R ⟼ R"}}
+}),/missing\/forged name/);
+assert.throws(()=>p15(g15Yaml,v13Contract,{
+  ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
+}),/inconsistent inherited U\/L\/R/);
+console.log("G15: R O C L U inherited basis and model-derived Russian reader prelude.");

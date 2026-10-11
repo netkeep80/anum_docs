@@ -1000,3 +1000,80 @@ export function renderReaderScienceClosure(x:ReaderScienceClosure):string{
     ]),
   ].join("\n");
 }
+
+
+/** G15: five accepted v0.13 basis Links named explicitly before later Nat/ExactSequence explanations. */
+export const READER_BOOTSTRAP_G15_PATH="requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml";
+export interface ReaderBootstrapSymbol {
+  readonly symbol:"R"|"O"|"C"|"L"|"U";
+  readonly exactEquation:string;readonly explanationRu:string;
+  readonly exclusions:readonly string[];
+}
+export interface ReaderBootstrapNames {
+  readonly schema:"mts-reader-bootstrap-symbols/v0.1";
+  readonly authorApproval:"not-recorded";readonly publication:"blocked";
+  readonly symbols:readonly ReaderBootstrapSymbol[];
+}
+export function parseReaderBootstrapNames(text:string,source13:Record<string,unknown>,
+  source14:Record<string,unknown>):ReaderBootstrapNames{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G15 invalid basis YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G15 basis");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","source_contract","symbols"],"G15 basis");
+  if(raw.schema!=="mts-reader-bootstrap-symbols/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.source_contract!=="contracts/mts-contract-v0.13.json"||
+     source13.schema!=="mts-contract/v0.13"||source13.accepted!==true||
+     source14.schema!=="mts-contract/v0.14"||source14.accepted!==true)
+    fail("G15 cannot forge inherited basis or approval");
+  const basis=object(object(source13.bootstrapBasis,"v0.13 basis").definitions,"v0.13 definitions");
+  if(object(source14.inheritedFoundation,"v0.14 inherited foundation").rootBasis!=="R/O/C/L/U")
+    fail("G15 inherited basis drift");
+  if(!Array.isArray(raw.symbols)||raw.symbols.length!==5)fail("G15 requires five basis symbols");
+  const names=["R","O","C","L","U"];
+  const symbols:ReaderBootstrapSymbol[]=raw.symbols.map((entry,i)=>{
+    const x=object(entry,"G15 symbol");
+    exactFields(x,["symbol","exact_equation","explanation_ru","exclusions"],"G15 symbol");
+    if(x.symbol!==names[i]||typeof x.exact_equation!=="string"||
+       x.exact_equation!==basis[names[i]!]||
+       typeof x.explanation_ru!=="string"||x.explanation_ru.length<145||
+       !Array.isArray(x.exclusions)||x.exclusions.length!==1||
+       typeof x.exclusions[0]!=="string"||x.exclusions[0].length<30)
+      fail("G15 missing, forged or incomplete basis definition");
+    return Object.freeze({symbol:x.symbol as ReaderBootstrapSymbol["symbol"],
+      exactEquation:x.exact_equation,explanationRu:x.explanation_ru,
+      exclusions:Object.freeze([...x.exclusions])});
+  });
+  const nat=object(source14.natTheory,"v0.14 Nat");
+  const degree=object(source14.connectivityDegreeTheory,"v0.14 Degree");
+  const sequence=object(source14.sequenceSemantics,"v0.14 sequence");
+  if(nat.zero!=="N0 = U"||degree.one!=="D1 = L"||sequence.rootOrigin!=="R")
+    fail("G15 inconsistent inherited U/L/R scopes");
+  return Object.freeze({schema:"mts-reader-bootstrap-symbols/v0.1" as const,
+    authorApproval:"not-recorded" as const,publication:"blocked" as const,
+    symbols:Object.freeze(symbols)});
+}
+export function loadReaderBootstrapNames(root:string):ReaderBootstrapNames{
+  const v13=object(JSON.parse(readFileSync(resolve(root,
+    "contracts/mts-contract-v0.13.json"),"utf8")),"v0.13 source");
+  const v14=object(JSON.parse(readFileSync(resolve(root,
+    "contracts/mts-contract-v0.14.json"),"utf8")),"v0.14 source");
+  return parseReaderBootstrapNames(
+    readFileSync(resolve(root,READER_BOOTSTRAP_G15_PATH),"utf8"),v13,v14);
+}
+export function loadReaderDraftWithBootstrapPrelude(root:string):string{
+  const preview=loadReaderDraftPreview(root),basis=loadReaderBootstrapNames(root);
+  if(preview.publication!=="blocked"||basis.publication!=="blocked")
+    fail("G15 draft may not be published");
+  const firstChapter=preview.markdown.indexOf("## ");
+  if(firstChapter<0)fail("G15 missing draft chapter");
+  const prelude=[
+    "### Исходные обозначения корневого базиса","",
+    "Имена базиса восходят к принятому контракту v0.13:",
+    ...basis.symbols.map(x=>"- **"+x.symbol+"** — "+x.exactEquation+". "+
+      x.explanationRu+" Ограничение: "+x.exclusions.join("; ")+"."),
+    "","В v0.14: N₀=U, D₁=L; локальное начало последовательности — R.","",
+  ].join("\n");
+  return preview.markdown.slice(0,firstChapter)+prelude+preview.markdown.slice(firstChapter);
+}
