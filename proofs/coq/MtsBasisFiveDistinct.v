@@ -40,24 +40,31 @@ Proof.
     symmetry. exact Heq. }
   assert (Hrl : R F <> L).
   { intro Heq. apply (proj1 HL).
+    change (start F L = L).
     rewrite <- Heq. exact (proj1 HR). }
   assert (Hru : R F <> U).
   { intro Heq. apply (proj1 HU).
+    change (start F U = U).
     rewrite <- Heq. exact (proj1 HR). }
   assert (Hoc : O <> C).
   { intro Heq. apply (proj1 HC).
+    change (start F C = C).
     rewrite <- Heq. exact (proj1 HO). }
   assert (Hol : O <> L).
   { intro Heq. apply (proj1 HL).
+    change (start F L = L).
     rewrite <- Heq. exact (proj1 HO). }
   assert (Hou : O <> U).
   { intro Heq. apply (proj1 HU).
+    change (start F U = U).
     rewrite <- Heq. exact (proj1 HO). }
   assert (Hcl : C <> L).
   { intro Heq. apply (proj2 HL).
+    change (finish F L = L).
     rewrite <- Heq. exact (proj2 HC). }
   assert (Hcu : C <> U).
   { intro Heq. apply (proj2 HU).
+    change (finish F U = U).
     rewrite <- Heq. exact (proj2 HC). }
   assert (Hlu : L <> U).
   { intro Heq.
