@@ -187,7 +187,7 @@ export interface ReaderIntroPlan {
   readonly schema: "mts-reader-intro-proposal/v0.1";
   readonly status: "proposed";
   readonly publication: "blocked";
-  readonly completeness: "partial-reviewed-bridges";
+  readonly completeness: "partial-candidate-bridges";
   readonly nodes: readonly ReaderIntroNode[];
 }
 export function parseReaderIntro(
@@ -202,7 +202,7 @@ export function parseReaderIntro(
     "publication", "completeness", "nodes"], "intro proposal");
   if (raw.schema !== "mts-reader-intro-proposal/v0.1" || raw.status !== "proposed" ||
       raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
-      raw.publication !== "blocked" || raw.completeness !== "partial-reviewed-bridges") {
+      raw.publication !== "blocked" || raw.completeness !== "partial-candidate-bridges") {
     fail("introductory DAG must remain partial, proposed, unapproved and blocked");
   }
   if (!Array.isArray(raw.nodes) || raw.nodes.length === 0) fail("intro nodes missing");
@@ -250,7 +250,7 @@ export function parseReaderIntro(
     schema: "mts-reader-intro-proposal/v0.1" as const,
     status: "proposed" as const,
     publication: "blocked" as const,
-    completeness: "partial-reviewed-bridges" as const,
+    completeness: "partial-candidate-bridges" as const,
     nodes: Object.freeze(nodes),
   });
 }

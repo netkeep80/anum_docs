@@ -4,7 +4,7 @@ status: proposed
 semantic_change: false
 author_approval: not-recorded
 publication: blocked
-completeness: partial-reviewed-bridges
+completeness: partial-candidate-bridges
 nodes:
   - id: foundation
     accepted_id: V14-L1

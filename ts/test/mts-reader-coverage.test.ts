@@ -85,8 +85,10 @@ const intro = loadReaderIntro(root);
 assert.equal(intro.schema, "mts-reader-intro-proposal/v0.1");
 assert.equal(intro.status, "proposed");
 assert.equal(intro.publication, "blocked");
-assert.equal(intro.completeness, "partial-reviewed-bridges");
+assert.equal(intro.completeness, "partial-candidate-bridges");
 assert.equal(intro.nodes.length, 19);
+assert.equal(intro.nodes.reduce((n,x) => n + x.requires.length, 0), 23);
+assert.equal(new Set(intro.nodes.map(x => x.acceptedId)).size, 16);
 assert.ok(intro.nodes.every(x => x.review === "pending"));
 assert.equal(new Set(intro.nodes.map(x => x.id)).size, 19);
 const places = new Map(intro.nodes.map((x,i) => [x.id,i]));
@@ -102,7 +104,7 @@ assert.ok(intro.nodes.every(x => x.acceptedId === "V14-L1" || x.g4ScienceStep ==
 const parse = (input: string) => parseReaderIntro(input, plan, scienceIds);
 assert.throws(() => parse(introYaml.replace("publication: blocked", "publication: ready")),
   /must remain partial, proposed/);
-assert.throws(() => parse(introYaml.replace("completeness: partial-reviewed-bridges", "completeness: complete")),
+assert.throws(() => parse(introYaml.replace("completeness: partial-candidate-bridges", "completeness: complete")),
   /must remain partial, proposed/);
 assert.throws(() => parse(introYaml.replace("g4_science_step: context-roles", "g4_science_step: Fake")),
   /forged or missing G4 science anchor/);
