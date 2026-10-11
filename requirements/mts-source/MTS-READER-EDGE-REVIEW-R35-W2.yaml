@@ -1,0 +1,298 @@
+# R35 Wave 2: 48 individually scoped nonredundant v0.15 reader edges.
+# Evaluates pedagogical prerequisite, not mathematical implication.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+original_dag_head: 026f515aac3315299ebeb49f0d80191aaa801afb
+review_boundary: individual-editorial-science-not-proof
+review_count: 48
+entries:
+  - source: "concept:anet-term"
+    consumer: "g11:v15-term-01"
+    decision: remove
+    rationale_ru: "Сам принятый тезис определяет нормативное имя ANet; предварительный глоссарий не является предпосылкой такого определения."
+    limitation_ru: "Глоссарий может стоять раньше по учебному маршруту, но не создаёт термина нормативно."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-auth-01"
+    decision: keep
+    rationale_ru: "Вводится единый путь FORMAL и JSON; предварительный обзор двух поверхностей необходим, чтобы различить исходную асеть и исполнительные стадии."
+    limitation_ru: "Единство source path не доказывает произвольную ассоциативность Link."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-auth-02"
+    decision: keep
+    rationale_ru: "Условия FORMAL_MIGRATED и VERTICAL_GREEN употребляют точную форму FORMAL-артефакта; читатель должен понимать source carrier."
+    limitation_ru: "Статусы требуют отдельных свидетельств, не выводятся из вступительного определения."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-onto-01"
+    decision: remove
+    rationale_ru: "Тезис о единственной Link-онтологии можно понять сразу после Foundation; английское имя ANet не является обязательным."
+    limitation_ru: "Нельзя объявлять терминологию основой онтологической единственности."
+    review_status: proposed
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g11:v15-onto-02"
+    decision: keep
+    rationale_ru: "Требование минимальной выразительности прямо называет ExactSequence среди доступных носителей, поэтому носитель должен быть определён."
+    limitation_ru: "Это не доказательство выразимости любой структуры средствами ExactSequence."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-onto-03"
+    decision: remove
+    rationale_ru: "Инвариантность поведения при переименовании определяется структурой Link и контекстным разрешением, а не предварительным английским названием асети."
+    limitation_ru: "Не подменять структурный критерий терминологией ANet."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-struct-01"
+    decision: keep
+    rationale_ru: "Сходящиеся FORMAL/JSON пути в нативную Link-топологию являются предметом утверждения и требуют предварительного введения их общего source смыслового слоя."
+    limitation_ru: "Четыре формы ROOT/START/END/PAIR не становятся четырьмя примитивами."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-close-01"
+    decision: remove
+    rationale_ru: "VERTICAL_GREEN и транзитивная полнота семантических предпосылок — критерии свидетельств; для их смысла достаточно уже введённой области артефакта."
+    limitation_ru: "Имя ANet не может заменить проверку замыкания."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-close-02"
+    decision: remove
+    rationale_ru: "Классификация внешних зависимостей и версий — самостоятельное требование к assurance, не терминологическая лемма ANet."
+    limitation_ru: "Не объявлять любые версии зависимостей частью онтологии."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-close-03"
+    decision: remove
+    rationale_ru: "Нулевой бюджет специальной host-семантики понятен как ограничение исполнения без предварительного определения английского имени асети."
+    limitation_ru: "Не считать общую оркестрацию новым semantic opcode."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-fresh-01"
+    decision: keep
+    rationale_ru: "Свежий replay канонического FORMAL должен следовать после объяснения общей поверхности FORMAL/JSON и исходного пакета."
+    limitation_ru: "Успех повторного запуска не доказывает сам по себе полноту всех стадий."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-fresh-02"
+    decision: keep
+    rationale_ru: "Свежий replay непосредственно введённого JSON требует предварительно определить способ его перевода в native source ANet."
+    limitation_ru: "Один round-trip ещё не является доказательством поведения."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-fresh-03"
+    decision: keep
+    rationale_ru: "Сравнение двух независимых Memory использует ранее определённый канонический исполняемый артефакт и общий pipeline; зависимость учебная."
+    limitation_ru: "Независимость аллокации не даёт безусловного равенства произвольных хост-адресов."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-name-01"
+    decision: keep
+    rationale_ru: "Контекстные пути :A и R:A рассматриваются внутри формальной нотации и source-разрешения, поэтому ввод языка предшествует точным примерам."
+    limitation_ru: "Глобальная host namespace не появляется из абсолютного синтаксиса."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-json-01"
+    decision: keep
+    rationale_ru: "Сохранность исполняемых ролей канонического JSON требует заранее различить JSON-транспорт и native source ANet."
+    limitation_ru: "Сохранение буквальной строки не эквивалентно сохранению денотации."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-json-02"
+    decision: keep
+    rationale_ru: "Утверждение об одной денотации FORMAL и JSON именно раскрывает смысл введённого ранее общего source пути."
+    limitation_ru: "Это не разрешение произвольной перегруппировки дерева Link."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-json-03"
+    decision: keep
+    rationale_ru: "Фальсификатор мутаций JSON должен различать семантическую исходную структуру и транспортное оформление."
+    limitation_ru: "Изменение пробелов не должно менять Link-денотацию."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-vert-01"
+    decision: remove
+    rationale_ru: "VERTICAL_GREEN — критерий комплекта доказательных свидетельств и нулевого host-бюджета; термин ANet не является необходимым входом."
+    limitation_ru: "Имя асети не доказывает зелёный статус."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-vert-02"
+    decision: remove
+    rationale_ru: "Результат проверки статуса по registry/evidence понятен независимо от термина ANet."
+    limitation_ru: "Заголовок PR не должен повышать научное состояние."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-and-01"
+    decision: keep
+    rationale_ru: "Boolean AND предъявляется как источник zero-role Rule, исполняемый общей Γ-реакцией; объяснение общего исполнителя должно предшествовать примеру."
+    limitation_ru: "Таблица T/F не легализует специальный opcode AND."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-and-02"
+    decision: keep
+    rationale_ru: "Сравнение matcher/Γ совместимого маршрута с host-dispatch требует раннего определения Γ."
+    limitation_ru: "Результат NO_MATCH вне T/F — обязательная граница примера."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-and-03"
+    decision: keep
+    rationale_ru: "Утверждение о едином Boolean источнике и backend-понижении опирается на модель единой Γ-семантики."
+    limitation_ru: "Эквивалентность таблицы не разрешает второй runtime."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-and-04"
+    decision: keep
+    rationale_ru: "NOT/OR/XOR прямо требуют повторно использовать общий Γ-путь и нативные zero-role Rule; его сначала необходимо объяснить."
+    limitation_ru: "Нельзя присваивать этим операциям отдельные host-смыслы."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-ctx-01"
+    decision: remove
+    rationale_ru: "Контекстные исполнительные роли Theory/Context/Entry/Result задаются через Link membership независимо от того, успели ли объяснить Γ."
+    limitation_ru: "Не выводить Context из исполнения Γ: это было бы перепутывание предмета и операции."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-ctx-02"
+    decision: remove
+    rationale_ru: "Зависимость ролей одной Link от выбранного Context является утверждением о membership; она концептуально предшествует механизму Γ."
+    limitation_ru: "Переименование без изменения membership не создаёт другую роль."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-gamma-01"
+    decision: keep
+    rationale_ru: "Развёрнутое описание J0/S1/S2 и атомарной публикации развивает первую краткую дефиницию Γ; предварительный обзор полезен читателю."
+    limitation_ru: "Предварительный обзор не подтверждает полноту реализации Γ."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-formal-proof-01"
+    decision: keep
+    rationale_ru: "Теоремы Lean4/Rocq проверяют конкретную часть FORMAL-денотации, поэтому предмет формализации вводится заранее."
+    limitation_ru: "Нельзя объявлять доказанным всё исходное исполнение или все языковые формы."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-formal-proof-02"
+    decision: keep
+    rationale_ru: "Парное внешнее свидетельство касается схождения FORMAL/JSON и кодирования в 8/9/6/1; до его области следует объяснить denotation path."
+    limitation_ru: "Проверенный фрагмент не является доказательством любого backend или Γ."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-json-04"
+    decision: keep
+    rationale_ru: "Массивы JSON и ExactSequence входят в общий FORMAL/JSON source маршрут; перед их уточнением нужно знать, что такое канонический JSON."
+    limitation_ru: "Корневая свёртка F_R не заменяет позиционный carrier."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-stage-01"
+    decision: keep
+    rationale_ru: "Покомпонентные стадии FORMAL/JSON source→semantic→recursion требуют предварительно назвать входные поверхности и исходную асеть."
+    limitation_ru: "Это требования наблюдаемости, не самостоятельная новая семантика."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-stage-02"
+    decision: remove
+    rationale_ru: "Запрет скрытых мутаций при чтении, поиске и проверке — общий принцип стадий; он не выводится из двух поверхностей FORMAL/JSON."
+    limitation_ru: "Не путать fail-closed staging с семантической денотацией JSON."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-fals-01"
+    decision: keep
+    rationale_ru: "Положительные и отрицательные сценарии включая JSON-мутирование и смену Context должны читаться после базового объяснения source FORMAL/JSON."
+    limitation_ru: "Положительный набор тестов не заменяет фальсификаторы."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-gov-01"
+    decision: remove
+    rationale_ru: "Машинный реестр требований и его authority определяются правилами governance, а не введением английского термина ANet."
+    limitation_ru: "Не приписывать governance структуре как математической аксиоме."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-gov-02"
+    decision: remove
+    rationale_ru: "Аудит host-семантики и обходов backend не требует предварительного именования асети ANet."
+    limitation_ru: "Успех Boolean выхода не оправдывает host-dispatch."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-gov-03"
+    decision: remove
+    rationale_ru: "Проекция roadmap и статусов из registry/evidence не является определением понятия ANet."
+    limitation_ru: "Статус нельзя поправить вручную в сгенерированном тексте."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g11:v15-corpus-01"
+    decision: keep
+    rationale_ru: "Постоянная регрессия канонического JSON через метакомпиляцию и A-memory использует общий исполнитель Γ как этап."
+    limitation_ru: "Зафиксированная A-memory 0.175.0 не означает принятие иных backend семантик."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-gov-04"
+    decision: remove
+    rationale_ru: "Защита CI/repo-guard и режимов аварийного обхода — процессуальный контроль независимо от термина ANet."
+    limitation_ru: "Успех guard не заменяет индивидуальное научное рецензирование."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-docs-01"
+    decision: keep
+    rationale_ru: "Генерация канонической «Формальной нотации МТС.md» происходит из модели FORMAL/JSON; входная область должна быть введена."
+    limitation_ru: "Генерируемый Markdown не обладает отдельной семантической authority."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-ready-01"
+    decision: remove
+    rationale_ru: "Критерий RELEASE_READY определяется достигнутыми нормативными статусами; ANet-термин не составляет prerequisite."
+    limitation_ru: "Нельзя повышать выпуск из частного успеха."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-ready-02"
+    decision: keep
+    rationale_ru: "Независимый readiness audit проверяет, среди прочего, полноту JSON и дрейф входного исходника, потому нужны определения source FORMAL/JSON."
+    limitation_ru: "Положительный CI не доказывает отсутствия скрытого host-смысла."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-ready-03"
+    decision: remove
+    rationale_ru: "Смена accepted/current требует явного решения Автора и не зависит от English name ANet."
+    limitation_ru: "Завершённый workflow не равен авторскому ACCEPT."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-author-json-01"
+    decision: keep
+    rationale_ru: "AUTHOR_REVIEW_PENDING относится к каноническому исполняемому JSON; до правил утверждения требуется определить его native source путь."
+    limitation_ru: "Проверка aprover может иметь отдельный статус и границу доверия."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-author-json-02"
+    decision: keep
+    rationale_ru: "Пакет для Автора включает точные FORMAL/JSON и свидетельства round-trip/replay; нужно знать назначение обоих источников."
+    limitation_ru: "Нельзя скрыть host-код под красивой нотацией."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-author-json-03"
+    decision: keep
+    rationale_ru: "Привязка одобрения к ревизии JSON осмысленна только после определения канонического артефакта."
+    limitation_ru: "Сохранение имени файла не сохраняет авторское решение после семантической правки."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-author-json-04"
+    decision: keep
+    rationale_ru: "Групповая приёмка касается точно предъявленных JSON-артефактов с фиксированными входными моделями."
+    limitation_ru: "Пакетное одобрение не является открытой лицензией на будущие JSON."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-reg-01"
+    decision: keep
+    rationale_ru: "Регрессионный корпус хранит точный утверждённый JSON; его семантический предмет должен быть введён заранее."
+    limitation_ru: "Одна строка JSON в реестре ещё не свидетельствует о replay."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-reg-02"
+    decision: keep
+    rationale_ru: "Изменения FORMAL/JSON и метакомпилятора запускают регрессию из уже утверждённого корпуса, поэтому надо разъяснить общий source путь."
+    limitation_ru: "Нельзя выборочно прогонять лишь текущий новый JSON."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "g11:v15-reg-03"
+    decision: keep
+    rationale_ru: "Запрет скрытой перегенерации утверждённых JSON относится к каноническим source артефактам и их свидетельствам."
+    limitation_ru: "Несовместимое изменение требует нового авторского решения."
+    review_status: proposed
