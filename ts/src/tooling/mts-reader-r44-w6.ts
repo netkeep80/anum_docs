@@ -11,6 +11,7 @@ import {loadReaderF01F02P01} from "./mts-reader-review-f01-f02-p01.js";
 import {loadReaderF03F04F05} from "./mts-reader-review-f03-f04-f05.js";
 import {loadReaderF06F07} from "./mts-reader-review-f06-f07.js";
 import {loadReaderR01R02} from "./mts-reader-review-r01-r02.js";
+import {loadReaderR03R04} from "./mts-reader-review-r03-r04.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -119,6 +120,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const structuralReview=loadReaderF03F04F05(root);
  const inversionReview=loadReaderF06F07(root);
  const relationalReview=loadReaderR01R02(root);
+ const representationReview=loadReaderR03R04(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -157,7 +159,10 @@ export function renderReaderW6(root:string):ReaderW6Document{
     relationalReview.anetMd,"");
   }
   if(chapter.id==="representation-first-use"){
-   main.push(relationalReview.sequenceMd,"");
+   main.push(relationalReview.sequenceMd,"",representationReview.representationMd,"");
+  }
+  if(chapter.id==="derived-and-context"){
+   main.push(representationReview.arithmeticMd,"");
   }
   if(chapter.id==="grounded-inverse-context"){
    main.push(structuralReview.groundedMd,"",structuralReview.identityMd,"",
