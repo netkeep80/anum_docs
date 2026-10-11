@@ -8,7 +8,7 @@ completeness: editorial-dependencies-unverified
 source_atoms: 104
 first_use_definitions: 10
 editorial_replacement_atoms: 5
-# These 41 nodes are an editorial reading spine, not the theorem-premise DAG.
+# These 42 nodes are an editorial reading spine, not the theorem-premise DAG.
 opening_spine:
   - "g4:foundation"
   - "editorial:foundation-ontology"
@@ -29,6 +29,7 @@ opening_spine:
   - "g4:one-sided-realizability"
   - "editorial:root-basis-witnesses"
   - "g4:grounded-normalization"
+  - "g4:identity-by-poles"
   - "g4:inversion-domain"
   - "g4:inversion-relation"
   - "g4:inversion-total"
