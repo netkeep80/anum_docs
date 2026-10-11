@@ -55,4 +55,5 @@ assert.throws(()=>parse(source.replace("primary_text_atoms: 102","primary_text_a
 assert.throws(()=>parse(source.replace("historical_g16_atoms: 5","historical_g16_atoms: 0")),/source-preserving layout/);
 assert.throws(()=>parse(source.replace("original_source_atoms: 119","original_source_atoms: 118")),/source-preserving layout/);
 assert.throws(()=>parse(source+"\npublication: ready\n"),/malformed\/duplicate YAML/);
+console.log("=====R44-W6-RENDERED-MAIN-BEGIN=====\n"+document.mainText+"\n=====R44-W6-RENDERED-MAIN-END=====");
 console.log("R44-W6 readable preview: all 119 source fragments reconstruct byte-identical text; 102 primary / 17 historical+governance annex; 10 chapters, 48 reviews and 9 open findings.");
