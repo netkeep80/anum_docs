@@ -303,3 +303,149 @@ export function renderReaderG20Preview(draft: ReaderG20Draft): string {
     ]),
   ].join("\n");
 }
+
+
+/**
+ * G41 corrects genuine first-use prose defects without editing the accepted
+ * G7 or G15 source text, changing DAG edges, or authorizing publication.
+ * Equation and explanation are already distinct source-owner fields in G15.
+ */
+export const READER_G41_PATH = "requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml";
+export interface ReaderG41Plan {
+  readonly schema: "mts-reader-first-use-presentation/v0.1";
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+  readonly deferred: ReadonlyArray<{
+    symbol: "L" | "U";
+    firstUseNode: string;
+    afterNode: string;
+    exactEquation: string;
+    sourceExplanationRu: string;
+  }>;
+  readonly earlyQ: Readonly<{
+    sourceAtom: "g7:q-codec";
+    insertBefore: "g7:recursive-codec";
+    acceptedId: "V14-L13";
+    exactSourceOpeningRu: string;
+  }>;
+}
+export function parseReaderG41(
+  sourceText: string,
+  draft: ReaderG20Draft,
+  basis: ReturnType<typeof loadReaderBootstrapNames>,
+  originalSources: readonly ReaderG20Source[],
+): ReaderG41Plan {
+  const doc = parseDocument(sourceText, { strict: true, uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) fail("G41 malformed/duplicate YAML");
+  const root = record(doc.toJS({ maxAliasCount: 0 }), "G41");
+  fields(root, ["schema", "status", "author_approval", "publication",
+    "semantic_change", "source_reader_graph", "deferred_basis_commentary",
+    "early_term", "prose_policy"], "G41");
+  if (root.schema !== "mts-reader-first-use-presentation/v0.1" ||
+      root.status !== "proposed" || root.author_approval !== "not-recorded" ||
+      root.publication !== "blocked" || root.semantic_change !== false ||
+      root.source_reader_graph !== READER_G20_PATH) {
+    fail("G41 cannot promote or replace the accepted source");
+  }
+  const policy = record(root.prose_policy, "G41 prose policy");
+  fields(policy, ["deferred_sections_are_source_owned", "source_text_unchanged",
+    "projection_is_not_a_new_formal_law"], "G41 policy");
+  if (Object.values(policy).some(value => value !== true)) {
+    fail("G41 source ownership and authority boundaries must remain");
+  }
+  if (!Array.isArray(root.deferred_basis_commentary) ||
+      root.deferred_basis_commentary.length !== 2) {
+    fail("G41 must defer exactly L and U original explanations");
+  }
+  const order = new Map(draft.ordered.map((node, index) => [node.id, index]));
+  const names: readonly ("L" | "U")[] = ["L", "U"];
+  const deferred = root.deferred_basis_commentary.map((raw, index) => {
+    const row = record(raw, "G41 basis[" + index + "]");
+    fields(row, ["symbol", "first_use_node", "emit_explanation_after"], "G41 basis row");
+    const symbol = names[index]!;
+    const firstUseNode = "basis:" + symbol;
+    const afterNode = symbol === "L" ? "g7:degree-one" : "concept:nat-first-use";
+    if (row.symbol !== symbol || row.first_use_node !== firstUseNode ||
+        row.emit_explanation_after !== afterNode ||
+        order.get(firstUseNode) === undefined || order.get(afterNode) === undefined ||
+        order.get(firstUseNode)! >= order.get(afterNode)!) {
+      fail("G41 basis L/U first-use/release anchor drift");
+    }
+    const sourceBasis = basis.symbols.find(item => item.symbol === symbol);
+    const original = draft.nodes.find(item => item.id === firstUseNode);
+    if (!sourceBasis || !original ||
+        original.textRu !== sourceBasis.exactEquation + ". " + sourceBasis.explanationRu) {
+      fail("G41 original G15 exact equation and Russian explanation drift");
+    }
+    return Object.freeze({
+      symbol, firstUseNode, afterNode,
+      exactEquation: sourceBasis.exactEquation,
+      sourceExplanationRu: sourceBasis.explanationRu,
+    });
+  });
+  const term = record(root.early_term, "G41 Q first-use");
+  fields(term, ["symbol", "source_atom", "accepted_id", "insert_before",
+    "exact_source_opening_ru"], "G41 Q term");
+  if (term.symbol !== "Q" || term.source_atom !== "g7:q-codec" ||
+      term.accepted_id !== "V14-L13" || term.insert_before !== "g7:recursive-codec" ||
+      typeof term.exact_source_opening_ru !== "string" ||
+      term.exact_source_opening_ru.length < 45 ||
+      order.get("g7:recursive-codec") === undefined ||
+      order.get("g7:q-codec") === undefined ||
+      order.get("g7:recursive-codec")! >= order.get("g7:q-codec")!) {
+    fail("G41 Q early first-use proposal drift");
+  }
+  const originalQ = originalSources.find(item => item.id === term.source_atom);
+  if (!originalQ || originalQ.acceptedId !== term.accepted_id ||
+      !originalQ.textRu.startsWith(term.exact_source_opening_ru)) {
+    fail("G41 Q first-use quote not exact prefix of source-owned G7 prose");
+  }
+  return Object.freeze({
+    schema: "mts-reader-first-use-presentation/v0.1" as const,
+    authorApproval: "not-recorded" as const, publication: "blocked" as const,
+    deferred: Object.freeze(deferred),
+    earlyQ: Object.freeze({
+      sourceAtom: "g7:q-codec" as const,
+      insertBefore: "g7:recursive-codec" as const,
+      acceptedId: "V14-L13" as const,
+      exactSourceOpeningRu: term.exact_source_opening_ru,
+    }),
+  });
+}
+export function loadReaderG41(root: string): ReaderG41Plan {
+  return parseReaderG41(
+    readFileSync(resolve(root, READER_G41_PATH), "utf8"),
+    loadReaderG20(root), loadReaderBootstrapNames(root), readerG20Sources(root),
+  );
+}
+export function renderReaderG41Preview(root: string): string {
+  const draft = loadReaderG20(root);
+  const plan = loadReaderG41(root);
+  if (plan.publication !== "blocked" || plan.authorApproval !== "not-recorded") {
+    fail("G41 unapproved publication");
+  }
+  const firstById = new Map(plan.deferred.map(item => [item.firstUseNode, item]));
+  const lastById = new Map(plan.deferred.map(item => [item.afterNode, item]));
+  const sections: string[] = [
+    "# МТС: учебный черновик G41 — исправленный первый ввод",
+    "",
+    "**ПРЕДЛОЖЕНИЕ. НЕ УТВЕРЖДЕНО АВТОРОМ. ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА.**",
+    "Это ещё не полноценная монография: структура глав и проверка всех переходов ожидают рецензии.",
+    "",
+  ];
+  for (const node of draft.ordered) {
+    if (node.id === plan.earlyQ.insertBefore) {
+      sections.push("### Первое определение Q (точный фрагмент G7)",
+        plan.earlyQ.exactSourceOpeningRu, "");
+    }
+    const deferred = firstById.get(node.id);
+    sections.push("## " + node.id,
+      deferred ? deferred.exactEquation : node.textRu, "");
+    const released = lastById.get(node.id);
+    if (released) {
+      sections.push("### Отложенное пояснение к " + released.symbol +
+        " (исходный G15)", released.sourceExplanationRu, "");
+    }
+  }
+  return sections.join("\n");
+}
