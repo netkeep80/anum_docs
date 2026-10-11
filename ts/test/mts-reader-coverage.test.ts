@@ -502,6 +502,7 @@ const g18Source=readFileSync(resolve(root,
 const g18=loadReaderChapterCycleAudit(root);
 assert.equal(g18.schema,"mts-reader-chapter-cycle-audit/v0.1");
 assert.equal(g18.acceptedNormativeEdges,100);
+assert.equal(g18.normativeLawDagAcyclic,true);
 assert.equal(g18.crossChapterEdges,37);
 assert.equal(g18.components.length,2);
 assert.deepEqual(g18.components.map(x=>x.members),[
@@ -517,6 +518,7 @@ assert.equal(g18.authorApproval,"not-recorded");
 assert.equal(g18.publication,"blocked");
 const derivedCycles=deriveReaderChapterCycles(plan,routes);
 assert.equal(derivedCycles.crossChapterEdges,37);
+assert.equal(derivedCycles.normativeLawDagAcyclic,true);
 assert.deepEqual(derivedCycles.cyclicComponents,g18.components.map(x=>x.members));
 assert.ok(renderReaderChapterCycleAudit(g18).includes("не противоречие в принятых законах"));
 const g18Parse=(text:string,coverage=plan,routeModel=routes,audit=g17)=>
@@ -537,4 +539,9 @@ assert.throws(()=>g18Parse(g18Source.replace("singletons: [execution, inversion-
   /isolated chapter set drift/);
 assert.throws(()=>g18Parse(g18Source.replace("components:\n",
   "components:\n  - id: fake\n    id: fake\n")),/G18 invalid cycle YAML/);
+const normativeCycle={...plan,rows:plan.rows.map(x=>x.id==="V14-L1"?{
+  ...x,normativeDependsOn:["V14-L2"],
+}:x)};
+assert.throws(()=>deriveReaderChapterCycles(normativeCycle,routes),
+  /accepted law graph has a dependency cycle/);
 console.log("G18: two 5-chapter SCCs over 37 cross-chapter edges; no chapter-level DAG.");

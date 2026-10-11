@@ -1300,6 +1300,7 @@ export interface ReaderChapterCycleComponent {
 }
 export interface ReaderChapterCycleGraph {
   readonly acceptedNormativeEdges:100;
+  readonly normativeLawDagAcyclic:true;
   readonly crossChapterEdges:number;
   readonly cyclicComponents:readonly (readonly ReaderSection[])[];
   readonly singletonSections:readonly ReaderSection[];
@@ -1310,6 +1311,7 @@ export interface ReaderChapterCycleAudit {
   readonly authorApproval:"not-recorded";
   readonly readerDag:"scientific-review-pending";
   readonly acceptedNormativeEdges:100;
+  readonly normativeLawDagAcyclic:true;
   readonly crossChapterEdges:37;
   readonly components:readonly ReaderChapterCycleComponent[];
   readonly singletonSections:readonly ReaderSection[];
@@ -1322,6 +1324,19 @@ export function deriveReaderChapterCycles(
     fail("G18 accepted route/chapter source mismatch");
   const accepted=new Map(coverage.rows.map(x=>[x.id,x]));
   if(accepted.size!==62)fail("G18 duplicate accepted law");
+  // First confirm the original 62-law registry graph is acyclic. Aggregation
+  // into chapters may create new cycles without creating mathematical ones.
+  const visiting=new Set<string>(), completed=new Set<string>();
+  const visitNormative=(id:string):void=>{
+    if(visiting.has(id))fail("G18 accepted law graph has a dependency cycle");
+    if(completed.has(id))return;
+    const law=accepted.get(id);
+    if(!law)fail("G18 unknown accepted law during cycle check");
+    visiting.add(id);
+    for(const dep of law.normativeDependsOn)visitNormative(dep);
+    visiting.delete(id);completed.add(id);
+  };
+  for(const id of accepted.keys())visitNormative(id);
   const edges=new Map<ReaderSection,Set<ReaderSection>>(
     sections.map(x=>[x,new Set<ReaderSection>()]));
   let normativeCount=0;
@@ -1377,7 +1392,7 @@ export function deriveReaderChapterCycles(
      singletons.length!==3||[...cyclic,...singletons.map(x=>[x])].flat().length!==13)
     fail("G18 chapter aggregation SCC changed");
   return Object.freeze({
-    acceptedNormativeEdges:100 as const,crossChapterEdges:cross,
+    acceptedNormativeEdges:100 as const,normativeLawDagAcyclic:true as const,crossChapterEdges:cross,
     cyclicComponents:Object.freeze(cyclic.map(x=>Object.freeze([...x]))),
     singletonSections:Object.freeze(singletons),
   });
@@ -1423,7 +1438,7 @@ export function parseReaderChapterCycleAudit(
     schema:"mts-reader-chapter-cycle-audit/v0.1" as const,
     publication:"blocked" as const,authorApproval:"not-recorded" as const,
     readerDag:"scientific-review-pending" as const,
-    acceptedNormativeEdges:100 as const,crossChapterEdges:37 as const,
+    acceptedNormativeEdges:100 as const,normativeLawDagAcyclic:true as const,crossChapterEdges:37 as const,
     components:Object.freeze(components),
     singletonSections: Object.freeze([...derived.singletonSections]),
   });
@@ -1438,6 +1453,7 @@ export function renderReaderChapterCycleAudit(a:ReaderChapterCycleAudit):string{
     "# Циклы межраздельной научной маршрутизации МТС","",
     "**Диагностика группировки, не противоречие в принятых законах.**","",
     "Прямых нормативных зависимостей: "+a.acceptedNormativeEdges+".",
+    "Исходный нормативный граф 62 законов: без циклов.",
     "Различных межраздельных направлений: "+a.crossChapterEdges+".",
     "Сильно связных групп глав: "+a.components.length+".",
     "Авторски утверждённых читательских графов: 0.","",
