@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq '.[].number' | wc -l | tr -d ' ')"
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
 
           if [ "$existing" -gt 0 ]; then
             echo "Open PR already exists for $BRANCH."
@@ -54,7 +54,7 @@ jobs:
           fi
 
           # A stacked PR can be opened/retargeted while compare is running.
-          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq '.[].number' | wc -l | tr -d ' ')"
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
           if [ "$existing" -gt 0 ]; then
             echo "An open exact-head PR now exists, including stacked bases; no new PR."
             exit 0
@@ -108,7 +108,7 @@ jobs:
 
           # If another actor won the race, the existing exact-head PR
           # is the authoritative outcome; do not treat it as a second create.
-          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq '.[].number' | wc -l | tr -d ' ')"
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
           if [ "$existing" -gt 0 ]; then
             echo "::notice::Exact-head PR already exists after concurrent create attempt."
             exit 0
