@@ -195,6 +195,23 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
     }
   }
   if (ordered.length !== 119) fail("cyclic reader first-use graph");
+  // FIFO Kahn is the structural acyclicity proof, not the prose ordering:
+  // enqueuing unrelated zero-degree governance nodes before a just-enabled
+  // source paragraph fragments mathematical sections. For a blocked reader
+  // preview, prefer the authored source registry order and visit each node's
+  // prerequisites first. This adds no edge or theorem premise.
+  const sourceOrdered: ReaderG20Node[] = [];
+  const sourceSeen = new Set<number>();
+  const visitInSourceOrder = (i: number): void => {
+    if (sourceSeen.has(i)) return;
+    for (const dependency of nodes[i]!.readerRequires) {
+      visitInSourceOrder(index.get(dependency)!);
+    }
+    sourceSeen.add(i);
+    sourceOrdered.push(nodes[i]!);
+  };
+  for (let i = 0; i < nodes.length; i++) visitInSourceOrder(i);
+  if (sourceOrdered.length !== 119) fail("source-order projection lost G20 atom");
   // Reader spine is an explicit *presentation* choice. It is checked for
   // exact prerequisites but contributes ZERO edges to the scientific graph.
   if (!Array.isArray(raw.opening_spine) || raw.opening_spine.length !== 42 ||
@@ -229,7 +246,7 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
   // topological order is stable. Neither text nor edge ownership changes.
   const presentation = [
     ...openingSpine.map(id => nodes[index.get(id)!]!),
-    ...ordered.filter(node => !introduced.has(node.id)),
+    ...sourceOrdered.filter(node => !introduced.has(node.id)),
   ];
   if (presentation.length !== 119 || new Set(presentation.map(x => x.id)).size !== 119) {
     fail("opening spine dropped/duplicated original source atom");
