@@ -1,0 +1,313 @@
+# R40 wave 1: independent first-pass scientific Russian prose audit of the 42-node opening.
+# These are editorial observations only, not accepted formal theorem judgments.
+schema: mts-reader-prose-audit/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+source_model: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+accepted_semantics_change: false
+coverage: opening-only
+review_count: 42
+entries:
+  - position: 1
+    node: "g4:foundation"
+    disposition: retain
+    scope_note_ru: "Содержание Foundation называет одну form, проекции двух полюсных позиций и R; не выводит единственность без A1."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 2
+    node: "editorial:foundation-ontology"
+    disposition: integrate
+    scope_note_ru: "Пересказывает внешний интерфейс сразу за полным Foundation. Для монографии нужен связный один вводный абзац и отдельный блок формальных уравнений."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 3
+    node: "g4:incidence"
+    disposition: retain
+    scope_note_ru: "Разделяет четыре локальных случая самоинцидентности без утверждения существования каждого представителя."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 4
+    node: "g4:local-decision"
+    disposition: retain
+    scope_note_ru: "Явно называет дополнительную разрешимость LocalSelfDecision для данного x, не универсальную вычислимость."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 5
+    node: "g4:local-exhaustiveness"
+    disposition: retain
+    scope_note_ru: "Исчерпываемость локальных четырёх случаев строго условна по предъявленному LocalSelfDecision(F,x)."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 6
+    node: "editorial:local-self-classification"
+    disposition: integrate
+    scope_note_ru: "Доступное пояснение 11/10/01/00 повторяет три предыдущих пункта; объединить в учебный текст без потери условности."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 7
+    node: "basis:R"
+    disposition: retain
+    scope_note_ru: "Точное самозамкнутое уравнение R; не доказывать им FND-02 без A1."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 8
+    node: "basis:O"
+    disposition: retain
+    scope_note_ru: "Определение O с первым совпадающим полюсом; не вводить абсолютный START."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 9
+    node: "basis:C"
+    disposition: retain
+    scope_note_ru: "Определение C со вторым совпадающим полюсом; не вводить абсолютный END."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 10
+    node: "basis:L"
+    disposition: split-commentary
+    scope_note_ru: "Точное L=O⟼C вводится вовремя, но пояснение преждевременно использует неопределённые Degree, Nat и N₁."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 11
+    node: "basis:U"
+    disposition: split-commentary
+    scope_note_ru: "Точное U=C⟼O вводится вовремя; пояснение преждевременно использует Nat, N₀ и ExactSequence."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 12
+    node: "g4:grounded"
+    disposition: retain
+    scope_note_ru: "Конечная рекурсивная обоснованность не заявляется для каждой циклической Link без свидетельства."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 13
+    node: "g4:distinction"
+    disposition: retain
+    scope_note_ru: "Distinguishable — внешний индуктивный предикат, а не автоматическое host-сравнение ссылок."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 14
+    node: "g4:separation-a1"
+    disposition: retain
+    scope_note_ru: "A1RecursiveSeparation — отдельная внешняя предпосылка; не производить её из form/start/finish."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 15
+    node: "g4:root-uniqueness"
+    disposition: retain
+    scope_note_ru: "FND_02_unique_root предъявляется только при A1, различая уравнение R и единственность."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 16
+    node: "g4:one-sided-existence"
+    disposition: retain
+    scope_note_ru: "F2F3OneSidedExistence дополнительно предъявляет u/v; классификация не гарантирует существование."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 17
+    node: "g4:one-sided-realizability"
+    disposition: retain
+    scope_note_ru: "FND_01_grounded_realizability выводит представителей в области дополнительного E."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 18
+    node: "editorial:root-basis-witnesses"
+    disposition: integrate
+    scope_note_ru: "Полезное сравнение условий FND_01 и FND_02, но повторяет R/O/C/L; оформить как итоговый поясняющий переход."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 19
+    node: "g4:grounded-normalization"
+    disposition: retain
+    scope_note_ru: "F2F3GroundedNormalization назван дополнительным интерфейсом на конечном Grounded-домене."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 20
+    node: "g4:identity-by-poles"
+    disposition: retain
+    scope_note_ru: "Условная FND_13_identity_by_poles требует N и два Grounded-свидетельства; перенесена прямо после нормализации, перед инверсией."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 21
+    node: "g4:inversion-domain"
+    disposition: retain
+    scope_note_ru: "RecursiveInversionDomain и E предъявлены отдельно; не утверждается глобальная инверсия всех Link."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 22
+    node: "g4:inversion-relation"
+    disposition: retain
+    scope_note_ru: "RecursiveInversion задаёт отношение под D, а не тотальную функцию инверсии без предпосылок."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 23
+    node: "g4:inversion-total"
+    disposition: retain
+    scope_note_ru: "INV_01 задаёт существование инверсии лишь в точной области A1/E/D/Grounded."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 24
+    node: "g4:inversion-involutive"
+    disposition: retain
+    scope_note_ru: "INV_02 использует нормализацию N и общий условный домен; не переносить на произвольные циклы."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 25
+    node: "g4:chiral-classes"
+    disposition: retain
+    scope_note_ru: "SameChiralClass и OppositeChiralClass описывают внешний класс собственных односторонних представителей."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 26
+    node: "g4:chiral-orbit"
+    disposition: retain
+    scope_note_ru: "CTX_03_objective_chiral_orbit_before_context условно устанавливает пару до выбора наблюдателя."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 27
+    node: "g4:context-marker"
+    disposition: retain
+    scope_note_ru: "ContextOrientationMarker вводится отдельно, не как гарантированно существующий выбор для всех контекстов."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 28
+    node: "g4:context-roles"
+    disposition: retain
+    scope_note_ru: "CTX_03_context_selection_induces_local_roles условна по предъявленному маркеру, не даёт глобальной W/J."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 29
+    node: "editorial:relative-chiral-orientation"
+    disposition: integrate
+    scope_note_ru: "Сопоставляет объективную орбиту и относительную ориентировку после выбора; оформить как переход, а не повтор полного доказательства."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 30
+    node: "g8:glyph-map"
+    disposition: retain
+    scope_note_ru: "Символы ∞/♂/♀/⟼ и 8/9/6/1 — метазапись, не четыре операции создания Связей."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 31
+    node: "g8:ontology-level"
+    disposition: chapter-heading
+    scope_note_ru: "Нулевой уровень Link корректен, но научное изложение должно отделять структурный слой от онтологии визуальным заголовком."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 32
+    node: "g8:recursive-level"
+    disposition: retain
+    scope_note_ru: "Рекурсивный алфавит относится к описанию одной Link-онтологии, не добавляет базовых сортов."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 33
+    node: "concept:anet-term"
+    disposition: retain
+    scope_note_ru: "Глоссарий явно задаёт ANet и ограничивает исторический Aset; не следует переносить статус термина на онтологию."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 34
+    node: "concept:exact-sequence-first-use"
+    disposition: version-clarify
+    scope_note_ru: "Краткое определение позиционной ExactSequence и различие с F_R даны после R; отделять v0.15 JSON-специфику от более ранней v0.14 позиции."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 35
+    node: "g7:link-identity"
+    disposition: retain
+    scope_note_ru: "Неизменность полюсов отдельной Link противопоставляется изменениям membership всей асети."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 36
+    node: "g7:anum-carrier"
+    disposition: retain
+    scope_note_ru: "Anum определён как представление последовательности, а не дополнительный Link-сорт."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 37
+    node: "g7:exact-sequence"
+    disposition: retain
+    scope_note_ru: "Позиционность и кратность ExactSequence отделены от совпадения значения свёртки."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 38
+    node: "g7:recursive-codec"
+    disposition: term-gap
+    scope_note_ru: "Употребляет Anum/Q до отдельного определения Q; термин Q нужно объяснить перед сравнением кодеков."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 39
+    node: "editorial:representation-boundary"
+    disposition: term-gap
+    scope_note_ru: "Повторно употребляет Q до его определения и сводит 8/9/6/1 к одному предложению; нужен ввод Q и структурированный переход."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 40
+    node: "concept:formal-json-first-use"
+    disposition: retain
+    scope_note_ru: "Вводный FORMAL/JSON абзац отделяет общую source-денотацию от произвольного перегруппирования."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 41
+    node: "concept:gamma-first-use"
+    disposition: retain
+    scope_note_ru: "Глоссарий Γ разделяет J0/S1/S2, staged successor и атомарную публикацию; не считать это набором opcode."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 42
+    node: "concept:nat-first-use"
+    disposition: term-gap
+    scope_note_ru: "Первое собственное определение Nat и D₁ появляется лишь после ссылок на Nat/Degree в комментариях L/U."
+    publication_effect: blocked
+    review: individual-proposed
+findings:
+  - id: R40-01
+    severity: high
+    first_use_consumer: "basis:L"
+    first_use_symbols: [Nat, Degree]
+    definition_node: "concept:nat-first-use"
+    remedy_ru: "В исходной проекции у L оставить формальное уравнение и локальную структурную роль, а сравнительный абзац о Nat/Degree перенести после определений шкал; исходное explanation_ru G15 не изменять."
+    state: proposed
+  - id: R40-02
+    severity: high
+    first_use_consumer: "basis:U"
+    first_use_symbols: [Nat, ExactSequence]
+    definition_node: "concept:exact-sequence-first-use"
+    remedy_ru: "У U перед определением шкал вывести только структурное уравнение и полюсную роль, а сравнение U=N₀ с R/ExactSequence перенести в производные шкалы; сохранить исходную G15-модель."
+    state: proposed
+  - id: R40-03
+    severity: high
+    first_use_consumer: "g7:recursive-codec"
+    first_use_symbols: [Q]
+    definition_node: "g7:q-codec"
+    remedy_ru: "Дать до сравнения рекурсивного кодека и Anum/Q краткое первое определение Q как версионируемого кодека, взятое из его точного G7-владельца; не удалять inherited reader_requires."
+    state: proposed
+  - id: R40-04
+    severity: high
+    first_use_consumer: "editorial:representation-boundary"
+    first_use_symbols: [Q]
+    definition_node: "g7:q-codec"
+    remedy_ru: "Редакционный итог о кодеках размещать только после первого определения Q; допустимо вводное source-owned пояснение, но не ранняя подмена версии Q."
+    state: proposed
+  - id: R40-05
+    severity: high
+    first_use_consumer: "g4:identity-by-poles"
+    first_use_symbols: [FND-13]
+    definition_node: "g4:grounded-normalization"
+    remedy_ru: "Исправлено в Draft: поместить условную теорему FND-13 сразу за нормализацией Grounded и перед инверсией; сохранять two-Grounded scope и не утверждать универсальную экстенсиональность."
+    state: corrected-in-draft
+  - id: R40-06
+    severity: high
+    first_use_consumer: "renderReaderG20Preview"
+    first_use_symbols: [chapter-structure]
+    definition_node: "G20-output-contract"
+    remedy_ru: "Сегодняшняя проекция даёт 119 технических заголовков, метаданные и повторяющиеся оговорки; требуется отдельная source-owned академическая структура разделов, связных переходов, формул, пояснений и точных ссылок на доказательства. Не редактировать generated Markdown вручную."
+    state: proposed
+  - id: R40-07
+    severity: medium
+    first_use_consumer: "editorial:foundation-ontology"
+    first_use_symbols: [Foundation]
+    definition_node: "g4:foundation"
+    remedy_ru: "Не повторять одинаковое определение подряд в двух полноценных абзацах: разделить учебное введение и технический доказательный интерфейс, оставив оба source-owned текста и формальные условия доступными."
+    state: proposed
