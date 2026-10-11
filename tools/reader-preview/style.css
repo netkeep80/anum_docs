@@ -1,0 +1,61 @@
+:root { color-scheme: light; }
+@font-face { font-family: "MTS Text"; src: local("Noto Serif"); }
+@font-face { font-family: "MTS Sans"; src: local("Noto Sans"); }
+@page {
+  size: A4;
+  margin: 20mm 18mm 22mm 19mm;
+  @top-right {
+    content: "НАУЧНЫЙ ЧЕРНОВИК — НЕ ПРИНЯТО";
+    font-family: "Noto Sans", "DejaVu Sans", sans-serif;
+    font-size: 7.5pt; color: #767676;
+  }
+  @bottom-center {
+    content: "Страница " counter(page) " / " counter(pages);
+    font-family: "Noto Sans", "DejaVu Sans", sans-serif;
+    font-size: 8pt; color: #555;
+  }
+}
+html { font-size: 15px; }
+body {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 24px 32px 54px;
+  color: #1d2732;
+  background: #fff;
+  font-family: "Noto Serif", "DejaVu Serif", serif;
+  font-size: 1rem;
+  line-height: 1.52;
+  hyphens: auto;
+}
+h1, h2, h3, h4, nav, table, thead, caption, th {
+  font-family: "Noto Sans", "DejaVu Sans", sans-serif;
+}
+h1 { font-size: 2.05em; font-weight: 750; line-height: 1.23; margin: 1.5em 0 1.3em; }
+h2 { color: #273b50; font-size: 1.43em; margin: 2.4em 0 1em; }
+h3 { font-size: 1.1em; margin: 1.65em 0 .65em; }
+h1, h2, h3, h4 { break-after: avoid-page; }
+p { margin: 0 0 .95em; text-align: justify; orphans: 3; widows: 3; }
+p > strong:first-child { font-family: "Noto Sans", sans-serif; font-weight: 650; }
+a { color: #23608d; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+code, pre { font-family: "DejaVu Sans Mono", monospace; overflow-wrap: anywhere; }
+code { font-size: .89em; }
+pre { white-space: pre-wrap; }
+table { border-collapse: collapse; width: 100%; font-size: .82em; margin: 1.3em 0; }
+th, td { padding: .48em .45em; vertical-align: top; border-bottom: 1px solid #ccd2da; overflow-wrap: anywhere; }
+th { text-align: left; border-bottom: 2px solid #567; }
+tr { break-inside: avoid; }
+img { max-width: 100%; height: auto; display: block; margin: .5em auto; }
+figure, blockquote, pre { break-inside: avoid; }
+nav#TOC { margin: 2em 0 3em; border-top: 1px solid #ced8df; border-bottom: 1px solid #ced8df; padding: 1em; }
+nav#TOC ul { list-style: none; padding-left: 1em; }
+nav#TOC li { margin: .22em 0; }
+hr { border: 0; border-top: 1px solid #ddd; }
+@media print {
+  body { padding: 0; margin: 0; max-width: none; font-size: 10.2pt; line-height: 1.43; }
+  h1 { font-size: 21pt; }
+  h2 { font-size: 14pt; break-before: page; }
+  h3 { font-size: 11pt; }
+  nav#TOC { break-after: page; }
+  table { font-size: 7.5pt; }
+  a { color: #304b67; }
+}

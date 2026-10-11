@@ -1,0 +1,112 @@
+name: Russian reader PDF preview — not author-approved
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - ".github/workflows/reader-preview.yml"
+      - "ts/src/tooling/mts-reader-r44-w6*.ts"
+      - "ts/src/tooling/mts-reader-r44-w*.ts"
+      - "ts/test/mts-reader-r44-w6.test.ts"
+      - "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
+      - "requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml"
+      - "tools/reader-preview/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mts-reader-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check expected Draft source authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml
+          test -f ts/src/tooling/mts-reader-r44-w6-cli.ts
+          test -f tools/reader-preview/render.py
+          test -f tools/reader-preview/style.css
+          git diff --name-status origin/main...HEAD -- docs/assets | tee /tmp/mts-historical-assets-diff.txt
+          if grep -Eq '^D[[:space:]]' /tmp/mts-historical-assets-diff.txt; then
+            echo "::error::Historical image deletion detected relative to accepted main"
+            exit 1
+          fi
+          echo "HISTORICAL_IMAGE_DELETION=0"
+          printf 'Historical assets tracked: '
+          git ls-files docs/assets | wc -l
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install reproducible preview toolchains
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq pandoc fonts-noto-core fonts-dejavu-core fonts-freefont-ttf > /tmp/mts-reader-apt.log
+          python -m venv /tmp/mts-reader-venv
+          /tmp/mts-reader-venv/bin/pip install --disable-pip-version-check --quiet \
+            "weasyprint==68.0" "pypdf==5.9.0" "PyMuPDF==1.26.7" "Pillow==11.3.0"
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          pandoc --version | head -1
+          /tmp/mts-reader-venv/bin/python -c 'import weasyprint,pypdf,fitz,PIL; print("READER_PDF_TOOLS=READY")'
+
+      - name: Compile source-owned reader and generate Markdown
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix ts run build --silent
+          mkdir -p /tmp/mts-reader-src
+          (
+            cd ts
+            node dist/src/tooling/mts-reader-r44-w6-cli.js > /tmp/mts-reader-src/reader.md
+          )
+          test -s /tmp/mts-reader-src/reader.md
+          echo "READER_MARKDOWN_GENERATED=YES"
+          wc -c /tmp/mts-reader-src/reader.md
+
+      - name: Render Russian HTML and PDF, check every page and references
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          /tmp/mts-reader-venv/bin/python tools/reader-preview/render.py \
+            --input /tmp/mts-reader-src/reader.md \
+            --css tools/reader-preview/style.css \
+            --output-dir /tmp/mts-reader-preview \
+            --repo-root "$PWD" \
+            --source-sha "$SOURCE_SHA" \
+            --thumbnails
+          test -s /tmp/mts-reader-preview/mts-v015-reader-preview.md
+          test -s /tmp/mts-reader-preview/mts-v015-reader-preview.html
+          test -s /tmp/mts-reader-preview/mts-v015-reader-preview.pdf
+          test -s /tmp/mts-reader-preview/quality-report.json
+          echo "READER_SOURCE_PROVENANCE=119_OF_119"
+          echo "READER_SCIENTIFIC_PUBLICATION=BLOCKED"
+
+      - name: Upload non-authoritative rendered manuscript and page contact sheets
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mts-reader-v015-preview-${{ github.event.pull_request.head.sha || github.sha }}
+          path: /tmp/mts-reader-preview/
+          if-no-files-found: warn
+          retention-days: 14
