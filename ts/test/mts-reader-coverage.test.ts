@@ -288,8 +288,10 @@ assert.throws(()=>p10(g10Source.replace("  - id: v14-l3","  - id: v14-l3\n    id
 console.log("G10: 7 v0.14 Russian first-pass laws proposed, unverified and blocked.");
 
 const g11=loadReaderV15G11(root);
+assert.ok(g10.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Принятый контракт")&&x.domain!=="Link"));
 const c11=projectReaderAllFirstPassCensus(g9,g10,g11);
 assert.equal(g11.atoms.length,48);
+assert.ok(g11.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Принятая нормативная область")));
 assert.equal(new Set(g11.atoms.map(x=>x.acceptedId)).size,48);
 assert.ok(g11.atoms.every(x=>v15.find(y=>y.id===x.acceptedId)?.statement===x.sourceQuote));
 assert.equal(g11.publication,"blocked");
@@ -365,4 +367,9 @@ assert.throws(()=>parseReaderScienceClosure(g13Text.replace("    status: pending
  "    status: approved"),draft),/missing, duplicated or falsely resolved/);
 assert.throws(()=>parseReaderScienceClosure(g13Text.replace("  - id: reader-dag",
  "  - id: reader-dag\n    id: reader-dag"),draft),/G13 invalid gate YAML/);
+assert.throws(()=>p10(g10Source.replace(/    domain: "[^"]+"/,
+  '    domain: "Принятый контракт V14-L3"')),/incomplete scientific text/);
+assert.throws(()=>parse11(w11.map((x,i)=>i===0?x.replace(/    domain: "[^"]+"/,
+  '    domain: "Принятая нормативная область V15-TERM-01"'):x)),
+  /incomplete Russian science text/);
 console.log("G13: 12 unresolved science/publication blockers remain explicit and source-owned.");

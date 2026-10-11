@@ -11,41 +11,41 @@ atoms:
     accepted_id: V14-L3
     source_quote: "Q14 [ ] T F is version-separated from immutable legacy Q13 [ ] 1 0."
     ru: "В версии Q14 алфавит последовательности содержит различимые маркеры пустой последовательности, T и F; принятый ранее Q13 использует свои маркеры 1 и 0. Версия интерпретатора — часть значения записи, а совпадение отдельных символов не даёт права смешивать профили."
-    domain: "Принятый контракт V14-L3"
+    domain: "Версионированные представления последовательностей Q13 и Q14"
     exclusions: ["Не декодировать записи Q13 правилами Q14"]
   - id: v14-l4
     accepted_id: V14-L4
     source_quote: "Successful empty reaction {}, active identity, START continuation and END continuation are distinct results."
     ru: "Реакция может успешно завершиться несколькими различными по форме результатами: пустым {}, активным тождеством, START-продолжением либо END-продолжением. Эти случаи следует различать при обсуждении результата исполнения и не сводить к единому признаку наличия новых Связей."
-    domain: "Принятый контракт V14-L4"
+    domain: "Множество результатов успешной реакции в выбранном контексте исполнения"
     exclusions: ["Не считать пустой успешный результат неуспехом реакции"]
   - id: v14-l7
     accepted_id: V14-L7
     source_quote: "Count over canonical ExactSequence returns Nat cardinality."
     ru: "Производная операция Count считает количество позиций канонической ExactSequence и возвращает результат в шкале Nat. Позиционность означает, что повтор одного Link в разных местах вносит несколько единиц; величина не равна числу уникальных Link в графе."
-    domain: "Принятый контракт V14-L7"
+    domain: "Позиционная функция Count над канонической ExactSequence с результатом Nat"
     exclusions: ["Не заменять позиционную мощность числом различных Связей"]
   - id: v14-l8
     accepted_id: V14-L8
     source_quote: "Canonical Add is constructor-scoped and is total/function-like over selected Nat evidence."
     ru: "Каноническая операция Add строится для выбранного носителя Nat и заявлена функциональной и тотальной в его подтверждённой области. Свойства сложения требуют сохранения конструктора и свидетельств Nat, а не просто наличия записи N⟼L где угодно в ANet."
-    domain: "Принятый контракт V14-L8"
+    domain: "Каноническое сложение Add в подтверждённой шкале Nat"
     exclusions: ["Не утверждать тотальность Add для произвольных Link"]
   - id: v14-l9
     accepted_id: V14-L9
     source_quote: "Derived Le requires canonical Add proof authority."
     ru: "Отношение Le выводится из канонического Add и его доказательных оснований. Введение обозначения отношения ещё не предоставляет автоматически всех свойств привычного линейного порядка на любом множестве Связей: область и исходные свойства Add должны быть предъявлены."
-    domain: "Принятый контракт V14-L9"
+    domain: "Производное отношение порядка Le, построенное через каноническую Add"
     exclusions: ["Не постулировать свойства Le без Add authority"]
   - id: v14-l10
     accepted_id: V14-L10
     source_quote: "Multiplication/full semiring is explicitly outside the v0.14 acceptance scope."
     ru: "Умножение и полная структура полукольца находятся вне принятой области v0.14. Исследовательские определения и демонстрационные вычисления с ними могут существовать отдельно, но их наличие не означает авторскую приёмку соответствующих аксиом или теорем."
-    domain: "Link"
+    domain: "Граница принятой арифметики МТС версии v0.14"
     exclusions: ["Не включать multiplication и semiring в v0.14 acceptance"]
   - id: v14-l11
     accepted_id: V14-L11
     source_quote: "Generalized modus ponens/reaction is preserved from accepted v0.13 through the explicit A14 -> A16 -> A17 -> A72w witness chain covering 1->0, 1->1, 1->N, N->1 and N->M without host function/cardinality opcodes."
     ru: "Обобщённая реакция по Modus Ponens сохраняет принятые положения v0.13 через цепочку свидетельств A14→A16→A17→A72w. Она охватывает случаи 1→0, 1→1, 1→N, N→1, N→M, не вводя для них специальных host-команд по арности или количеству образов."
-    domain: "Link"
+    domain: "Обобщённая реакция Modus Ponens по принятой цепочке A14–A72w"
     exclusions: ["Не заменять универсальное правило специальными host-кодами"]

@@ -698,7 +698,8 @@ export function parseReaderV14G10(text:string, coverage:ReaderCoveragePlan,
       fail("G10 duplicate, unknown or already-owned accepted ID");
     if(typeof x.source_quote!=="string"||acceptedLaws.get(x.accepted_id)!==x.source_quote)
       fail("G10 exact accepted law quote mismatch");
-    if(typeof x.ru!=="string"||x.ru.length<140||typeof x.domain!=="string"||!x.domain.trim()||
+    if(typeof x.ru!=="string"||x.ru.length<140||typeof x.domain!=="string"||
+       x.domain.trim().length<30||x.domain==="Link"||x.domain.startsWith("Принятый контракт")||
        !Array.isArray(x.exclusions)||x.exclusions.length!==1||
        typeof x.exclusions[0]!=="string"||x.exclusions[0].length<25)
       fail("G10 incomplete scientific text and exclusions");
@@ -770,7 +771,8 @@ export function parseReaderV15G11(waves:readonly string[],
       if(typeof a.source_quote!=="string"||a.source_quote!==acceptedLaws.get(a.accepted_id))
         fail("G11 source quote differs from accepted registry");
       if(typeof a.ru!=="string"||a.ru.length<145||
-        typeof a.domain!=="string"||!a.domain.trim()||
+        typeof a.domain!=="string"||a.domain.trim().length<30||
+        a.domain.startsWith("Принятая нормативная область")||a.domain==="Link"||
         !Array.isArray(a.exclusions)||a.exclusions.length!==1||
         typeof a.exclusions[0]!=="string"||a.exclusions[0].length<27)
         fail("G11 incomplete Russian science text / exclusion");
