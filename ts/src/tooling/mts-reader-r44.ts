@@ -135,6 +135,7 @@ export function renderReaderR44W1Preview(root:string):string{
   one(manuscript,govTitle,"history chapter");
   manuscript=manuscript.replace(govTitle,govTitle+"\n\n### История принятия версии v0.15\n\n"+
     plan.history.prose+"\n\n"+plan.history.evidence+"\n\n"+
+    "Исторический merge SHA: `"+plan.history.mergeSha+"` (не тождественен автоматически текущему main).\n\n"+
     "Источник: [PR #2078](https://github.com/netkeep80/anum_docs/pull/2078), "+
     "[зафиксированный реестр](https://github.com/netkeep80/anum_docs/blob/c64b7e21340c6add248c8f380f3fef1292616ac6/traceability/mts-v0.15.json).");
   const tail="## Редакционные ограничения R40";

@@ -17,7 +17,7 @@ assert.ok(after.includes("A⟼B⟼C"));
 assert.ok(after.includes("(A⟼B)⟼C"));
 assert.ok(after.includes("A⟼(B⟼C)"));
 assert.ok(!loadReaderG42(root).chapters.find(c=>c.id==="grammar-and-historical-mp")!.scopeRu.includes("неявная алгебраическая ассоциативность"));
-assert.ok(after.includes("813a1569300b241a3b70eb282eecd8231db15e4b")===false);
+assert.ok(after.includes("Исторический merge SHA: `813a1569300b241a3b70eb282eecd8231db15e4b`"));
 assert.ok(after.includes("7 октября 2026 года в 23:17:15 UTC"));
 assert.ok(after.includes("PR #2078"));
 assert.ok(after.includes("FRM-04 — PROVED_UNDER_EXACT_SEQUENCE_INJECTIVITY"));
