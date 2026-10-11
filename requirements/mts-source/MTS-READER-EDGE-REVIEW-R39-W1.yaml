@@ -1,0 +1,247 @@
+# R39 W1: 34 independently assessed transitively redundant Foundation reader references in G4/G7.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: c0847c211203db3a1f7ef7a42e50140756632060
+review_boundary: editorial-direct-reference-vs-formal-proof-premise
+review_count: 34
+entries:
+  - source: "g4:foundation"
+    consumer: "g4:local-decision"
+    decision: remove
+    indirect_via: "g4:incidence"
+    rationale_ru: "Локальная разрешимость двух проверок вводится после incidence; этот предикат уже выведен в reader-порядке из Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:incidence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:local-exhaustiveness"
+    decision: remove
+    indirect_via: "g4:local-decision"
+    rationale_ru: "Условная исчерпываемость при LocalSelfDecision уже опирается на предыдущее локальное решение; отдельный повтор ссылки на Foundation не требуется."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:local-decision сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:distinction"
+    decision: remove
+    indirect_via: "g4:grounded"
+    rationale_ru: "Distinguishable использует Grounded и локальную различимость; Grounded уже несёт Foundation в порядке определений."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:grounded сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:separation-a1"
+    decision: remove
+    indirect_via: "g4:distinction"
+    rationale_ru: "A1RecursiveSeparation характеризует различимость на Grounded; предыдущий узел distinction обеспечивает объяснение исходного интерфейса."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:distinction сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:root-uniqueness"
+    decision: remove
+    indirect_via: "g4:incidence"
+    rationale_ru: "FND_02_unique_root условна по A1 и FullSelf; ссылки на incidence и separation-a1 уже вводят Foundation без прямой дублирующей дуги."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:incidence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:one-sided-existence"
+    decision: remove
+    indirect_via: "g4:root-uniqueness"
+    rationale_ru: "Дополнительный E-интерфейс предъявляет односторонних свидетелей; путь через root-uniqueness сохраняет базовый носитель Link."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:root-uniqueness сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:one-sided-realizability"
+    decision: remove
+    indirect_via: "g4:one-sided-existence"
+    rationale_ru: "FND_01_grounded_realizability опирается на E и Grounded, оба описаны после Foundation; отдельный исходный корень повторяется транзитивно."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:one-sided-existence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:grounded-normalization"
+    decision: remove
+    indirect_via: "g4:grounded"
+    rationale_ru: "Нормализация F2F3GroundedNormalization строится поверх Grounded и реализуемости; обе ссылки сохраняют описание Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:grounded сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:identity-by-poles"
+    decision: remove
+    indirect_via: "g4:grounded-normalization"
+    rationale_ru: "FND_13_identity_by_poles использует GroundedNormalization; это содержательно более точная предпосылка, чем повторное Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:grounded-normalization сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:inversion-domain"
+    decision: remove
+    indirect_via: "g4:one-sided-existence"
+    rationale_ru: "RecursiveInversionDomain определён при E и Grounded; обе опоры уже вводят полюсные позиции Link."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:one-sided-existence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:inversion-relation"
+    decision: remove
+    indirect_via: "g4:inversion-domain"
+    rationale_ru: "RecursiveInversion опирается на inversion-domain и incidence; базовая структура достигается обоими путями."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:inversion-domain сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:inversion-total"
+    decision: remove
+    indirect_via: "g4:inversion-relation"
+    rationale_ru: "INV_01 требует A1, E, D и Grounded; читательский путь через inversion-relation и separation-a1 обеспечивает порядок без лишнего корня."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:inversion-relation сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:inversion-involutive"
+    decision: remove
+    indirect_via: "g4:inversion-total"
+    rationale_ru: "INV_02 требует нормализацию и тотальную инверсию; обе предметные ссылки ведут к Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:inversion-total сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:chiral-classes"
+    decision: remove
+    indirect_via: "g4:incidence"
+    rationale_ru: "ProperOneSided и Same/OppositeChiralClass основаны на incidence и inversion-relation; Foundation уже предшествует им."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:incidence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:chiral-orbit"
+    decision: remove
+    indirect_via: "g4:chiral-classes"
+    rationale_ru: "CTX_03_objective_chiral_orbit_before_context использует инверсионные классы и инволюцию; их пути к Foundation сохранены."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:chiral-classes сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:context-marker"
+    decision: remove
+    indirect_via: "g4:chiral-orbit"
+    rationale_ru: "ContextOrientationMarker определяется после chiral-orbit и inversion-domain; отдельная стрелка к базовому интерфейсу избыточна."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:chiral-orbit сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g4:context-roles"
+    decision: remove
+    indirect_via: "g4:context-marker"
+    rationale_ru: "CTX_03_context_selection_induces_local_roles условна по маркеру и A1; через context-marker и separation-a1 Foundation уже введён."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g4:context-marker сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:link-identity"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Тезис различает тождество Link и изменение асети; глоссарий ANet уже зависит от Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через concept:anet-term сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:link-rewrite"
+    decision: remove
+    indirect_via: "g7:link-identity"
+    rationale_ru: "Переписывание меняет членство, но не полюса Link; предыдущее link-identity обеспечивает доступ к Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:link-identity сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:link-deletion-boundary"
+    decision: remove
+    indirect_via: "g7:link-rewrite"
+    rationale_ru: "Отличие удаления membership от физического удаления читается после link-rewrite, уже связанного с Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:link-rewrite сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:nat-zero"
+    decision: remove
+    indirect_via: "g7:link-identity"
+    rationale_ru: "Равенство N₀=U раскрывается через link-identity и определение Nat; оба предшествуют этому месту."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:link-identity сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:nat-successor"
+    decision: remove
+    indirect_via: "g7:nat-zero"
+    rationale_ru: "Succ(N)=N⟼L объясняется после nat-zero и термина Nat; базовый Link уже доступен."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:nat-zero сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:degree-one"
+    decision: remove
+    indirect_via: "g7:nat-successor"
+    rationale_ru: "Degree D₁=L противопоставлена шкале Nat; связь через nat-successor уже достигает Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:nat-successor сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:nat-degree-nonidentity"
+    decision: remove
+    indirect_via: "g7:degree-one"
+    rationale_ru: "Неотождествимость N₁ и D₁ обсуждается после degree-one; его основание включает базовый Link."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:degree-one сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:anum-carrier"
+    decision: remove
+    indirect_via: "g7:link-identity"
+    rationale_ru: "Anum определяется как кодировка Link-последовательности после link-identity; отдельный прямой корневой дубль не нужен."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:link-identity сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:exact-sequence"
+    decision: remove
+    indirect_via: "g7:anum-carrier"
+    rationale_ru: "Позиционное тождество ExactSequence вводится после Anum, а значит Link уже определён."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:anum-carrier сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:recursive-codec"
+    decision: remove
+    indirect_via: "g7:exact-sequence"
+    rationale_ru: "Различие рекурсивного Link codec и Anum вводится после exact-sequence; все ранние предметные определения доступны."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:exact-sequence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:q-codec"
+    decision: remove
+    indirect_via: "g7:recursive-codec"
+    rationale_ru: "Версионность Q объясняется после recursive-codec; он уже опирается на определённый Link."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:recursive-codec сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:sequence-origin"
+    decision: remove
+    indirect_via: "g7:exact-sequence"
+    rationale_ru: "Локальный корень последовательности R объясняется после exact-sequence; её предыдущие зависимости уже вводят Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:exact-sequence сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:objective-orbit-qualified"
+    decision: remove
+    indirect_via: "g7:link-identity"
+    rationale_ru: "Условная объективная хиральность опирается непосредственно на g4:chiral-orbit, а не на повтор Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:link-identity сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:context-marker-qualified"
+    decision: remove
+    indirect_via: "g7:objective-orbit-qualified"
+    rationale_ru: "Относительный маркер требует objective-orbit-qualified и g4:context-roles; оба пути ведут к базовому интерфейсу."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:objective-orbit-qualified сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:context-local-names"
+    decision: remove
+    indirect_via: "g7:context-marker-qualified"
+    rationale_ru: "χ(K), START_K и END_K уточняют контекстные роли после маркера; Foundation уже известен."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:context-marker-qualified сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:relative-z2"
+    decision: remove
+    indirect_via: "g7:context-local-names"
+    rationale_ru: "Ковариантность относительного Z₂ вводится после локальных имён ориентации; базовые Link-позиции уже определены."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:context-local-names сохраняются без изменения принятой семантики."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g7:orientation-authority-boundary"
+    decision: remove
+    indirect_via: "g7:relative-z2"
+    rationale_ru: "Граница источника ориентации уточняет Z₂ и выбранный Link-маркер, не нуждается в повторе общего Foundation."
+    limitation_ru: "Удалена только транзитивно повторная прямая ссылка; точные исходные предпосылки и путь через g7:relative-z2 сохраняются без изменения принятой семантики."
+    review_status: proposed
