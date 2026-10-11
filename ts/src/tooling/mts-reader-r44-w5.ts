@@ -66,7 +66,7 @@ export function parseR44W5(sourceText:string,root:string):R44W5{
      orig.state==="proposed"&&r.original_status==="open"&&r.editorial_assessment===modes[i],
      "R40 original authority, open status or order drift");
    return {id,wave:orig.wave,atom:orig.atom,title:prose(r.title_ru,"case title",14),
-     assessment:prose(r.assessment_ru,"case assessment",185),
+     assessment:prose(r.assessment_ru,"case assessment",155),
      gap:prose(r.outstanding_ru,"case gap",135),
      question:prose(r.author_question_ru,"author question",80)};
  });
