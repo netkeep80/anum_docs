@@ -19,8 +19,8 @@ assert.equal(draft.edges, 151);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
-assert.equal(draft.openingSpine.length, 41);
-assert.deepEqual(draft.ordered.slice(0, 41).map(x => x.id), draft.openingSpine);
+assert.equal(draft.openingSpine.length, 42);
+assert.deepEqual(draft.ordered.slice(0, 42).map(x => x.id), draft.openingSpine);
 assert.deepEqual(draft.ordered.slice(0, 3).map(x => x.id),
   ["g4:foundation", "editorial:foundation-ontology", "g4:incidence"]);
 // R35 is an individually written proposal, not Author-approved science.
@@ -155,10 +155,14 @@ for (const [node, position] of [
   ["editorial:foundation-ontology", 2],
   ["editorial:local-self-classification", 6],
   ["editorial:root-basis-witnesses", 18],
-  ["editorial:relative-chiral-orientation", 28],
-  ["editorial:representation-boundary", 38],
+  ["editorial:relative-chiral-orientation", 29],
+  ["editorial:representation-boundary", 39],
 ] as const) assert.equal(index.get(node), position - 1, "late G16 first-use " + node);
-assert.equal(draft.ordered.slice(0, 41).filter(x => x.sourceOwner === "G11").length, 0);
+assert.equal(draft.ordered.slice(0, 42).filter(x => x.sourceOwner === "G11").length, 0);
+assert.equal(index.get("g4:identity-by-poles"), index.get("g4:grounded-normalization")! + 1,
+  "FND-13 should be introduced immediately after conditional Grounded normalization");
+assert.ok(index.get("g4:identity-by-poles")! < index.get("g4:inversion-domain")!,
+  "FND-13 explanation must precede the inversion section");
 for (const node of draft.ordered) for (const dependency of node.readerRequires) {
   assert.ok(index.has(dependency), "dangling " + node.id + "->" + dependency);
   assert.ok(index.get(dependency)! < index.get(node.id)!, "out of order " + node.id);
@@ -189,7 +193,7 @@ const editSpine = (modified: string): string => {
   return original.slice(0, spineStart) + modified + original.slice(spineEnd);
 };
 assert.throws(() => parse(editSpine(authoredSpine.replace(
-  '  - "basis:C"', '  - "basis:O"'))), /invalid\/duplicate\/unknown 41-step opening spine/);
+  '  - "basis:C"', '  - "basis:O"'))), /invalid\/duplicate\/unknown 42-step opening spine/);
 assert.throws(() => parse(editSpine(authoredSpine.replace(
   '  - "basis:C"', '  - "basis:absent"'))), /invalid\/duplicate\/unknown 41-step opening spine/);
 assert.throws(() => parse(editSpine(authoredSpine.replace(
@@ -248,4 +252,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 nodes, 151 reader edges, 57 inherited source edges, 94 individually reviewed authored edges, 41-node academic spine, 251 individual review decisions incl 135 R39 redundant review entries, no publication, negative falsifiers GREEN.");
+console.log("G20: 119 nodes, 151 reader edges, 57 inherited source edges, 94 individually reviewed authored edges, 42-node academic spine, 251 individual review decisions incl 135 R39 redundant review entries, no publication, negative falsifiers GREEN.");
