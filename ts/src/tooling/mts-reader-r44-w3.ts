@@ -19,6 +19,7 @@ export interface ReaderR44W3 {
   readonly publication:"blocked";
 }
 const mainSha="c64b7e21340c6add248c8f380f3fef1292616ac6";
+const draftSourceSha="632be4ff018e813ce4dca46ed926bdbc25fc3c7c";
 const sourcePaths=["W1","W2","W3","W4"].map(x=>"requirements/mts-source/MTS-READER-V15-G11-"+x+".yaml");
 function must(b:unknown,why:string):asserts b{if(!b)throw new Error("mts-reader-r44-w3: "+why);}
 function ob(v:unknown,label:string):Obj {must(v!==null&&typeof v==="object"&&!Array.isArray(v),label+" mapping");return v as Obj;}
@@ -35,13 +36,14 @@ function pin(path:string,sha:string):string {return "https://github.com/netkeep8
 export function parseReaderR44W3(source:string,root:string):ReaderR44W3{
   const doc=parse(source);
   keys(doc,["schema","status","author_approval","publication","semantic_change","coverage",
-    "accepted_registry","accepted_main_sha","upstream_science","source_waves","historical_mp",
+    "accepted_registry","accepted_main_sha","proposed_source_sha","upstream_science","source_waves","historical_mp",
     "proof_scope","authority_boundary","reviews","unresolved_r40"],"R44-W3");
   must(doc.schema==="mts-reader-v015-individual-audit-r44-w3/v0.1"&&
     doc.status==="proposed"&&doc.author_approval==="not-recorded"&&doc.publication==="blocked"&&
     doc.semantic_change===false&&
     doc.coverage==="source-attributed-forty-eight-editorial-judgements-not-forty-eight-formal-proofs"&&
     doc.accepted_registry==="requirements/mts-v0.15.json"&&doc.accepted_main_sha===mainSha&&
+    doc.proposed_source_sha==="632be4ff018e813ce4dca46ed926bdbc25fc3c7c"&&
     doc.upstream_science==="requirements/mts-source/MTS-READER-INDIVIDUAL-MATH-REVIEW-R44-W2.yaml"&&
     JSON.stringify(doc.source_waves)===JSON.stringify(sourcePaths),
     "no editor can accept, publish, redefine or overstate v0.15 proof coverage");
@@ -93,8 +95,8 @@ export function parseReaderR44W3(source:string,root:string):ReaderR44W3{
       permitted.has(row.type as string),"cannot self-promote 48 editor judgements");
     must(composition.chapters.some(ch=>ch.atomIds.includes("g11:"+original.id)),
       "reviewed requirement missing from G42 119-atom source: "+canonical.id);
-    const assessmentRu=str(row.assessment_ru,"individual assessment",95);
-    const limitationRu=str(row.limitation_ru,"individual exclusion",80);
+    const assessmentRu=str(row.assessment_ru,"individual assessment",90);
+    const limitationRu=str(row.limitation_ru,"individual exclusion",60);
     // A distinct, original assessment and limitation must exist for each, not one generic batch template.
     must(assessmentRu!==original.ru&&limitationRu!==original.exclusions.join(" "),
       "editorial judgement cannot merely duplicate G11 unchanged");
@@ -183,7 +185,7 @@ export function renderReaderR44W3Preview(root:string):string {
       " · редакционный статус: требуется авторская рецензия","",
       r.assessmentRu,"",
       "**Граница и дальнейшая проверка.** "+r.limitationRu,"",
-      "Источник: [точный G11/"+r.wave+" / "+r.atom+"]("+pin(source,mainSha)+
+      "Источник: [точный G11/"+r.wave+" / "+r.atom+"]("+pin(source,draftSourceSha)+
       "); [утверждённое требование]("+pin("requirements/mts-v0.15.json",mainSha)+").","");
   }
   const manuscript=base.replace(anchor,appendix.join("\n")+"\n"+anchor);

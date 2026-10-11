@@ -7,6 +7,7 @@ semantic_change: false
 coverage: source-attributed-forty-eight-editorial-judgements-not-forty-eight-formal-proofs
 accepted_registry: requirements/mts-v0.15.json
 accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+proposed_source_sha: 632be4ff018e813ce4dca46ed926bdbc25fc3c7c
 upstream_science: requirements/mts-source/MTS-READER-INDIVIDUAL-MATH-REVIEW-R44-W2.yaml
 source_waves:
   - requirements/mts-source/MTS-READER-V15-G11-W1.yaml
