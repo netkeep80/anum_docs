@@ -13,7 +13,9 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude,
   loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening,
   loadReaderReverseNormativeAudit, parseReaderReverseNormativeAudit, deriveReaderReverseNormativeEdges,
-  renderReaderReverseNormativeAudit }
+  renderReaderReverseNormativeAudit,
+  loadReaderChapterCycleAudit, deriveReaderChapterCycles, parseReaderChapterCycleAudit,
+  renderReaderChapterCycleAudit }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -493,3 +495,46 @@ const alteredPlan={...plan,rows:plan.rows.map(x=>x.id==="V14-L7"?{
 }:x)};
 assert.throws(()=>g17Parse(g17Source,alteredPlan),/accepted normative dependency source drift/);
 console.log("G17: 100 normative edges; 17 individually reviewed chapter inversions, zero accepted reader DAG edges.");
+
+
+const g18Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-CHAPTER-CYCLES-G18.yaml"),"utf8");
+const g18=loadReaderChapterCycleAudit(root);
+assert.equal(g18.schema,"mts-reader-chapter-cycle-audit/v0.1");
+assert.equal(g18.acceptedNormativeEdges,100);
+assert.equal(g18.crossChapterEdges,37);
+assert.equal(g18.components.length,2);
+assert.deepEqual(g18.components.map(x=>x.members),[
+  ["architecture","arithmetic","formal-notation","foundations","representation"],
+  ["assurance","documentation","governance","proofs","worked-examples"],
+]);
+assert.deepEqual(g18.singletonSections,[
+  "execution","inversion-and-context","terminology",
+]);
+assert.ok(g18.components.every(x=>x.review==="pending" && x.riskRu.length>=110 &&
+  x.repairRu.length>=110));
+assert.equal(g18.authorApproval,"not-recorded");
+assert.equal(g18.publication,"blocked");
+const derivedCycles=deriveReaderChapterCycles(plan,routes);
+assert.equal(derivedCycles.crossChapterEdges,37);
+assert.deepEqual(derivedCycles.cyclicComponents,g18.components.map(x=>x.members));
+assert.ok(renderReaderChapterCycleAudit(g18).includes("не противоречие в принятых законах"));
+const g18Parse=(text:string,coverage=plan,routeModel=routes,audit=g17)=>
+  parseReaderChapterCycleAudit(text,coverage,routeModel,audit);
+assert.throws(()=>g18Parse(g18Source.replace("status: proposed","status: accepted")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("normative_edges_are_reader_edges: false",
+  "normative_edges_are_reader_edges: true")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("cross_chapter_edges: 37",
+  "cross_chapter_edges: 36")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("  - id: foundation-architecture-loop",
+  "  - id: proof-assurance-governance-loop")),
+  /chapter SCC is altered or scientific explanation missing/);
+assert.throws(()=>g18Parse(g18Source.replace("singletons: [execution, inversion-and-context, terminology]",
+  "singletons: [terminology, execution, inversion-and-context]")),
+  /isolated chapter set drift/);
+assert.throws(()=>g18Parse(g18Source.replace("components:\n",
+  "components:\n  - id: fake\n    id: fake\n")),/G18 invalid cycle YAML/);
+console.log("G18: two 5-chapter SCCs over 37 cross-chapter edges; no chapter-level DAG.");
