@@ -69,7 +69,7 @@ function inspectSources(root:string){
  for(const [group,left,right] of [
   ["gpr","gpr_lean","gpr_rocq"],["formal","formal_lean","formal_rocq"],
   ["foundation","foundation_lean","foundation_rocq"]
- ]){
+ ] as const){
   for(const [,source,symbol] of expected.filter(x=>x[1]===group)){
    for(const p of [left,right])guard(texts[p]?.includes(symbol),
     "missing accepted "+symbol+" in "+p);
