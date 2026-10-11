@@ -1,0 +1,359 @@
+# R39 W2: 50 individually scoped added Foundation edges (G8/G10/G11).
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: c0847c211203db3a1f7ef7a42e50140756632060
+review_boundary: scope-backed-transitive-redundancy-not-theorem
+review_count: 50
+entries:
+  - source: "g4:foundation"
+    consumer: "g8:glyph-map"
+    decision: remove
+    indirect_via: "g4:incidence"
+    rationale_ru: "Сопоставление ∞/♂/♀/⟼ с локальными формами уже опирается на g4:incidence и не требует второй прямой ссылки на Foundation."
+    limitation_ru: "Не меняется ни доказательная область g8:glyph-map, ни исходный контракт Link: сохранён путь через g4:incidence и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:positional-forms"
+    decision: remove
+    indirect_via: "g8:glyph-map"
+    rationale_ru: "Четыре позиционные остенсивные формы следуют за glyph-map; этот читательский маршрут уже вводит полюса Link."
+    limitation_ru: "Не меняется ни доказательная область g8:positional-forms, ни исходный контракт Link: сохранён путь через g8:glyph-map и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:grammar-explicit"
+    decision: remove
+    indirect_via: "g8:positional-forms"
+    rationale_ru: "Явная грамматика построена после positional-forms, поэтому Foundation достигается через принятый словарь форм."
+    limitation_ru: "Не меняется ни доказательная область g8:grammar-explicit, ни исходный контракт Link: сохранён путь через g8:positional-forms и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:reject-ambiguity"
+    decision: remove
+    indirect_via: "g8:grammar-explicit"
+    rationale_ru: "Запрет неоднозначного группирования относится к грамматике и следует после grammar-explicit; повторный Root-примитив в этом месте не нужен."
+    limitation_ru: "Не меняется ни доказательная область g8:reject-ambiguity, ни исходный контракт Link: сохранён путь через g8:grammar-explicit и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:no-implicit-associativity"
+    decision: remove
+    indirect_via: "g8:reject-ambiguity"
+    rationale_ru: "Отсутствие implicitPairAssociativity относится к v0.14 reject-ambiguity, уже достигнутому после Foundation."
+    limitation_ru: "Не меняется ни доказательная область g8:no-implicit-associativity, ни исходный контракт Link: сохранён путь через g8:reject-ambiguity и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:v015-das-version-boundary"
+    decision: remove
+    indirect_via: "g8:no-implicit-associativity"
+    rationale_ru: "Граница различия v0.14 и v0.15 объясняется после no-implicit-associativity; прямая дуга к Foundation не добавляет версии."
+    limitation_ru: "Не меняется ни доказательная область g8:v015-das-version-boundary, ни исходный контракт Link: сохранён путь через g8:no-implicit-associativity и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:recursive-level"
+    decision: remove
+    indirect_via: "g8:ontology-level"
+    rationale_ru: "Рекурсивный слой следует за ontology-level; последний уже вводит Link-онтологию Foundation."
+    limitation_ru: "Не меняется ни доказательная область g8:recursive-level, ни исходный контракт Link: сохранён путь через g8:ontology-level и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:codecs-level"
+    decision: remove
+    indirect_via: "g8:recursive-level"
+    rationale_ru: "Кодеки представлены вслед за recursive-level; дополнительное прямое указание на Foundation было бы повтором уже раскрытой структуры."
+    limitation_ru: "Не меняется ни доказательная область g8:codecs-level, ни исходный контракт Link: сохранён путь через g8:recursive-level и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:byte-text-level"
+    decision: remove
+    indirect_via: "g8:codecs-level"
+    rationale_ru: "Байтово-текстовый слой опирается на codecs-level, уже связанный с рекурсивным Link-представлением."
+    limitation_ru: "Не меняется ни доказательная область g8:byte-text-level, ни исходный контракт Link: сохранён путь через g8:codecs-level и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:symbolic-meta-level"
+    decision: remove
+    indirect_via: "g8:byte-text-level"
+    rationale_ru: "Dictionary/Grammar/Theory/FORMAL объясняются после byte-text-level; базовая Link-онтология в этой цепочке известна."
+    limitation_ru: "Не меняется ни доказательная область g8:symbolic-meta-level, ни исходный контракт Link: сохранён путь через g8:byte-text-level и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:no-second-ontology"
+    decision: remove
+    indirect_via: "g8:symbolic-meta-level"
+    rationale_ru: "Запрет второй онтологии завершает символическую иерархию; цепь symbolic-meta-level уже содержит объяснение единого Link."
+    limitation_ru: "Не меняется ни доказательная область g8:no-second-ontology, ни исходный контракт Link: сохранён путь через g8:symbolic-meta-level и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l3"
+    decision: remove
+    indirect_via: "g7:q-codec"
+    rationale_ru: "Версионная разница Q13/Q14 читается после g7:q-codec; базовая онтология достижима через определение кодека."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l3, ни исходный контракт Link: сохранён путь через g7:q-codec и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l4"
+    decision: remove
+    indirect_via: "g8:glyph-map"
+    rationale_ru: "Успешный пустой результат и START/END-продолжения объясняются после glyph-map; Foundation уже включён в предшествующую классификацию."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l4, ни исходный контракт Link: сохранён путь через g8:glyph-map и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l7"
+    decision: remove
+    indirect_via: "concept:exact-sequence-first-use"
+    rationale_ru: "Count работает с ExactSequence и Nat, оба уже опираются на Link; дополнительная прямая дуга к Foundation избыточна."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l7, ни исходный контракт Link: сохранён путь через concept:exact-sequence-first-use и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l8"
+    decision: remove
+    indirect_via: "concept:nat-first-use"
+    rationale_ru: "Add задаётся для Nat; определение шкалы Nat уже обеспечивает объяснение Link, а отдельное Foundation не даёт свойств сложения."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l8, ни исходный контракт Link: сохранён путь через concept:nat-first-use и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l9"
+    decision: remove
+    indirect_via: "concept:nat-first-use"
+    rationale_ru: "Le выводится из Add внутри Nat; прямая стрелка к Foundation не является свидетельством отношения порядка."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l9, ни исходный контракт Link: сохранён путь через concept:nat-first-use и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l10"
+    decision: remove
+    indirect_via: "concept:nat-first-use"
+    rationale_ru: "Непринятость умножения и полукольца имеет предмет Nat; его первичный ввод уже содержит Foundation."
+    limitation_ru: "Не меняется ни доказательная область g10:v14-l10, ни исходный контракт Link: сохранён путь через concept:nat-first-use и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-auth-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Единый FORMAL/JSON путь вводится через первый концепт формата; сам этот концепт уже связан с Link через ANet."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-auth-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-auth-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Критерии FORMAL_MIGRATED и VERTICAL_GREEN опираются на ранее введённый FORMAL/JSON; независимое повторение Foundation не объясняет evidence."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-auth-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-onto-02"
+    decision: remove
+    indirect_via: "concept:exact-sequence-first-use"
+    rationale_ru: "Минимальность Grammar проверяется на ExactSequence и Link; первый уже ведёт к базовому Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-onto-02, ни исходный контракт Link: сохранён путь через concept:exact-sequence-first-use и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-struct-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "ROOT/START/END/PAIR в source FORMAL/JSON трактуются через сам концепт FORMAL и ANet; прямая корневая дуга не нужна."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-struct-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-fresh-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Fresh FORMAL воспроизведение требует ранее раскрытой native source ANet, уже имеющей Link-основание."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-fresh-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-fresh-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Свежий JSON replay является частным тестом того же source-пути, до которого Foundation уже введён."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-fresh-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-fresh-03"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Инвариантность двух новых Memory определяется через canonical source и поведение; исходная Link-область достигается через FORMAL."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-fresh-03, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-name-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Контекстное имя :A и R:A рассматривается внутри FORMAL; его вводный концепт уже достигает Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-name-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-json-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Полнота канонического JSON опирается на ANet source, ранее введённую как Link-носитель."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-json-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-json-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Тождество денотации FORMAL и JSON разъяснено в FORMAL-концепте, который уже зависит от Link."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-json-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-json-03"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "JSON-мутирование проверяет семантическую модель после ввода FORMAL/JSON; ссылка на Foundation не добавляет тестов."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-json-03, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-and-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Boolean AND как zero-role Rule читается после Γ, а концепт Γ уже последовательно зависит от Link-источника."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-and-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-and-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Общий matcher/Γ маршрут разъяснён в первом концепте Γ; повторное Foundation не вводит NO_MATCH."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-and-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-and-03"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Единый источник Boolean и ограничение backend уже опираются на Γ через вложенные определения."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-and-03, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-and-04"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Повторное использование общего Γ для NOT/OR/XOR обеспечивает ввод Link-семантики через единый маршрут."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-and-04, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-ctx-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Membership Context определяется после термина ANet; именно через него достигнут Link Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-ctx-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-ctx-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Различие ролей Link при разных Context уже использует ANet membership, термин которого связан с Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-ctx-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-gamma-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Развёрнутое Γ J0/S1/S2 следует после вводного Γ; Link определяется транзитивно ещё раньше."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-gamma-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-formal-proof-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Предмет парных Lean4/Rocq свидетельств определён как FORMAL-ядро; оно уже базируется на Link."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-formal-proof-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-formal-proof-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Ограниченный парный proof scope FORMAL/JSON вводится после общего source-пути и не требует повторения исходного носителя."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-formal-proof-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-json-04"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Позиционное значение JSON-массива связано с FORMAL/JSON и ExactSequence; доступ к Foundation уже обеспечен через них."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-json-04, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-stage-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Границы стадий обработки вводятся после канонического FORMAL/JSON; прямой Foundation не является дополнительным этапом."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-stage-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-fals-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Фальсификаторы FORMAL/JSON читаются после представления модели; повторный Foundation не является отдельным негативным тестом."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-fals-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-corpus-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Корпус replay проходит через Γ и source ANet; Link-основание уже обеспечивается обоими концептами."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-corpus-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-docs-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Генерация нормативной нотации из FORMAL/JSON зависит от его источника, где Link определён ранее."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-docs-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-ready-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Readiness audit включает JSON/host-scope, ранее введённый через FORMAL/JSON; прямая дуга к Foundation не усиливает assurance."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-ready-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-author-json-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "AUTHOR_REVIEW_PENDING касается source JSON; его путь к Link раскрыт в вводном FORMAL/JSON."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-author-json-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-author-json-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Пакет сравнения FORMAL и JSON наследует исходную Link-область через их общий вводный маршрут."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-author-json-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-author-json-03"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Одобрение exact JSON revision относится к ранее введённому source; математический Foundation не обосновывает SHA-проверку."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-author-json-03, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-author-json-04"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Границы пакетной приёмки JSON разъясняются через canonical artifact, без повторной прямой Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-author-json-04, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-reg-01"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Регрессионный корпус JSON содержит ранее определённые нативные артефакты; Link вводится через FORMAL."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-reg-01, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-reg-02"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Триггеры повторного тестирования source/backend следуют после определения FORMAL/JSON, уже содержащего Link."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-reg-02, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-reg-03"
+    decision: remove
+    indirect_via: "concept:anet-term"
+    rationale_ru: "Запрет скрытой перегенерации JSON связан с source provenance, а не отдельной аксиомой Foundation."
+    limitation_ru: "Не меняется ни доказательная область g11:v15-reg-03, ни исходный контракт Link: сохранён путь через concept:anet-term и нет нового принятого закона."
+    review_status: proposed
