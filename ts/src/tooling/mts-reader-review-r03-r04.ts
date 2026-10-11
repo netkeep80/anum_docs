@@ -107,7 +107,7 @@ function acceptedEvidence(root:string){
   [paths.exact_ts,["materializeExactSequence","readExactSequence"]],
   [paths.add_ts,["expectDerivationReject","foreign theory","ruleKind"]],
   [paths.order_ts,["replayLe","leFromAdd","expectReplayReject"]],
-  [paths.nat_ts,["least","successor"]],
+  [paths.nat_ts,["induction","successor"]],
   [paths.formal_ts,["PAIR_FT","DUP_FF","readExactSequence"]]
  ] as const;
  for(const [path,symbols] of checks){
