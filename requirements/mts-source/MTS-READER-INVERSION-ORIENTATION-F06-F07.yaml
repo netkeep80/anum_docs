@@ -33,17 +33,17 @@ orientation:
   gap_ru: "Научные вопросы для дальнейшей проверки: точный язык контекстных ролей ANet и их зависимость от K; пределы связи относительной хиральности с групповой геометрией; доказательства корректного переноса из CTX-03 через FORMAL/JSON в Γ. Пока это отдельные обязательства, а не завершённые результаты FRM-07 или разрешение на изменения принятого v0.15."
 theorem_evidence:
   - { id: INV-01-TOTAL, symbol: INV_01_recursive_inversion_total, assumptions: [A1, E, D, Grounded], scope: "exists-image-grounded" }
-  - { id: INV-01-FUNCTIONAL, symbol: recursive_inversion_functional, assumptions: [D, Edge(x,y), Edge(x,z)], scope: "unique-existing-image" }
+  - { id: INV-01-FUNCTIONAL, symbol: recursive_inversion_functional, assumptions: [D, "Edge(x,y)", "Edge(x,z)"], scope: "unique-existing-image" }
   - { id: INV-01-UNIQUE, symbol: INV_01_recursive_inversion_unique_total, assumptions: [A1, E, D, Grounded], scope: "unique-total-grounded" }
-  - { id: INV-02-RELATIONAL, symbol: INV_02_recursive_inversion_involutive, assumptions: [A1, N, E, D, Edge(x,y), Edge(y,z)], scope: "involution-two-edges" }
+  - { id: INV-02-RELATIONAL, symbol: INV_02_recursive_inversion_involutive, assumptions: [A1, N, E, D, "Edge(x,y)", "Edge(y,z)"], scope: "involution-two-edges" }
   - { id: INV-02-TOTAL, symbol: INV_02_unique_total_involution, assumptions: [A1, N, E, D, Grounded], scope: "total-involution-grounded" }
   - { id: INV-06, symbol: INV_06_root_basis, assumptions: [A1, N, E, D], scope: "root-basis-evidence" }
-  - { id: INV-07, symbol: INV_07_objective_chirality, assumptions: [A1, N, E, D, Edge(x,y)], scope: "one-sided-chiral-mirror" }
+  - { id: INV-07, symbol: INV_07_objective_chirality, assumptions: [A1, N, E, D, "Edge(x,y)"], scope: "one-sided-chiral-mirror" }
   - { id: CTX-03-Z2, symbol: CTX_03_relational_z2_support, assumptions: [A1, N, E, D], scope: "proper-one-sided-relational-z2" }
   - { id: CTX-03-MARKER, symbol: CTX_03_context_selection_induces_local_roles, assumptions: [A1, E, D, ContextOrientationMarker], scope: "local-role-existence" }
   - { id: CTX-03-ORBIT, symbol: CTX_03_objective_chiral_orbit_before_context, assumptions: [A1, N, E, D], scope: "objective-chiral-two-element-orbit" }
   - { id: CTX-03-CHI, symbol: CTX_03_context_marker_selects_unique_chi, assumptions: [A1, E, D, ContextOrientationMarker], scope: "unique-local-chi" }
-  - { id: CTX-03-COVARIANCE, symbol: CTX_03_simultaneous_inversion_covariance, assumptions: [A1, N, E, D, Edge(a,ja), Edge(b,jb)], scope: "same-opposite-covariance" }
+  - { id: CTX-03-COVARIANCE, symbol: CTX_03_simultaneous_inversion_covariance, assumptions: [A1, N, E, D, "Edge(a,ja)", "Edge(b,jb)"], scope: "same-opposite-covariance" }
   - { id: CTX-03-GAUGE, symbol: CTX_03_context_relative_gauge, assumptions: [A1, N, E, D], scope: "context-relative-gauge" }
   - { id: CTX-03-SEMANTIC, symbol: CTX_03_semantic_covariance_capstone, assumptions: [A1, N, E, D], scope: "chosen-semantic-mp-slice" }
 open_obligations: [INVERSION_NON_GROUNDED_EXTENSION, CTX_GAMMA_REFINEMENT_BRIDGE, GLOBAL_Z2_ACTION_NOT_CLAIMED]
