@@ -64,7 +64,7 @@ export function parseR44W4(src:string,root:string):R44W4 {
     "G4 proof review cannot be upgraded");
   const g16=yaml(load(root,r.source_editorial_opening as string));
   insist(g16.publication==="blocked"&&g16.author_approval==="not-recorded"&&
-    phrase(g16.candidate_ru,"historical G16",100).includes("LocalSelfDecision"),
+    phrase(g16.candidate_ru,"historical G16",100).includes("свидетельств разрешимости"),
     "G16 monolithic editorial history remains noncanonical");
   const nodes=new Map(graph.ordered.map(x=>[x.id,x]));
   const pairIds=[
