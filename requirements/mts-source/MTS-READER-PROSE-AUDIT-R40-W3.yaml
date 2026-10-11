@@ -1,0 +1,334 @@
+# R40 wave 3: individually reviewed 48 v0.15 prose atoms; editorial scope only.
+schema: mts-reader-prose-audit/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+source_model: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+accepted_semantics_change: false
+coverage: v015-current-only
+review_count: 48
+entries:
+  - position: 72
+    node: "g11:v15-term-01"
+    disposition: terminology
+    scope_note_ru: "Термин ANet нормативен; Aset/aset допустим лишь как исторический идентификатор кода, не тип или альтернативная онтология."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 73
+    node: "g11:v15-auth-01"
+    disposition: formal-execution
+    scope_note_ru: "Единый source path FORMAL/JSON → резолвер → денотация → Γ следует из принятого v0.15 маршрута; не подменять его специальными host-ветками."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 74
+    node: "g11:v15-auth-02"
+    disposition: assurance-appendix
+    scope_note_ru: "FORMAL_MIGRATED и VERTICAL_GREEN относятся к трассируемым свидетельствам и точному исходнику; в монографии поместить в раздел assurance, не в список теорем."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 75
+    node: "g11:v15-onto-01"
+    disposition: mathematical-scope
+    scope_note_ru: "Одна Link-онтология сохраняется после v0.14; контейнеры/codec не получают нового математического сорта."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 76
+    node: "g11:v15-onto-02"
+    disposition: mathematical-scope
+    scope_note_ru: "Минимальность Grammar сформулирована как обязательная проверка выразимости до нового конструктора, а не как доказанная универсальная полнота."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 77
+    node: "g11:v15-onto-03"
+    disposition: mathematical-scope
+    scope_note_ru: "Тождество Link отделено от строкового имени; переименование при той же топологии должно оставлять денотацию неизменной."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 78
+    node: "g11:v15-struct-01"
+    disposition: formal-execution
+    scope_note_ru: "ROOT/START/END/PAIR и 8/9/6/1 — носители структурной записи единой Link, не четыре независимые form-операции."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 79
+    node: "g11:v15-close-01"
+    disposition: assurance-appendix
+    scope_note_ru: "VERTICAL_GREEN требует замыкания зависимостей; локальный положительный пример не является свидетельством closure."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 80
+    node: "g11:v15-close-02"
+    disposition: assurance-appendix
+    scope_note_ru: "Версии внешних зависимостей должны сопровождать evidence; это метод научной проверяемости, не теорема о полюсах."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 81
+    node: "g11:v15-close-03"
+    disposition: execution-contract
+    scope_note_ru: "Бюджет программно-специфической host-семантики равен нулю, но общий host-код допустим; поместить в проверяемые архитектурные ограничения."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 82
+    node: "g11:v15-fresh-01"
+    disposition: assurance-appendix
+    scope_note_ru: "FORMAL replay в пустой Memory требует независимого восстановления; простая загрузка/парсинг не заменяет исполнения."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 83
+    node: "g11:v15-fresh-02"
+    disposition: assurance-appendix
+    scope_note_ru: "Прямой JSON replay должен воспроизвести источник без второго FORMAL-файла; текстовый round-trip не является семантическим доказательством."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 84
+    node: "g11:v15-fresh-03"
+    disposition: assurance-appendix
+    scope_note_ru: "Два новых Memory с разными аллокациями должны давать одинаковую каноническую структуру и поведение, не адресное тождество указателей."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 85
+    node: "g11:v15-name-01"
+    disposition: notation-example
+    scope_note_ru: "Абсолютный путь :A=R:A отличается от локального имени; разрешение требует контекстного резолвера, не host-глобального словаря."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 86
+    node: "g11:v15-json-01"
+    disposition: formal-execution
+    scope_note_ru: "Канонический JSON охватывает исполняемые роли ANet; serialization round-trip недостаточен без проверки восстановления денотации."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 87
+    node: "g11:v15-json-02"
+    disposition: formal-execution
+    scope_note_ru: "FORMAL и прямой JSON обязаны дать одну нативную ANet и DAS-денотацию до исполнения; не заявлять равенство произвольных перегруппированных деревьев."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 88
+    node: "g11:v15-json-03"
+    disposition: assurance-appendix
+    scope_note_ru: "Мутации семантического JSON и незначимые изменения транспортного оформления проверяются раздельно; это явный фальсификатор."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 89
+    node: "g11:v15-vert-01"
+    disposition: assurance-appendix
+    scope_note_ru: "VERTICAL_GREEN требует полного provenance-пакета и нулевого обхода host-логики; состояние должно подтверждаться реестром."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 90
+    node: "g11:v15-vert-02"
+    disposition: governance-appendix
+    scope_note_ru: "Статус выводится из зарегистрированных свидетельств, а не из заголовка PR; положение — governance, не математическая лемма."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 91
+    node: "g11:v15-and-01"
+    disposition: execution-contract
+    scope_note_ru: "AND определяется одной локальной таблицей T/F в нативной ANet через zero-role Rule; потребительские opcode не разрешаются."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 92
+    node: "g11:v15-and-02"
+    disposition: worked-example-needed
+    scope_note_ru: "NO_MATCH вне T/F и общий matcher/Γ-путь являются обязательной границей применения AND; нужны отдельные наглядные примеры FF/FT/TF/TT."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 93
+    node: "g11:v15-and-03"
+    disposition: execution-contract
+    scope_note_ru: "Любая backend-оптимизация обязана сохранять таблицу и NO_MATCH; корректный вывод ещё не доказывает корректный source-путь."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 94
+    node: "g11:v15-and-04"
+    disposition: worked-example-needed
+    scope_note_ru: "NOT/OR/XOR используют тот же универсальный исполнитель, но тексту необходимы отдельные показательные FORMAL/JSON примеры, а не перечень запретов."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 95
+    node: "g11:v15-ctx-01"
+    disposition: mathematical-scope
+    scope_note_ru: "Роли Theory/Context/Entry/Result определяются членством в семантической ANet; не смешивать исполнительный Context с выбором хирального маркера."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 96
+    node: "g11:v15-ctx-02"
+    disposition: mathematical-scope
+    scope_note_ru: "Одна Link имеет относительные роли в разных Context по membership; строковые имена и host-адреса не являются источником роли."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 97
+    node: "g11:v15-gamma-01"
+    disposition: execution-contract
+    scope_note_ru: "Γ: J0 структурная применимость, S1 только чтение/связывание, S2 синтез, 0/1/N и атомарная публикация; не заявлять J1 или второй runtime необходимыми."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 98
+    node: "g11:v15-formal-proof-01"
+    disposition: proof-evidence
+    scope_note_ru: "Lean4/Rocq покрывают лишь поддерживаемый фрагмент FORMAL и его точные предпосылки; нужна ссылка на инвентарь конкретных теорем в доказательном разделе."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 99
+    node: "g11:v15-formal-proof-02"
+    disposition: proof-evidence
+    scope_note_ru: "Парное внешнее свидетельство ограничено указанным фрагментом объединения FORMAL/JSON и 8/9/6/1; не обобщать на все стадии Γ/backend."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 100
+    node: "g11:v15-json-04"
+    disposition: worked-example-needed
+    scope_note_ru: "JSON массив соответствует позиционной ExactSequence, [] — R, свёртка F_R отдельна; необходимо явно показать пример с повторными элементами."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 101
+    node: "g11:v15-stage-01"
+    disposition: assurance-appendix
+    scope_note_ru: "Наблюдаемость source ANet, semantic ANet, денотации и backend должна быть представлена схемой трассировки, не смешивая разные стадии."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 102
+    node: "g11:v15-stage-02"
+    disposition: execution-contract
+    scope_note_ru: "Read-only обход не имеет скрытой материализации, публикация происходит явной стадией; это технический контракт границы исполнения."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 103
+    node: "g11:v15-fals-01"
+    disposition: assurance-appendix
+    scope_note_ru: "Негативные фальсификаторы обязательны наряду с positive replay, но список в тексте не означает фактически выполненных испытаний."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 104
+    node: "g11:v15-gov-01"
+    disposition: governance-appendix
+    scope_note_ru: "Машинный реестр requirements — источник статуса исполнения; этот процессуальный контракт не принадлежит главе математической онтологии."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 105
+    node: "g11:v15-gov-02"
+    disposition: assurance-appendix
+    scope_note_ru: "Аудит special host-семантики проверяет не только таблицы T/F, но и конкретный путь получения результата; нужна ссылка на evidence."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 106
+    node: "g11:v15-gov-03"
+    disposition: governance-appendix
+    scope_note_ru: "Дорожная карта и отчёты выводятся из моделей, не редактируются вручную; вынести в приложения о воспроизводимости."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 107
+    node: "g11:v15-corpus-01"
+    disposition: assurance-appendix
+    scope_note_ru: "Регрессия требует общего JSON→ANet→recursion→A-memory пути на замороженной версии 0.175.0; нужна точная граница текущих свидетельств."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 108
+    node: "g11:v15-gov-04"
+    disposition: governance-appendix
+    scope_note_ru: "Обязательная защита CI/repo-guard и аварийный обход — организационные требования, не дедуктивные доказательства МТС."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 109
+    node: "g11:v15-docs-01"
+    disposition: governance-appendix
+    scope_note_ru: "«Формальная нотация МТС.md» должна порождаться моделью; каноническая документация не имеет автономного права определять смысл."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 110
+    node: "g11:v15-ready-01"
+    disposition: governance-appendix
+    scope_note_ru: "RELEASE_READY определяется полным обязательным gate, не одним успешным тестом; утверждение относится к выпуску."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 111
+    node: "g11:v15-ready-02"
+    disposition: assurance-appendix
+    scope_note_ru: "Независимая проверка должна искать контрпримеры и дрейф source, а не только повторять положительный CI."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 112
+    node: "g11:v15-ready-03"
+    disposition: historical-version
+    scope_note_ru: "Фраза о переходе accepted/current с v0.14 на v0.15 описывает ИСТОРИЧЕСКУЮ процедуру приёмки, поскольку сама v0.15 уже принята; без датировки вводит в заблуждение."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 113
+    node: "g11:v15-author-json-01"
+    disposition: governance-appendix
+    scope_note_ru: "Приёмка исполняемых JSON отделяется от принятия самой v0.15 и от будущей границы aprover v0.16."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 114
+    node: "g11:v15-author-json-02"
+    disposition: governance-appendix
+    scope_note_ru: "Автору предъявляется полный вход/выход FORMAL/JSON и replay; без exact артефакта нет идентифицируемого предмета решения."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 115
+    node: "g11:v15-author-json-03"
+    disposition: governance-appendix
+    scope_note_ru: "Одобрение относится к exact JSON revision/digest; семантическая правка требует нового решения, не переименования."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 116
+    node: "g11:v15-author-json-04"
+    disposition: governance-appendix
+    scope_note_ru: "Пакетная приёмка ограничена явно перечисленными точными артефактами и не санкционирует будущую автогенерацию."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 117
+    node: "g11:v15-reg-01"
+    disposition: assurance-appendix
+    scope_note_ru: "Принятые JSON попадают в постоянный исполнимый корпус с зафиксированной ревизией, не только в списки документации."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 118
+    node: "g11:v15-reg-02"
+    disposition: assurance-appendix
+    scope_note_ru: "Любая существенная правка source/backend запускает регрессию всех ранее принятых JSON, а не одной новой программы."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 119
+    node: "g11:v15-reg-03"
+    disposition: governance-appendix
+    scope_note_ru: "Запрет бесследной регенерации одобренного JSON удерживает границу авторитета артефакта; миграция требует нового approval."
+    publication_effect: blocked
+    review: individual-proposed
+findings:
+  - id: R40-11
+    severity: high
+    first_use_consumer: "g11:v15-ready-03"
+    first_use_symbols: [accepted-current-v015]
+    definition_node: "g11:v15-ready-03"
+    remedy_ru: "В тексте монографии отделить историческую процедуру переключения accepted/current с v0.14 на v0.15 от текущего уже принятого baseline; указывать дату и SHA принятия, не представляя правило cutover как незавершённую задачу."
+    state: proposed
+  - id: R40-12
+    severity: high
+    first_use_consumer: "g11:v15-gov-01"
+    first_use_symbols: [governance-vs-theorem]
+    definition_node: "g11:v15-formal-proof-01"
+    remedy_ru: "Разнести математические определения/теоремы, исполняемые примеры, независимую проверку и статусные нормы по разным исходно-модельным разделам; правила CI и AUTHOR_REVIEW не должны выглядеть выводами из аксиом Foundation."
+    state: proposed
+  - id: R40-13
+    severity: medium
+    first_use_consumer: "g11:v15-formal-proof-01"
+    first_use_symbols: [lean-rocq-proof-scope]
+    definition_node: "g11:v15-formal-proof-02"
+    remedy_ru: "Каждый фрагмент о парных Lean4/Rocq свидетельствах снабдить модельной ссылкой на конкретный файл/символ/условия теоремы; без неё общий текст о доказанности должен оставаться ограниченным областью указанного proof inventory."
+    state: proposed
+  - id: R40-14
+    severity: medium
+    first_use_consumer: "g11:v15-and-02"
+    first_use_symbols: [AND-NO_MATCH]
+    definition_node: "g11:v15-and-01"
+    remedy_ru: "В научной части показать полностью источник zero-role AND, четыре FF/FT/TF/TT и отдельный NO_MATCH за пределами T/F; примеры выводить из FORMAL/JSON-модели, не из ручной таблицы кода."
+    state: proposed
+  - id: R40-15
+    severity: medium
+    first_use_consumer: "g11:v15-json-04"
+    first_use_symbols: [ExactSequence-F_R]
+    definition_node: "concept:exact-sequence-first-use"
+    remedy_ru: "Показать контрпример, где разные позиционные ExactSequence имеют совпадающую свёртку F_R, и вывод []=R; не утверждать тождество массива результату свёртки."
+    state: proposed
