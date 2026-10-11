@@ -1,0 +1,27 @@
+# R36 wave 4: three newly exposed nonredundant edges, individually reviewed.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: 82ff389f011a73190e4d9bdcd364b80d86084133
+review_boundary: second-order-v014-v015-first-use-not-proof
+review_count: 3
+entries:
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g7:recursive-codec"
+    decision: remove
+    rationale_ru: "Положение v0.14 разграничивает кодек одной рекурсивной Link и Anum как кодирование последовательности; оно само объясняет предмет и не требует вступления v0.15 о JSON-массивах ExactSequence."
+    limitation_ru: "Не превращать v0.15 JSON array lowering в формальную предпосылку более ранней v0.14 границы кодеков."
+    review_status: proposed
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g7:sequence-origin"
+    decision: remove
+    rationale_ru: "Утверждение, что локальный источник последовательности есть R, принято ранее в модели v0.14; его смысл не основан на позднем JSON-позиционном вводном абзаце."
+    limitation_ru: "Не отождествлять R с Nat-нулём U или с произвольной свёрткой."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-stage-02"
+    decision: remove
+    rationale_ru: "Техническая гарантия read-only проверки и явной стадийной материализации формулируется независимо от математических уравнений Foundation; прямая стрелка стала видна лишь после снятия искусственной терминологической ссылки."
+    limitation_ru: "Не считать запрет неявной записи следствием start(form(a,b))=a."
+    review_status: proposed
