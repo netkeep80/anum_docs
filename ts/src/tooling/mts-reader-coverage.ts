@@ -1181,3 +1181,108 @@ export function loadReaderDraftWithFoundationOpening(root: string): string {
   ].join("\n");
   return manuscript.slice(0, beforeBasis) + inserted + manuscript.slice(beforeBasis);
 }
+
+
+/** G17 diagnostic: later-chapter normative prerequisites; NOT asserted reader DAG edges. */
+export const READER_INVERSION_G17_PATH =
+  "requirements/mts-source/MTS-READER-INVERSION-G17.yaml";
+export interface ReaderReverseNormativeEdge {
+  readonly prerequisite: string;
+  readonly consumer: string;
+  readonly review: "pending";
+  readonly riskRu: string;
+  readonly proposalRu: string;
+}
+export interface ReaderReverseNormativeAudit {
+  readonly schema: "mts-reader-inversion-audit/v0.1";
+  readonly status: "proposed";
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+  readonly readerDag: "scientific-review-pending";
+  readonly normativeEdgeCount: 100;
+  readonly reversedChapterEdges: readonly ReaderReverseNormativeEdge[];
+}
+/** Chapter order is only a proposed presentation, never inferred mathematical truth. */
+export function deriveReaderReverseNormativeEdges(
+  coverage: ReaderCoveragePlan, routes: ReaderRoutes,
+): readonly {prerequisite:string; consumer:string}[] {
+  const chapterIds=Object.keys(routes.chapters) as ReaderSection[];
+  if (chapterIds.length!==13 || coverage.rows.length!==62) fail("G17 chapter or registry mismatch");
+  const chapterIndex=new Map(chapterIds.map((chapter,i)=>[chapter,i]));
+  const accepted=new Map(coverage.rows.map(row=>[row.id,row]));
+  if(accepted.size!==62)fail("G17 duplicate accepted law");
+  const edgeCount=coverage.rows.reduce((count,row)=>count+row.normativeDependsOn.length,0);
+  if(edgeCount!==100)fail("G17 accepted normative dependency source drift");
+  const inverted:{prerequisite:string;consumer:string}[]=[];
+  for(const row of coverage.rows)for(const dep of row.normativeDependsOn){
+    const source=accepted.get(dep);
+    if(!source)fail("G17 unresolved accepted normative prerequisite");
+    const indexSource=chapterIndex.get(source.proposedSection);
+    const indexConsumer=chapterIndex.get(row.proposedSection);
+    if(indexSource===undefined||indexConsumer===undefined)
+      fail("G17 section not in ordered editorial outline");
+    if(indexSource>indexConsumer)inverted.push({prerequisite:dep,consumer:row.id});
+  }
+  return Object.freeze(inverted.map(x=>Object.freeze(x)));
+}
+export function parseReaderReverseNormativeAudit(
+  text: string, coverage:ReaderCoveragePlan, routes:ReaderRoutes,
+): ReaderReverseNormativeAudit {
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G17 invalid inversion YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G17 inversion audit");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","reader_dag","normative_edges_are_reader_edges","observations"],"G17 inversion audit");
+  if(raw.schema!=="mts-reader-inversion-audit/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.reader_dag!=="scientific-review-pending"||
+     raw.normative_edges_are_reader_edges!==false)
+    fail("G17 cannot approve editorial or normative/reader DAG equivalence");
+  const derived=deriveReaderReverseNormativeEdges(coverage,routes);
+  if(derived.length!==17||!Array.isArray(raw.observations)||raw.observations.length!==17)
+    fail("G17 accepted edge inversion count mismatch");
+  const expectedKeys=new Set(derived.map(x=>x.prerequisite+"→"+x.consumer));
+  const seen=new Set<string>();
+  const entries:ReaderReverseNormativeEdge[]=raw.observations.map((entry,i)=>{
+    const x=object(entry,"G17 observation");
+    exactFields(x,["prerequisite","consumer","review","risk_ru","proposal_ru"],"G17 observation");
+    const key=String(x.prerequisite)+"→"+String(x.consumer);
+    if(!expectedKeys.has(key)||seen.has(key))
+      fail("G17 accepted normalized dependency/chapter relation drift");
+    seen.add(key);
+    if(x.review!=="pending"||typeof x.risk_ru!=="string"||x.risk_ru.trim().length<85||
+       typeof x.proposal_ru!=="string"||x.proposal_ru.trim().length<85)
+      fail("G17 each inversion needs individual unapproved scientific rationale");
+    return Object.freeze({
+      prerequisite:x.prerequisite as string,consumer:x.consumer as string,
+      review:"pending" as const,riskRu:x.risk_ru,proposalRu:x.proposal_ru,
+    });
+  });
+  if(seen.size!==expectedKeys.size)fail("G17 missing accepted inversion");
+  return Object.freeze({
+    schema:"mts-reader-inversion-audit/v0.1" as const,status:"proposed" as const,
+    authorApproval:"not-recorded" as const,publication:"blocked" as const,
+    readerDag:"scientific-review-pending" as const,normativeEdgeCount:100 as const,
+    reversedChapterEdges:Object.freeze(entries),
+  });
+}
+export function loadReaderReverseNormativeAudit(root:string):ReaderReverseNormativeAudit{
+  return parseReaderReverseNormativeAudit(
+    readFileSync(resolve(root,READER_INVERSION_G17_PATH),"utf8"),
+    loadReaderCoverage(root),loadReaderRoutes(root));
+}
+export function renderReaderReverseNormativeAudit(a:ReaderReverseNormativeAudit):string{
+  return [
+    "# Межраздельные зависимости научного черновика МТС","",
+    "**17 предметных редакционных рисков; ни одна нормативная зависимость не объявляется автоматически reader DAG.**","",
+    "Принятых нормативных зависимостей: "+a.normativeEdgeCount+".",
+    "Зависимостей из поздней главы в более раннюю: "+a.reversedChapterEdges.length+".",
+    "Авторски утверждённых reader DAG переходов: 0.","",
+    ...a.reversedChapterEdges.flatMap(e=>[
+      "## "+e.prerequisite+" → "+e.consumer,"",
+      "Диагностика: "+e.riskRu,"",
+      "Предлагаемое решение: "+e.proposalRu,"",
+      "Статус: научная проверка не завершена.","",
+    ]),
+  ].join("\n");
+}

@@ -11,7 +11,9 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderDraftPreview, projectReaderDraftPreview,
   loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure,
   loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude,
-  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening }
+  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening,
+  loadReaderReverseNormativeAudit, parseReaderReverseNormativeAudit, deriveReaderReverseNormativeEdges,
+  renderReaderReverseNormativeAudit }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -455,3 +457,39 @@ assert.throws(()=>g16Parse(g16Yaml,g4,{
   }
 }),/accepted v0.13 structural witnesses drift/);
 console.log("G16: original historic source unchanged; standalone blocked scientific prelude candidate.");
+
+
+const g17Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-INVERSION-G17.yaml"),"utf8");
+const g17=loadReaderReverseNormativeAudit(root);
+assert.equal(g17.schema,"mts-reader-inversion-audit/v0.1");
+assert.equal(g17.normativeEdgeCount,100);
+assert.equal(g17.reversedChapterEdges.length,17);
+assert.equal(g17.authorApproval,"not-recorded");
+assert.equal(g17.publication,"blocked");
+assert.equal(g17.readerDag,"scientific-review-pending");
+assert.ok(g17.reversedChapterEdges.every(x=>x.review==="pending" &&
+  x.riskRu.length>=85 && x.proposalRu.length>=85));
+assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V14-L6"&&x.consumer==="V14-L7"));
+assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V15-TERM-01"&&x.consumer==="V15-NAME-01"));
+assert.deepEqual(deriveReaderReverseNormativeEdges(plan,routes).map(x=>[x.prerequisite,x.consumer]),
+  g17.reversedChapterEdges.map(x=>[x.prerequisite,x.consumer]));
+assert.ok(renderReaderReverseNormativeAudit(g17).includes("Авторски утверждённых reader DAG переходов: 0."));
+const g17Parse=(text:string,coverage=plan,routeModel=routes)=>
+  parseReaderReverseNormativeAudit(text,coverage,routeModel);
+assert.throws(()=>g17Parse(g17Source.replace("status: proposed","status: accepted")),
+  /cannot approve editorial or normative\/reader DAG equivalence/);
+assert.throws(()=>g17Parse(g17Source.replace("normative_edges_are_reader_edges: false",
+  "normative_edges_are_reader_edges: true")),
+  /cannot approve editorial or normative\/reader DAG equivalence/);
+assert.throws(()=>g17Parse(g17Source.replace("  - prerequisite: V14-L6",
+  "  - prerequisite: V14-L5")),/accepted normalized dependency\/chapter relation drift/);
+assert.throws(()=>g17Parse(g17Source.replace("    review: pending","    review: green")),
+  /each inversion needs individual unapproved scientific rationale/);
+assert.throws(()=>g17Parse(g17Source.replace("observations:\n","observations:\n  - prerequisite: V14-L6\n    prerequisite: V14-L6\n")),
+  /G17 invalid inversion YAML/);
+const alteredPlan={...plan,rows:plan.rows.map(x=>x.id==="V14-L7"?{
+  ...x,normativeDependsOn:["V14-L13"],
+}:x)};
+assert.throws(()=>g17Parse(g17Source,alteredPlan),/accepted normative dependency source drift/);
+console.log("G17: 100 normative edges; 17 individually reviewed chapter inversions, zero accepted reader DAG edges.");
