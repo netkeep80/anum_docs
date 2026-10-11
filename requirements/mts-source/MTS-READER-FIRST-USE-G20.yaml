@@ -133,7 +133,7 @@ nodes:
     source_owner: G7
     source_atom: "link-identity"
     accepted_id: V14-L5
-    reader_requires: ["g4:foundation"]
+    reader_requires: ["g4:foundation", "concept:anet-term"]
     review: pending
   - id: "g7:link-rewrite"
     source_owner: G7
@@ -307,13 +307,13 @@ nodes:
     source_owner: G10
     source_atom: "v14-l3"
     accepted_id: V14-L3
-    reader_requires: ["g4:foundation"]
+    reader_requires: ["g4:foundation", "g7:q-codec"]
     review: pending
   - id: "g10:v14-l4"
     source_owner: G10
     source_atom: "v14-l4"
     accepted_id: V14-L4
-    reader_requires: ["g4:foundation"]
+    reader_requires: ["g4:foundation", "g8:glyph-map"]
     review: pending
   - id: "g10:v14-l7"
     source_owner: G10
@@ -337,7 +337,7 @@ nodes:
     source_owner: G10
     source_atom: "v14-l10"
     accepted_id: V14-L10
-    reader_requires: ["g4:foundation"]
+    reader_requires: ["g4:foundation", "concept:nat-first-use"]
     review: pending
   - id: "g10:v14-l11"
     source_owner: G10
@@ -349,7 +349,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-term-01"
     accepted_id: V15-TERM-01
-    reader_requires: ["g4:foundation"]
+    reader_requires: ["g4:foundation", "concept:anet-term"]
     review: pending
   - id: "g11:v15-auth-01"
     source_owner: G11
@@ -373,7 +373,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-onto-02"
     accepted_id: V15-ONTO-02
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:exact-sequence-first-use"]
     review: pending
   - id: "g11:v15-onto-03"
     source_owner: G11
@@ -535,7 +535,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-fals-01"
     accepted_id: V15-FALS-01
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-gov-01"
     source_owner: G11
@@ -583,7 +583,7 @@ nodes:
     source_owner: G11
     source_atom: "v15-ready-02"
     accepted_id: V15-READY-02
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-ready-03"
     source_owner: G11
@@ -619,19 +619,19 @@ nodes:
     source_owner: G11
     source_atom: "v15-reg-01"
     accepted_id: V15-REG-01
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-reg-02"
     source_owner: G11
     source_atom: "v15-reg-02"
     accepted_id: V15-REG-02
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "g11:v15-reg-03"
     source_owner: G11
     source_atom: "v15-reg-03"
     accepted_id: V15-REG-03
-    reader_requires: ["g4:foundation", "concept:anet-term"]
+    reader_requires: ["g4:foundation", "concept:anet-term", "concept:formal-json-first-use"]
     review: pending
   - id: "basis:R"
     source_owner: G15
