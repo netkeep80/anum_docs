@@ -7,6 +7,7 @@ import {loadReaderR43} from "./mts-reader-r43.js";
 import {loadReaderR44W3} from "./mts-reader-r44-w3.js";
 import {loadReaderR44W4} from "./mts-reader-r44-w4.js";
 import {loadReaderR44W5} from "./mts-reader-r44-w5.js";
+import {loadReaderF01F02P01} from "./mts-reader-review-f01-f02-p01.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -111,6 +112,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const model=parseReaderW6Model(read(root,READER_W6_PATH));
  const graph=loadReaderG20(root),g41=loadReaderG41(root),g42=loadReaderG42(root);
  const r43=loadReaderR43(root),w3=loadReaderR44W3(root),w4=loadReaderR44W4(root),w5=loadReaderR44W5(root);
+ const scientificReview=loadReaderF01F02P01(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -144,6 +146,12 @@ export function renderReaderW6(root:string):ReaderW6Document{
   const titleOverride=model.renamed.find(x=>x.id===chapter.id)?.title;
   main.push("## "+(ci+1)+". "+(titleOverride??chapter.titleRu),"",transition.reading,"",
     "**Граница применимости.** "+transition.limit,"");
+  if(chapter.id==="foundational-forms"){
+   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"");
+  }
+  if(chapter.id==="proof-and-refinement"){
+   main.push(scientificReview.assuranceMd,"");
+  }
   let paragraph=0;
   for(const id of chapter.atomIds){
    const node=byId.get(id)!;check(node!==undefined,"missing source "+id);

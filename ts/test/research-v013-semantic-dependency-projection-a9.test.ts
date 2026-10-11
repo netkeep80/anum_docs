@@ -1254,6 +1254,8 @@ const postV013ToolingDeltaFiles = new Set([
   // W6 human-readable manuscript and CLI rearrange immutable science; no runtime semantics.
   "ts/src/tooling/mts-reader-r44-w6.ts",
   "ts/src/tooling/mts-reader-r44-w6-cli.ts",
+  // F01/F02/P01 reads pinned proofs to render non-authoritative scholarly context.
+  "ts/src/tooling/mts-reader-review-f01-f02-p01.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
