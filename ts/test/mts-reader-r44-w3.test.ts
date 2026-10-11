@@ -18,6 +18,8 @@ for(const x of reviewed.rows){
   assert.equal(manuscript.split(x.limitationRu).length-1,1);
 }
 assert.equal(reviewed.rows.filter(x=>x.id==="V15-READY-03")[0]?.requirementState,"ACCEPTED");
+assert.ok(manuscript.includes("47 цитат дословное совпадение"));
+assert.ok(manuscript.includes("V15-READY-03"));
 assert.ok(manuscript.includes("A14→A16→A17→A72w"));
 assert.ok(manuscript.includes("Γ предпосылкой"));
 assert.ok(manuscript.includes("FRM-04")&&manuscript.includes("FRM-05")&&manuscript.includes("FRM-06")&&manuscript.includes("FRM-07"));
@@ -27,6 +29,10 @@ const p=(s:string)=>parseReaderR44W3(s,root);
 assert.throws(()=>p(original.replace("author_approval: not-recorded","author_approval: approved")),/cannot accept, publish|no editor can accept/);
 assert.throws(()=>p(original.replace("publication: blocked","publication: ready")),/no editor can accept/);
 assert.throws(()=>p(original.replace("not-forty-eight-formal-proofs","forty-eight-formal-proofs")),/no editor can accept/);
+assert.throws(()=>p(original.replace(
+  "historical_quote: \"Only explicit Author ACCEPT/REJECT can change accepted/current from v0.14 to v0.15.\"",
+  "historical_quote: \"The author approves anything.\"")),/historical quote exception must be exact/);
+assert.throws(()=>p(original.replace("source_wave: W4\n  historical_quote","source_wave: W3\n  historical_quote")),/historical quote exception must be exact/);
 assert.throws(()=>p(original.replace("source_atom: v15-term-01","source_atom: v15-gamma-01")),/cannot detach source/);
 assert.throws(()=>p(original.replace("source_authority_state: ACCEPTED","source_authority_state: COMPONENT_GREEN")),/cannot detach source/);
 assert.throws(()=>p(original.replace("type: terminology","type: universally-proved")),/cannot self-promote/);
@@ -34,4 +40,4 @@ assert.throws(()=>p(original.replace("audit_state: individually-scoped-editorial
 assert.throws(()=>p(original.replace("  - id: V15-TERM-01\n","  - id: V15-TERM-02\n")),/cannot detach source/);
 assert.throws(()=>p(original.replace("open: [R40-06","open: [R40-07")),/cannot silently close R40/);
 assert.throws(()=>p(original+"\npublication: ready\n"),/malformed\/duplicate YAML/);
-console.log("R44-W3: 48 individually source-traced v0.15 reviews (4x12), exact registry+G11 source-quote parity, MP→Γ history, 8 FRM proof classifications, author/governance distinctions, 119 original atoms preserved, no science acceptance.");
+console.log("R44-W3: 48 individually source-traced v0.15 reviews (4x12), 47 exact G11 quotes + explicit V15-READY-03 acceptance-history exception, MP→Γ history, 8 FRM proof classifications, author/governance distinctions, 119 original atoms preserved, no science acceptance.");

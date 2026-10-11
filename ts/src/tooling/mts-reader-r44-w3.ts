@@ -36,7 +36,7 @@ function pin(path:string,sha:string):string {return "https://github.com/netkeep8
 export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
   const doc=parse(documentText);
   keys(doc,["schema","status","author_approval","publication","semantic_change","coverage",
-    "accepted_registry","accepted_main_sha","proposed_source_sha","upstream_science","source_waves","historical_mp",
+    "accepted_registry","accepted_main_sha","proposed_source_sha","upstream_science","source_waves","historical_cutover_exception","historical_mp",
     "proof_scope","authority_boundary","reviews","unresolved_r40"],"R44-W3");
   must(doc.schema==="mts-reader-v015-individual-audit-r44-w3/v0.1"&&
     doc.status==="proposed"&&doc.author_approval==="not-recorded"&&doc.publication==="blocked"&&
@@ -79,16 +79,37 @@ export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
   }
   must(source.length===48&&new Set(source.map(x=>x.accepted_id)).size===48,
     "duplicate/omitted V15 source atoms");
+  const historical=ob(doc.historical_cutover_exception,"historical cutover");
+  keys(historical,["id","source_wave","historical_quote","accepted_summary",
+    "author_decision_source","interpretation_ru"],"v0.15 historical quote exception");
+  must(historical.id==="V15-READY-03"&&historical.source_wave==="W4"&&
+    historical.historical_quote==="Only explicit Author ACCEPT/REJECT can change accepted/current from v0.14 to v0.15."&&
+    historical.accepted_summary==="Explicit Author ACCEPT changes accepted/current from v0.14 to v0.15."&&
+    historical.author_decision_source==="traceability/mts-v0.15.json"&&
+    str(historical.interpretation_ru,"historical quote commentary",190).includes("уже состоявшийся ACCEPT"),
+    "historical quote exception must be exact and explicit, not a generic bypass");
+  const traced=JSON.parse(read(root,historical.author_decision_source as string)) as {
+    status:string; authorDecision:{state:string;decision:string;decisionEvidence:string};
+  };
+  must(traced.status==="accepted"&&traced.authorDecision.state==="ACCEPTED"&&
+    traced.authorDecision.decision==="ACCEPT_MTS_V0_15"&&
+    traced.authorDecision.decisionEvidence==="netkeep80/anum_docs#1876 issuecomment-6046228475",
+    "historical exception needs accepted Author evidence");
   const raw=array(doc.reviews,"individual reviews");
   must(raw.length===48,"every one of the 48 v0.15 requirements needs its own signed editorial judgement");
   const permitted=new Set(["terminology","semantic-contract","execution-contract","evidence-condition","governance-rule"]);
+  let sourceQuoteExceptions=0;
   const reviewed=raw.map((v,i)=>{
     const row=ob(v,"review "+i);
     keys(row,["id","source_wave","source_atom","source_authority_state","type",
       "audit_state","assessment_ru","limitation_ru"],"individual review");
     const canonical=accepted.requirements[i]!,original=source[i]!;
     must(row.id===canonical.id&&row.source_atom===original.id&&row.source_wave===sourceWave[i]&&
-      original.accepted_id===canonical.id&&original.source_quote===canonical.summary&&
+      original.accepted_id===canonical.id&&
+      (original.source_quote===canonical.summary||
+        (canonical.id===historical.id&&sourceWave[i]===historical.source_wave&&
+          original.source_quote===historical.historical_quote&&
+          canonical.summary===historical.accepted_summary&&++sourceQuoteExceptions===1))&&
       row.source_authority_state===canonical.state,
       "review cannot detach source or misquote accepted requirement: "+canonical.id);
     must(row.audit_state==="individually-scoped-editorial-review-pending-author"&&
@@ -103,6 +124,7 @@ export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
     return {id:canonical.id,atom:original.id,wave:sourceWave[i]!,requirementState:canonical.state,
       kind:row.type as string,assessmentRu,limitationRu};
   });
+  must(sourceQuoteExceptions===1,"G11 v0.15 47/48 exact quotes plus one historically explained author cutover");
   must(new Set(reviewed.map(x=>x.assessmentRu)).size===48&&
     new Set(reviewed.map(x=>x.limitationRu)).size===48,
     "all 48 judgements must be distinct");
@@ -170,7 +192,7 @@ export function renderReaderR44W3Preview(root:string):string {
   const anchor="## Редакционные ограничения R40";
   must(base.split(anchor).length===2,"exact one reader R40 boundary");
   const appendix=["## R44-W3 — индивидуальная научно-редакционная проверка требований v0.15","",
-    "Все 48 обязательных требований сверены с принятым реестром и точными цитатами четырёх русских волн G11. Ни одна из этих редакционных оценок не заменяет формального доказательства либо решения Автора.","",
+    "Все 48 обязательных требований сопоставлены с принятым реестром и первичными формулировками G11. У 47 цитат дословное совпадение; у V15-READY-03 зафиксирована историческая разница между правилом допуска ACCEPT/REJECT и уже принятым решением ACCEPT. Эти редакционные оценки не заменяют формального доказательства или решения Автора.","",
     "### Исторические MP и Γ: переход нормативных областей","",review.mp.scientificRu,"",
     "**Не следует:** "+review.mp.exclusionRu,"",
     "### Парные FORMAL-свидетельства и их реальные пределы","",review.proof.scientificRu,"",

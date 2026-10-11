@@ -14,6 +14,13 @@ source_waves:
   - requirements/mts-source/MTS-READER-V15-G11-W2.yaml
   - requirements/mts-source/MTS-READER-V15-G11-W3.yaml
   - requirements/mts-source/MTS-READER-V15-G11-W4.yaml
+historical_cutover_exception:
+  id: V15-READY-03
+  source_wave: W4
+  historical_quote: "Only explicit Author ACCEPT/REJECT can change accepted/current from v0.14 to v0.15."
+  accepted_summary: "Explicit Author ACCEPT changes accepted/current from v0.14 to v0.15."
+  author_decision_source: traceability/mts-v0.15.json
+  interpretation_ru: "Русский текст G11/W4 и его исходная английская цитата фиксируют историческое правило допуска ACCEPT или REJECT. Принятый реестр отражает уже состоявшийся ACCEPT и поэтому содержит другую, более позднюю английскую формулировку. Оба источника сохраняются без переписывания; научное издание обязано различать историческое правило и действующий статус."
 historical_mp:
   source: requirements/mts-source/MTS-READER-V14-G10.yaml
   source_atom: v14-l11
