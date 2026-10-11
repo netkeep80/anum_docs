@@ -1,0 +1,128 @@
+# R44-W4 — editorial continuity and theorem-to-proof catalogue; not new MTS authority.
+schema: mts-reader-scientific-continuity-r44-w4/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+coverage: ten-chapter-transitions-five-overlaps-eight-formal-cases
+source_manuscript: requirements/mts-source/MTS-READER-V015-INDIVIDUAL-AUDIT-R44-W3.yaml
+source_graph: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+source_composition: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+source_foundation: requirements/mts-source/MTS-FND-V14-L1.yaml
+source_editorial_opening: requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml
+source_proofs: proofs/v015-formal-proof-assurance.json
+evidence_bootstrap: proofs/v015-evidence/formal-bootstrap-frm01-06.json
+evidence_refinement: proofs/v015-evidence/formal-refinement-frm07-08.json
+accepted_proof_lean4: proofs/lean4/MtsV015Formal.lean
+accepted_proof_rocq: proofs/coq/MtsV015Formal.v
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+source_draft_sha: 7f56affeff393017bd9004de131b712e29d0e5a0
+publication_template:
+  title_ru: "Метатеория Связей: основания, представления, исполнение и область доказательств"
+  annotation_ru: "Научный читательский черновик принятой МТС v0.15 с разделёнными слоями онтологии Link, формальных языков, исполнительной семантики, проверенных внешних теорем и свидетельств реализации. Оригинальные источники и доказательные условия цитируются отдельно; предложенная редакция не является новым принятимым нормативным текстом."
+  introduction_ru: "Цель изложения — восстановить логическую зависимость каждого понятия от ранее определённых сущностей и предпосылок. Принятая семантика не изменяется; спорные переходы, не предъявленные доказательства и история принятия выделяются явно. Русский термин Связь сопровождается Link при первом введении, без подмены математической сущности именем файла или типа данных."
+  presentation_policy: "Непосредственно после математического утверждения указывать условия применимости, точный исходный ID и внешний источник доказательства; после каждого раздела отделять непроверенные обобщения от доказанных результатов. Не удалять исторические поясняющие атомы G16, не дублировать их как независимые аксиомы и не считать красивое оформление авторской приёмкой."
+  images_policy: "Исторические изображения сохраняются неизменными, если их исходные метаданные не подтверждают право на удаление; новая редакция вправе переместить ссылку и добавить подпись, но не стирать исходный объект или отрезать происхождение."
+foundation_overlap:
+  - id: R44-W4-F01
+    proof_atom: "g4:foundation"
+    explanation_atom: "editorial:foundation-ontology"
+    relationship_ru: "Внешняя аксиоматика Foundation задаёт интерфейс form/start/finish/R и уравнения проекций. Атом G16 педагогически вводит те же понятия, не добавляя другую операцию или альтернативный набор аксиом."
+    editorial_rule_ru: "Не печатать G16 как ещё одну независимую систему аксиом: сохранять текст с пометкой о его поясняющей функции и ссылкой на G4."
+    retained: true
+  - id: R44-W4-F02
+    proof_atom: "g4:incidence"
+    explanation_atom: "editorial:local-self-classification"
+    relationship_ru: "G4 определяет FullSelf, StartOnly, FinishOnly и PairLocal вместе с условием LocalSelfDecision. G16 поясняет четыре позиции 11/10/01/00, но его перечень не устанавливает существование четырёх свидетелей."
+    editorial_rule_ru: "Условная конструктивная исчерпываемость относится к выбранной x; нельзя превращать её в утверждение о глобальной разрешимости равенства."
+    retained: true
+  - id: R44-W4-F03
+    proof_atom: "g4:one-sided-realizability"
+    explanation_atom: "editorial:root-basis-witnesses"
+    relationship_ru: "G4 получает представителей 10/01/00 лишь после явного F2F3OneSidedExistence, а FND-02 отделяет единственность R через A1RecursiveSeparation. G16 показывает принятое обозначение R/O/C/L как читательский базис."
+    editorial_rule_ru: "Не выводить свойства абстрактного Foundation из имён конкретных базисных Связей без включения дополнительных предпосылок."
+    retained: true
+  - id: R44-W4-F04
+    proof_atom: "g4:context-roles"
+    explanation_atom: "editorial:relative-chiral-orientation"
+    relationship_ru: "Внешняя теорема об объективной хиральной орбите отделена от теоремы о двух ролях после выбора ContextOrientationMarker. G16 даёт словесный переход между этими уровнями, не назначая глобальную W."
+    editorial_rule_ru: "Не смешивать роли START_K/END_K с программным Context/currentness для Γ и не смешивать предпосылки двух теорем CTX-03."
+    retained: true
+  - id: R44-W4-F05
+    proof_atom: "g7:recursive-codec"
+    explanation_atom: "editorial:representation-boundary"
+    relationship_ru: "G7 различает кодеки, Q и Anum, а G16 напоминает об отличии структурного 8/9/6/1 от алфавита последовательностей. Это пояснение уровня записи, а не новая теорема об онтологии."
+    editorial_rule_ru: "Не отождествлять байтовую запись, позиционную ExactSequence и инвариантное тождество Link только по сходству символов."
+    retained: true
+chapter_transitions:
+  - chapter: foundational-forms
+    evidence_atom: "g4:foundation"
+    transition_ru: "Постановка. Один онтологический объект Link допускает внешние проекции двух полюсных позиций. Четыре случая самоинцидентности выводятся как логические условия, а существование их представителей требует дополнительных свидетельств."
+    limit_ru: "Опорные уравнения Foundation не доказывают глобальную единственность R или алгоритмическую разрешимость равенства Link."
+  - chapter: grounded-inverse-context
+    evidence_atom: "g4:identity-by-poles"
+    transition_ru: "Переход. После явного Grounded можно сформулировать FND-13 с нормализацией, затем инверсию и отдельно доказать объективную орбиту и контекстно выбранные роли. Каждая теорема имеет свою сигнатуру предпосылок."
+    limit_ru: "Объективная хиральная пара не выбирает W; относительная ориентация требует ContextOrientationMarker и не наследует автоматически все предпосылки орбиты."
+  - chapter: representation-first-use
+    evidence_atom: "g7:recursive-codec"
+    transition_ru: "Переход. Нотация 8/9/6/1 описывает рекурсивные структурные аспекты, но текстовые кодеки, Anum и Q представляют другой слой. Ранний Q выводится с точным указанием исходного атома G7."
+    limit_ru: "Первое объяснение кодека не определяет новое тождество Link и не разрешает смешивать профили Q13 и Q14."
+  - chapter: derived-and-context
+    evidence_atom: "g7:nat-degree-nonidentity"
+    transition_ru: "Переход. Шкалы Nat и Degree задаются разными начальными элементами U и L; последовательные структуры и операции преобразования не следует объявлять равными из-за одинакового числового индекса."
+    limit_ru: "N₁=U⟼L и D₁=L — различные выражения; утверждение N₁=D₁ исключено в принятом контракте, несмотря на исследовательский статус Nat."
+  - chapter: grammar-and-historical-mp
+    evidence_atom: "g8:no-implicit-associativity"
+    transition_ru: "Переход. Отсутствие неявной группировки в v0.14 относится к синтаксису, а DSA v0.15 задаёт конкретное чтение цепочки. Исторический обобщённый MP рассматривается до введения исполнительного контракта Γ."
+    limit_ru: "Нельзя выводить алгебраическую ассоциативность из DSA или считать Γ предпосылкой ранее принятых A14→A16→A17→A72w."
+  - chapter: v015-ontology
+    evidence_atom: "g11:v15-onto-01"
+    transition_ru: "Переход. Теория сохраняет единую онтологию Link, а правила именования, контекстное членство и требования к кодеку описываются по их собственным областям. Метки готовности относятся к контролю требований."
+    limit_ru: "Статусы COMPONENT_GREEN и ACCEPTED, а также регламент работы с GitHub не являются теоремами об элементах Link."
+  - chapter: v015-execution
+    evidence_atom: "g11:v15-gamma-01"
+    transition_ru: "Переход. Общий путь FORMAL/JSON → нативная ANet → денотация → Γ требует снимка перед J0, read-only S1, конструктивного S2 и атомарной публикации 0/1/N результатов. AND иллюстрирует этот контракт."
+    limit_ru: "Таблица FF/FT/TF/TT не распространяется за строгий T/F; отдельный тест NO_MATCH и позиционная ExactSequence не заменяются произвольным F_R."
+  - chapter: proof-and-refinement
+    evidence_atom: "g11:v15-formal-proof-01"
+    transition_ru: "Переход. Восемь FRM-целей проверяются только относительно явно объявленных моделей Lean4 и Rocq. Каталог сопоставляет теорему с сигнатурой, фактическими предпосылками и источником свидетельства."
+    limit_ru: "Наличие формальной цели и выполненных тестов не доказывает семантическую корректность произвольного production TypeScript и не снимает условий FRM-04–07."
+  - chapter: reproducibility-assurance
+    evidence_atom: "g11:v15-fals-01"
+    transition_ru: "Переход. Исполняемые реплеи, мутации и замыкание authority подтверждают наблюдаемое поведение выбранных артефактов. Каждое свидетельство следует отделять от общего математического утверждения о модели."
+    limit_ru: "GREEN одного CI или статус SKIPPED на Draft не заменяют полный регрессионный пакет и самостоятельную независимую экспертизу."
+  - chapter: governance-and-history
+    evidence_atom: "g11:v15-ready-03"
+    transition_ru: "Переход. Авторское принятие v0.15 — завершённое историческое событие, тогда как публикация новой научной редакции и утверждение нового JSON требуют отдельных точных решений."
+    limit_ru: "Нельзя изменять accepted/current на основании редакционного ревью, закрытого PR или зелёных тестов рукописи."
+formal_catalogue:
+  - id: FRM-01
+    scientific_ru: "Внешнее доказательство абсолютного контекстного имени дано для выбранной математической модели без глобального host namespace."
+    exclusion_ru: "Парсер production и полнота разрешения любых пользовательских имён не формально верифицированы этим результатом."
+  - id: FRM-02
+    scientific_ru: "Разделение корневой source-роли и вложенного membership подтверждено для bootstrap-среза, охватывающего bare, binding и пустой bundle."
+    exclusion_ru: "Непустые рекурсивные bundles требуют самостоятельной проверки refinement за пределами bootstrap-среза."
+  - id: FRM-03
+    scientific_ru: "Трёхчленный случай Direct Sequential Association формализует семантику чтения цепочки без утверждения об алгебраической ассоциативности Link."
+    exclusion_ru: "Общее тождество (A⟼B)⟼C=A⟼(B⟼C) отсюда не следует, как и правило группировки исторической v0.14."
+  - id: FRM-04
+    scientific_ru: "Позиционная ExactSequence различает пустую последовательность, один корень и два корня в модели с явно предположенной инъективностью кодирования."
+    exclusion_ru: "Инъективность production encoder не доказана одной этой теоремой и остаётся отдельным обязательством refinement."
+  - id: FRM-05
+    scientific_ru: "Сходимость денотации FORMAL и JSON следует в математической модели из предпосылки равенства реконструированных нативных source ANet."
+    exclusion_ru: "Равенство декодеров production для всех произвольных JSON и FORMAL текстов не содержится в доказательстве."
+  - id: FRM-06
+    scientific_ru: "Сохранение смысла рекурсивной метакомпиляции доказано при предпосылке decode(compile(semantic))=semantic на выбранном профиле."
+    exclusion_ru: "Наличие такого равенства для production codec не доказывается самой условной теоремой; произвольная байтовая строка может быть недопустима."
+  - id: FRM-07
+    scientific_ru: "Refinement утверждённого артефакта доказан при совместном выполнении production-сходимости FORMAL/JSON, свойства left inverse кодека и закона чтения ExactSequence."
+    exclusion_ru: "Lean4/Rocq не верифицируют текст программы TypeScript; три production-предпосылки требуют отдельных исполняемых свидетельств."
+  - id: FRM-08
+    scientific_ru: "Структурные аспекты Link формализованы в выбранной модели с отдельно зарегистрированным production witness для поддерживаемого фрагмента."
+    exclusion_ru: "Результат не разрешает произвольные циклические FORMAL bindings и не превращает structural aspects в host-opcodes."
+review_gate:
+  state: independent-author-scientific-revision-still-required
+  final_r40_states_unchanged: true
+  source_atoms_preserved: 119
+  individually_reviewed_v015_requirements_preserved: 48
+  statement_ru: "W4 устраняет непрозрачность переходов и привязывает читательские утверждения к точному восьмичастному формальному каталогу, но не закрывает девять оставшихся R40 и не заменяет независимую математическую экспертизу каждой претензии."
