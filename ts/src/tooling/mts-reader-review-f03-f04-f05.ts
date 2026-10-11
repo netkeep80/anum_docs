@@ -30,6 +30,7 @@ const gSymbols=["LocalSelfDecision","local_self_incidence_exhaustive",
 const iSymbols=["fnd13_form_injective","FND_13_identity_by_poles",
  "FND_02_unique_root","F2F3GroundedNormalization","explicit_fnd13_replay"];
 const xSymbols=["badStart_not_grounded","badFinish_not_grounded","fallback_cycle_not_grounded"];
+const xRocqSymbols=["model_bad_start_not_grounded","model_bad_finish_not_grounded","fallback_cycle_not_grounded"];
 const pairNames=["R/O","R/C","R/L","R/U","O/C","O/L","O/U","C/L","C/U","L/U"];
 const pairReasons=["E.startRootNeRoot","E.finishRootNeRoot",
  "FullSelf(R) versus PairLocal(L)","FullSelf(R) versus PairLocal(U)",
@@ -89,10 +90,10 @@ export function parseReaderF03F04F05(source:string,root:string):F03F05{
  symbols(fl,iSymbols.slice(0,4),"FND-13 Lean");
  symbols(fc,iSymbols.slice(0,4),"FND-13 Rocq");
  symbols(ml,[...xSymbols,"explicit_fnd13_replay"],"Explicit model Lean");
- symbols(mc,[...xSymbols,"explicit_fnd13_replay"],"Explicit model Rocq");
+ symbols(mc,[...xRocqSymbols,"explicit_fnd13_replay"],"Explicit model Rocq");
  const b=rec(d.basis,"F03"),g=rec(d.grounded,"F04"),i=rec(d.identity,"F05");
  exactKeys(b,["heading_ru","status",...f03,"table","lean_symbols","rocq_symbols"],"F03");
- exactKeys(g,["heading_ru",...f04,"lean_symbols","rocq_symbols","model_symbols"],"F04");
+ exactKeys(g,["heading_ru",...f04,"lean_symbols","rocq_symbols","model_lean_symbols","model_rocq_symbols"],"F04");
  exactKeys(i,["heading_ru",...f05,"lean_symbols","rocq_symbols","open_obligations"],"F05");
  guard(b.status==="CONDITIONAL_DERIVATION_FROM_ACCEPTED_THEOREMS_NOT_NEW_KERNEL_CERTIFICATE",
   "pairwise table is a derived proposition, not independently accepted kernel proof");
@@ -100,7 +101,8 @@ export function parseReaderF03F04F05(source:string,root:string):F03F05{
  eqList(b.rocq_symbols,bSymbols,"F03 Rocq");
  eqList(g.lean_symbols,gSymbols,"F04 Lean");
  eqList(g.rocq_symbols,gSymbols,"F04 Rocq");
- eqList(g.model_symbols,xSymbols,"F04 cyclic witnesses");
+ eqList(g.model_lean_symbols,xSymbols,"F04 Lean cyclic witnesses");
+ eqList(g.model_rocq_symbols,xRocqSymbols,"F04 Rocq cyclic witnesses");
  eqList(i.lean_symbols,iSymbols,"F05 Lean");
  eqList(i.rocq_symbols,iSymbols,"F05 Rocq");
  eqList(i.open_obligations,open,"F05 open problems");

@@ -45,7 +45,8 @@ grounded:
   limit_ru: "Нельзя смешивать четыре локальных булевых случая с четырьмя примитивными операциями или четырьмя элементами всего носителя. Не доказано, что каждая Link является Grounded; также не доказана тотальная вычислимая классификация arbitrary Link без конкретного решения LocalSelfDecision."
   lean_symbols: [LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive, Grounded, Distinguishable, A1RecursiveSeparation, FND_01_grounded_realizability, FND_01_four_structural_cases]
   rocq_symbols: [LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive, Grounded, Distinguishable, A1RecursiveSeparation, FND_01_grounded_realizability, FND_01_four_structural_cases]
-  model_symbols: [badStart_not_grounded, badFinish_not_grounded, fallback_cycle_not_grounded]
+  model_lean_symbols: [badStart_not_grounded, badFinish_not_grounded, fallback_cycle_not_grounded]
+  model_rocq_symbols: [model_bad_start_not_grounded, model_bad_finish_not_grounded, fallback_cycle_not_grounded]
 identity:
   heading_ru: "F05. A1, FND-02 и FND-13: строгая карта независимых предпосылок"
   a1_ru: "A1RecursiveSeparation(F) утверждает, что для x,y с конечными доказательствами Grounded(x) и Grounded(y) невозможность построить Distinguishable(x,y) влечёт x=y. Это дополнительное условие класса моделей, а не определение равенства и не следствие одной лишь сигнатуры. Доказательство explicit_a1 устанавливает его на одной конкретной ExplicitFoundation, но не на всех возможных Foundation."
