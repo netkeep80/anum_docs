@@ -184,6 +184,25 @@ assert.equal(g8.authorApproval, "not-recorded");
 assert.equal(g8.publication, "blocked");
 const g8Parser = (source: string) => parseReaderG8(source, g7Laws, acceptedV14, plan,
   new Map(v15.map(x => [x.id, x.statement])));
+assert.throws(() => g8Parser(g8Yaml, {
+  ...acceptedV14, ostensiveFormalNotation: {
+    ...acceptedV14.ostensiveFormalNotation, implicitPairAssociativity: "LEFT",
+  },
+}), /accepted v0.14 ostensive grammar scope has changed/);
+assert.throws(() => g8Parser(g8Yaml, {
+  ...acceptedV14, ostensiveFormalNotation: {
+    ...acceptedV14.ostensiveFormalNotation, synonyms: {
+      ...acceptedV14.ostensiveFormalNotation.synonyms, "♀": "9",
+    },
+  },
+}), /glyph-to-recursive-alphabet mismatch/);
+assert.throws(() => g8Parser(g8Yaml, {
+  ...acceptedV14, representationLayers: {
+    ...acceptedV14.representationLayers, symbolicMetanotation: {
+      ...acceptedV14.representationLayers.symbolicMetanotation, introducesOntologyEntity: true,
+    },
+  },
+}), /accepted representation layer facts changed/);
 assert.throws(() => g8Parser(g8Yaml.replace("status: proposed", "status: accepted")),
   /cannot promote/);
 assert.throws(() => g8Parser(g8Yaml.replace("proof_check: contract-trace-only", "proof_check: proven")),

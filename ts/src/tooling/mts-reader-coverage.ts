@@ -421,6 +421,37 @@ function resolveReaderContractPointer(contract: Record<string, unknown>, pointer
   }
   return value;
 }
+function verifyG8AcceptedLayerFacts(contract: Record<string, unknown>): void {
+  const notation = object(contract.ostensiveFormalNotation, "accepted ostensive notation");
+  const glyphs = object(notation.synonyms, "accepted glyph synonyms");
+  const pairs: Readonly<Record<string, string>> = { "∞": "8", "♂": "9", "♀": "6", "⟼": "1" };
+  if (Object.keys(glyphs).length !== 4 ||
+      Object.entries(pairs).some(([glyph, value]) => glyphs[glyph] !== value)) {
+    fail("G8 source model glyph-to-recursive-alphabet mismatch");
+  }
+  if (notation.implicitPairAssociativity !== "NONE" ||
+      notation.ambiguousUngroupedFormsRejected !== true ||
+      notation.finalSurfaceGrammar !== "GREEN_RESEARCH" ||
+      JSON.stringify(notation.positionalForms) !== JSON.stringify(["∞", "♂S", "S♀", "A ⟼ B"])) {
+    fail("G8 accepted v0.14 ostensive grammar scope has changed");
+  }
+  const layers = object(contract.representationLayers, "accepted representation layers");
+  const expected = [
+    ["ontology", 0, true, ["Link"]],
+    ["recursiveStructure", 1, false, ["8", "9", "6", "1"]],
+    ["representationsAndCodecs", 2, false, ["recursive Link codec", "Anum", "ExactSequence", "Q"]],
+    ["byteText", 3, false, ["STRING", "UTF-8"]],
+    ["symbolicMetanotation", 4, false, ["names", "Dictionary", "Grammar", "Theory", "FORMAL"]],
+  ] as const;
+  for (const [name, level, introducesOntology, members] of expected) {
+    const layer = object(layers[name], "accepted " + name);
+    if (layer.level !== level || layer.introducesOntologyEntity !== introducesOntology ||
+        JSON.stringify(layer.members) !== JSON.stringify(members)) {
+      fail("G8 accepted representation layer facts changed: " + name);
+    }
+  }
+}
+
 export function parseReaderG8(
   text: string,
   acceptedLaws: ReadonlyMap<string, string>,
@@ -438,6 +469,7 @@ export function parseReaderG8(
       raw.publication !== "blocked" || raw.proof_check !== "contract-trace-only") {
     fail("G8 cannot promote editorial prose to accepted or proven");
   }
+  verifyG8AcceptedLayerFacts(contract);
   const scope = ["V14-L2", "V14-L14"];
   if (!Array.isArray(raw.accepted_scope) || raw.accepted_scope.join(",") !== scope.join(",")) {
     fail("G8 accepted law scope mismatch");
