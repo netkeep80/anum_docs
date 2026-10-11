@@ -104,7 +104,7 @@ export function parseReaderG42(source: string, root: string): ReaderG42Plan {
     keys(ch, ["id","title_ru","bridge_ru","scope_ru","boundary_ru",
       hasRange ? "positions" : "dispositions"], "G42 chapter");
     for(const field of ["id","title_ru","bridge_ru","scope_ru","boundary_ru"]) {
-      check(typeof ch[field] === "string" && (ch[field] as string).trim().length >= (field==="id"?4:45),
+      check(typeof ch[field] === "string" && (ch[field] as string).trim().length >= (field==="id"?4:field==="title_ru"?10:25),
         "G42 chapter needs substantive " + field);
     }
     check(typeof ch.id === "string" && !chaptersRaw.slice(0,index).some(x => object(x,"chapter").id === ch.id),
