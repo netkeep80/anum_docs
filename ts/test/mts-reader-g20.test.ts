@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseDocument } from "yaml";
+import { loadReaderBootstrapNames } from "../src/tooling/mts-reader-coverage.js";
 import {
-  READER_G20_PATH, loadReaderG20, parseReaderG20, readerG20Sources,
-  renderReaderG20Preview,
+  READER_G20_PATH, READER_G41_PATH,
+  loadReaderG20, parseReaderG20, readerG20Sources,
+  loadReaderG41, parseReaderG41, renderReaderG41Preview, renderReaderG20Preview,
 } from "../src/tooling/mts-reader-g20.js";
 
 const root = resolve("..");
@@ -312,5 +314,55 @@ assert.ok(r40Findings.find(x => x.id === "R40-15")?.remedy_ru.includes(
   "только при предъявленном свидетельстве"),
   "Do not invent mathematical counterexamples to positional fold injectivity");
 console.log("R40: all 119 source-owned scientific prose atoms individually scoped; 15 precise findings, one reordering fix, author approval and publication BLOCKED.");
+
+// G41 is a blocked presentation view of exact existing source-owned paragraphs.
+// No change to G7/G15, 119 node identities, 151 graph edges, or accepted proofs.
+const g41 = loadReaderG41(root);
+assert.equal(g41.schema, "mts-reader-first-use-presentation/v0.1");
+assert.equal(g41.publication, "blocked");
+assert.equal(g41.authorApproval, "not-recorded");
+assert.deepEqual(g41.deferred.map(item => item.symbol), ["L", "U"]);
+const g41Text = renderReaderG41Preview(root);
+assert.equal((g41Text.match(/^## /gm) ?? []).length, 119);
+assert.ok(g41Text.includes("ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА"));
+const firstL = g41Text.indexOf("## basis:L\n");
+const firstU = g41Text.indexOf("## basis:U\n");
+const introducedNat = g41Text.indexOf("## concept:nat-first-use\n");
+const definedDegree = g41Text.indexOf("## g7:degree-one\n");
+const introducedQ = g41Text.indexOf("### Первое определение Q");
+const qComparison = g41Text.indexOf("## g7:recursive-codec\n");
+const fullQ = g41Text.indexOf("## g7:q-codec\n");
+assert.ok(firstL >= 0 && firstU > firstL && introducedNat > firstU);
+assert.ok(definedDegree > introducedNat);
+assert.ok(introducedQ > 0 && introducedQ < qComparison && qComparison < fullQ);
+const inlineL = g41Text.slice(firstL, firstU);
+const inlineU = g41Text.slice(firstU, g41Text.indexOf("## g4:grounded\n"));
+assert.ok(inlineL.includes("L = O ⟼ C") && !inlineL.includes("Degree"));
+assert.ok(inlineU.includes("U = C ⟼ O") && !inlineU.includes("ExactSequence"));
+for (const basis of g41.deferred) {
+  const first = g41Text.indexOf("## " + basis.firstUseNode + "\n");
+  const late = g41Text.indexOf("## " + basis.afterNode + "\n");
+  const explanation = g41Text.indexOf(basis.sourceExplanationRu);
+  assert.ok(first >= 0 && late > first && explanation > late,
+    "G41 commentary used before its required technical introduction: " + basis.symbol);
+  assert.equal(g41Text.split(basis.sourceExplanationRu).length - 1, 1,
+    "G41 may not duplicate or omit original source commentary");
+}
+assert.equal(g41Text.split(g41.earlyQ.exactSourceOpeningRu).length - 1, 2,
+  "Q's source-owned exact opening must appear once before and once inside its full G7 paragraph");
+const g41Original = readFileSync(resolve(root, READER_G41_PATH), "utf8");
+const parseG41 = (text: string) => parseReaderG41(
+  text, draft, loadReaderBootstrapNames(root), sources);
+assert.throws(() => parseG41(g41Original.replace("publication: blocked",
+  "publication: ready")), /G41 cannot promote/);
+assert.throws(() => parseG41(g41Original.replace(
+  "Q — версионируемый кодек и интерпретатор последовательностей.",
+  "Q — произвольный двоичный оператор.")),
+  /G41 Q early first-use proposal drift|G41 Q first-use quote not exact prefix/);
+assert.throws(() => parseG41(g41Original.replace(
+  'emit_explanation_after: "g7:degree-one"',
+  'emit_explanation_after: "basis:L"')),
+  /G41 basis L\/U first-use\/release anchor drift/);
+console.log("G41: source-owned Q first-use and deferred G15 L/U comments render once, no accepted source edit or publication.");
 
 console.log("G20: 119 nodes, 151 reader edges, 57 inherited source edges, 94 individually reviewed authored edges, 42-node academic spine, 251 individual review decisions incl 135 R39 redundant review entries, no publication, negative falsifiers GREEN.");
