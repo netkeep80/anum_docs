@@ -48,8 +48,8 @@ assert.throws(()=>bad("author_approval: not-recorded","author_approval: recorded
 assert.throws(()=>bad("publication: blocked","publication: accepted"),/no authority/);
 assert.throws(()=>bad("semantic_change: false","semantic_change: true"),/no authority/);
 assert.throws(()=>bad("master_issue: 2217","master_issue: 10"),/no authority/);
-assert.throws(()=>bad('pair: "L/U"','pair: "L/L"'),/basis inequality/);
-assert.throws(()=>bad('reason: "fnd13_form_injective and O != C"','reason: "associativity"'),/basis inequality/);
+assert.throws(()=>bad('pair: "L/U"','pair: "L/L"'),/basis equality\/inequality rationale/);
+assert.throws(()=>bad('reason: "fnd13_form_injective and O != C"','reason: "associativity"'),/basis equality\/inequality rationale/);
 assert.throws(()=>bad("A1_INDEPENDENCE","A1_PROVED"),/F05 open problems/);
 assert.throws(()=>bad("proofs/lean4/MtsFoundation.lean","proofs/coq/MtsFoundation.v"),/source path drift/);
 assert.throws(()=>bad("CONDITIONAL_DERIVATION_FROM_ACCEPTED_THEOREMS_NOT_NEW_KERNEL_CERTIFICATE","KERNEL_PROVED"),
