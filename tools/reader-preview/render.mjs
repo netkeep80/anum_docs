@@ -51,10 +51,12 @@ function transformHTML(text, style) {
   required(headings===15, "required exactly 10 chapter and 5 full appendix page starts; got "+headings);
   let small=0;
   text=text.replace(/<table>[\s\S]*?<\/table>/g, table=>{
-    if (count(table,/<tr/g)<=8) {small++;return table.replace("<table>",'<table class="compact-table">');}
+    if (count(table,/<tr/g)<=8 && table.includes("RuleFF") && table.includes("RuleTT")) {
+      small++;return table.replace("<table>",'<table class="compact-table">');
+    }
     return table;
   });
-  required(small===1, "expected one small AND example table");
+  required(small===1, "expected exactly one recognized four-row AND example table");
   required(text.includes("</head>"),"missing HTML head");
   text=text.replace("</head>","<style>\n"+style+"\n</style>\n</head>");
   return text;
