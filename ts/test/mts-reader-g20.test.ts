@@ -77,7 +77,6 @@ const requiredFirstUse: readonly [string, string][] = [
   ["g10:v14-l3", "g7:q-codec"],
   ["g10:v14-l4", "g8:glyph-map"],
   ["g10:v14-l10", "concept:nat-first-use"],
-  ["g11:v15-term-01", "concept:anet-term"],
   ["g11:v15-onto-02", "concept:exact-sequence-first-use"],
   ["g11:v15-fals-01", "concept:formal-json-first-use"],
   ["g11:v15-ready-02", "concept:formal-json-first-use"],
