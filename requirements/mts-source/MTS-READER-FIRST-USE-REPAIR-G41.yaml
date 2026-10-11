@@ -1,0 +1,24 @@
+# G41: purely editorial first-use presentation repair; original science source owners remain unchanged.
+schema: mts-reader-first-use-presentation/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+source_reader_graph: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+deferred_basis_commentary:
+  - symbol: L
+    first_use_node: "basis:L"
+    emit_explanation_after: "g7:degree-one"
+  - symbol: U
+    first_use_node: "basis:U"
+    emit_explanation_after: "concept:nat-first-use"
+early_term:
+  symbol: Q
+  source_atom: "g7:q-codec"
+  accepted_id: V14-L13
+  insert_before: "g7:recursive-codec"
+  exact_source_opening_ru: "Q — версионируемый кодек и интерпретатор последовательностей."
+prose_policy:
+  deferred_sections_are_source_owned: true
+  source_text_unchanged: true
+  projection_is_not_a_new_formal_law: true
