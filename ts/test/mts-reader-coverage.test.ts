@@ -419,6 +419,7 @@ assert.ok(g4.statement.ru.startsWith(g16.historicalOpening));
 assert.ok(!g16.candidateRu.includes(g16.historicalOpening));
 assert.ok(g16.candidateRu.includes("11") && g16.candidateRu.includes("01"));
 assert.ok(g16.candidateRu.includes("START_K") && g16.candidateRu.includes("END_K"));
+assert.ok(g16.candidateRu.includes("R представляет случай 11"));
 assert.equal(g16.exclusions.length,3);
 assert.equal(g16.authorApproval,"not-recorded");
 assert.equal(g16.publication,"blocked");
@@ -430,7 +431,8 @@ assert.ok(firstDefinition>=0 && firstDefinition<basisDefinition && basisDefiniti
 assert.equal((introduced.match(/^## /gm)??[]).length,13);
 assert.equal((introduced.match(/^### V1[45]-/gm)??[]).length,62);
 assert.equal((introduced.match(/^#### /gm)??[]).length,104);
-const g16Parse=(text:string,model=g4)=>parseReaderFoundationOpening(text,model);
+const g16Parse=(text:string,model=g4,v13=v13Contract)=>
+  parseReaderFoundationOpening(text,model,v13);
 assert.throws(()=>g16Parse(g16Yaml.replace("status: proposed","status: accepted")),
  /G16 historical provenance or unapproved state drift/);
 assert.throws(()=>g16Parse(g16Yaml.replace("publication: blocked","publication: ready")),
@@ -443,4 +445,13 @@ assert.throws(()=>g16Parse(g16Yaml.replace("accepted_id: V14-L1","accepted_id: V
 assert.throws(()=>g16Parse(g16Yaml.replace("  - ","  - ")
   .replace("exclusions:\n","exclusions:\n  - \"\" \n")),
  /G16 needs three separate scientific noninference boundaries/);
+assert.throws(()=>g16Parse(g16Yaml,g4,{
+  ...v13Contract,aspectFoundationTheorem:{
+    ...v13Contract.aspectFoundationTheorem,necessity:{
+      ...v13Contract.aspectFoundationTheorem.necessity,witnesses:{
+        ...v13Contract.aspectFoundationTheorem.necessity.witnesses,PAIR:"U"
+      }
+    }
+  }
+}),/accepted v0.13 structural witnesses drift/);
 console.log("G16: original historic source unchanged; standalone blocked scientific prelude candidate.");

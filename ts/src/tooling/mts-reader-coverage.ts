@@ -642,6 +642,8 @@ export function loadReaderScienceCensus(root: string): ReaderScienceCensus {
   return projectReaderScienceCensus(
     loadReaderCoverage(root),
     loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    object(JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.13.json"), "utf8")),
+      "accepted v0.13 contract"),
     loadReaderG7(root), loadReaderG8(root),
   );
 }
@@ -1094,6 +1096,7 @@ export interface ReaderFoundationOpening {
 }
 export function parseReaderFoundationOpening(
   text: string, g4: ReturnType<typeof loadMtsSourceRequirement>,
+  acceptedV13: Record<string, unknown>,
 ): ReaderFoundationOpening {
   const doc = parseDocument(text, {strict:true, uniqueKeys:true});
   if (doc.errors.length || doc.warnings.length) fail("G16 invalid editorial YAML");
@@ -1118,13 +1121,27 @@ export function parseReaderFoundationOpening(
       !g4.statement.ru.startsWith(historicalOpening)) {
     fail("G16 historical provenance or unapproved state drift");
   }
-  if (typeof raw.candidate_ru !== "string" ||
+  if (acceptedV13.schema !== "mts-contract/v0.13" || acceptedV13.accepted !== true) {
+    fail("G16 witness provenance requires accepted v0.13");
+  }
+  const aspect = object(acceptedV13.aspectFoundationTheorem, "accepted v0.13 theorem scope");
+  const necessity = object(aspect.necessity, "accepted v0.13 witness necessity");
+  const witnesses = object(necessity.witnesses, "accepted v0.13 ROOT/START/END/PAIR witnesses");
+  const expected: Readonly<Record<string,string>> = {ROOT:"R",START:"O",END:"C",PAIR:"L"};
+  if (aspect.domain !== "admissible semantic Links with finite R-grounding" ||
+      Object.keys(witnesses).length !== 4 ||
+      Object.entries(expected).some(([role, value]) => witnesses[role] !== value)) {
+    fail("G16 accepted v0.13 structural witnesses drift");
+  }
+    if (typeof raw.candidate_ru !== "string" ||
       raw.candidate_ru.trim().length < 1000 ||
       !raw.candidate_ru.includes("Link") ||
       !raw.candidate_ru.includes("11") ||
       !raw.candidate_ru.includes("10") ||
       !raw.candidate_ru.includes("01") ||
       !raw.candidate_ru.includes("00") ||
+      !raw.candidate_ru.includes("R представляет случай 11") ||
+      !raw.candidate_ru.includes("L — случай 00") ||
       !raw.candidate_ru.includes("START_K") ||
       !raw.candidate_ru.includes("END_K") ||
       raw.candidate_ru.includes(historicalOpening)) {
