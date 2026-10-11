@@ -96,7 +96,7 @@ reader_definitions:
     - id: reader-def-local-decision
       kind: definition
       domain: "Foundation, конкретная Связь x"
-      science_steps: [incidence]
+      science_steps: [incidence, local-decision, local-exhaustiveness]
       prerequisites: [reader-def-root]
       proof_symbols: [StartOnly, FinishOnly, PairLocal, LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive]
       external_metanotation: true
@@ -145,12 +145,30 @@ reader_science:
     - id: incidence
       role: definition
       ru: |-
-        Для Связи x локальные предикаты FullSelf, StartOnly, FinishOnly и PairLocal различают соответственно оба совпадения start(x)=x и finish(x)=x, только первое, только второе и ни одного. Метаобозначения 11/10/01/00 фиксируют эти четыре логически несовместимых случая, а не четыре сорта Связей. LocalSelfDecision(F,x) — предъявленные логические свидетельства выбора между равенством и неравенством для каждой позиции; они дают конструктивную исчерпываемость классификации данного x, но не общий исполнимый алгоритм равенства и не доказательство существования представителей всех случаев.
+        Для Связи x локальные предикаты FullSelf, StartOnly, FinishOnly и PairLocal различают соответственно оба совпадения start(x)=x и finish(x)=x, только первое, только второе и ни одного. Метаобозначения 11/10/01/00 фиксируют четыре попарно несовместимых локальных случая, а не четыре сорта Связей. Их определения сами по себе не утверждают существования представителей каждого случая.
       proof_symbol: StartOnly
       requires: [foundation]
       premises: []
       domain: ["Link"]
       exclusions: []
+    - id: local-decision
+      role: definition
+      ru: |-
+        LocalSelfDecision(F,x) — внешняя предпосылка локальной разрешимости двух проверок самоинцидентности конкретной Связи x: предъявляются дизъюнкции start(x)=x или start(x)≠x, а также finish(x)=x или finish(x)≠x. Наличие этих логических свидетельств не доказывает существование общего исполнимого алгоритма сравнения произвольных Связей.
+      proof_symbol: LocalSelfDecision
+      requires: [incidence]
+      premises: []
+      domain: ["Foundation, x"]
+      exclusions: ["not a global equality algorithm"]
+    - id: local-exhaustiveness
+      role: conditional-theorem
+      ru: |-
+        Для данной Связи x с предъявленным LocalSelfDecision(F,x) теорема local_self_incidence_exhaustive устанавливает конструктивную дизъюнкцию FullSelf(F,x), StartOnly(F,x), FinishOnly(F,x) либо PairLocal(F,x). Это исчерпываемость локальных случаев для x при указанной предпосылке, а не доказательство существования всех четырёх типов представителей в каждой модели Foundation.
+      proof_symbol: local_self_incidence_exhaustive
+      requires: [local-decision]
+      premises: [LocalSelfDecision]
+      domain: ["Foundation, x"]
+      exclusions: ["does not prove realization of all four cases"]
     - id: grounded
       role: definition
       ru: |-

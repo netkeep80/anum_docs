@@ -97,9 +97,9 @@ assert.deepEqual(definitions.entries.map((entry) => entry.kind), [
 ]);
 assert.ok(definitions.entries.every((entry) =>
   entry.authorApproval === "not-recorded" && entry.externalMetanotation));
-assert.deepEqual(definitions.entries.map((entry) => entry.scienceSteps.length), [4, 1, 3, 2, 8]);
+assert.deepEqual(definitions.entries.map((entry) => entry.scienceSteps.length), [4, 3, 3, 2, 8]);
 const groupOwnership = definitions.entries.flatMap((entry) => entry.scienceSteps);
-assert.equal(new Set(groupOwnership).size, 18);
+assert.equal(new Set(groupOwnership).size, 20);
 assert.deepEqual(groupOwnership.slice(0, 4), [
   "foundation", "distinction", "separation-a1", "root-uniqueness",
 ]);
@@ -142,9 +142,10 @@ assert.equal(science.status, "proposed");
 assert.equal(science.proofCheck, "declarations-only");
 assert.equal(science.publication, "blocked");
 assert.equal(science.authorApproval, "not-recorded");
-assert.equal(science.steps.length, 18);
+assert.equal(science.steps.length, 20);
 assert.deepEqual(science.steps.map((step) => step.id), [
-  "foundation", "incidence", "grounded", "distinction", "separation-a1",
+  "foundation", "incidence", "local-decision", "local-exhaustiveness",
+  "grounded", "distinction", "separation-a1",
   "root-uniqueness", "one-sided-existence", "one-sided-realizability",
   "grounded-normalization", "identity-by-poles", "inversion-domain",
   "inversion-relation", "inversion-total", "inversion-involutive",
@@ -155,12 +156,13 @@ for (const [index, step] of science.steps.entries()) {
   assert.ok(step.requires.every((dependency) => (position.get(dependency) ?? Infinity) < index));
   assert.ok(step.ru.length > 100, "a scientific node owns full Russian prose");
 }
-assert.equal(science.steps[5]?.role, "conditional-theorem");
-assert.deepEqual(science.steps[5]?.premises, ["A1RecursiveSeparation"]);
-assert.ok(science.steps[8]?.id === "grounded-normalization");
-assert.equal(science.steps[15]?.proofSymbol, "CTX_03_objective_chiral_orbit_before_context");
-assert.deepEqual(science.steps[15]?.exclusions, ["no globally selected W"]);
-assert.deepEqual(science.steps[17]?.premises, [
+assert.equal(science.steps[7]?.role, "conditional-theorem");
+assert.deepEqual(science.steps[7]?.premises, ["A1RecursiveSeparation"]);
+assert.deepEqual(science.steps[3]?.premises, ["LocalSelfDecision"]);
+assert.ok(science.steps[10]?.id === "grounded-normalization");
+assert.equal(science.steps[17]?.proofSymbol, "CTX_03_objective_chiral_orbit_before_context");
+assert.deepEqual(science.steps[17]?.exclusions, ["no globally selected W"]);
+assert.deepEqual(science.steps[19]?.premises, [
   "A1RecursiveSeparation", "F2F3OneSidedExistence", "RecursiveInversionDomain",
 ]);
 
@@ -266,7 +268,7 @@ assert.throws(
 
 const audit = renderMtsSourceRequirementAuditFragment(model);
 assert.ok(audit.includes("model_status=proposed"));
-assert.ok(audit.includes("reader_science_nodes=18"));
+assert.ok(audit.includes("reader_science_nodes=20"));
 assert.ok(audit.includes("reader_science_text_authority=atomic-yaml"));
 assert.ok(audit.includes("reader_science_proof_check=declarations-only"));
 assert.ok(audit.includes("reader_science_publication=blocked"));
