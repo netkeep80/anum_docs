@@ -1,0 +1,37 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { renderReaderR44W2Preview } from "../src/tooling/mts-reader-r44-w2.js";
+import { READER_R44_W3_PATH,loadReaderR44W3,parseReaderR44W3,renderReaderR44W3Preview } from "../src/tooling/mts-reader-r44-w3.js";
+const root=resolve("..");
+const original=readFileSync(resolve(root,READER_R44_W3_PATH),"utf8");
+const reviewed=loadReaderR44W3(root),base=renderReaderR44W2Preview(root),manuscript=renderReaderR44W3Preview(root);
+assert.equal(reviewed.publication,"blocked");
+assert.equal(reviewed.rows.length,48);
+assert.deepEqual([...new Set(reviewed.rows.map(x=>x.wave))],["W1","W2","W3","W4"]);
+assert.equal((manuscript.match(/^\*\*V15-[A-Z0-9-]+\*\* · /gm)??[]).length,48);
+assert.equal((manuscript.match(/^\*\*(?:g4:|g7:|g8:|g10:|g11:|basis:|concept:|editorial:)/gm)??[]).length,119);
+assert.equal((manuscript.match(/^## /gm)??[]).length,(base.match(/^## /gm)??[]).length+1);
+for(const x of reviewed.rows){
+  assert.ok(manuscript.includes("**"+x.id+"** · "+x.kind));
+  assert.equal(manuscript.split(x.assessmentRu).length-1,1);
+  assert.equal(manuscript.split(x.limitationRu).length-1,1);
+}
+assert.equal(reviewed.rows.filter(x=>x.id==="V15-READY-03")[0]?.requirementState,"ACCEPTED");
+assert.ok(manuscript.includes("A14→A16→A17→A72w"));
+assert.ok(manuscript.includes("Γ предпосылкой"));
+assert.ok(manuscript.includes("FRM-04")&&manuscript.includes("FRM-05")&&manuscript.includes("FRM-06")&&manuscript.includes("FRM-07"));
+assert.ok(manuscript.includes("COMPONENT_GREEN")&&manuscript.includes("RELEASE_READY"));
+assert.ok(manuscript.includes("ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА"));
+const p=(s:string)=>parseReaderR44W3(s,root);
+assert.throws(()=>p(original.replace("author_approval: not-recorded","author_approval: approved")),/cannot accept, publish|no editor can accept/);
+assert.throws(()=>p(original.replace("publication: blocked","publication: ready")),/no editor can accept/);
+assert.throws(()=>p(original.replace("not-forty-eight-formal-proofs","forty-eight-formal-proofs")),/no editor can accept/);
+assert.throws(()=>p(original.replace("source_atom: v15-term-01","source_atom: v15-gamma-01")),/cannot detach source/);
+assert.throws(()=>p(original.replace("source_authority_state: ACCEPTED","source_authority_state: COMPONENT_GREEN")),/cannot detach source/);
+assert.throws(()=>p(original.replace("type: terminology","type: universally-proved")),/cannot self-promote/);
+assert.throws(()=>p(original.replace("audit_state: individually-scoped-editorial-review-pending-author","audit_state: accepted")),/cannot self-promote/);
+assert.throws(()=>p(original.replace("  - id: V15-TERM-01\n","  - id: V15-TERM-02\n")),/cannot detach source/);
+assert.throws(()=>p(original.replace("open: [R40-06","open: [R40-07")),/cannot silently close R40/);
+assert.throws(()=>p(original+"\npublication: ready\n"),/malformed\/duplicate YAML/);
+console.log("R44-W3: 48 individually source-traced v0.15 reviews (4x12), exact registry+G11 source-quote parity, MP→Γ history, 8 FRM proof classifications, author/governance distinctions, 119 original atoms preserved, no science acceptance.");

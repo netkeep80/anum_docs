@@ -1245,6 +1245,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r44.ts",
   // R44-W2 scientific editorial prose is read-only and does not execute MTS semantics.
   "ts/src/tooling/mts-reader-r44-w2.ts",
+  // R44-W3 source-attributed scientific reviewer appendix; no execution semantics.
+  "ts/src/tooling/mts-reader-r44-w3.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);

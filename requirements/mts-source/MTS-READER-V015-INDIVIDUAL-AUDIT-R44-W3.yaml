@@ -1,0 +1,417 @@
+# R44-W3: individually reviewed manuscript scope for all 48 accepted v0.15 registry nodes.
+schema: mts-reader-v015-individual-audit-r44-w3/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+coverage: source-attributed-forty-eight-editorial-judgements-not-forty-eight-formal-proofs
+accepted_registry: requirements/mts-v0.15.json
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+upstream_science: requirements/mts-source/MTS-READER-INDIVIDUAL-MATH-REVIEW-R44-W2.yaml
+source_waves:
+  - requirements/mts-source/MTS-READER-V15-G11-W1.yaml
+  - requirements/mts-source/MTS-READER-V15-G11-W2.yaml
+  - requirements/mts-source/MTS-READER-V15-G11-W3.yaml
+  - requirements/mts-source/MTS-READER-V15-G11-W4.yaml
+historical_mp:
+  source: requirements/mts-source/MTS-READER-V14-G10.yaml
+  source_atom: v14-l11
+  scientific_ru: "Обобщённый Modus Ponens версий v0.13 и v0.14 имеет собственную принятую область и цепочку A14→A16→A17→A72w. Единая Γ версии v0.15 задаёт поздний исполнительный профиль: J0, снимок, S1, S2 и атомарную публикацию. Историческая преемственность не является доказательством логического тождества двух теорем для любого окружения."
+  exclusion_ru: "Нельзя изображать Γ предпосылкой более ранних MP-законов, переносить на старые релизы S1/S2 или объявлять backend с Γ доказательством каждой прежней теоремы без отдельного refinement."
+proof_scope:
+  inventory: proofs/v015-formal-proof-assurance.json
+  authoritative_cases: [FRM-01, FRM-02, FRM-03, FRM-04, FRM-05, FRM-06, FRM-07, FRM-08]
+  scientific_ru: "Внешняя верификация Lean4 и Rocq фиксирует восемь FRM-целей в выбранных моделях; FRM-04 условна по инъективности ExactSequence, FRM-05 по общности исходной нативной ANet, FRM-06 по round-trip метакомпиляции, FRM-07 по перечисленным production refinement premises. Эти условия нельзя скрывать словом «доказано»."
+  exclusion_ru: "Восемь теорем не означают полной машинной верификации production TypeScript или любого возможного FORMAL-входа. Исполняемые regression GREEN имеют другую доказательную силу."
+authority_boundary:
+  scientific_ru: "Нормативный реестр различает принятые требования к форме источника, исполнению, наблюдаемости, CI, публикации, авторскому решению и регрессионному корпусу. Статус COMPONENT_GREEN, VERTICAL_GREEN, RELEASE_READY либо ACCEPTED фиксирует управляемую готовность требования и не превращает любое его предложение в доказанную математическую теорему."
+  exclusion_ru: "Публикация рукописи и новый JSON требуют самостоятельного авторского решения. Уже принятое v0.15 не переутверждается посредством редакционной модели R44-W3."
+reviews:
+  - id: V15-TERM-01
+    source_wave: W1
+    source_atom: v15-term-01
+    source_authority_state: COMPONENT_GREEN
+    type: terminology
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "ANet — нормативное английское название асети; legacy Aset обозначает исторические имена в коде, а не новый вид объекта или альтернативную теорию."
+    limitation_ru: "Решить, где вводить русский термин и английский эквивалент; не выводить из правила именования свойства графа."
+  - id: V15-AUTH-01
+    source_wave: W1
+    source_atom: v15-auth-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "FORMAL и канонический JSON обязаны сходиться в нативной исходной ANet до общей семантики; разные оболочки ввода не создают двух законов исполнения."
+    limitation_ru: "Реализационная сходимость требует прослеживаемой цепочки и тестов, а не философского утверждения о тождестве всех файлов."
+  - id: V15-AUTH-02
+    source_wave: W1
+    source_atom: v15-auth-02
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "FORMAL_MIGRATED и VERTICAL_GREEN являются аттестационными статусами лишь при наличии source artifact, точки входа, дайджеста и полного набора свидетельств."
+    limitation_ru: "Статус нельзя превращать в математическую теорему и присваивать по результату одиночного CI."
+  - id: V15-ONTO-01
+    source_wave: W1
+    source_atom: v15-onto-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Онтология сохраняет один вид сущностей — Link; технические типы узлов, runtime и кодеков не становятся дополнительными онтологическими сортами."
+    limitation_ru: "Это нормативная граница семантической власти, а не доказательство универсальной выразительности любого алгоритма."
+  - id: V15-ONTO-02
+    source_wave: W1
+    source_atom: v15-onto-02
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Предпочтение существующей Link-топологии и ExactSequence перед расширением Grammar задаёт минималистическую дисциплину моделирования."
+    limitation_ru: "Фраза не устанавливает теорему полноты обычных Link для всех будущих конструкций."
+  - id: V15-ONTO-03
+    source_wave: W1
+    source_atom: v15-onto-03
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Переименование presentation names, сохраняющее разрешение и структурное членство, не должно менять поведение семантической ANet."
+    limitation_ru: "Нельзя утверждать инвариантность при смене контекста или при изменении связности вместе с именем."
+  - id: V15-STRUCT-01
+    source_wave: W1
+    source_atom: v15-struct-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "ROOT/START/END/PAIR — структурные аспекты Link, материализуемые через общий источник FORMAL/JSON в 8/9/6/1."
+    limitation_ru: "Поддержка аспектов не снимает запрета произвольных циклических форм связывания имён."
+  - id: V15-CLOSE-01
+    source_wave: W1
+    source_atom: v15-close-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "VERTICAL_GREEN требует транзитивного замыкания зависимостей именно выбранного исполняемого артефакта и его заявленной области."
+    limitation_ru: "Успех частной программы не свидетельствует об отсутствии неназванных внешних зависимостей."
+  - id: V15-CLOSE-02
+    source_wave: W1
+    source_atom: v15-close-02
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Каждая внешняя семантическая либо инструментальная зависимость должна иметь категорию и версию; это предотвращает смену authority под видом имплементации."
+    limitation_ru: "Нельзя приписывать зависимости математическое содержание только из-за наличия версии."
+  - id: V15-CLOSE-03
+    source_wave: W1
+    source_atom: v15-close-03
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Нулевая программно-специфическая host-инъекция касается семантических правил; допустимый универсальный host-код продолжает выполнять оркестрацию."
+    limitation_ru: "Это не запрет TypeScript или backend-кода как технического механизма."
+  - id: V15-FRESH-01
+    source_wave: W1
+    source_atom: v15-fresh-01
+    source_authority_state: COMPONENT_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "FORMAL должен восстановить исполняемый пакет в новой Memory только из зафиксированных общих механизмов и источника."
+    limitation_ru: "Предыдущие скрытые объекты Memory нельзя использовать как предпосылку воспроизводимости."
+  - id: V15-FRESH-02
+    source_wave: W1
+    source_atom: v15-fresh-02
+    source_authority_state: COMPONENT_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Самодостаточный канонический JSON должен давать такой же исполняемый пакет в чистой Memory без отдельного FORMAL-файла для исправления."
+    limitation_ru: "Текстовый JSON round-trip без сравнения семантического исполнения недостаточен."
+  - id: V15-FRESH-03
+    source_wave: W2
+    source_atom: v15-fresh-03
+    source_authority_state: COMPONENT_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Шум посторонних аллокаций в двух свежих Memory не должен менять рекурсивное представление или наблюдаемое поведение данного артефакта."
+    limitation_ru: "Речь о семантическом результате, не о тождестве адресов, времени работы или случайного порядка выдачи handles."
+  - id: V15-NAME-01
+    source_wave: W2
+    source_atom: v15-name-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Имена FORMAL разрешаются контекстно; запись :A есть сокращённая форма R:A, а полюса структурных выражений проходят один резолвер."
+    limitation_ru: "Глобальные строки идентификаторов хоста не дают самостоятельного способа создавать смысл Связей."
+  - id: V15-JSON-01
+    source_wave: W2
+    source_atom: v15-json-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Поддерживаемый JSON обязан передавать не только структуру, но и семантически значимые membership и исполнительные роли source ANet."
+    limitation_ru: "Равенство сериализованных строк без повторного построения носителя не доказывает полноту представления."
+  - id: V15-JSON-02
+    source_wave: W2
+    source_atom: v15-json-02
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Текст FORMAL и JSON не могут иметь двух независимых денотационных механизмов: оба сходятся в общей ANet и общем DAS."
+    limitation_ru: "Это требование ограничено поддерживаемым профилем; нельзя заявлять поддержку всякой возможной JSON-структуры."
+  - id: V15-JSON-03
+    source_wave: W2
+    source_atom: v15-json-03
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Негативная мутация канонического JSON должна изменять либо отклонять семантический источник, а транспортное форматирование не должно менять смысл."
+    limitation_ru: "В тестовой модели необходимо различать семантические и чисто транспортные изменения."
+  - id: V15-VERT-01
+    source_wave: W2
+    source_atom: v15-vert-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Вертикаль признаётся GREEN только при полном проверенном комплекте свидетельств и нулевом обходе канонической семантики через host."
+    limitation_ru: "Факт заполнения полей реестра не равен успешной проверке их фактического происхождения."
+  - id: V15-VERT-02
+    source_wave: W2
+    source_atom: v15-vert-02
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Реестр, а не PR или эмоциональная оценка, вычисляет статус исполнения по машинно сопоставленным свидетельствам."
+    limitation_ru: "Алгоритм агрегации статусов не доказывает корректность самих исходных аксиом."
+  - id: V15-AND-01
+    source_wave: W2
+    source_atom: v15-and-01
+    source_authority_state: VERTICAL_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "AND представлен четырьмя zero-role Rule на строгом носителе T/F без альтернативного role dictionary или отдельного семантического opcode."
+    limitation_ru: "Из четырёх положительных клеток таблицы нельзя вывести правило для любого не-T/F операнда."
+  - id: V15-AND-02
+    source_wave: W2
+    source_atom: v15-and-02
+    source_authority_state: VERTICAL_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Общий matcher и Γ-совместимый путь допускает результат NO_MATCH вне локального домена Boolean AND."
+    limitation_ru: "NO_MATCH подтверждается отдельным отрицательным тестом; таблица FF/FT/TF/TT его не выводит."
+  - id: V15-AND-03
+    source_wave: W2
+    source_atom: v15-and-03
+    source_authority_state: VERTICAL_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Оптимизация backend допустима лишь как семантически сохраняющее понижение единственной модели AND."
+    limitation_ru: "Технический ускоритель не вправе менять строгую область T/F или NO_MATCH."
+  - id: V15-AND-04
+    source_wave: W2
+    source_atom: v15-and-04
+    source_authority_state: VERTICAL_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "NOT, OR, XOR и AND должны иметь общий источник FORMAL/JSON и единый путь zero-role Rule и Γ."
+    limitation_ru: "Не выдавать отдельный host-dispatch для каждой логической функции за равноправную семантику МТС."
+  - id: V15-CTX-01
+    source_wave: W2
+    source_atom: v15-ctx-01
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Theory, Context/currentness, Entry и Result — исполнительные роли, обусловленные членством и структурой ANet."
+    limitation_ru: "Контекст исполнения Γ не следует автоматически отождествлять с ориентационным Context K теоремы CTX-03."
+  - id: V15-CTX-02
+    source_wave: W3
+    source_atom: v15-ctx-02
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Одна физическая Link допускает разные исполнительные роли в разных выбранных асетях благодаря различному membership."
+    limitation_ru: "Смена manifest-имени без смены membership не образует новую семантическую роль."
+  - id: V15-GAMMA-01
+    source_wave: W3
+    source_atom: v15-gamma-01
+    source_authority_state: COMPONENT_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Γ выполняется как единая структурная реакция: snapshot, J0 на одном текущем полюсе, только читающий S1, конструктивный S2, 0/1/N образы и атомарная публикация."
+    limitation_ru: "Не делать J1, read-own-writes или backend-специфические opcode скрытыми предпосылками данной Γ."
+  - id: V15-FORMAL-PROOF-01
+    source_wave: W3
+    source_atom: v15-formal-proof-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Парные Lean4 и Rocq подтверждают объявленный фрагмент FORMAL с конкретными идентификаторами теорем и областями предпосылок."
+    limitation_ru: "Нельзя повышать статус доказательства на весь язык FORMAL или на код TypeScript без отдельного refinement."
+  - id: V15-FORMAL-PROOF-02
+    source_wave: W3
+    source_atom: v15-formal-proof-02
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Утверждение о сохранении семантики FORMAL/JSON и рекурсивной компиляции требует точных FRM-свидетельств и предпосылок production refinement."
+    limitation_ru: "Зелёный корпус исполняемых примеров сам по себе не заменяет теорему soundness."
+  - id: V15-JSON-04
+    source_wave: W3
+    source_atom: v15-json-04
+    source_authority_state: COMPONENT_GREEN
+    type: semantic-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Массивы дают позиционную ExactSequence с пустым корнем R; вычисляемая F_R является иной операцией над данными."
+    limitation_ru: "Нельзя подменять порядок и кратность членов одним значением F_R или заявлять конкретную коллизию без свидетеля."
+  - id: V15-STAGE-01
+    source_wave: W3
+    source_atom: v15-stage-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Наблюдаемая цепочка этапов source bytes → source ANet → semantic ANet → recursive → backend → execution → projection служит трассировке."
+    limitation_ru: "Логическая наблюдаемость интерфейсов этапов не является доказательством корректности каждого из них."
+  - id: V15-STAGE-02
+    source_wave: W3
+    source_atom: v15-stage-02
+    source_authority_state: COMPONENT_GREEN
+    type: execution-contract
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Чтение и structural match остаются read-only, тогда как создание и публикация Связей выделены в отдельные разрешённые стадии."
+    limitation_ru: "Нельзя тихо материализовать новую Link в getter и затем объявлять snapshot неизменным."
+  - id: V15-FALS-01
+    source_wave: W3
+    source_atom: v15-fals-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Отрицательные фальсификаторы охватывают отсутствие authority, мутацию JSON, смену контекста и replay в новой Memory."
+    limitation_ru: "Ни одна конечная регрессия сама по себе не доказывает обобщённого математического закона для бесконечного носителя."
+  - id: V15-GOV-01
+    source_wave: W3
+    source_atom: v15-gov-01
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Регистры требований и трассируемости — административный источник статуса; Markdown остаётся производной проекцией."
+    limitation_ru: "Это правило управления репозиторием не является аксиомой Link или выводом из Foundation."
+  - id: V15-GOV-02
+    source_wave: W3
+    source_atom: v15-gov-02
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Аудит проверяет отсутствие семантической инъекции в host/backend, даже если видимая таблица истинности совпадает."
+    limitation_ru: "Равный результат на выбранных входах не гарантирует тождество маршрута получения результата."
+  - id: V15-GOV-03
+    source_wave: W3
+    source_atom: v15-gov-03
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Дорожные карты и отчёты получают данные из реестра и свидетельств, чтобы не порождать ручные независимые статусы."
+    limitation_ru: "Оформление dashboard не добавляет математической достоверности доказательствам."
+  - id: V15-CORPUS-01
+    source_wave: W3
+    source_atom: v15-corpus-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Реплей принятого корпуса привязан к A-memory 0.175.0 и точным источникам и digest, а не к любой современной реализации backend."
+    limitation_ru: "Свидетельство старого замороженного runtime нельзя молча переносить на будущую версию."
+  - id: V15-GOV-04
+    source_wave: W4
+    source_atom: v15-gov-04
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Защита merge опирается на обязательные CI/repo-guard и контролируемые правила bypass, проверенные отрицательным RED PR."
+    limitation_ru: "Статус SKIPPED в Draft и наличие названия проверки не означают успешного исполнения блокирующего check."
+  - id: V15-DOCS-01
+    source_wave: W4
+    source_atom: v15-docs-01
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Каноническая документация FORMAL/JSON генерируется из модели и принятого корпуса, не редактируется вручную как альтернативный источник смысла."
+    limitation_ru: "Отредактированный академический черновик не становится нормативным текстом по факту красивой генерации."
+  - id: V15-READY-01
+    source_wave: W4
+    source_atom: v15-ready-01
+    source_authority_state: RELEASE_READY
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "RELEASE_READY возможен только при достижении всех обязательных требований разрешённых состояний по реестру."
+    limitation_ru: "Нельзя оценивать выпуск исключительно суммой зелёных тестов без closure статусов."
+  - id: V15-READY-02
+    source_wave: W4
+    source_atom: v15-ready-02
+    source_authority_state: RELEASE_READY
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Независимый аудит готовности должен искать именно опровергающие примеры и утраченные зависимости, а не повторять положительные тесты."
+    limitation_ru: "Второй запуск того же CI не подменяет независимую содержательную проверку."
+  - id: V15-READY-03
+    source_wave: W4
+    source_atom: v15-ready-03
+    source_authority_state: ACCEPTED
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Авторский ACCEPT v0.15 исторически уже зафиксирован; статус принятия не устанавливается помощником, успешным CI или новой редакцией текста."
+    limitation_ru: "Исторический переход от v0.14 нельзя описывать как ещё ожидаемое решение; новые JSON требуют отдельного согласия."
+  - id: V15-AUTHOR-JSON-01
+    source_wave: W4
+    source_atom: v15-author-json-01
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Каждый новый исполняемый JSON требует AUTHOR_REVIEW_PENDING и явного решения Автора; авторитет прошлых одобрений не переносится автоматически."
+    limitation_ru: "Откладываемые исследования aprover v0.16 не являются частью разрешения новых JSON v0.15."
+  - id: V15-AUTHOR-JSON-02
+    source_wave: W4
+    source_atom: v15-author-json-02
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Автору нужен полный пакет: FORMAL, JSON, денотационная цепочка, replay в чистой Memory, точные digest и отрицательные тесты."
+    limitation_ru: "Один screenshot либо совпадающая строка вывода не позволяют восстановить предмет решения."
+  - id: V15-AUTHOR-JSON-03
+    source_wave: W4
+    source_atom: v15-author-json-03
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Одобрение связывается с точным revision/digest JSON и не действует на семантически изменённое содержимое."
+    limitation_ru: "Нельзя сохранять принятие после несовместимой перегенерации под тем же именем файла."
+  - id: V15-AUTHOR-JSON-04
+    source_wave: W4
+    source_atom: v15-author-json-04
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Пакетное авторское решение разрешается лишь для заранее перечисленного точного множества артефактов."
+    limitation_ru: "Ни один batch ACCEPT не разрешает будущие неизвестные артефакты."
+  - id: V15-REG-01
+    source_wave: W4
+    source_atom: v15-reg-01
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Утверждённые JSON входят в постоянный проверяемый корпус с конкретными digest и авторскими решениями."
+    limitation_ru: "Утрата одного артефакта из полного реплея должна рассматриваться как деградация гарантий."
+  - id: V15-REG-02
+    source_wave: W4
+    source_atom: v15-reg-02
+    source_authority_state: COMPONENT_GREEN
+    type: evidence-condition
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Семантически влияющее изменение источника или метакомпиляции обязано прогонять весь corpus, не только затронутый пример."
+    limitation_ru: "Локальные unit tests не устанавливают отсутствие регрессий в остальных одобренных программах."
+  - id: V15-REG-03
+    source_wave: W4
+    source_atom: v15-reg-03
+    source_authority_state: COMPONENT_GREEN
+    type: governance-rule
+    audit_state: individually-scoped-editorial-review-pending-author
+    assessment_ru: "Принятый JSON запрещено молча регенерировать; несовместимость должна проходить формальную миграцию и новое авторское решение."
+    limitation_ru: "Совпадение пути файла не доказывает сохранность утверждённых байтов и смысловой версии."
+unresolved_r40:
+  corrected_previously: [R40-05]
+  needs_rereview: [R40-01, R40-02, R40-03, R40-04, R40-08]
+  open: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]
