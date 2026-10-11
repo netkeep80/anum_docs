@@ -14,7 +14,7 @@ assert.equal(sources.length, 114);
 assert.equal(new Set(sources.map(x => x.id)).size, 114);
 assert.equal(draft.nodes.length, 119);
 assert.equal(draft.ordered.length, 119);
-assert.equal(draft.edges, 307);
+assert.equal(draft.edges, 303);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
@@ -48,6 +48,19 @@ for (const [nodeId, prior] of requiredFirstUse) {
   assert.ok(draft.nodes.find(x => x.id === nodeId)?.readerRequires.includes(prior),
     "G20 first-use required science prerequisite omitted " + nodeId + " -> " + prior);
 }
+// Independent R35 review: remove mistaken historical/ontological ordering claims.
+for (const [consumer, rejected] of [
+  ["g7:anum-carrier", "concept:exact-sequence-first-use"],
+  ["g7:objective-orbit-qualified", "g4:context-roles"],
+  ["g8:ontology-level", "g4:incidence"],
+  ["g10:v14-l11", "concept:gamma-first-use"],
+  ["concept:exact-sequence-first-use", "concept:anet-term"],
+] as const) {
+  assert.ok(!draft.nodes.find(n => n.id === consumer)?.readerRequires.includes(rejected),
+    "R35 forbidden spurious scientific dependency " + rejected + " -> " + consumer);
+}
+assert.ok(draft.nodes.find(n => n.id === "g7:objective-orbit-qualified")?.readerRequires
+  .includes("g4:chiral-orbit"), "objective chirality must cite its own context-free proof");
 assert.equal(draft.publication, "blocked");
 assert.equal(draft.authorApproval, "not-recorded");
 assert.equal(draft.completeness, "editorial-dependencies-unverified");
@@ -152,4 +165,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 source-backed nodes, 307 edges, 41-node academic spine, original 57 edges, no publication, negative falsifiers GREEN.");
+console.log("G20: 119 source-backed nodes, 303 scientifically filtered edges, 41-node academic spine, original 57 edges, no publication, negative falsifiers GREEN.");
