@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { parseDocument } from "yaml";
 // G5 proposed reader coverage. Accepted registries are normative; these routes are not.
 import { loadMtsSemanticIr, type MtsRequirementProjection } from "./mts-compiler.js";
 
@@ -5,31 +8,72 @@ export type ReaderSection = "foundations" | "inversion-and-context" | "represent
   "arithmetic" | "formal-notation" | "execution" | "architecture" |
   "worked-examples" | "proofs" | "assurance" | "governance" | "documentation" | "terminology";
 
-const V14: Readonly<Record<string, ReaderSection>> = Object.freeze({
-  "V14-L1": "foundations",
-  "V14-L2": "formal-notation",
-  "V14-L3": "representation",
-  "V14-L4": "execution",
-  "V14-L5": "foundations",
-  "V14-L6": "arithmetic",
-  "V14-L7": "representation",
-  "V14-L8": "arithmetic",
-  "V14-L9": "arithmetic",
-  "V14-L10": "arithmetic",
-  "V14-L11": "execution",
-  "V14-L12": "inversion-and-context",
-  "V14-L13": "representation",
-  "V14-L14": "architecture",
-});
-const V15: Readonly<Record<string, ReaderSection>> = Object.freeze({
-  TERM: "terminology", AUTH: "architecture", ONTO: "foundations",
-  STRUCT: "foundations", CLOSE: "architecture", FRESH: "assurance",
-  NAME: "formal-notation", JSON: "formal-notation", VERT: "assurance",
-  AND: "worked-examples", CTX: "execution", GAMMA: "execution",
-  FORMAL_PROOF: "proofs", STAGE: "architecture", FALS: "assurance",
-  GOV: "governance", CORPUS: "assurance", DOCS: "documentation",
-  READY: "governance", AUTHOR_JSON: "governance", REG: "assurance",
-});
+export const READER_ROUTE_MODEL_PATH = "requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml";
+const CHAPTERS = [
+  "foundations", "inversion-and-context", "representation", "arithmetic",
+  "formal-notation", "execution", "architecture", "worked-examples",
+  "proofs", "assurance", "governance", "documentation", "terminology",
+] as const;
+
+export interface ReaderRoutes {
+  readonly chapters: Readonly<Record<ReaderSection, string>>;
+  readonly v014: Readonly<Record<string, ReaderSection>>;
+  readonly v015Groups: Readonly<Record<string, ReaderSection>>;
+}
+
+function object(value: unknown, label: string): Record<string, unknown> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("mts-reader-coverage: " + label + " must be an object");
+  }
+  return value as Record<string, unknown>;
+}
+function exactFields(value: Record<string, unknown>, keys: readonly string[], label: string): void {
+  if (Object.keys(value).sort().join(",") !== [...keys].sort().join(",")) {
+    throw new Error("mts-reader-coverage: " + label + " field mismatch");
+  }
+}
+export function parseReaderRoutes(text: string): ReaderRoutes {
+  const doc = parseDocument(text, { strict: true, uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) fail("invalid editorial YAML source");
+  const raw = object(doc.toJS({maxAliasCount: 0}), "route proposal");
+  exactFields(raw, ["schema", "status", "semantic_change", "author_approval",
+    "reader_edges", "chapters", "v014", "v015_groups"], "route proposal");
+  if (raw.schema !== "mts-reader-route-proposal/v0.1" || raw.status !== "proposed" ||
+      raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
+      raw.reader_edges !== "scientific-review-pending") {
+    fail("reader routes must remain proposed, unapproved, and not publishing");
+  }
+  const chapters = object(raw.chapters, "chapters");
+  exactFields(chapters, CHAPTERS, "chapters");
+  for (const chapter of CHAPTERS) {
+    if (typeof chapters[chapter] !== "string" || !(chapters[chapter] as string).trim()) {
+      fail("chapter needs nonempty Russian label: " + chapter);
+    }
+  }
+  const readMap = (value: unknown, label: string, count: number) => {
+    const map = object(value, label);
+    if (Object.keys(map).length !== count) fail(label + " coverage must equal " + count);
+    for (const [key, section] of Object.entries(map)) {
+      if (!CHAPTERS.includes(section as ReaderSection)) fail(label + " invalid section for " + key);
+      if (label === "v014" && !/^V14-L(?:[1-9]|1[0-4])$/.test(key)) {
+        fail("v014 invalid semantic ID " + key);
+      }
+      if (label === "v015_groups" && !/^[A-Z]+(?:_[A-Z]+)*$/.test(key)) {
+        fail("v015 invalid group " + key);
+      }
+    }
+    return Object.freeze(map as Record<string, ReaderSection>);
+  };
+  return Object.freeze({
+    chapters: Object.freeze(chapters as Record<ReaderSection, string>),
+    v014: readMap(raw.v014, "v014", 14),
+    v015Groups: readMap(raw.v015_groups, "v015_groups", 21),
+  });
+}
+export function loadReaderRoutes(root: string): ReaderRoutes {
+  return parseReaderRoutes(readFileSync(resolve(root, READER_ROUTE_MODEL_PATH), "utf8"));
+}
+
 export interface ReaderCoverageRow {
   readonly id: string;
   readonly release: "v0.14" | "v0.15";
@@ -57,6 +101,7 @@ function fail(message: string): never {
 export function projectReaderCoverage(
   v14: readonly MtsRequirementProjection[],
   v15: readonly MtsRequirementProjection[],
+  routes: ReaderRoutes,
 ): ReaderCoveragePlan {
   if (v14.length !== 14 || v15.length !== 48) fail("expected exact 14 + 48 accepted ID coverage");
   const ids = new Set<string>();
@@ -67,11 +112,11 @@ export function projectReaderCoverage(
       fail("missing accepted authority or current documentation owner for " + item.id);
     }
     let proposedSection: ReaderSection | undefined;
-    if (release === "v0.14") proposedSection = V14[item.id];
+    if (release === "v0.14") proposedSection = routes.v014[item.id];
     else {
       if (!item.classificationPath.startsWith("v015/")) fail("unrecognized v0.15 grouping: " + item.id);
       const group = item.classificationPath.slice(5).toUpperCase().replace(/-/g, "_");
-      proposedSection = V15[group];
+      proposedSection = routes.v015Groups[group];
     }
     if (!proposedSection) fail("scientific chapter routing has no owner for " + item.id);
     ids.add(item.id);
@@ -93,7 +138,7 @@ export function projectReaderCoverage(
   for (const row of rows) for (const dep of row.normativeDependsOn) {
     if (!allIds.has(dep)) fail(row.id + " has unresolved normative dependency " + dep);
   }
-  if (ids.size !== 62 || Object.keys(V14).length !== 14 || Object.keys(V15).length !== 21) {
+  if (ids.size !== 62 || Object.keys(routes.v014).length !== 14 || Object.keys(routes.v015Groups).length !== 21) {
     fail("incomplete scientific section coverage");
   }
   return Object.freeze({
@@ -106,6 +151,7 @@ export function loadReaderCoverage(root: string): ReaderCoveragePlan {
   return projectReaderCoverage(
     loadMtsSemanticIr(root, "requirements/mts-v0.14.json").requirements,
     loadMtsSemanticIr(root).requirements,
+    loadReaderRoutes(root),
   );
 }
 export function renderReaderCoverageAudit(plan: ReaderCoveragePlan): string {
