@@ -286,7 +286,7 @@ assert.equal(r40.findings.length, 7);
 assert.equal(new Set(r40.findings.map(x => x.id)).size, 7);
 for (const item of r40.findings) {
   assert.ok(item.remedy_ru.length > 75, "R40 missing concrete correction " + item.id);
-  assert.equal(item.severity, "high" === item.severity ? "high" : "medium");
+  assert.ok(item.severity === "high" || item.severity === "medium");
   assert.ok(item.state === "proposed" || item.state === "corrected-in-draft");
 }
 assert.equal(r40.findings.find(x => x.id === "R40-05")?.state, "corrected-in-draft");
