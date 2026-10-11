@@ -122,7 +122,7 @@ function verifySources(root:string){
   for(const word of tokens)check(text[source]?.includes(word),"accepted production evidence absent "+source+"/"+word);
  }
  check(text.accepted_formal?.includes("A->B->C")&&
-  text.gamma_authority?.includes("Modus"),"accepted Russian source missing");
+  text.gamma_authority?.includes("Theory ⟼ relation"),"accepted Russian source missing");
 }
 export function parseReaderL01L03(raw:string,root:string):L01L03{
  const old=loadReaderR03R04(root);
