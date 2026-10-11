@@ -1262,6 +1262,9 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-f06-f07.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
+  // #2231: reader-only R01/R02 scientific source validation, no semantic Memory access.
+  // Keep the frozen v0.13 S3 ownership counts immutable; classify only this new tooling file.
+  "ts/src/tooling/mts-reader-review-r01-r02.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
