@@ -74,6 +74,8 @@ assert.ok(index.get("g4:context-roles")! <
           index.get("editorial:relative-chiral-orientation")!);
 const preview = renderReaderG20Preview(draft);
 assert.ok(preview.includes("ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА"));
+assert.ok(preview.includes("Тексты всех 104 исходных научных атомов"));
+assert.ok(!preview.includes("Тексты первых 104 атомов"));
 assert.equal((preview.match(/^## /gm) ?? []).length, 119);
 for (const source of sources) {
   assert.ok(preview.includes(source.textRu), "lost source-owner scientific text " + source.id);
