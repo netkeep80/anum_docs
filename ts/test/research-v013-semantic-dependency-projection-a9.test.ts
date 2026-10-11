@@ -1267,6 +1267,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-r01-r02.ts",
   // #2217 R03/R04: source-only science/contract audit, no native Memory execution.
   "ts/src/tooling/mts-reader-review-r03-r04.ts",
+  // #2217 L01/L02/L03: reader-only FORMAL/DAS/Γ contract proof-scope validator.
+  "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
