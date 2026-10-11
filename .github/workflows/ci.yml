@@ -80,6 +80,13 @@ jobs:
           cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean
           /tmp/mts-lean/bin/lean /tmp/MtsFoundationWithExplicitModel.lean
 
+          # #2222: new parameterized F03 kernel candidate; preserve accepted files.
+          cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsBasisFiveDistinct.lean > /tmp/MtsBasisFiveDistinct.lean
+          printf '\n#print axioms MTS.External.F03_basis_five_pairwise_distinct\n' >> /tmp/MtsBasisFiveDistinct.lean
+          /tmp/mts-lean/bin/lean /tmp/MtsBasisFiveDistinct.lean 2>&1 | tee /tmp/mts-f03-lean.log
+          grep -Fq 'does not depend on any axioms' /tmp/mts-f03-lean.log
+          ! grep -Fq 'sorryAx' /tmp/mts-f03-lean.log
+
           cp proofs/lean4/MtsFoundation.lean /tmp/MtsFoundationAssurance.lean
           node <<'NODE'
           const fs = require("node:fs");
@@ -263,6 +270,15 @@ jobs:
             -v "$PWD/proofs/coq:/input:ro" \
             "$ROCQ_IMAGE" \
             sh -lc 'cat /input/MtsFoundation.v /input/MtsExplicitModel.v > /tmp/MtsFoundationWithExplicitModel.v && cd /tmp && rocq compile MtsFoundationWithExplicitModel.v'
+
+          # #2222: compile the separate suffix against exact accepted Rocq source.
+          mkdir -p /tmp/mts-f03-rocq
+          cat proofs/coq/MtsFoundation.v proofs/coq/MtsBasisFiveDistinct.v > /tmp/mts-f03-rocq/MtsBasisFiveDistinct.v
+          printf '\nPrint Assumptions F03_basis_five_pairwise_distinct.\n' >> /tmp/mts-f03-rocq/MtsBasisFiveDistinct.v
+          docker run --rm -v "/tmp/mts-f03-rocq:/input:ro" "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsBasisFiveDistinct.v /tmp/MtsBasisFiveDistinct.v && cd /tmp && rocq compile MtsBasisFiveDistinct.v' \
+            2>&1 | tee /tmp/mts-f03-rocq.log
+          grep -Fq 'Closed under the global context' /tmp/mts-f03-rocq.log
 
           rm -rf /tmp/mts-coq-assurance
           mkdir -p /tmp/mts-coq-assurance
