@@ -244,7 +244,7 @@ const sourceDrift = original.replace(
   (whole, mid: string, deps: string) => {
     assert.ok(deps.includes('"g4:incidence"'));
     return 'id: "g4:local-decision"' + mid +
-      'reader_requires: [' + deps.replace(', "g4:incidence"', "") + ']';
+      'reader_requires: [' + deps.replace('"g4:incidence"', "") + ']';
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
