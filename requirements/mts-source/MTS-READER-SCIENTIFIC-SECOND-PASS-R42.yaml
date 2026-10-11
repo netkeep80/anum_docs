@@ -51,12 +51,12 @@ chapter_reviews:
     outstanding_ru: "К каждому доказательному утверждению приводить точный символ Lean4, символ Rocq, предпосылки, exclusions, границу production replay. Не добавлять гипотетический контрпример к F_R без фактически проверенного свидетеля."
     verdict: revision-required
   - chapter: reproducibility-assurance
-    evidence_nodes: [g11:v15-auth-02, g11:v15-formal-proof-02, g11:v15-fals-01]
+    evidence_nodes: [g11:v15-auth-02, g11:v15-fresh-01, g11:v15-fals-01]
     assessment_ru: "В текущей генерации статусы исполняемых регрессий отделены от математических утверждений, но сама риторика GREEN может ошибочно читаться как доказательство любых формул. Часть свидетелей относится к замороженной A-memory 0.175.0, не к любой последующей версии."
     outstanding_ru: "Для каждой метки GREEN ссылаться на точную ревизию, входной артефакт и выполненный тест; SKIPPED или отсутствующий proof witness оставлять видимым как ограничение."
     verdict: revision-required
   - chapter: governance-and-history
-    evidence_nodes: [g11:v15-ready-03, g11:v15-author-json-01, g11:v15-reg-01]
+    evidence_nodes: [g11:v15-ready-03, g11:v15-author-json-01, g11:v15-gov-01]
     assessment_ru: "Правило AUTHOR_REVIEW задавало переход v0.14→v0.15, но этот переход исторически уже завершён. Статус принятой модели нельзя выводить из успешного CI, а нынешние редакционные YAML и будущие JSON требуют собственных полномочий."
     outstanding_ru: "Вводить два явно подписанных времени: историческую процедуру author cutover и текущий accepted baseline, привязанный к точному решению/merge; не изображать исторический cutover как ещё ожидаемый."
     verdict: revision-required
