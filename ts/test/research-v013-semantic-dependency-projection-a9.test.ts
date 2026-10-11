@@ -1249,6 +1249,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r44-w3.ts",
   // R44-W4 reader science transitions and bibliography are non-executable editorial content.
   "ts/src/tooling/mts-reader-r44-w4.ts",
+  // W5 review/provenance appendix does not execute semantic model operations.
+  "ts/src/tooling/mts-reader-r44-w5.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
