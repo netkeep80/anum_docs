@@ -15,7 +15,7 @@ assert.equal(sources.length, 114);
 assert.equal(new Set(sources.map(x => x.id)).size, 114);
 assert.equal(draft.nodes.length, 119);
 assert.equal(draft.ordered.length, 119);
-assert.equal(draft.edges, 286);
+assert.equal(draft.edges, 272);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
@@ -28,6 +28,7 @@ assert.deepEqual(draft.ordered.slice(0, 3).map(x => x.id),
 const reviews = [
   "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W1.yaml",
   "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W2.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W3.yaml",
 ].map(path => {
   const doc = parseDocument(readFileSync(resolve(root, path), "utf8"),
     { strict: true, uniqueKeys: true });
@@ -40,7 +41,7 @@ const reviews = [
       rationale_ru: string; limitation_ru: string; review_status: string}[];
   };
 });
-assert.deepEqual(reviews.map(x => x.review_count), [40, 48]);
+assert.deepEqual(reviews.map(x => x.review_count), [40, 48, 24]);
 const edgeReviews = reviews.flatMap(x => {
   assert.equal(x.schema, "mts-reader-edge-review/v0.1");
   assert.equal(x.status, "proposed");
@@ -49,10 +50,10 @@ const edgeReviews = reviews.flatMap(x => {
   assert.equal(x.entries.length, x.review_count);
   return x.entries;
 });
-assert.equal(edgeReviews.length, 88, "87 old edges + one corrected CTX-03 edge");
-assert.equal(new Set(edgeReviews.map(x => x.source + "->" + x.consumer)).size, 88);
+assert.equal(edgeReviews.length, 112, "87 initial edges + CTX-03 replacement + 24 second-order edges");
+assert.equal(new Set(edgeReviews.map(x => x.source + "->" + x.consumer)).size, 112);
 assert.deepEqual(["keep", "remove", "replace"].map(v =>
-  edgeReviews.filter(x => x.decision === v).length), [66, 21, 1]);
+  edgeReviews.filter(x => x.decision === v).length), [76, 35, 1]);
 for (const item of edgeReviews) {
   assert.equal(item.review_status, "proposed");
   assert.ok(item.rationale_ru.trim().length > 35, "missing individual scientific reason");
@@ -205,4 +206,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 nodes, 286 editorial edges, 41-node opening, 57 original edges, 88 proposed R35 reviews with 22 corrected decisions, no publication, falsifiers GREEN.");
+console.log("G20: 119 nodes, 272 editorial edges, 41-node opening, 57 inherited edges, 112 R35/R36 individual proposed reviews, 36 corrected dispositions, no publication, falsifiers GREEN.");
