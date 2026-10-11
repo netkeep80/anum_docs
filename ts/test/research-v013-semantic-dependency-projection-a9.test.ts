@@ -1230,6 +1230,9 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-compiler.ts",
   // #2127: post-v0.15 YAML publication/source governance is tooling-only.
   "ts/src/tooling/mts-source-requirement.ts",
+  // #2141: 62-ID reader coverage only projects accepted registry/doc ownership;
+  // it contains no runtime decisions, writes, or new MTS semantic authorities.
+  "ts/src/tooling/mts-reader-coverage.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
