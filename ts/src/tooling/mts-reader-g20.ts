@@ -197,15 +197,16 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
   if (ordered.length !== 119) fail("cyclic reader first-use graph");
   // Reader spine is an explicit *presentation* choice. It is checked for
   // exact prerequisites but contributes ZERO edges to the scientific graph.
-  if (!Array.isArray(raw.opening_spine) || raw.opening_spine.length !== 41 ||
-      new Set(raw.opening_spine).size !== 41 ||
+  if (!Array.isArray(raw.opening_spine) || raw.opening_spine.length !== 42 ||
+      new Set(raw.opening_spine).size !== 42 ||
       raw.opening_spine.some(id => typeof id !== "string" || !index.has(id))) {
-    fail("invalid/duplicate/unknown 41-step opening spine");
+    fail("invalid/duplicate/unknown 42-step opening spine");
   }
   const openingSpine = raw.opening_spine as string[];
   const requiredOpening = [
     "editorial:foundation-ontology", "editorial:local-self-classification",
     "editorial:root-basis-witnesses", "editorial:relative-chiral-orientation",
+    "g4:identity-by-poles",
     "editorial:representation-boundary",
     ..."ROCLU".split("").map(name => "basis:" + name),
     ...["anet-term", "nat-first-use", "exact-sequence-first-use",
@@ -224,7 +225,7 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
     introduced.add(anchor);
   }
   // The base topological sort remains authoritative about allowed edges;
-  // the 41 explicitly authored anchors are emitted first, then the remaining
+  // the 42 explicitly authored anchors are emitted first, then the remaining
   // topological order is stable. Neither text nor edge ownership changes.
   const presentation = [
     ...openingSpine.map(id => nodes[index.get(id)!]!),
