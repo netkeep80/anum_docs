@@ -195,10 +195,10 @@ const editSpine = (modified: string): string => {
 assert.throws(() => parse(editSpine(authoredSpine.replace(
   '  - "basis:C"', '  - "basis:O"'))), /invalid\/duplicate\/unknown 42-step opening spine/);
 assert.throws(() => parse(editSpine(authoredSpine.replace(
-  '  - "basis:C"', '  - "basis:absent"'))), /invalid\/duplicate\/unknown 41-step opening spine/);
+  '  - "basis:C"', '  - "basis:absent"'))), /invalid\/duplicate\/unknown 42-step opening spine/);
 assert.throws(() => parse(editSpine(authoredSpine.replace(
   '  - "editorial:relative-chiral-orientation"\n', ""))),
-  /invalid\/duplicate\/unknown 41-step opening spine/);
+  /invalid\/duplicate\/unknown 42-step opening spine/);
 assert.throws(() => parse(editSpine(authoredSpine.replace(
   '  - "g4:incidence"\n  - "g4:local-decision"',
   '  - "g4:local-decision"\n  - "g4:incidence"'))),
