@@ -14,10 +14,36 @@ assert.equal(sources.length, 114);
 assert.equal(new Set(sources.map(x => x.id)).size, 114);
 assert.equal(draft.nodes.length, 119);
 assert.equal(draft.ordered.length, 119);
-assert.equal(draft.edges, 296);
+assert.equal(draft.edges, 307);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
+const originalSourceEdges = sources.reduce((sum, a) => sum + a.sourceRequires.length, 0);
+assert.equal(originalSourceEdges, 57, "G4:31 + G7:16 + G8:10 must remain source-authoritative");
+for (const source of sources) {
+  const node = draft.nodes.find(x => x.id === source.id);
+  assert.ok(node, "G20 missing source owner " + source.id);
+  for (const req of source.sourceRequires) {
+    assert.ok(node.readerRequires.includes(req), "G20 dropped original prerequisite " + source.id + " -> " + req);
+  }
+}
+const requiredFirstUse: readonly [string, string][] = [
+  ["g7:link-identity", "concept:anet-term"],
+  ["g10:v14-l3", "g7:q-codec"],
+  ["g10:v14-l4", "g8:glyph-map"],
+  ["g10:v14-l10", "concept:nat-first-use"],
+  ["g11:v15-term-01", "concept:anet-term"],
+  ["g11:v15-onto-02", "concept:exact-sequence-first-use"],
+  ["g11:v15-fals-01", "concept:formal-json-first-use"],
+  ["g11:v15-ready-02", "concept:formal-json-first-use"],
+  ["g11:v15-reg-01", "concept:formal-json-first-use"],
+  ["g11:v15-reg-02", "concept:formal-json-first-use"],
+  ["g11:v15-reg-03", "concept:formal-json-first-use"],
+];
+for (const [nodeId, prior] of requiredFirstUse) {
+  assert.ok(draft.nodes.find(x => x.id === nodeId)?.readerRequires.includes(prior),
+    "G20 first-use required science prerequisite omitted " + nodeId + " -> " + prior);
+}
 assert.equal(draft.publication, "blocked");
 assert.equal(draft.authorApproval, "not-recorded");
 assert.equal(draft.completeness, "editorial-dependencies-unverified");
@@ -75,4 +101,13 @@ const changed = original.replace(
   });
 assert.notEqual(changed, original);
 assert.throws(() => parse(changed), /missing explicit first-use prerequisite/);
-console.log("G20: 119 source-backed reader nodes, 296 edges, no publication, negative falsifiers GREEN.");
+const sourceDrift = original.replace(
+  /id: "g4:local-decision"([\s\S]*?)reader_requires: \[([^\n]*)\]/,
+  (whole, mid: string, deps: string) => {
+    assert.ok(deps.includes('"g4:incidence"'));
+    return 'id: "g4:local-decision"' + mid +
+      'reader_requires: [' + deps.replace(', "g4:incidence"', "") + ']';
+  });
+assert.notEqual(sourceDrift, original);
+assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
+console.log("G20: 119 source-backed reader nodes, 307 edges, original 57 edges preserved, no publication, negative falsifiers GREEN.");
