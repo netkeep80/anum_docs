@@ -48,6 +48,31 @@ assert.ok(!document.mainText.includes("V15-READY-03"));
 assert.ok(document.annexes.includes("V15-READY-03"));
 assert.deepEqual(w3.rows.filter(x=>x.kind==="governance-rule").map(x=>x.atom).sort(),
  document.annexIds.filter(x=>x.startsWith("g11:")).map(x=>x.slice(4)).sort());
+const actualModel=parseReaderW6Model(source);
+assert.equal(actualModel.headings.length,9);
+assert.equal(actualModel.headings.flat().length,102);
+assert.equal(new Set(actualModel.headings.flat()).size,102);
+assert.equal((document.mainText.match(/^\*\*\d+\.\d+\. /gm)??[]).length,102);
+assert.ok(document.mainText.includes("**1.1. Внешний математический интерфейс Foundation.**"));
+assert.ok(document.mainText.includes("**2.14. Объективная хиральная пара без выбора контекста.**"));
+assert.ok(!document.mainText.includes("**1.1. Определение и математическое положение.**"));
+assert.ok(!document.mainText.includes("**7.1. Нормативное положение.**"));
+assert.ok(document.mainText.includes("## 4. Производные шкалы, преобразования и контекстная ориентация"));
+assert.ok(document.mainText.includes("## 5. Нотация, профили Q, историческая арифметика и Modus Ponens"));
+assert.ok(document.mainText.includes("## 10. Статус принятия, нормативные границы и история релизов"));
+const history=document.mainText.slice(document.mainText.indexOf("## 10. "));
+assert.ok(history.length>900,"chapter 10 must have substantive accepted history, not an empty bridge");
+assert.ok(history.includes("### Принятие v0.15 и пределы авторского решения"));
+assert.ok(history.includes("ACCEPT_MTS_V0_15"));
+assert.ok(history.includes("813a1569300b241a3b70eb282eecd8231db15e4b"));
+assert.ok(history.includes("issue #1876"));
+assert.ok(history.includes("PR #2078"));
+assert.ok(history.includes("https://github.com/netkeep80/anum_docs/issues/1876#issuecomment-6046228475"));
+assert.ok(!document.mainText.includes("\n\n Правила Q"),
+ "trim display-only Q leading whitespace while keeping exact original source fragments");
+const example=document.mainText.slice(document.mainText.indexOf("### Пример на принятых источниках: AND"),
+ document.mainText.indexOf("## 8. "));
+assert.equal((example.match(/NO_MATCH/g)??[]).length,1,"do not repeat the same NO_MATCH caveat in the worked example");
 const parse=(x:string)=>parseReaderW6Model(x);
 assert.throws(()=>parse(source.replace("author_approval: not-recorded","author_approval: recorded")),/cannot promote/);
 assert.throws(()=>parse(source.replace("publication: blocked","publication: ready")),/cannot promote/);
@@ -55,5 +80,8 @@ assert.throws(()=>parse(source.replace("primary_text_atoms: 102","primary_text_a
 assert.throws(()=>parse(source.replace("historical_g16_atoms: 5","historical_g16_atoms: 0")),/source-preserving layout/);
 assert.throws(()=>parse(source.replace("original_source_atoms: 119","original_source_atoms: 118")),/source-preserving layout/);
 assert.throws(()=>parse(source+"\npublication: ready\n"),/malformed\/duplicate YAML/);
-console.log("=====R44-W6-RENDERED-MAIN-BEGIN=====\n"+document.mainText+"\n=====R44-W6-RENDERED-MAIN-END=====");
+
+assert.throws(()=>parse(source.replace("author_comment: 6046228475","author_comment: 0000000000")),/history must identify actual author acceptance/);
+assert.throws(()=>parse(source.replace('        - "Корневая Связь R"','        - "Внешний математический интерфейс Foundation"')),/distinct scientific titles/);
+console.log("R44-W6 reader revision: 102 named source-owned paragraphs, nonempty witnessed acceptance chapter, unique AND caveat, exact 119 atom reassembly, 17 archival atoms, 48 science review records, publication blocked.\n");
 console.log("R44-W6 readable preview: all 119 source fragments reconstruct byte-identical text; 102 primary / 17 historical+governance annex; 10 chapters, 48 reviews and 9 open findings.");

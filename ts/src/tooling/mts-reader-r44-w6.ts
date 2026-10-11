@@ -27,7 +27,7 @@ function evidence(path:string){return "https://github.com/netkeep80/anum_docs/bl
 export function parseReaderW6Model(source:string){
  const doc=parse(source);
  shape(doc,["schema","status","author_approval","publication","semantic_change","source_academic_model",
-  "source_editing_model","source_review_model","source_first_use","source_v015_review","source_main_pin","layout"],"W6");
+  "source_editing_model","source_review_model","source_first_use","source_v015_review","source_main_pin","layout","scholarly_repairs"],"W6");
  check(doc.schema==="mts-reader-human-edition-r44-w6/v0.1"&&doc.status==="proposed"&&
  doc.author_approval==="not-recorded"&&doc.publication==="blocked"&&doc.semantic_change===false&&
  doc.source_main_pin===pin&&
@@ -59,12 +59,66 @@ export function parseReaderW6Model(source:string){
  archive=str(l.archive_ru,"archive",160),assurance=str(l.assurance_ru,"assurance",115);
  check(archive.includes("119")&&archive.includes("102")&&archive.includes("17")&&
  caveat.includes("девять")&&assurance.includes("48"),"scientific source count or status drift");
- return {introduction,caveat,archive,assurance,publication:"blocked" as const};
+ const repair=map(doc.scholarly_repairs,"direct-render scientific repair");
+ shape(repair,["status","author_approval","publication","observation","reason_ru",
+  "chapter_labels","chapter_title_overrides","historic_acceptance",
+  "no_match_duplicate_policy","q_display_normalization"],"scholarly repair");
+ check(repair.status==="proposed"&&repair.author_approval==="not-recorded"&&
+  repair.publication==="blocked"&&
+  repair.observation==="direct-inspection-of-generated-W6-main-text"&&
+  repair.no_match_duplicate_policy==="one-source-comment-plus-one-four-row-table"&&
+  repair.q_display_normalization==="display-trim-leading-space-while-source-fragments-remain-identical",
+  "direct scholarly repair cannot change accepted text");
+ str(repair.reason_ru,"actual rendered-text critique",180);
+ check(Array.isArray(repair.chapter_labels),"nine chapter-specific heading lists missing");
+ const chapterIds=["foundational-forms","grounded-inverse-context","representation-first-use",
+  "derived-and-context","grammar-and-historical-mp","v015-ontology",
+  "v015-execution","proof-and-refinement","reproducibility-assurance"];
+ const counts=[9,16,12,13,16,6,13,2,15];
+ const headings=(repair.chapter_labels as unknown[]).map((item,i)=>{
+  const c=map(item,"chapter labels");shape(c,["id","headings_ru"],"chapter labels");
+  check(c.id===chapterIds[i]&&Array.isArray(c.headings_ru),"chapter heading sequence or owner changed");
+  const list=(c.headings_ru as unknown[]).map(x=>str(x,"individual Russian heading",12));
+  check(list.length===counts[i]&&new Set(list).size===list.length,
+   "all "+counts[i]+" chapter paragraphs need distinct scientific titles");
+  return list;
+ });
+ check(headings.length===9&&headings.flat().length===102,"all 102 source-owned paragraphs require titles");
+ check(Array.isArray(repair.chapter_title_overrides),"two amended chapter titles");
+ const renamed=(repair.chapter_title_overrides as unknown[]).map((item,i)=>{
+  const v=map(item,"chapter title override");shape(v,["id","title_ru"],"override");
+  const target=["derived-and-context","grammar-and-historical-mp"][i];
+  check(v.id===target,"only the two historically heterogeneous chapters can be renamed");
+  return {id:target!,title:str(v.title_ru,"chapter title",35)};
+ });
+ check(renamed.length===2,"two chapter titles required");
+ const h=map(repair.historic_acceptance,"accepted v0.15 decision");
+ shape(h,["evidence_source","author_issue","author_comment","pull_request",
+  "merged_at_utc","merge_sha","accepted_ru","meaning_ru","source_ru","provenance_ru"],"history");
+ check(h.evidence_source==="traceability/mts-v0.15.json"&&h.author_issue===1876&&
+  h.author_comment===6046228475&&h.pull_request===2078&&
+  h.merged_at_utc==="2026-10-07T23:17:15Z"&&
+  h.merge_sha==="813a1569300b241a3b70eb282eecd8231db15e4b",
+  "history must identify actual author acceptance and exact release merge");
+ const history={evidenceSource:h.evidence_source as string,mergeSha:h.merge_sha as string,
+  acceptedRu:str(h.accepted_ru,"exact acceptance history",240),
+  meaningRu:str(h.meaning_ru,"scope of ACCEPT",220),
+  sourceRu:str(h.source_ru,"V15-READY-03 historical contrast",210),
+  provenanceRu:str(h.provenance_ru,"merge SHA distinction",170)};
+ return {introduction,caveat,archive,assurance,headings,renamed,history,publication:"blocked" as const};
 }
 export function renderReaderW6(root:string):ReaderW6Document{
  const model=parseReaderW6Model(read(root,READER_W6_PATH));
  const graph=loadReaderG20(root),g41=loadReaderG41(root),g42=loadReaderG42(root);
  const r43=loadReaderR43(root),w3=loadReaderR44W3(root),w4=loadReaderR44W4(root),w5=loadReaderR44W5(root);
+ const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
+   status:string;currentAccepted:{mtsVersion:string};
+   authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
+ check(v015.status==="accepted"&&v015.currentAccepted.mtsVersion==="v0.15"&&
+   v015.authorDecision.state==="ACCEPTED"&&v015.authorDecision.decision==="ACCEPT_MTS_V0_15"&&
+   v015.authorDecision.ownerIssue===1876&&
+   v015.authorDecision.decisionEvidence==="netkeep80/anum_docs#1876 issuecomment-6046228475",
+   "scientific history is not supported by accepted author evidence");
  check(graph.publication==="blocked"&&w3.publication==="blocked"&&w4.publication==="blocked"&&
  w5.publication==="blocked"&&graph.ordered.length===119&&w3.rows.length===48&&
  w4.proofs.length===8&&w5.cases.length===9,"source science acceptance gate");
@@ -87,7 +141,8 @@ export function renderReaderW6(root:string):ReaderW6Document{
  for(let ci=0;ci<g42.chapters.length;ci++){
   const chapter=g42.chapters[ci]!,transition=w4.chapters[ci]!;
   check(chapter.id===transition.id,"academic chapter source order changed");
-  main.push("## "+(ci+1)+". "+chapter.titleRu,"",transition.reading,"",
+  const titleOverride=model.renamed.find(x=>x.id===chapter.id)?.title;
+  main.push("## "+(ci+1)+". "+(titleOverride??chapter.titleRu),"",transition.reading,"",
     "**Граница применимости.** "+transition.limit,"");
   let paragraph=0;
   for(const id of chapter.atomIds){
@@ -100,29 +155,39 @@ export function renderReaderW6(root:string):ReaderW6Document{
     main.push("**Предварительное определение Q.** "+g41.earlyQ.exactSourceOpeningRu,"");
     emit("g7:q-codec",g41.earlyQ.exactSourceOpeningRu);
    }
-   const kind=reviews.get(id.substring(4))?.kind;
-   const label=node.sourceOwner==="G4"?"Определение и математическое положение":
-    node.sourceOwner==="G11"?(kind==="execution-contract"?"Контракт исполнения":"Нормативное положение"):
-    node.sourceOwner==="G10"?"Историческое положение":"Понятие и представление";
-   main.push("**"+(ci+1)+"."+(paragraph)+". "+label+".**","");
+   const humanHeading=model.headings[ci]?.[paragraph-1];
+   check(humanHeading!==undefined,"unreviewed or reordered paragraph "+chapter.id+"/"+paragraph);
+   main.push("**"+(ci+1)+"."+(paragraph)+". "+humanHeading+".**","");
    const b=deferred.get(id);
    if(b){
     check(node.textRu===b.exactEquation+". "+b.sourceExplanationRu,"G15 exact equation changed");
     main.push(b.exactEquation+".","");emit(id,b.exactEquation+". ");
    }else if(id==="g7:q-codec"){
     const remainder=node.textRu.slice(g41.earlyQ.exactSourceOpeningRu.length);
-    main.push(remainder,"");emit(id,remainder);
+    main.push(remainder.trimStart(),"");emit(id,remainder);
    }else{main.push(node.textRu,"");emit(id,node.textRu);}
    const rel=releases.get(id);
    if(rel){main.push("**Пояснение к "+rel.symbol+" после введения необходимых понятий.**","",
      rel.sourceExplanationRu,"");emit(rel.firstUseNode,rel.sourceExplanationRu);}
+  }
+  check(ci===9||paragraph===model.headings[ci]?.length,
+   "chapter paragraph count invalid after editorial repair");
+  if(chapter.id==="governance-and-history"){
+   check(paragraph===0&&chapter.atomIds.every(id=>toAnnex.has(id)),
+    "historical chapter must be filled with attributed narrative, not duplicated governance axioms");
+   main.push("### Принятие v0.15 и пределы авторского решения","",
+    model.history.acceptedRu,"",model.history.meaningRu,"",
+    "### Историческое правило авторского перехода","",model.history.sourceRu,"",
+    "### Проверяемые контрольные точки","",model.history.provenanceRu,"",
+    "Первоисточники: [принятый реестр]("+evidence(model.history.evidenceSource)+
+    "), [авторское решение #1876](https://github.com/netkeep80/anum_docs/issues/1876#issuecomment-6046228475), "+
+    "[релизный PR #2078](https://github.com/netkeep80/anum_docs/pull/2078).","");
   }
   if(chapter.id==="v015-execution"){
    main.push("### Пример на принятых источниках: AND","",r43.examples.andRu,"",
    "| Вход | Правило | Результат |","|---|---|---|",
    "| F,F | RuleFF | F |","| F,T | RuleFT | F |",
    "| T,F | RuleTF | F |","| T,T | RuleTT | T |","",
-   "NO_MATCH вне области T/F подтверждается отдельным отрицательным тестом, а не пятым правилом JSON.","",
    "[FORMAL]("+evidence(r43.examples.formal)+"), [JSON]("+evidence(r43.examples.json)+
    "), [отрицательный тест]("+evidence(r43.examples.negative)+").","");
   }
