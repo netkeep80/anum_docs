@@ -1,0 +1,156 @@
+# R39 W3: 21 individual direct-signpost decisions across G7/G8/G16.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: 130d4b0b006e75a6f4feb655a8404926dad638e5
+review_boundary: explicit-pedagogical-signpost-vs-unneeded-direct-reference
+review_count: 21
+entries:
+  - source: "concept:nat-first-use"
+    consumer: "g7:nat-successor"
+    decision: keep
+    indirect_via: "g7:nat-zero"
+    rationale_ru: "Формула Succ(N)=N⟼L непосредственно опирается на определение шкалы Nat; явное прямое пояснение предотвращает трактовку как степени Degree."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника concept:nat-first-use не расширяется."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g7:degree-one"
+    decision: keep
+    indirect_via: "g7:nat-successor"
+    rationale_ru: "Определение D₁=L одновременно противопоставляет Degree и Nat, потому явная ссылка на шкалу Nat содержательно уместна."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника concept:nat-first-use не расширяется."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g7:nat-degree-nonidentity"
+    decision: keep
+    indirect_via: "g7:degree-one"
+    rationale_ru: "Сравнение N₁=U⟼L и D₁=L использует сразу обе шкалы; Nat здесь не только транзитивное условие, но и самостоятельный предмет сравнения."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника concept:nat-first-use не расширяется."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "g7:context-local-names"
+    decision: keep
+    indirect_via: "g7:context-marker-qualified"
+    rationale_ru: "Имена START_K/END_K обозначают именно вывод CTX_03_context_selection_induces_local_roles; прямая ссылка предохраняет от глобальной ориентации."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g4:context-roles не расширяется."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "g7:relative-z2"
+    decision: keep
+    indirect_via: "g7:context-local-names"
+    rationale_ru: "Правило относительного Z₂ применяется к уже ориентированным контекстам; прямое упоминание условия CTX-03 не даёт забыть требуемый маркер."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g4:context-roles не расширяется."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "g7:orientation-authority-boundary"
+    decision: keep
+    indirect_via: "g7:relative-z2"
+    rationale_ru: "Граница источника ориентации требует явного понимания локальной теоремы CTX-03, а не только предыдущего обсуждения Z₂."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g4:context-roles не расширяется."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:positional-forms"
+    decision: remove
+    indirect_via: "g8:glyph-map"
+    rationale_ru: "Формы ∞, ♂S, S♀, A⟼B уже следуют за glyph-map, который сам вводит связь с incidence; дублирующая дуга не объясняет дополнительных символов."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:glyph-map."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:grammar-explicit"
+    decision: remove
+    indirect_via: "g8:positional-forms"
+    rationale_ru: "Грамматика задаёт разбор после positional-forms; локальные предикаты самоинцидентности уже обеспечены через форму записи."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:positional-forms."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:reject-ambiguity"
+    decision: remove
+    indirect_via: "g8:grammar-explicit"
+    rationale_ru: "Отбраковка неоднозначных форм есть правило разбора после grammar-explicit, а не отдельное применение incidence."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:grammar-explicit."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:no-implicit-associativity"
+    decision: remove
+    indirect_via: "g8:reject-ambiguity"
+    rationale_ru: "Профиль NONE относится к соглашению о группировании, следующему после reject-ambiguity, и не усиливается повтором incidence."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:reject-ambiguity."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:v015-das-version-boundary"
+    decision: remove
+    indirect_via: "g8:no-implicit-associativity"
+    rationale_ru: "Версионное различие DAS v0.15 и v0.14 требует предыдущего правила группирования; инцидентность уже названа в основании грамматики."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:no-implicit-associativity."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:codecs-level"
+    decision: remove
+    indirect_via: "g8:recursive-level"
+    rationale_ru: "Уровень кодеков следует за recursive-level и не вводит новую классификацию локальных полюсных совпадений."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:recursive-level."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:byte-text-level"
+    decision: remove
+    indirect_via: "g8:codecs-level"
+    rationale_ru: "Байтовая запись относится к переносу и отображению после codecs-level; incidence доступна через предшествующую иерархию."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:codecs-level."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:symbolic-meta-level"
+    decision: remove
+    indirect_via: "g8:byte-text-level"
+    rationale_ru: "Символическая метанотация располагается над текстовым слоем; её порядок следует из структуры слоёв, а не прямой новой инцидентности."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:byte-text-level."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:no-second-ontology"
+    decision: remove
+    indirect_via: "g8:symbolic-meta-level"
+    rationale_ru: "Вывод об отсутствии второй онтологии замыкает иерархию репрезентаций, которая уже ссылается на исходный Link и incidence."
+    limitation_ru: "Удаляется лишь повторный указатель, а не исходная структурная предпосылка: она по-прежнему доступна через g8:symbolic-meta-level."
+    review_status: proposed
+  - source: "basis:R"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    indirect_via: "basis:O"
+    rationale_ru: "Предлагаемое русское введение буквально перечисляет уравнение R=R⟼R; явная ссылка на R нужна, несмотря на достижимость через O/C/L."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника basis:R не расширяется."
+    review_status: proposed
+  - source: "basis:O"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    indirect_via: "basis:L"
+    rationale_ru: "Абзац непосредственно содержит O=O⟼R; удалять прямое указание на O только из-за транзитивного пути через L нецелесообразно."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника basis:O не расширяется."
+    review_status: proposed
+  - source: "basis:C"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    indirect_via: "basis:L"
+    rationale_ru: "Объяснение корневых свидетелей выписывает C=R⟼C как отдельный полюсный случай; нужно показать C непосредственно."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника basis:C не расширяется."
+    review_status: proposed
+  - source: "g4:root-uniqueness"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    indirect_via: "g4:one-sided-realizability"
+    rationale_ru: "Текст особо отделяет условную FND_02_unique_root от FND_01 существования; прямая ссылка на A1-зависимую единственность существенна."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g4:root-uniqueness не расширяется."
+    review_status: proposed
+  - source: "g4:chiral-orbit"
+    consumer: "editorial:relative-chiral-orientation"
+    decision: keep
+    indirect_via: "g4:context-roles"
+    rationale_ru: "Один обзорный абзац содержит две различные CTX-03 теоремы: объективную орбиту до контекста и последующий локальный выбор; оба факта следует сослать напрямую."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g4:chiral-orbit не расширяется."
+    review_status: proposed
+  - source: "g7:anum-carrier"
+    consumer: "editorial:representation-boundary"
+    decision: keep
+    indirect_via: "g7:recursive-codec"
+    rationale_ru: "Граница представления противопоставляет рекурсивный кодек одной Link и Anum как носитель последовательностей; Anum нужен непосредственно, а не только через recursive-codec."
+    limitation_ru: "Сохранённая прямая ссылка есть научно-педагогическое пояснение, а не новая математическая теорема; прежняя область источника g7:anum-carrier не расширяется."
+    review_status: proposed
