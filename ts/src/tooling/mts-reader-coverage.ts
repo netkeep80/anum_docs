@@ -837,3 +837,104 @@ export function renderReaderAllFirstPassCensus(c:ReaderAllFirstPassCensus):strin
     "publication_ready_ids="+c.publicationReadyIds,
   ].join("\n");
 }
+
+
+/** G12 deterministic PREVIEW renderer: no generated markdown is authoritative or published. */
+export interface ReaderDraftParagraph {
+  readonly id:string; readonly acceptedId:string; readonly source:string;
+  readonly textRu:string; readonly role:string; readonly exclusionRu:readonly string[];
+}
+export interface ReaderDraftPreview {
+  readonly schema:"mts-reader-draft-preview/v0.1";
+  readonly publication:"blocked";
+  readonly authorApproval:"not-recorded";
+  readonly readerOrder:"registry-order-not-reviewed";
+  readonly sectionCount:13;
+  readonly acceptedLawCount:62;
+  readonly proposedParagraphCount:104;
+  readonly markdown:string;
+}
+export function projectReaderDraftPreview(
+  coverage:ReaderCoveragePlan,routes:ReaderRoutes,
+  g4:ReturnType<typeof loadMtsSourceRequirement>,g7:ReaderG7Plan,g8:ReaderG8Plan,
+  g10:ReaderV14G10,g11:ReaderV15G11,full:ReaderAllFirstPassCensus
+):ReaderDraftPreview{
+  if(full.acceptedIds!==62||full.idsWithProposedRussianText!==62||
+     full.totalProposedRussianAtoms!==104||full.scientificallyCompleteIds!==0||
+     full.authorApprovedIds!==0||full.publicationReadyIds!==0||
+     g4.readerScience?.publication!=="blocked"||
+     g7.publication!=="blocked"||g8.publication!=="blocked"||
+     g10.publication!=="blocked"||g11.publication!=="blocked")
+    fail("G12 cannot present incomplete or approved scientific corpus as draft");
+  if(coverage.rows.length!==62||Object.keys(routes.chapters).length!==13)
+    fail("G12 reader coverage or chapters changed");
+  const blocks=new Map<string,ReaderDraftParagraph[]>();
+  const uniqueKeys=new Set<string>();
+  const add=(id:string,source:string,atom:string,text:string,role:string,exclusions:readonly string[])=>{
+    if(!coverage.rows.some(x=>x.id===id)||!atom||!text.trim())fail("G12 invalid source atom");
+    const key=source+"/"+atom;
+    if(uniqueKeys.has(key))fail("G12 duplicate source text ownership");
+    uniqueKeys.add(key);
+    const arr=blocks.get(id)??[];
+    arr.push(Object.freeze({
+      id:atom,acceptedId:id,source,textRu:text,role,
+      exclusionRu:Object.freeze([...exclusions]),
+    }));
+    blocks.set(id,arr);
+  };
+  if(!g4.readerScience)fail("G12 missing G4 science owner");
+  for(const x of g4.readerScience.steps)
+    add("V14-L1","G4",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g7.atoms)
+    add(x.acceptedId,"G7",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g8.atoms)
+    add(x.acceptedId,"G8",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g10.atoms)
+    add(x.acceptedId,"G10",x.id,x.ru,"accepted-contract-exposition",x.exclusions);
+  for(const x of g11.atoms)
+    add(x.acceptedId,"G11-"+x.wave,x.id,x.ru,"accepted-contract-exposition",x.exclusions);
+  if(uniqueKeys.size!==104||blocks.size!==62)
+    fail("G12 duplicate/missing source texts");
+  const out=[
+    "# Метатеория Связей — научное изложение (редакционный черновик)",
+    "",
+    "**СТАТУС: ПРЕДЛОЖЕНИЕ; АВТОР НЕ УТВЕРЖДАЛ; ПУБЛИКАЦИЯ ЗАПРЕЩЕНА.**",
+    "",
+    "Материал построен из моделей и дословно привязан к принятым нормативным идентификаторам.",
+    "Порядок ниже пока повторяет порядок реестров внутри разделов и НЕ является доказанным reader DAG.",
+    "Наличие текста не гарантирует полноту объяснения, доказательств или корректность межпонятийных переходов.",
+    "",
+  ];
+  const chapters=Object.entries(routes.chapters) as [ReaderSection,string][];
+  for(const [section,title] of chapters){
+    out.push("## "+title,"");
+    for(const row of coverage.rows.filter(x=>x.proposedSection===section)){
+      out.push("### "+row.id+" — редакционный кандидат","","Нормативный источник: "+
+        row.acceptedAuthority.path+"#"+row.acceptedAuthority.pointer+".","");
+      for(const atom of blocks.get(row.id)??[]){
+        out.push("#### "+atom.id,"",atom.textRu,"");
+        if(atom.exclusionRu.length)
+          out.push("Граница утверждения: "+atom.exclusionRu.join("; ")+".","");
+      }
+      out.push("*Статус: научная полнота не подтверждена; авторское одобрение отсутствует.*","");
+    }
+  }
+  out.push("---","",
+    "Этот черновик не заменяет принятые нормативные реестры и внешние доказательства.",
+    "Пока не выполнен полный индивидуальный научный аудит, публикация недопустима.","");
+  return Object.freeze({
+    schema:"mts-reader-draft-preview/v0.1" as const,publication:"blocked" as const,
+    authorApproval:"not-recorded" as const,
+    readerOrder:"registry-order-not-reviewed" as const,
+    sectionCount:13 as const,acceptedLawCount:62 as const,
+    proposedParagraphCount:104 as const,markdown:out.join("\n"),
+  });
+}
+export function loadReaderDraftPreview(root:string):ReaderDraftPreview{
+  const census=loadReaderScienceCensus(root);
+  const g10=loadReaderV14G10(root),g11=loadReaderV15G11(root);
+  return projectReaderDraftPreview(loadReaderCoverage(root),loadReaderRoutes(root),
+    loadMtsSourceRequirement(root,"requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    loadReaderG7(root),loadReaderG8(root),g10,g11,
+    projectReaderAllFirstPassCensus(census,g10,g11));
+}

@@ -7,7 +7,8 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
   loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
   loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
-  projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS }
+  projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS,
+  loadReaderDraftPreview, projectReaderDraftPreview }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -323,3 +324,26 @@ assert.throws(()=>projectReaderAllFirstPassCensus(g9,g10,{
   ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!,acceptedId:"V14-L2"}]
 }),/duplicate\/foreign cross-source ID/);
 console.log("G11: 48 first-pass v0.15 source-owned Russian texts; 62/62 accepted ID owner presence, ZERO scientific completion.");
+
+const draft=loadReaderDraftPreview(root);
+assert.equal(draft.schema,"mts-reader-draft-preview/v0.1");
+assert.equal(draft.publication,"blocked");
+assert.equal(draft.authorApproval,"not-recorded");
+assert.equal(draft.readerOrder,"registry-order-not-reviewed");
+assert.equal(draft.sectionCount,13);
+assert.equal(draft.acceptedLawCount,62);
+assert.equal(draft.proposedParagraphCount,104);
+assert.ok(draft.markdown.startsWith("# Метатеория Связей — научное изложение (редакционный черновик)"));
+assert.ok(draft.markdown.includes("ПУБЛИКАЦИЯ ЗАПРЕЩЕНА"));
+assert.ok(draft.markdown.includes("НЕ является доказанным reader DAG"));
+assert.equal((draft.markdown.match(/^## /gm)??[]).length,13);
+assert.equal((draft.markdown.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((draft.markdown.match(/^#### /gm)??[]).length,104);
+assert.equal(loadReaderDraftPreview(root).markdown,draft.markdown);
+assert.throws(()=>projectReaderDraftPreview(plan,routes,g4,g7,g8,g10,g11,{
+  ...c11,authorApprovedIds:1 as 0,
+}),/cannot present incomplete or approved/);
+assert.throws(()=>projectReaderDraftPreview(plan,routes,g4,g7,g8,g10,{
+ ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!}],
+},c11),/duplicate source text ownership/);
+console.log("G12: 13-section 62-law 104-atom deterministic unapproved Russian draft preview.");
