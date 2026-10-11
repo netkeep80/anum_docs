@@ -15,7 +15,7 @@ assert.equal(sources.length, 114);
 assert.equal(new Set(sources.map(x => x.id)).size, 114);
 assert.equal(draft.nodes.length, 119);
 assert.equal(draft.ordered.length, 119);
-assert.equal(draft.edges, 268);
+assert.equal(draft.edges, 151);
 assert.equal(draft.originalAtoms, 104);
 assert.equal(draft.basisAndFirstUse, 10);
 assert.equal(draft.replacementAtoms, 5);
@@ -31,6 +31,10 @@ const reviews = [
   "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W3.yaml",
   "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W4.yaml",
   "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W5.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W1.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W2.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W3.yaml",
+  "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W4.yaml",
 ].map(path => {
   const doc = parseDocument(readFileSync(resolve(root, path), "utf8"),
     { strict: true, uniqueKeys: true });
@@ -40,10 +44,10 @@ const reviews = [
     schema: string; status: string; author_approval: string;
     publication: string; review_count: number;
     entries: {source: string; consumer: string; decision: string;
-      rationale_ru: string; limitation_ru: string; review_status: string}[];
+      rationale_ru: string; limitation_ru: string; review_status: string; indirect_via?: string}[];
   };
 });
-assert.deepEqual(reviews.map(x => x.review_count), [40, 48, 24, 3, 1]);
+assert.deepEqual(reviews.map(x => x.review_count), [40, 48, 24, 3, 1, 34, 50, 21, 30]);
 const edgeReviews = reviews.flatMap(x => {
   assert.equal(x.schema, "mts-reader-edge-review/v0.1");
   assert.equal(x.status, "proposed");
@@ -52,10 +56,10 @@ const edgeReviews = reviews.flatMap(x => {
   assert.equal(x.entries.length, x.review_count);
   return x.entries;
 });
-assert.equal(edgeReviews.length, 116, "87 initial + 1 CTX-03 replacement + 28 newly exposed");
-assert.equal(new Set(edgeReviews.map(x => x.source + "->" + x.consumer)).size, 116);
+assert.equal(edgeReviews.length, 251, "116 original review entries + 135 individually reviewed redundant edges");
+assert.equal(new Set(edgeReviews.map(x => x.source + "->" + x.consumer)).size, 251);
 assert.deepEqual(["keep", "remove", "replace"].map(v =>
-  edgeReviews.filter(x => x.decision === v).length), [76, 39, 1]);
+  edgeReviews.filter(x => x.decision === v).length), [94, 156, 1]);
 for (const item of edgeReviews) {
   assert.equal(item.review_status, "proposed");
   assert.ok(item.rationale_ru.trim().length > 35, "missing individual scientific reason");
@@ -65,6 +69,42 @@ for (const item of edgeReviews) {
   const linked = owner.readerRequires.includes(item.source);
   assert.equal(linked, item.decision === "keep",
     "R35 verdict differs from exact revised first-use edge: " + item.source + " -> " + item.consumer);
+}
+// Every directly retained added edge has one individually scoped KEEP review.
+// Inherited source-owner dependencies are independently protected and exempt.
+const originalSet = new Set(sources.flatMap(a =>
+  a.sourceRequires.map(from => from + "->" + a.id)));
+const keptReviewSet = new Set(edgeReviews.filter(x => x.decision === "keep")
+  .map(x => x.source + "->" + x.consumer));
+const allDirect = draft.nodes.flatMap(n => n.readerRequires.map(from => from + "->" + n.id));
+const authoredDirect = allDirect.filter(key => !originalSet.has(key));
+assert.equal(originalSet.size, 57);
+assert.equal(authoredDirect.length, 94);
+assert.deepEqual(new Set(authoredDirect), keptReviewSet,
+  "every retained authored reader edge needs its own R35/R36/R39 individual scientific review");
+const originalDag = new Map(draft.nodes.map(n => [n.id, n.readerRequires]));
+function reachesReader(from: string, target: string): boolean {
+  const pending = [from], visited = new Set<string>();
+  while (pending.length) {
+    const next = pending.pop()!;
+    if (next === target) return true;
+    if (visited.has(next)) continue;
+    visited.add(next);
+    pending.push(...(originalDag.get(next) ?? []));
+  }
+  return false;
+}
+const r39Entries = reviews.slice(5).flatMap(x => x.entries);
+assert.equal(r39Entries.length, 135);
+assert.equal(r39Entries.filter(x => x.decision === "remove").length, 117);
+assert.equal(r39Entries.filter(x => x.decision === "keep").length, 18);
+for (const item of r39Entries) {
+  assert.ok(typeof item.indirect_via === "string" && item.indirect_via !== item.source);
+  const consumer = originalDag.get(item.consumer) ?? [];
+  assert.ok(consumer.includes(item.indirect_via!),
+    "R39 alternative direct prerequisite disappeared: " + item.consumer);
+  assert.ok(reachesReader(item.indirect_via!, item.source),
+    "R39 alternative path no longer reaches original prerequisite: " + item.consumer);
 }
 const originalSourceEdges = sources.reduce((sum, a) => sum + a.sourceRequires.length, 0);
 assert.equal(originalSourceEdges, 57, "G4:31 + G7:16 + G8:10 must remain source-authoritative");
@@ -208,4 +248,4 @@ const sourceDrift = original.replace(
   });
 assert.notEqual(sourceDrift, original);
 assert.throws(() => parse(sourceDrift), /source-owner reader dependency omitted/);
-console.log("G20: 119 nodes, 268 editorial edges, 41-node opening, 57 inherited edges, 116 R35/R36 proposed individual reviews, 40 corrected dispositions, no publication, falsifiers GREEN.");
+console.log("G20: 119 nodes, 151 reader edges, 57 inherited source edges, 94 individually reviewed authored edges, 41-node academic spine, 251 individual review decisions incl 135 R39 redundant review entries, no publication, negative falsifiers GREEN.");
