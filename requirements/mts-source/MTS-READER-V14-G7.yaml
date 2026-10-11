@@ -34,7 +34,7 @@ atoms:
   - id: nat-zero
     accepted_id: V14-L6
     role: accepted-contract
-    source_quote: "Nat starts at U"
+    source_quote: "Nat starts at U and uses uniform successor N⟼L"
     ru: "Производная шкала натуральных чисел МТС Nat имеет нулевую точку N₀=U. Здесь U — обозначение из принятой модели Nat, а не автоматически корень R любой последовательности; связь этих носителей должна задаваться явно."
     domain: "Производная Nat, а не примитив Foundation"
     exclusions: ["Не отождествлять U с R только по роли начала"]
