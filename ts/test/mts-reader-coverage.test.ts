@@ -182,7 +182,8 @@ assert.equal(g8.atoms.find(x => x.id === "ontology-level")?.acceptedDetailPointe
 assert.equal(g8.proofCheck, "contract-trace-only");
 assert.equal(g8.authorApproval, "not-recorded");
 assert.equal(g8.publication, "blocked");
-const g8Parser = (source: string) => parseReaderG8(source, g7Laws, acceptedV14, plan,
+const g8Parser = (source: string, contractModel: Record<string, unknown> = acceptedV14) =>
+  parseReaderG8(source, g7Laws, contractModel, plan,
   new Map(v15.map(x => [x.id, x.statement])));
 assert.throws(() => g8Parser(g8Yaml, {
   ...acceptedV14, ostensiveFormalNotation: {
