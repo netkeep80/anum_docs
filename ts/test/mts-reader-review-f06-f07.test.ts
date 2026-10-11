@@ -58,7 +58,7 @@ assert.throws(()=>fail("CTX_GAMMA_REFINEMENT_BRIDGE","CTX_GAMMA_PROVED"),/open s
 assert.throws(()=>fail("exists-image-grounded","globally-total"),/theorem identity or scope drift/);
 assert.throws(()=>fail("assumptions: [A1, N, E, D, Grounded]","assumptions: [A1, E, D, Grounded]"),
  /proof hypotheses INV-02-TOTAL/);
-assert.throws(()=>fail("CTX_03_relational_z2_support","CTX_03_abs_orientation"),
+assert.throws(()=>fail("id: CTX-03-Z2, symbol: CTX_03_relational_z2_support","id: CTX-03-Z2, symbol: CTX_03_abs_orientation"),
  /theorem identity or scope drift/);
 assert.throws(()=>fail("proofs/coq/MtsFoundation.v","proofs/lean4/MtsFoundation.lean"),
  /source redirected/);
