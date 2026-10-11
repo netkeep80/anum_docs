@@ -1,0 +1,66 @@
+# R44-W1 independently audited scientific boundaries; publication and acceptance remain blocked.
+schema: mts-reader-independent-mathematical-audit-r44-w1/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+scientific_coverage: targeted-first-wave-not-119-full-review
+source_composition: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+source_preview: requirements/mts-source/MTS-READER-SOURCE-ATTRIBUTION-R43.yaml
+grammar:
+  source_owner: G8
+  source_atom: g8:no-implicit-associativity
+  accepted_id: V14-L2
+  accepted_contract: contracts/mts-contract-v0.14.json
+  accepted_property: ostensiveFormalNotation.implicitPairAssociativity
+  accepted_value: NONE
+  source_yaml: requirements/mts-source/MTS-READER-V14-G8.yaml
+  v014_ru: "В остенсивном синтаксисе v0.14 значение implicitPairAssociativity=NONE означает отказ от неявного выбора дерева PAIR. Для трёх связей требуется явная структурная группировка; из синтаксического ограничения не выводится ни ассоциативность, ни её отрицание как алгебраический закон Link."
+  v015_ru: "В принятом v0.15 соглашение Direct Sequential Association для трёхчленной цепочки без явных скобок задаёт левую группировку: A⟼B⟼C читается как (A⟼B)⟼C. Запись A⟼(B⟼C) имеет явную другую группировку, которая не отменяется соглашением чтения. Нельзя переносить это правило на историческую грамматику v0.14."
+  nonidentity_ru: "Никакой общий закон (A⟼B)⟼C = A⟼(B⟼C) из DSA не следует; FRM-03 доказывает лишь выбранный трёхчленный случай семантики чтения."
+  proof_case: FRM-03
+  finding: R40-09
+historical_acceptance:
+  source: traceability/mts-v0.15.json
+  owner_issue: 1876
+  decision: ACCEPT_MTS_V0_15
+  recorded_evidence: "netkeep80/anum_docs#1876 issuecomment-6046228475"
+  acceptance_pr: 2078
+  exact_merge_sha: 813a1569300b241a3b70eb282eecd8231db15e4b
+  merged_at_utc: "2026-10-07T23:17:15Z"
+  historical_ru: "Авторское решение ACCEPT МТС v0.15 уже зафиксировано в issue #1876, а релизный PR #2078 был объединён 7 октября 2026 года в 23:17:15 UTC. Это историческая запись о переходе от v0.14 к принятой v0.15; правила cutover не описывают ещё ожидаемую приёмку."
+  evidence_ru: "Идентификаторы подтверждаются принятым реестром traceability/mts-v0.15.json и историческим PR #2078; точные SHA принятия и текущей main могут отличаться."
+  finding: R40-11
+review_cases:
+  - id: R44-W1-01
+    chapter: grammar-and-historical-mp
+    state: corrected-in-proposed-G42-only
+    source_basis: [g8:no-implicit-associativity, g8:v015-das-version-boundary, FRM-03]
+    finding: R40-09
+    judgement_ru: "Ложно трактовать NONE как алгебраический закон; G42 раньше употребляла выражение «отсутствует неявная алгебраическая ассоциативность». Исправлена только научная формулировка главы и добавлено точное сравнение версионных профилей."
+    next_ru: "Требуется отдельная проверка всего перехода между грамматикой v0.14, FORMAL v0.15 и точным доказательством FRM-03; исправление одного абзаца не закрывает R40-09."
+  - id: R44-W1-02
+    chapter: governance-and-history
+    state: evidence-attached-no-status-promotion
+    source_basis: [g11:v15-ready-03, traceability/mts-v0.15.json, PR-2078]
+    finding: R40-11
+    judgement_ru: "Принятое состояние v0.15 имеет авторский источник и отдельный merge SHA 813a1569; прежняя процедура принятия должна приводиться в прошедшем времени и не смешиваться с современным требованием author approval новых JSON."
+    next_ru: "Отдельно проверить, что все встречающиеся в полном корпусе глаголы ожидания ACCEPT относятся к исторической процедуре, а не к текущему accepted baseline."
+  - id: R44-W1-03
+    chapter: proof-and-refinement
+    state: evidence-bounded-not-universal
+    source_basis: [FRM-03, FRM-04, FRM-07]
+    finding: R40-13
+    judgement_ru: "FRM-03 доказывает семантику чтения трёх членов в выбранной модели, FRM-04 зависит от инъективности ExactSequence, FRM-07 зависит от перечисленных premises production refinement. Ни одно свидетельство не подтверждает полный компилятор TypeScript."
+    next_ru: "Остальные пять случаев FRM-01/02/05/06/08 требуют столь же точных ссылок, если их утверждения войдут в финальную научную монографию."
+  - id: R44-W1-04
+    chapter: v015-execution
+    state: evidence-bounded-no-new-json
+    source_basis: [g11:v15-json-04, g11:v15-and-02, FRM-04]
+    finding: R40-15
+    judgement_ru: "Утверждённая ExactSequence сохраняет порядок и кратность; в принятом профиле []=R. Свёртка F_R является другой проекцией. Без конструктивного свидетеля нельзя объявлять конкретную коллизию двух последовательностей при F_R."
+    next_ru: "Для будущего доказательного раздела разнести предпосылку инъективности позиционного носителя и экспериментальные результаты B7; реальная коллизия F_R пока не предъявлена."
+remaining_r40:
+  corrected_previously: [R40-05]
+  mitigated_needs_rereview: [R40-01, R40-02, R40-03, R40-04, R40-08]
+  open: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]

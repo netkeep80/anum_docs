@@ -1241,6 +1241,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r42.ts",
   // R43 displays provenance and accepted test evidence; no semantic execution.
   "ts/src/tooling/mts-reader-r43.ts",
+  // R44 read-only scientific boundary/acceptance-history audit; non-semantic tooling.
+  "ts/src/tooling/mts-reader-r44.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
