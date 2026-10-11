@@ -1243,6 +1243,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r43.ts",
   // R44 read-only scientific boundary/acceptance-history audit; non-semantic tooling.
   "ts/src/tooling/mts-reader-r44.ts",
+  // R44-W2 scientific editorial prose is read-only and does not execute MTS semantics.
+  "ts/src/tooling/mts-reader-r44-w2.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
