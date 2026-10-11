@@ -16,6 +16,7 @@ assert.deepEqual(dossier.obligations,["A1_INDEPENDENCE",
 assert.equal((dossier.basisMd.match(/^\| [ROCLU]\/[ROCLU] \|/gm)??[]).length,10);
 assert.ok(dossier.basisMd.includes("F2F3OneSidedExistence"));
 assert.ok(dossier.basisMd.includes("fnd13_form_injective"));
+assert.ok(dossier.basisMd.includes("N₁=form(U,L)≠D₁"));
 assert.ok(dossier.basisMd.includes("отдельная совместная Lean4/Rocq-лемма"));
 assert.ok(dossier.groundedMd.includes("Distinguishable"));
 assert.ok(dossier.groundedMd.includes("fallback_cycle_not_grounded"));

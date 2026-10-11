@@ -17,7 +17,7 @@ const files={
  explicit_rocq:"proofs/coq/MtsExplicitModel.v"
 };
 const base="c64b7e21340c6add248c8f380f3fef1292616ac6";
-const f03=["notation_ru","equations_ru","proof_ru","limit_ru","model_ru"];
+const f03=["notation_ru","equations_ru","proof_ru","nat_degree_corollary_ru","limit_ru","model_ru"];
 const f04=["logic_ru","induction_ru","distinction_ru","realization_ru","cycle_ru","limit_ru"];
 const f05=["a1_ru","root_ru","injection_ru","fnd13_ru","model_ru","counterexample_ru","open_ru"];
 const bSymbols=["F2F3OneSidedExistence","f2f3_start_root_pattern","f2f3_finish_root_pattern",
