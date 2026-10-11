@@ -103,6 +103,8 @@ function verifySources(root:string){
      "missing exact paired proof symbol "+symbol+"/"+lang);
   }else if(origin==="executable")check(text.association_ts?.includes(symbol),
    "missing direct association source");
+  else if(origin==="kernel")check(cmd.name===symbol,
+   "missing accepted Gamma structural authority");
   else check(reg.requirements.some((x:unknown)=>rec(x,"accepted row").id===symbol),
    "missing v0.15 normative source");
  }
