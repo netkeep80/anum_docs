@@ -384,3 +384,144 @@ export function loadReaderG7(root: string): ReaderG7Plan {
   return parseReaderG7(readFileSync(resolve(root, READER_ATOMIC_V14_G7_PATH), "utf8"),
     acceptedLaws, g4.readerScience);
 }
+
+
+export const READER_ATOMIC_V14_G8_PATH = "requirements/mts-source/MTS-READER-V14-G8.yaml";
+export interface ReaderG8Atom {
+  readonly id: string;
+  readonly acceptedId: "V14-L2" | "V14-L14";
+  readonly section: ReaderSection;
+  readonly role: "accepted-contract" | "scope-boundary" | "version-boundary";
+  readonly sourceQuote: string;
+  readonly acceptedDetailPointer: string;
+  readonly ru: string;
+  readonly domain: string;
+  readonly exclusions: readonly string[];
+  readonly requires: readonly string[];
+  readonly relatedAcceptedId: string | null;
+}
+export interface ReaderG8Plan {
+  readonly schema: "mts-reader-atomic-v14/v0.2";
+  readonly status: "proposed";
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+  readonly proofCheck: "contract-trace-only";
+  readonly atoms: readonly ReaderG8Atom[];
+}
+function resolveReaderContractPointer(contract: Record<string, unknown>, pointer: string): unknown {
+  if (!/^\/(ostensiveFormalNotation|representationLayers)\/[A-Za-z][A-Za-z0-9]*$/.test(pointer)) {
+    fail("G8 disallowed contract detail pointer");
+  }
+  const parts = pointer.slice(1).split("/");
+  let value: unknown = contract;
+  for (const part of parts) {
+    if (value === null || typeof value !== "object" || Array.isArray(value) ||
+        !Object.prototype.hasOwnProperty.call(value, part)) fail("G8 accepted detail pointer unresolved");
+    value = (value as Record<string, unknown>)[part];
+  }
+  return value;
+}
+export function parseReaderG8(
+  text: string,
+  acceptedLaws: ReadonlyMap<string, string>,
+  contract: Record<string, unknown>,
+  coverage: ReaderCoveragePlan,
+  v015Laws: ReadonlyMap<string, string>,
+): ReaderG8Plan {
+  const doc = parseDocument(text, { strict: true, uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) fail("invalid G8 atomic YAML");
+  const raw = object(doc.toJS({maxAliasCount: 0}), "G8 model");
+  exactFields(raw, ["schema", "status", "semantic_change", "author_approval", "publication",
+    "proof_check", "accepted_scope", "atoms"], "G8 model");
+  if (raw.schema !== "mts-reader-atomic-v14/v0.2" || raw.status !== "proposed" ||
+      raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
+      raw.publication !== "blocked" || raw.proof_check !== "contract-trace-only") {
+    fail("G8 cannot promote editorial prose to accepted or proven");
+  }
+  const scope = ["V14-L2", "V14-L14"];
+  if (!Array.isArray(raw.accepted_scope) || raw.accepted_scope.join(",") !== scope.join(",")) {
+    fail("G8 accepted law scope mismatch");
+  }
+  if (!Array.isArray(raw.atoms) || raw.atoms.length !== 12) fail("G8 requires exactly 12 source-owned atoms");
+  const used = new Set<string>();
+  const texts = new Set<string>();
+  const owners = new Set<string>();
+  const sections = new Map(coverage.rows.map(row => [row.id, row.proposedSection]));
+  const atoms: ReaderG8Atom[] = raw.atoms.map((entry, index) => {
+    const item = object(entry, "G8.atom[" + index + "]");
+    const role = item.role;
+    if (role !== "accepted-contract" && role !== "scope-boundary" && role !== "version-boundary") {
+      fail("G8 unknown atom role");
+    }
+    const fields = ["id", "accepted_id", "section", "role", "source_quote", "accepted_detail_pointer",
+      "ru", "domain", "exclusions", "requires"];
+    if (role === "version-boundary") fields.push("related_accepted_id");
+    exactFields(item, fields, "G8.atom[" + index + "]");
+    const id = item.id;
+    if (typeof id !== "string" || !/^[a-z][a-z0-9-]+$/.test(id) || used.has(id)) {
+      fail("G8 duplicate/invalid atom id");
+    }
+    const law = item.accepted_id;
+    if (typeof law !== "string" || !scope.includes(law)) fail("G8 atom unknown accepted law");
+    if (item.section !== sections.get(law)) fail("G8 atom mismatched G5 reader section");
+    const statement = acceptedLaws.get(law);
+    if (typeof item.source_quote !== "string" || item.source_quote.length < 20 ||
+        !statement?.includes(item.source_quote)) fail("G8 accepted law source quote not exact");
+    const pointer = item.accepted_detail_pointer;
+    if (typeof pointer !== "string" ||
+        !pointer.startsWith(law === "V14-L2" ? "/ostensiveFormalNotation/" : "/representationLayers/") ||
+        resolveReaderContractPointer(contract, pointer) === undefined) {
+      fail("G8 mismatched accepted detail source");
+    }
+    if (typeof item.ru !== "string" || item.ru.trim().length < 125 || texts.has(item.ru.trim())) {
+      fail("G8 missing/duplicate scientific Russian prose");
+    }
+    if (typeof item.domain !== "string" || !item.domain.trim() ||
+        !Array.isArray(item.exclusions) || !item.exclusions.length ||
+        item.exclusions.some(x => typeof x !== "string" || !x.trim())) {
+      fail("G8 missing domain or exclusions");
+    }
+    if (!Array.isArray(item.requires) || new Set(item.requires).size !== item.requires.length ||
+        item.requires.some(x => typeof x !== "string" || !used.has(x))) {
+      fail("G8 forward/cyclic/duplicate reader atom edge");
+    }
+    const related = item.related_accepted_id;
+    if (role === "version-boundary" && (related !== "V15-JSON-02" || !v015Laws.has(related))) {
+      fail("G8 version bridge must cite exact accepted v0.15 denotation law");
+    }
+    used.add(id);
+    texts.add(item.ru.trim());
+    owners.add(law);
+    return Object.freeze({
+      id, acceptedId: law as ReaderG8Atom["acceptedId"], section: item.section as ReaderSection,
+      role: role as ReaderG8Atom["role"], sourceQuote: item.source_quote,
+      acceptedDetailPointer: pointer, ru: item.ru, domain: item.domain,
+      exclusions: Object.freeze([...item.exclusions]) as readonly string[],
+      requires: Object.freeze([...item.requires]) as readonly string[],
+      relatedAcceptedId: role === "version-boundary" ? related as string : null,
+    });
+  });
+  if (owners.size !== 2 || scope.some(id => !owners.has(id))) fail("G8 incomplete accepted law coverage");
+  return Object.freeze({
+    schema: "mts-reader-atomic-v14/v0.2" as const, status: "proposed" as const,
+    authorApproval: "not-recorded" as const, publication: "blocked" as const,
+    proofCheck: "contract-trace-only" as const, atoms: Object.freeze(atoms),
+  });
+}
+export function loadReaderG8(root: string): ReaderG8Plan {
+  const v14 = loadMtsSemanticIr(root, "requirements/mts-v0.14.json").requirements;
+  const v015 = loadMtsSemanticIr(root).requirements;
+  const contract = object(
+    JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.14.json"), "utf8")),
+    "accepted v0.14 contract",
+  );
+  if (contract.schema !== "mts-contract/v0.14" || contract.accepted !== true) {
+    fail("G8 source contract must be accepted v0.14");
+  }
+  return parseReaderG8(
+    readFileSync(resolve(root, READER_ATOMIC_V14_G8_PATH), "utf8"),
+    new Map(v14.map(row => [row.id, row.statement])),
+    contract, loadReaderCoverage(root),
+    new Map(v015.map(row => [row.id, row.statement])),
+  );
+}

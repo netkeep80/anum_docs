@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
 import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
-  loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7 }
+  loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8 }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -164,3 +164,45 @@ assert.throws(() => g7Parse(g7Yaml.replace("    role: accepted-contract", "    r
 assert.throws(() => g7Parse(g7Yaml.replace("  - id: link-identity", "  - id: link-identity\n    id: link-identity")),
   /invalid G7 atomic YAML/);
 console.log("G7 reader source: 17 exact-origin Russian atoms / 4 accepted laws / proof status unchanged.");
+
+
+const g8Yaml = readFileSync(resolve(root, "requirements/mts-source/MTS-READER-V14-G8.yaml"), "utf8");
+const acceptedV14 = JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.14.json"), "utf8"));
+const g8 = loadReaderG8(root);
+assert.equal(g8.schema, "mts-reader-atomic-v14/v0.2");
+assert.equal(g8.atoms.length, 12);
+assert.deepEqual([...new Set(g8.atoms.map(x => x.acceptedId))], ["V14-L2", "V14-L14"]);
+assert.ok(g8.atoms.every(x => x.ru.length >= 125 && x.exclusions.length > 0));
+assert.ok(g8.atoms.every(x => g7Laws.get(x.acceptedId)?.includes(x.sourceQuote)));
+assert.equal(g8.atoms.find(x => x.id === "v015-das-version-boundary")?.relatedAcceptedId, "V15-JSON-02");
+assert.equal(g8.atoms.find(x => x.id === "no-implicit-associativity")?.acceptedDetailPointer,
+  "/ostensiveFormalNotation/implicitPairAssociativity");
+assert.equal(g8.atoms.find(x => x.id === "ontology-level")?.acceptedDetailPointer,
+  "/representationLayers/ontology");
+assert.equal(g8.proofCheck, "contract-trace-only");
+assert.equal(g8.authorApproval, "not-recorded");
+assert.equal(g8.publication, "blocked");
+const g8Parser = (source: string) => parseReaderG8(source, g7Laws, acceptedV14, plan,
+  new Map(v15.map(x => [x.id, x.statement])));
+assert.throws(() => g8Parser(g8Yaml.replace("status: proposed", "status: accepted")),
+  /cannot promote/);
+assert.throws(() => g8Parser(g8Yaml.replace("proof_check: contract-trace-only", "proof_check: proven")),
+  /cannot promote/);
+assert.throws(() => g8Parser(g8Yaml.replace("source_quote: \"Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR\"",
+  "source_quote: \"New primitive command types are accepted\"")), /source quote not exact/);
+assert.throws(() => g8Parser(g8Yaml.replace("accepted_detail_pointer: /ostensiveFormalNotation/synonyms",
+  "accepted_detail_pointer: /ostensiveFormalNotation/missing")),
+  /accepted detail pointer unresolved/);
+assert.throws(() => g8Parser(g8Yaml.replace("related_accepted_id: V15-JSON-02",
+  "related_accepted_id: V15-MISSING-00")), /version bridge must cite/);
+assert.throws(() => g8Parser(g8Yaml.replace("    section: formal-notation", "    section: architecture")),
+  /mismatched G5 reader section/);
+assert.throws(() => g8Parser(g8Yaml.replace("  - id: positional-forms", "  - id: glyph-map")),
+  /duplicate\/invalid atom id/);
+assert.throws(() => g8Parser(g8Yaml.replace("    requires: [glyph-map]", "    requires: [no-second-ontology]")),
+  /forward\/cyclic\/duplicate reader atom edge/);
+assert.throws(() => g8Parser(g8Yaml.replace("  - id: glyph-map", "  - id: glyph-map\n    id: glyph-map")),
+  /invalid G8 atomic YAML/);
+assert.throws(() => g8Parser(g8Yaml.replace("accepted_scope: [V14-L2, V14-L14]",
+  "accepted_scope: [V14-L2]")), /scope mismatch/);
+console.log("G8: 12 exact-origin Russian atoms / two accepted v0.14 laws / no new ontology.");
