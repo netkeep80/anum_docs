@@ -642,8 +642,6 @@ export function loadReaderScienceCensus(root: string): ReaderScienceCensus {
   return projectReaderScienceCensus(
     loadReaderCoverage(root),
     loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
-    object(JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.13.json"), "utf8")),
-      "accepted v0.13 contract"),
     loadReaderG7(root), loadReaderG8(root),
   );
 }
@@ -1164,6 +1162,8 @@ export function loadReaderFoundationOpening(root: string): ReaderFoundationOpeni
   return parseReaderFoundationOpening(
     readFileSync(resolve(root, READER_FOUNDATION_G16_PATH), "utf8"),
     loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    object(JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.13.json"), "utf8")),
+      "accepted v0.13 contract"),
   );
 }
 export function loadReaderDraftWithFoundationOpening(root: string): string {
