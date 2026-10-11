@@ -23,7 +23,7 @@ function signature(s:string,name:string,lean:boolean):string{
   const prefix=(lean?"theorem ":"Theorem ")+name;
   const start=s.indexOf(prefix);
   assert(start>=0,"formal proof symbol absent: "+prefix);
-  const end=lean?s.indexOf(":= ",start):s.indexOf("Proof.",start);
+  const end=lean?s.indexOf(":=",start):s.indexOf("Proof.",start);
   assert(end>start,"formal proof body/signature absent: "+name);
   return s.slice(start,end);
 }
@@ -126,6 +126,10 @@ export function parseReaderR44W2(text:string,root:string):ReaderR44W2{
       ["N₀=U","D₁=L","oneEqualsDegreeOne=false"]
     ][i]!;
     assert(required.every(t=>scientificRu.includes(t)),"case scientific premises not individually documented: "+id);
+    if(i===3)assert(scientificRu.includes("ContextOrientationMarker не требуется") &&
+      scientificRu.includes("не выбирает глобальную W"),"orbit may not require marker or select W");
+    if(i===4)assert(scientificRu.includes("нет F2F3GroundedNormalization") &&
+      scientificRu.includes("предъявленный ContextOrientationMarker"),"context-selected roles must not import normalization premise");
     return {id,chapter,anchor,sourceStep:step,finding,state:c.state as string,scientificRu,boundaryRu};
   });
   assert(cases.length===6&&g15.schema==="mts-reader-bootstrap-symbols/v0.1"&&
