@@ -5,7 +5,8 @@ import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
 import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
   loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
-  loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus }
+  loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
+  loadReaderV14G10, parseReaderV14G10 }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -261,3 +262,24 @@ assert.throws(()=>projectReaderScienceCensus(plan, g4, {
   },g8), /unknown accepted scientific owner/);
 console.log("G9 computed source-owned science coverage " + g9.proposedTextAtoms + " atoms across " +
   g9.withSourceOwnedAtoms + " accepted IDs, never publication-ready.");
+
+const g10Source=readFileSync(resolve(root,"requirements/mts-source/MTS-READER-V14-G10.yaml"),"utf8");
+const g10=loadReaderV14G10(root);
+assert.equal(g10.atoms.length,7);
+assert.deepEqual(g10.atoms.map(x=>x.acceptedId),[
+  "V14-L3","V14-L4","V14-L7","V14-L8","V14-L9","V14-L10","V14-L11"]);
+assert.ok(g10.atoms.every(x=>x.sourceQuote===v14.find(z=>z.id===x.acceptedId)?.statement));
+assert.equal(g10.authorApproval,"not-recorded");
+assert.equal(g10.argumentCompleteness,"unverified");
+assert.equal(g10.publication,"blocked");
+const p10=(text:string)=>parseReaderV14G10(text,plan,g9,new Map(v14.map(x=>[x.id,x.statement])));
+assert.throws(()=>p10(g10Source.replace("status: proposed","status: accepted")),/science not approved/);
+assert.throws(()=>p10(g10Source.replace("argument_completeness: unverified",
+ "argument_completeness: complete")),/science not approved/);
+assert.throws(()=>p10(g10Source.replace("    accepted_id: V14-L3","    accepted_id: V14-L1")),
+ /duplicate, unknown or already-owned/);
+assert.throws(()=>p10(g10Source.replace("  - id: v14-l4","  - id: v14-l3")),
+ /duplicate, unknown or already-owned/);
+assert.throws(()=>p10(g10Source.replace("  - id: v14-l3","  - id: v14-l3\n    id: v14-l3")),
+ /G10 invalid YAML/);
+console.log("G10: 7 v0.14 Russian first-pass laws proposed, unverified and blocked.");

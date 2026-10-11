@@ -657,3 +657,64 @@ export function renderReaderScienceCensus(census: ReaderScienceCensus): string {
       .map(x=>"source_owned." + x.id + "=" + x.atomicTextCount),
   ].join("\n");
 }
+
+
+/** G10: every remaining v0.14 law gets one source-exact Russian EXPLANATORY atom. */
+export const READER_V14_G10_PATH="requirements/mts-source/MTS-READER-V14-G10.yaml";
+export interface ReaderV14G10Atom {
+  readonly id:string; readonly acceptedId:string; readonly sourceQuote:string;
+  readonly ru:string; readonly domain:string; readonly exclusions:readonly string[];
+}
+export interface ReaderV14G10 {
+  readonly schema:"mts-reader-v14-remaining/v0.1";
+  readonly status:"proposed"; readonly argumentCompleteness:"unverified";
+  readonly authorApproval:"not-recorded"; readonly publication:"blocked";
+  readonly proofCheck:"accepted-contract-only";
+  readonly atoms:readonly ReaderV14G10Atom[];
+}
+export function parseReaderV14G10(text:string, coverage:ReaderCoveragePlan,
+  previous:ReaderScienceCensus, acceptedLaws:ReadonlyMap<string,string>):ReaderV14G10{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G10 invalid YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G10 model");
+  exactFields(raw,["schema","status","semantic_change","author_approval","publication",
+    "argument_completeness","proof_check","atoms"],"G10 model");
+  if(raw.schema!=="mts-reader-v14-remaining/v0.1"||raw.status!=="proposed"||
+    raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+    raw.publication!=="blocked"||raw.argument_completeness!=="unverified"||
+    raw.proof_check!=="accepted-contract-only")
+    fail("G10 science not approved or argument not complete");
+  const remaining=coverage.rows.filter(x=>x.release==="v0.14"&&
+    previous.rows.find(y=>y.id===x.id)?.atomicTextCount===0);
+  if(remaining.length!==7||!Array.isArray(raw.atoms)||raw.atoms.length!==remaining.length)
+    fail("G10 v0.14 remaining scope incomplete");
+  const eligible=new Set(remaining.map(x=>x.id));
+  const ids=new Set<string>();
+  const atoms:ReaderV14G10Atom[]=raw.atoms.map((entry,index)=>{
+    const x=object(entry,"G10.atom["+index+"]");
+    exactFields(x,["id","accepted_id","source_quote","ru","domain","exclusions"],"G10.atom");
+    if(typeof x.id!=="string"||typeof x.accepted_id!=="string"||
+       x.id!==x.accepted_id.toLowerCase()||ids.has(x.id)||!eligible.has(x.accepted_id))
+      fail("G10 duplicate, unknown or already-owned accepted ID");
+    if(typeof x.source_quote!=="string"||acceptedLaws.get(x.accepted_id)!==x.source_quote)
+      fail("G10 exact accepted law quote mismatch");
+    if(typeof x.ru!=="string"||x.ru.length<140||typeof x.domain!=="string"||!x.domain.trim()||
+       !Array.isArray(x.exclusions)||x.exclusions.length!==1||
+       typeof x.exclusions[0]!=="string"||x.exclusions[0].length<25)
+      fail("G10 incomplete scientific text and exclusions");
+    ids.add(x.id);
+    return Object.freeze({id:x.id,acceptedId:x.accepted_id,sourceQuote:x.source_quote,
+      ru:x.ru,domain:x.domain,exclusions:Object.freeze([...x.exclusions])});
+  });
+  if(ids.size!==7)fail("G10 missing law");
+  return Object.freeze({schema:"mts-reader-v14-remaining/v0.1" as const,
+    status:"proposed" as const, argumentCompleteness:"unverified" as const,
+    authorApproval:"not-recorded" as const, publication:"blocked" as const,
+    proofCheck:"accepted-contract-only" as const,atoms:Object.freeze(atoms)});
+}
+export function loadReaderV14G10(root:string):ReaderV14G10{
+  return parseReaderV14G10(readFileSync(resolve(root,READER_V14_G10_PATH),"utf8"),
+    loadReaderCoverage(root),loadReaderScienceCensus(root),
+    new Map(loadMtsSemanticIr(root,"requirements/mts-v0.14.json").requirements
+      .map(x=>[x.id,x.statement])));
+}
