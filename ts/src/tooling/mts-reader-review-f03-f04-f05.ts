@@ -106,7 +106,7 @@ export function parseReaderF03F04F05(source:string,root:string):F03F05{
  eqList(kp.premises,["Foundation","F2F3OneSidedExistence"],"F03 minimal proof premises");
  const gitBlob=(source:string)=>{
   const bytes=Buffer.from(source,"utf8");
-  return createHash("sha1").update("blob "+bytes.length+"\\0").update(bytes).digest("hex");
+  return createHash("sha1").update("blob "+bytes.length+String.fromCharCode(0)).update(bytes).digest("hex");
  };
  for(const [path,sha] of [[kp.lean,kp.lean_blob_sha],[kp.rocq,kp.rocq_blob_sha]]){
   guard(typeof path==="string"&&typeof sha==="string"&&gitBlob(read(root,path))===sha,
