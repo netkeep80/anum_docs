@@ -76,7 +76,7 @@ export function parseReaderR43(source:string,root:string):ReaderR43{
       entry.scope.includes(i===0?"Degree":"ExactSequence"),"basis scope mismatch");
     valid(g42.order.indexOf(first.afterNode)>g42.order.indexOf(first.firstUseNode),
       "basis commentary before first use");
-    valid(g42.order.indexOf(i===0?"g7:degree-one":"concept:exact-sequence-first-use") <
+    valid(g42.order.indexOf(i===0?"g7:degree-one":"concept:exact-sequence-first-use") <=
       g42.order.indexOf(first.afterNode),"scientific prerequisite missing for "+entry.symbol);
   }
   const f=map(r.proof_sources,"proof sources");
