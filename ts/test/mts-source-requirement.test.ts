@@ -143,6 +143,8 @@ assert.equal(science.proofCheck, "declarations-only");
 assert.equal(science.publication, "blocked");
 assert.equal(science.authorApproval, "not-recorded");
 assert.equal(science.steps.length, 20);
+assert.ok(science.steps[0]?.ru.includes("root_full_self"));
+assert.ok(science.steps[19]?.ru.includes("K не является дополнительным параметром"));
 assert.deepEqual(science.steps.map((step) => step.id), [
   "foundation", "incidence", "local-decision", "local-exhaustiveness",
   "grounded", "distinction", "separation-a1",
@@ -191,6 +193,19 @@ expectReject(
   sourceText.replace(/      ru: \|-\n        [^\n]+/, '      ru: ""'),
   /must be a non-empty string/,
   "atomic reader text cannot be replaced with an empty non-prose value",
+);
+expectReject(
+  sourceText.replace(
+    "        " + science.steps[2]?.ru + "\n      proof_symbol: LocalSelfDecision",
+    "        " + science.steps[1]?.ru + "\n      proof_symbol: LocalSelfDecision",
+  ),
+  /ru must be nonempty and unique within the single source owner/,
+  "one full Russian statement must not be repeated under two science IDs",
+);
+expectReject(
+  sourceText.replace(/      ru: \|-\n        [^\n]+/, '      ru: "    "'),
+  /ru must be nonempty and unique within the single source owner/,
+  "whitespace is not an acceptable atomic scientific statement",
 );
 expectReject(
   sourceText.replace("requires: [foundation]", "requires: [context-roles]"),

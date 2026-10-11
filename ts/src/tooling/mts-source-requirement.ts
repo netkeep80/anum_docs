@@ -542,6 +542,7 @@ function parseReaderScience(
   }
   const proofs = definitions.proofSources.map((path) => readFileSync(resolve(root, path), "utf8"));
   const ids = new Set<string>();
+  const atomicTexts = new Set<string>();
   const steps = values(raw.steps, "reader_science.steps");
   if (steps.length === 0) fail("reader_science.steps must not be empty");
   const parsed = steps.map((value, index) => {
@@ -560,6 +561,11 @@ function parseReaderScience(
     }
     if (!owners.has(id)) fail(label + ".id has no unique source-owned definition group");
     const ru = string(entry.ru, label + ".ru");
+    const normalizedRu = ru.trim();
+    if (normalizedRu.length === 0 || atomicTexts.has(normalizedRu)) {
+      fail(label + ".ru must be nonempty and unique within the single source owner");
+    }
+    atomicTexts.add(normalizedRu);
     const proofSymbol = string(entry.proof_symbol, label + ".proof_symbol");
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(proofSymbol)) {
       fail(label + ".proof_symbol is invalid");

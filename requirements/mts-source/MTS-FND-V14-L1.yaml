@@ -136,7 +136,7 @@ reader_science:
     - id: foundation
       role: definition
       ru: |-
-        Во внешнем математическом интерфейсе Foundation задан носитель Link, одна операция образования form(a,b), две проекции полюсных позиций start(x) и finish(x) и выделенная Связь R. Приняты уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R. Поэтому start(R)=R и finish(R)=R; единственность такой Связи пока не доказана. Проекции являются средствами внешнего описания двух полюсных позиций, а не дополнительными примитивами онтологии МТС.
+        Во внешнем математическом интерфейсе Foundation задан носитель Link, одна операция образования form(a,b), две проекции полюсных позиций start(x) и finish(x) и выделенная Связь R. Приняты уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R. Поэтому start(R)=R и finish(R)=R; во внешнем доказательстве это установлено как root_full_self. Единственность полностью самозамкнутой Связи из этих уравнений сама по себе не следует. Проекции являются средствами внешнего описания двух полюсных позиций, а не дополнительными примитивами онтологии МТС.
       proof_symbol: Foundation
       requires: []
       premises: []
@@ -307,7 +307,7 @@ reader_science:
     - id: context-roles
       role: conditional-theorem
       ru: |-
-        При A1RecursiveSeparation(F), F2F3OneSidedExistence(F), RecursiveInversionDomain(F,E) и предъявленном ContextOrientationMarker(F,D,body,selected) теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров localStart и localEnd для данного body. Первый принадлежит тому же одностороннему классу, что selected, второй — противоположному. Имена START_K и END_K относятся только к выбранной ориентации контекста K, а не к абсолютным свойствам всех Связей.
+        При A1RecursiveSeparation(F), F2F3OneSidedExistence(F), RecursiveInversionDomain(F,E) и предъявленном ContextOrientationMarker(F,D,body,selected) теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров localStart и localEnd для данного body. Первый принадлежит тому же одностороннему классу, что selected, второй — противоположному. В этом изложении K обозначает контекстный выбор, представленный во внешней теореме параметрами body и selected; K не является дополнительным параметром или новой сущностью в доказательстве CTX-03. Имена START_K и END_K имеют смысл только относительно такого выбора, а не как абсолютные свойства всех Связей.
       proof_symbol: CTX_03_context_selection_induces_local_roles
       requires: [context-marker, separation-a1]
       premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
