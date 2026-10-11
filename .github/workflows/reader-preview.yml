@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           test -f requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml
           test -f ts/src/tooling/mts-reader-r44-w6-cli.ts
-          test -f tools/reader-preview/render.py
+          test -f tools/reader-preview/render.mjs
           test -f tools/reader-preview/style.css
           git diff --name-status origin/main...HEAD -- docs/assets | tee /tmp/mts-historical-assets-diff.txt
           if grep -Eq '^D[[:space:]]' /tmp/mts-historical-assets-diff.txt; then
@@ -60,13 +60,16 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq pandoc fonts-noto-core fonts-dejavu-core fonts-freefont-ttf > /tmp/mts-reader-apt.log
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq pandoc fonts-noto-core fonts-dejavu-core fonts-freefont-ttf poppler-utils imagemagick > /tmp/mts-reader-apt.log
           python -m venv /tmp/mts-reader-venv
           /tmp/mts-reader-venv/bin/pip install --disable-pip-version-check --quiet \
-            "weasyprint==68.0" "pypdf==5.9.0" "PyMuPDF==1.26.7" "Pillow==11.3.0"
+            "weasyprint==68.0"
           npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           pandoc --version | head -1
-          /tmp/mts-reader-venv/bin/python -c 'import weasyprint,pypdf,fitz,PIL; print("READER_PDF_TOOLS=READY")'
+          /tmp/mts-reader-venv/bin/weasyprint --version
+          pdfinfo -v 2>&1 | head -1
+          montage -version | head -1
+          echo "READER_EXTERNAL_RENDERERS=READY"
 
       - name: Compile source-owned reader and generate Markdown
         shell: bash
@@ -88,13 +91,12 @@ jobs:
           SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
-          /tmp/mts-reader-venv/bin/python tools/reader-preview/render.py \
+          WEASYPRINT_BIN=/tmp/mts-reader-venv/bin/weasyprint node tools/reader-preview/render.mjs \
             --input /tmp/mts-reader-src/reader.md \
             --css tools/reader-preview/style.css \
             --output-dir /tmp/mts-reader-preview \
             --repo-root "$PWD" \
-            --source-sha "$SOURCE_SHA" \
-            --thumbnails
+            --source-sha "$SOURCE_SHA"
           test -s /tmp/mts-reader-preview/mts-v015-reader-preview.md
           test -s /tmp/mts-reader-preview/mts-v015-reader-preview.html
           test -s /tmp/mts-reader-preview/mts-v015-reader-preview.pdf
