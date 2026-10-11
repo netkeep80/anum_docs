@@ -263,3 +263,124 @@ export function loadReaderIntro(root: string): ReaderIntroPlan {
     g4.readerScience.steps.map(step => step.id),
   );
 }
+
+
+export const READER_ATOMIC_V14_G7_PATH = "requirements/mts-source/MTS-READER-V14-G7.yaml";
+export interface ReaderG7Atom {
+  readonly id: string;
+  readonly acceptedId: "V14-L5" | "V14-L6" | "V14-L13" | "V14-L12";
+  readonly role: "accepted-contract" | "scope-boundary" | "conditional-theorem";
+  readonly sourceQuote: string;
+  readonly ru: string;
+  readonly domain: string;
+  readonly exclusions: readonly string[];
+  readonly requires: readonly string[];
+  readonly g4ScienceStep: string | null;
+  readonly proofSymbol: string | null;
+  readonly proofPremises: readonly string[];
+}
+export interface ReaderG7Plan {
+  readonly schema: "mts-reader-atomic-v14/v0.1";
+  readonly status: "proposed";
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+  readonly proofCheck: "declarations-only";
+  readonly atoms: readonly ReaderG7Atom[];
+}
+export function parseReaderG7(
+  text: string,
+  acceptedLaws: ReadonlyMap<string, string>,
+  g4: NonNullable<ReturnType<typeof loadMtsSourceRequirement>["readerScience"]>,
+): ReaderG7Plan {
+  const doc = parseDocument(text, { strict: true, uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) fail("invalid G7 atomic YAML");
+  const raw = object(doc.toJS({maxAliasCount: 0}), "G7 model");
+  exactFields(raw, ["schema", "status", "semantic_change", "author_approval", "publication",
+    "proof_check", "accepted_scope", "atoms"], "G7 model");
+  if (raw.schema !== "mts-reader-atomic-v14/v0.1" || raw.status !== "proposed" ||
+      raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
+      raw.publication !== "blocked" || raw.proof_check !== "declarations-only") {
+    fail("G7 cannot promote scientific prose or proof status");
+  }
+  const scope = ["V14-L5", "V14-L6", "V14-L13", "V14-L12"];
+  if (!Array.isArray(raw.accepted_scope) || raw.accepted_scope.join(",") !== scope.join(",")) {
+    fail("G7 accepted scope mismatch");
+  }
+  if (!Array.isArray(raw.atoms) || raw.atoms.length !== 17) fail("G7 requires exactly 17 source-owned atoms");
+  const used = new Set<string>();
+  const texts = new Set<string>();
+  const owners = new Set<string>();
+  const g4ById = new Map(g4.steps.map(step => [step.id, step]));
+  const atoms: ReaderG7Atom[] = raw.atoms.map((value, index) => {
+    const label = "G7.atom[" + index + "]";
+    const item = object(value, label);
+    const role = item.role;
+    const conditional = role === "conditional-theorem";
+    if (role !== "accepted-contract" && role !== "scope-boundary" && !conditional) fail(label + " invalid role");
+    const keys = ["id", "accepted_id", "role", "source_quote", "ru", "domain", "exclusions", "requires"];
+    if (conditional) keys.push("g4_science_step", "proof_symbol", "proof_premises");
+    exactFields(item, keys, label);
+    const id = item.id;
+    const acceptedId = item.accepted_id;
+    if (typeof id !== "string" || !/^[a-z][a-z0-9-]+$/.test(id) || used.has(id)) fail(label + " duplicate/invalid id");
+    if (typeof acceptedId !== "string" || !scope.includes(acceptedId)) fail(label + " unknown accepted law");
+    const normative = acceptedLaws.get(acceptedId);
+    if (!normative || typeof item.source_quote !== "string" ||
+        item.source_quote.length < 20 || !normative.includes(item.source_quote)) {
+      fail(label + " source quote not exact in accepted contract");
+    }
+    if (typeof item.ru !== "string" || item.ru.trim().length < 100 || texts.has(item.ru.trim())) {
+      fail(label + " scientific Russian prose missing or duplicated");
+    }
+    if (typeof item.domain !== "string" || !item.domain.trim() ||
+        !Array.isArray(item.exclusions) || item.exclusions.length === 0 ||
+        item.exclusions.some(e => typeof e !== "string" || !e.trim())) {
+      fail(label + " domain and exclusions must be explicit");
+    }
+    if (!Array.isArray(item.requires) || new Set(item.requires).size !== item.requires.length ||
+        item.requires.some(dep => typeof dep !== "string" || !used.has(dep))) {
+      fail(label + " requires unique earlier G7 atoms");
+    }
+    let g4ScienceStep: string | null = null;
+    let proofSymbol: string | null = null;
+    let proofPremises: string[] = [];
+    if (conditional) {
+      const g4Step = g4ById.get(String(item.g4_science_step));
+      if (!g4Step || g4Step.role !== "conditional-theorem" ||
+          typeof item.proof_symbol !== "string" || g4Step.proofSymbol !== item.proof_symbol ||
+          !Array.isArray(item.proof_premises) || item.proof_premises.join(",") !== g4Step.premises.join(",")) {
+        fail(label + " conditional theorem fails exact G4 signature/premises bridge");
+      }
+      g4ScienceStep = g4Step.id;
+      proofSymbol = g4Step.proofSymbol;
+      proofPremises = [...g4Step.premises];
+    }
+    used.add(id);
+    texts.add(item.ru.trim());
+    owners.add(acceptedId);
+    return Object.freeze({
+      id, acceptedId: acceptedId as ReaderG7Atom["acceptedId"],
+      role: role as ReaderG7Atom["role"], sourceQuote: item.source_quote,
+      ru: item.ru, domain: item.domain, exclusions: Object.freeze([...item.exclusions]) as readonly string[],
+      requires: Object.freeze([...item.requires]) as readonly string[],
+      g4ScienceStep, proofSymbol, proofPremises: Object.freeze(proofPremises),
+    });
+  });
+  if (owners.size !== 4 || scope.some(id => !owners.has(id))) fail("G7 incomplete accepted-law coverage");
+  return Object.freeze({
+    schema: "mts-reader-atomic-v14/v0.1" as const, status: "proposed" as const,
+    authorApproval: "not-recorded" as const, publication: "blocked" as const,
+    proofCheck: "declarations-only" as const, atoms: Object.freeze(atoms),
+  });
+}
+export function loadReaderG7(root: string): ReaderG7Plan {
+  const acceptedLaws = new Map(
+    loadMtsSemanticIr(root, "requirements/mts-v0.14.json").requirements.map(l => [l.id, l.statement]),
+  );
+  const g4 = loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml");
+  if (!g4.readerScience || g4.readerScience.publication !== "blocked") {
+    fail("G7 requires unapproved but verified G4 source-owner science");
+  }
+  return parseReaderG7(readFileSync(resolve(root, READER_ATOMIC_V14_G7_PATH), "utf8"),
+    acceptedLaws, g4.readerScience);
+}

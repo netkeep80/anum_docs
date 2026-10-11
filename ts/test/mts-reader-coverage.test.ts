@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
 import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
-  loadReaderIntro, parseReaderIntro }
+  loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7 }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -124,3 +124,43 @@ assert.throws(() => parse(introYaml.replace("    section: foundations", "    sec
   /invalid introductory DAG YAML/);
 console.log("G6 scientific introduction pilot: " + intro.nodes.length +
   " candidate nodes; no claims of 62-ID reader completeness.");
+
+
+const g7Yaml = readFileSync(resolve(root, "requirements/mts-source/MTS-READER-V14-G7.yaml"), "utf8");
+const g7 = loadReaderG7(root);
+const g7Laws = new Map(v14.map(x => [x.id, x.statement]));
+assert.equal(g7.schema, "mts-reader-atomic-v14/v0.1");
+assert.equal(g7.atoms.length, 17);
+assert.equal(new Set(g7.atoms.map(x => x.id)).size, 17);
+assert.deepEqual([...new Set(g7.atoms.map(x => x.acceptedId))],
+  ["V14-L5", "V14-L6", "V14-L13", "V14-L12"]);
+assert.ok(g7.atoms.every(a => a.ru.length >= 100 && a.exclusions.length > 0));
+assert.ok(g7.atoms.every(a => g7Laws.get(a.acceptedId)?.includes(a.sourceQuote)));
+assert.ok(g7.atoms.every(a => a.proofSymbol === null || a.g4ScienceStep !== null));
+assert.deepEqual(g7.atoms.filter(a => a.proofSymbol !== null).map(a => a.g4ScienceStep),
+  ["chiral-orbit", "context-roles"]);
+assert.ok(g7.atoms.every(a => a.proofSymbol === null || a.proofPremises.length > 0));
+assert.equal(g7.publication, "blocked");
+assert.equal(g7.authorApproval, "not-recorded");
+const g7Parse = (input: string) => parseReaderG7(input, g7Laws, g4.readerScience!);
+assert.throws(() => g7Parse(g7Yaml.replace("publication: blocked", "publication: ready")),
+  /cannot promote/);
+assert.throws(() => g7Parse(g7Yaml.replace("proof_check: declarations-only", "proof_check: fully-proven")),
+  /cannot promote/);
+assert.throws(() => g7Parse(g7Yaml.replace("source_quote: \"Semantic Link identity is immutable\"",
+  "source_quote: \"Invented law text: Link is mutable\"")), /source quote not exact/);
+assert.throws(() => g7Parse(g7Yaml.replace("g4_science_step: chiral-orbit", "g4_science_step: context-roles")),
+  /conditional theorem fails exact G4/);
+assert.throws(() => g7Parse(g7Yaml.replace("    proof_premises: [A1RecursiveSeparation, F2F3GroundedNormalization",
+  "    proof_premises: [F2F3GroundedNormalization")), /conditional theorem fails exact G4/);
+assert.throws(() => g7Parse(g7Yaml.replace("  - id: nat-zero", "  - id: link-identity")),
+  /duplicate\/invalid id/);
+assert.throws(() => g7Parse(g7Yaml.replace("    requires: [link-identity]", "    requires: [relative-z2]")),
+  /requires unique earlier G7 atoms/);
+assert.throws(() => g7Parse(g7Yaml.replace("    accepted_id: V14-L13", "    accepted_id: V14-L99")),
+  /unknown accepted law/);
+assert.throws(() => g7Parse(g7Yaml.replace("    role: accepted-contract", "    role: conditional-theorem")),
+  /field mismatch/);
+assert.throws(() => g7Parse(g7Yaml.replace("  - id: link-identity", "  - id: link-identity\n    id: link-identity")),
+  /invalid G7 atomic YAML/);
+console.log("G7 reader source: 17 exact-origin Russian atoms / 4 accepted laws / proof status unchanged.");
