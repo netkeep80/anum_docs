@@ -1233,6 +1233,8 @@ const postV013ToolingDeltaFiles = new Set([
   // #2141: 62-ID reader coverage only projects accepted registry/doc ownership;
   // it contains no runtime decisions, writes, or new MTS semantic authorities.
   "ts/src/tooling/mts-reader-coverage.ts",
+  // #2132/G20: source-owned editorial DAG validation; proof/status authority remains elsewhere.
+  "ts/src/tooling/mts-reader-g20.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
