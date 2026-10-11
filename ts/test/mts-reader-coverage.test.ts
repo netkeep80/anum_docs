@@ -397,12 +397,12 @@ const p15=(txt:string,v13=v13Contract,v14=v14Contract)=>
 assert.throws(()=>p15(g15Yaml.replace("status: proposed","status: accepted")),
   /cannot forge inherited basis/);
 assert.throws(()=>p15(g15Yaml.replace('exact_equation: "R = R ⟼ R"',
-  'exact_equation: "R = O ⟼ R"')),/missing\/forged name/);
+  'exact_equation: "R = O ⟼ R"')),/missing, forged or incomplete basis definition/);
 assert.throws(()=>p15(g15Yaml,{
   ...v13Contract,
   bootstrapBasis:{...v13Contract.bootstrapBasis,definitions:{
     ...v13Contract.bootstrapBasis.definitions,U:"U = R ⟼ R"}}
-}),/missing\/forged name/);
+}),/missing, forged or incomplete basis definition/);
 assert.throws(()=>p15(g15Yaml,v13Contract,{
   ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
 }),/inconsistent inherited U\/L\/R/);
