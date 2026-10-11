@@ -1,0 +1,15 @@
+# R36 wave 5 — final exposed single direct editorial prerequisite.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: f20e83ad0722524ad7c68074c755c26c89f29920
+review_boundary: historic-v014-Q-before-v015-JSON-array-introduction
+review_count: 1
+entries:
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g7:q-codec"
+    decision: remove
+    rationale_ru: "Q в принятой v0.14 самостоятельно назван версионируемым кодеком и интерпретатором последовательностей, а поздний v0.15 ввод о JSON-массивах не является необходимой предпосылкой его определения. История принятой версии не должна ретроспективно зависеть от нового учебного глоссария."
+    limitation_ru: "Удаление reader-ребра не разрешает смешивать Q13/Q14 и не изменяет семантику позиционной ExactSequence."
+    review_status: proposed
