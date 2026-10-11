@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { parseDocument } from "yaml";
 // G5 proposed reader coverage. Accepted registries are normative; these routes are not.
 import { loadMtsSemanticIr, type MtsRequirementProjection } from "./mts-compiler.js";
+import { loadMtsSourceRequirement } from "./mts-source-requirement.js";
 
 export type ReaderSection = "foundations" | "inversion-and-context" | "representation" |
   "arithmetic" | "formal-notation" | "execution" | "architecture" |
@@ -167,4 +168,98 @@ export function renderReaderCoverageAudit(plan: ReaderCoveragePlan): string {
     ...[...bySection].sort(([a], [b]) => a.localeCompare(b)).map(([key, count]) =>
       "proposed_section." + key + "=" + count),
   ].join("\n");
+}
+
+
+// G6: point-of-introduction edges are editorial, never accepted 'dependsOn'.
+// A chapter may recur between points; this is deliberately not a chapter-level DAG.
+export const READER_INTRO_MODEL_PATH = "requirements/mts-source/MTS-READER-INTRO-PROPOSAL.yaml";
+export interface ReaderIntroNode {
+  readonly id: string;
+  readonly acceptedId: string;
+  readonly section: ReaderSection;
+  readonly g4ScienceStep: string | null;
+  readonly requires: readonly string[];
+  readonly reasonRu: string;
+  readonly review: "pending";
+}
+export interface ReaderIntroPlan {
+  readonly schema: "mts-reader-intro-proposal/v0.1";
+  readonly status: "proposed";
+  readonly publication: "blocked";
+  readonly completeness: "partial-reviewed-bridges";
+  readonly nodes: readonly ReaderIntroNode[];
+}
+export function parseReaderIntro(
+  yaml: string,
+  coverage: ReaderCoveragePlan,
+  g4Steps: readonly string[],
+): ReaderIntroPlan {
+  const doc = parseDocument(yaml, { strict: true, uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) fail("invalid introductory DAG YAML");
+  const raw = object(doc.toJS({maxAliasCount: 0}), "intro proposal");
+  exactFields(raw, ["schema", "status", "semantic_change", "author_approval",
+    "publication", "completeness", "nodes"], "intro proposal");
+  if (raw.schema !== "mts-reader-intro-proposal/v0.1" || raw.status !== "proposed" ||
+      raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
+      raw.publication !== "blocked" || raw.completeness !== "partial-reviewed-bridges") {
+    fail("introductory DAG must remain partial, proposed, unapproved and blocked");
+  }
+  if (!Array.isArray(raw.nodes) || raw.nodes.length === 0) fail("intro nodes missing");
+  const accepted = new Map(coverage.rows.map(row => [row.id, row]));
+  const anchored = new Set(g4Steps);
+  const declared = new Set<string>();
+  const nodes = raw.nodes.map((item, index) => {
+    const name = "intro.nodes[" + index + "]";
+    const record = object(item, name);
+    const allowed = ["id", "accepted_id", "section", "requires", "reason_ru", "review"];
+    if (Object.prototype.hasOwnProperty.call(record, "g4_science_step")) allowed.push("g4_science_step");
+    exactFields(record, allowed, name);
+    const id = record.id;
+    if (typeof id !== "string" || !/^[a-z][a-z0-9-]*$/.test(id) || declared.has(id)) {
+      fail(name + " has duplicate/invalid ID");
+    }
+    const acceptedId = record.accepted_id;
+    const row = accepted.get(String(acceptedId));
+    if (!row || row.publication !== "blocked") fail(name + " references unknown/unblocked accepted ID");
+    if (record.section !== row.proposedSection) fail(name + " mismatched proposed section for " + acceptedId);
+    const anchor = record.g4_science_step;
+    if (anchor !== undefined && (acceptedId !== "V14-L1" ||
+        typeof anchor !== "string" || !anchored.has(anchor))) {
+      fail(name + " forged or missing G4 science anchor");
+    }
+    if (!Array.isArray(record.requires) || new Set(record.requires).size !== record.requires.length ||
+        record.requires.some(dep => typeof dep !== "string" || !declared.has(dep))) {
+      fail(name + " reader prerequisites must be unique and precede their consumer");
+    }
+    if (typeof record.reason_ru !== "string" || record.reason_ru.trim().length < 30) {
+      fail(name + " needs individual Russian pedagogical rationale");
+    }
+    if (record.review !== "pending") fail(name + " cannot claim approved science review");
+    declared.add(id);
+    return Object.freeze({
+      id, acceptedId: String(acceptedId), section: row.proposedSection,
+      g4ScienceStep: typeof anchor === "string" ? anchor : null,
+      requires: Object.freeze([...record.requires]) as readonly string[],
+      reasonRu: record.reason_ru as string,
+      review: "pending" as const,
+    });
+  });
+  if (!nodes.some(x => x.g4ScienceStep === "foundation")) fail("foundation anchor missing");
+  return Object.freeze({
+    schema: "mts-reader-intro-proposal/v0.1" as const,
+    status: "proposed" as const,
+    publication: "blocked" as const,
+    completeness: "partial-reviewed-bridges" as const,
+    nodes: Object.freeze(nodes),
+  });
+}
+export function loadReaderIntro(root: string): ReaderIntroPlan {
+  const g4 = loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml");
+  if (!g4.readerScience || g4.readerScience.publication !== "blocked") fail("G4 reader science prerequisite is absent");
+  return parseReaderIntro(
+    readFileSync(resolve(root, READER_INTRO_MODEL_PATH), "utf8"),
+    loadReaderCoverage(root),
+    g4.readerScience.steps.map(step => step.id),
+  );
 }

@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
-import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit }
+import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
+import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
+  loadReaderIntro, parseReaderIntro }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -73,3 +75,50 @@ assert.throws(() => parseReaderRoutes(proposedYaml.replace("  V14-L14: architect
 assert.throws(() => parseReaderRoutes(proposedYaml.replace("  REG: assurance\n", "")),
   /v015_groups coverage must equal 21/);
 console.log("G5 reader coverage census: 62/62 proposed; publication blocked.");
+
+
+const introYaml = readFileSync(resolve(root, "requirements/mts-source/MTS-READER-INTRO-PROPOSAL.yaml"), "utf8");
+const g4 = loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml");
+assert.ok(g4.readerScience);
+const scienceIds = g4.readerScience.steps.map(step => step.id);
+const intro = loadReaderIntro(root);
+assert.equal(intro.schema, "mts-reader-intro-proposal/v0.1");
+assert.equal(intro.status, "proposed");
+assert.equal(intro.publication, "blocked");
+assert.equal(intro.completeness, "partial-reviewed-bridges");
+assert.equal(intro.nodes.length, 19);
+assert.ok(intro.nodes.every(x => x.review === "pending"));
+assert.equal(new Set(intro.nodes.map(x => x.id)).size, 19);
+const places = new Map(intro.nodes.map((x,i) => [x.id,i]));
+for (const [i,x] of intro.nodes.entries()) {
+  assert.equal(x.section, plan.rows.find(row => row.id === x.acceptedId)?.proposedSection);
+  assert.ok(x.requires.every(dep => (places.get(dep) ?? Infinity) < i));
+}
+assert.equal(intro.nodes.find(x => x.id === "relative-context-pilot")?.g4ScienceStep, "context-roles");
+assert.deepEqual(intro.nodes.find(x => x.id === "json-source")?.requires,
+  ["contextual-names", "sequence-semantics"]);
+assert.ok(intro.nodes.some(x => x.section === "governance" && x.requires.length === 0));
+assert.ok(intro.nodes.every(x => x.acceptedId === "V14-L1" || x.g4ScienceStep === null));
+const parse = (input: string) => parseReaderIntro(input, plan, scienceIds);
+assert.throws(() => parse(introYaml.replace("publication: blocked", "publication: ready")),
+  /must remain partial, proposed/);
+assert.throws(() => parse(introYaml.replace("completeness: partial-reviewed-bridges", "completeness: complete")),
+  /must remain partial, proposed/);
+assert.throws(() => parse(introYaml.replace("g4_science_step: context-roles", "g4_science_step: Fake")),
+  /forged or missing G4 science anchor/);
+assert.throws(() => parse(introYaml.replace("accepted_id: V15-NAME-01", "accepted_id: V15-FAKE-01")),
+  /unknown\/unblocked accepted ID/);
+assert.throws(() => parse(introYaml.replace("section: formal-notation", "section: governance")),
+  /mismatched proposed section/);
+assert.throws(() => parse(introYaml.replace("requires: [foundation]", "requires: [release-readiness]")),
+  /reader prerequisites must be unique and precede/);
+assert.throws(() => parse(introYaml.replace("    review: pending", "    review: approved")),
+  /cannot claim approved science review/);
+assert.throws(() => parse(introYaml.replace("  - id: local-incidence", "  - id: foundation")),
+  /duplicate\/invalid ID/);
+assert.throws(() => parse(introYaml.replace("    requires: []", "    requires: [foundation, foundation]")),
+  /reader prerequisites must be unique and precede/);
+assert.throws(() => parse(introYaml.replace("    section: foundations", "    section: foundations\n    section: foundations")),
+  /invalid introductory DAG YAML/);
+console.log("G6 scientific introduction pilot: " + intro.nodes.length +
+  " candidate nodes; no claims of 62-ID reader completeness.");

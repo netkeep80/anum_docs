@@ -1,0 +1,126 @@
+# G6 candidate point-of-introduction order; not a complete scientific manuscript.
+schema: mts-reader-intro-proposal/v0.1
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+publication: blocked
+completeness: partial-reviewed-bridges
+nodes:
+  - id: foundation
+    accepted_id: V14-L1
+    section: foundations
+    g4_science_step: foundation
+    requires: []
+    reason_ru: "Первичное определение Link и внешнего Foundation должно предшествовать любым ролевым, представительным и исполнительным формулам."
+    review: pending
+  - id: local-incidence
+    accepted_id: V14-L1
+    section: foundations
+    g4_science_step: incidence
+    requires: [foundation]
+    reason_ru: "Локальные свойства самоинцидентности требуют введённых полюсных позиций, но не являются четырьмя онтологическими примитивами."
+    review: pending
+  - id: finite-grounding
+    accepted_id: V14-L1
+    section: foundations
+    g4_science_step: grounded
+    requires: [local-incidence]
+    reason_ru: "Индуктивное Grounded использует локальные совпадения полюсных позиций; это условие области доказательства, а не всеобщий запрет циклов."
+    review: pending
+  - id: relative-context-pilot
+    accepted_id: V14-L1
+    section: foundations
+    g4_science_step: context-roles
+    requires: [finite-grounding]
+    reason_ru: "Полная цепочка предпосылок CTX-03 задаётся исходным двадцатиузловым G4 DAG; этот мост ссылается на неё, а не повторяет или сокращает её."
+    review: pending
+  - id: link-identity
+    accepted_id: V14-L5
+    section: foundations
+    requires: [foundation]
+    reason_ru: "Принятое тождество Link отделяется от равенства произвольных структур по полюсам и вводится после Link."
+    review: pending
+  - id: derived-nat
+    accepted_id: V14-L6
+    section: arithmetic
+    requires: [link-identity]
+    reason_ru: "Выводимая арифметика Nat опирается на идентичность Связи, но не становится онтологическим примитивом."
+    review: pending
+  - id: sequence-semantics
+    accepted_id: V14-L13
+    section: representation
+    requires: [link-identity]
+    reason_ru: "Семантика позиционной последовательности использует Link-идентичность, но не сводится к производной арифметике."
+    review: pending
+  - id: relative-context
+    accepted_id: V14-L12
+    section: inversion-and-context
+    requires: [relative-context-pilot]
+    reason_ru: "Относительная ориентация контекста обсуждается после внешних предпосылок хиральности и инверсии, уже перечисленных в G4."
+    review: pending
+  - id: formal-notation
+    accepted_id: V14-L2
+    section: formal-notation
+    requires: [foundation]
+    reason_ru: "Сначала задан объект нотации Link, затем грамматическое описание; запись не создаёт отдельной семантики."
+    review: pending
+  - id: contextual-names
+    accepted_id: V15-NAME-01
+    section: formal-notation
+    requires: [formal-notation]
+    reason_ru: "Контекстные имена требуют предварительного представления FORMAL; глобальный host namespace не объявляется."
+    review: pending
+  - id: json-source
+    accepted_id: V15-JSON-01
+    section: formal-notation
+    requires: [contextual-names, sequence-semantics]
+    reason_ru: "JSON проецирует полный source ANet, используя контекстные имена и отличая последовательный carrier от обычной Связи."
+    review: pending
+  - id: json-exact-sequence
+    accepted_id: V15-JSON-04
+    section: formal-notation
+    requires: [json-source, sequence-semantics]
+    reason_ru: "Специальная трактовка массивов как ExactSequence объясняется после общей денотации и семантики последовательности."
+    review: pending
+  - id: execution-context
+    accepted_id: V15-CTX-01
+    section: execution
+    requires: [foundation]
+    reason_ru: "Context/currentness исполнения определяется Link-membership, а не переносится без доказательства из ориентационной хиральности CTX-03."
+    review: pending
+  - id: gamma-execution
+    accepted_id: V15-GAMMA-01
+    section: execution
+    requires: [execution-context]
+    reason_ru: "Универсальная Γ вводится после определения текущего контекста и не подменяется host-opcode."
+    review: pending
+  - id: boolean-example
+    accepted_id: V15-AND-01
+    section: worked-examples
+    requires: [gamma-execution, json-source]
+    reason_ru: "Строгий AND предъявляется как пример общего исполнения и source ANet, а не как новый машинный примитив."
+    review: pending
+  - id: formal-proofs
+    accepted_id: V15-FORMAL-PROOF-01
+    section: proofs
+    requires: [formal-notation, json-exact-sequence]
+    reason_ru: "Области проверенных Lean4/Rocq утверждений следует показывать после определения математического предмета FORMAL/JSON."
+    review: pending
+  - id: generated-docs
+    accepted_id: V15-DOCS-01
+    section: documentation
+    requires: [formal-proofs]
+    reason_ru: "Текстовые проекции модели отделяются от принимаемых доказательств, а не выдают generated prose за самостоятельную authority."
+    review: pending
+  - id: acceptance-governance
+    accepted_id: V15-GOV-01
+    section: governance
+    requires: []
+    reason_ru: "Политика принятия и статусов может быть прочитана самостоятельно; это не математическая аксиома."
+    review: pending
+  - id: release-readiness
+    accepted_id: V15-READY-01
+    section: governance
+    requires: [generated-docs, acceptance-governance, boolean-example]
+    reason_ru: "Готовность выпуска описывается после ввода необходимых свидетельств; дидактическая стрелка здесь не заменяет полную нормативную проверку readiness."
+    review: pending
