@@ -1251,6 +1251,9 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-r44-w4.ts",
   // W5 review/provenance appendix does not execute semantic model operations.
   "ts/src/tooling/mts-reader-r44-w5.ts",
+  // W6 human-readable manuscript and CLI rearrange immutable science; no runtime semantics.
+  "ts/src/tooling/mts-reader-r44-w6.ts",
+  "ts/src/tooling/mts-reader-r44-w6-cli.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);

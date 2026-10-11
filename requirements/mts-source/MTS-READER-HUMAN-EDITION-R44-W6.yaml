@@ -1,0 +1,33 @@
+# R44-W6 — single readable Russian manuscript; source archive is retained, never edited.
+schema: mts-reader-human-edition-r44-w6/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+source_academic_model: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+source_editing_model: requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml
+source_review_model: requirements/mts-source/MTS-READER-SCIENTIFIC-FINAL-REVIEW-R44-W5.yaml
+source_first_use: requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml
+source_v015_review: requirements/mts-source/MTS-READER-V015-INDIVIDUAL-AUDIT-R44-W3.yaml
+source_main_pin: c64b7e21340c6add248c8f380f3fef1292616ac6
+layout:
+  target: a-single-manuscript-with-main-text-and-audit-appendices
+  chapter_count: 10
+  original_source_atoms: 119
+  primary_text_atoms: 102
+  archival_appendix_atoms: 17
+  historical_g16_atoms: 5
+  administrative_g11_atoms: 12
+  individual_v015_reviews: 48
+  proof_catalogue: 8
+  scientific_open_findings: 9
+  main_id_policy: numbered-paragraphs-no-technical-owner-headings
+  provenance_policy: every-original-atom-listed-once-in-appendix
+  source_preservation: exact-source-strings-reconstruct-from-ordered-fragments
+  q_first_use: show-prefix-once-before-recursive-codec-and-suffix-at-full-source-owner
+  l_u_first_use: show-source-equation-then-delay-original-explanation
+  historic_image_policy: preserve-original-image-bytes-and-provenance
+  body_ru: "Основной текст вводит математические понятия в проверяемом порядке, а исходные машинные идентификаторы, повторяющие определения редакционные комментарии и административные требования вынесены в приложения. Это перемещение не является удалением или переписыванием источников."
+  caveat_ru: "Это генерация читательского черновика, а не окончательная публикация. Доказательства и условия применимости предъявляются только в пределах принятых внешних свидетельств; девять научных замечаний R40 остаются открытыми до отдельной авторской экспертизы."
+  archive_ru: "Все 119 исходных текстов сохраняются без перефразирования: 102 в основной научной части и 17 в архивных приложениях. Для Q и L/U сохранность проверяется конкатенацией точно исходных фрагментов при их разнесённом первом употреблении."
+  assurance_ru: "Редакционные рецензии всех 48 требований v0.15 и девяти открытых замечаний R40 помещаются в отдельные приложения и не объявляются теоремами МТС."
