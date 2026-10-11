@@ -40,6 +40,8 @@ export interface ReaderG20Draft {
   readonly originalAtoms: 104;
   readonly basisAndFirstUse: 10;
   readonly replacementAtoms: 5;
+  /** Proposed didactic spine; not an additional Link-law or proof dependency. */
+  readonly openingSpine: readonly string[];
   readonly edges: number;
   readonly nodes: readonly ReaderG20Node[];
   readonly ordered: readonly ReaderG20Node[];
@@ -105,7 +107,7 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
   const raw = record(doc.toJS({ maxAliasCount: 0 }), "G20");
   fields(raw, ["schema", "status", "semantic_change", "author_approval",
     "publication", "completeness", "source_atoms", "first_use_definitions",
-    "editorial_replacement_atoms", "nodes"], "G20");
+    "editorial_replacement_atoms", "opening_spine", "nodes"], "G20");
   if (raw.schema !== "mts-reader-first-use/v0.1" || raw.status !== "proposed" ||
       raw.semantic_change !== false || raw.author_approval !== "not-recorded" ||
       raw.publication !== "blocked" ||
@@ -193,7 +195,45 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
     }
   }
   if (ordered.length !== 119) fail("cyclic reader first-use graph");
-  const order = new Map(ordered.map((node, i) => [node.id, i]));
+  // Reader spine is an explicit *presentation* choice. It is checked for
+  // exact prerequisites but contributes ZERO edges to the scientific graph.
+  if (!Array.isArray(raw.opening_spine) || raw.opening_spine.length !== 41 ||
+      new Set(raw.opening_spine).size !== 41 ||
+      raw.opening_spine.some(id => typeof id !== "string" || !index.has(id))) {
+    fail("invalid/duplicate/unknown 41-step opening spine");
+  }
+  const openingSpine = raw.opening_spine as string[];
+  const requiredOpening = [
+    "editorial:foundation-ontology", "editorial:local-self-classification",
+    "editorial:root-basis-witnesses", "editorial:relative-chiral-orientation",
+    "editorial:representation-boundary",
+    ..."ROCLU".split("").map(name => "basis:" + name),
+    ...["anet-term", "nat-first-use", "exact-sequence-first-use",
+      "formal-json-first-use", "gamma-first-use"].map(name => "concept:" + name),
+  ];
+  if (openingSpine[0] !== "g4:foundation" ||
+      requiredOpening.some(id => !openingSpine.includes(id))) {
+    fail("opening spine is missing one of the 15 basic scientific introductions");
+  }
+  const introduced = new Set<string>();
+  for (const anchor of openingSpine) {
+    const node = nodes[index.get(anchor)!]!;
+    if (node.readerRequires.some(dependency => !introduced.has(dependency))) {
+      fail("opening spine dependency not previously introduced: " + anchor);
+    }
+    introduced.add(anchor);
+  }
+  // The base topological sort remains authoritative about allowed edges;
+  // the 41 explicitly authored anchors are emitted first, then the remaining
+  // topological order is stable. Neither text nor edge ownership changes.
+  const presentation = [
+    ...openingSpine.map(id => nodes[index.get(id)!]!),
+    ...ordered.filter(node => !introduced.has(node.id)),
+  ];
+  if (presentation.length !== 119 || new Set(presentation.map(x => x.id)).size !== 119) {
+    fail("opening spine dropped/duplicated original source atom");
+  }
+  const order = new Map(presentation.map((node, i) => [node.id, i]));
   const precedes = (node: string, dependency: string) => {
     const n = index.get(node), d = index.get(dependency);
     if (n === undefined || d === undefined) fail("missing required introduction " + node + "/" + dependency);
@@ -214,8 +254,8 @@ export function parseReaderG20(text: string, sources: readonly ReaderG20Source[]
     completeness: "editorial-dependencies-unverified" as const,
     authorApproval: "not-recorded" as const, publication: "blocked" as const,
     originalAtoms: 104 as const, basisAndFirstUse: 10 as const,
-    replacementAtoms: 5 as const, edges,
-    nodes: Object.freeze(nodes), ordered: Object.freeze(ordered),
+    replacementAtoms: 5 as const, openingSpine: Object.freeze([...openingSpine]), edges,
+    nodes: Object.freeze(nodes), ordered: Object.freeze(presentation),
   });
 }
 export function loadReaderG20(root: string): ReaderG20Draft {
