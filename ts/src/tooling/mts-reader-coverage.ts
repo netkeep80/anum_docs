@@ -1077,3 +1077,90 @@ export function loadReaderDraftWithBootstrapPrelude(root:string):string{
   ].join("\n");
   return preview.markdown.slice(0,firstChapter)+prelude+preview.markdown.slice(firstChapter);
 }
+
+
+/** G16 editorial candidate: replace orphan introductory narrative, preserve accepted history. */
+export const READER_FOUNDATION_G16_PATH =
+  "requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml";
+export interface ReaderFoundationOpening {
+  readonly schema: "mts-reader-foundation-opening/v0.1";
+  readonly acceptedId: "V14-L1";
+  readonly candidateRu: string;
+  readonly historicalOpening: string;
+  readonly historicalSha256: string;
+  readonly exclusions: readonly string[];
+  readonly publication: "blocked";
+  readonly authorApproval: "not-recorded";
+}
+export function parseReaderFoundationOpening(
+  text: string, g4: ReturnType<typeof loadMtsSourceRequirement>,
+): ReaderFoundationOpening {
+  const doc = parseDocument(text, {strict:true, uniqueKeys:true});
+  if (doc.errors.length || doc.warnings.length) fail("G16 invalid editorial YAML");
+  const raw = object(doc.toJS({maxAliasCount:0}), "G16 opening");
+  exactFields(raw, [
+    "schema","status","semantic_change","author_approval","publication",
+    "historical_source","historical_sha256","historical_opening","accepted_id",
+    "candidate_ru","exclusions"
+  ], "G16 opening");
+  const historicalOpening = "Первичен **" + "\u0060Link\u0060" + "**, а не четыре команды.";
+  const historicalSha256 =
+    "b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5";
+  if (raw.schema !== "mts-reader-foundation-opening/v0.1" ||
+      raw.status !== "proposed" || raw.semantic_change !== false ||
+      raw.author_approval !== "not-recorded" || raw.publication !== "blocked" ||
+      raw.historical_source !== "requirements/mts-source/MTS-FND-V14-L1.yaml" ||
+      raw.accepted_id !== "V14-L1" ||
+      raw.historical_opening !== historicalOpening ||
+      raw.historical_sha256 !== historicalSha256 ||
+      g4.statement.sha256 !== historicalSha256 ||
+      g4.statement.sourceRole !== "current-published-explanation" ||
+      !g4.statement.ru.startsWith(historicalOpening)) {
+    fail("G16 historical provenance or unapproved state drift");
+  }
+  if (typeof raw.candidate_ru !== "string" ||
+      raw.candidate_ru.trim().length < 1000 ||
+      !raw.candidate_ru.includes("Link") ||
+      !raw.candidate_ru.includes("11") ||
+      !raw.candidate_ru.includes("10") ||
+      !raw.candidate_ru.includes("01") ||
+      !raw.candidate_ru.includes("00") ||
+      !raw.candidate_ru.includes("START_K") ||
+      !raw.candidate_ru.includes("END_K") ||
+      raw.candidate_ru.includes(historicalOpening)) {
+    fail("G16 incomplete or orphaned replacement candidate");
+  }
+  if (!Array.isArray(raw.exclusions) || raw.exclusions.length !== 3 ||
+      raw.exclusions.some(x => typeof x !== "string" || x.length < 60)) {
+    fail("G16 needs three separate scientific noninference boundaries");
+  }
+  return Object.freeze({
+    schema: "mts-reader-foundation-opening/v0.1" as const,
+    acceptedId: "V14-L1" as const,
+    candidateRu: raw.candidate_ru,
+    historicalOpening, historicalSha256,
+    exclusions: Object.freeze([...raw.exclusions]) as readonly string[],
+    publication: "blocked" as const, authorApproval: "not-recorded" as const,
+  });
+}
+export function loadReaderFoundationOpening(root: string): ReaderFoundationOpening {
+  return parseReaderFoundationOpening(
+    readFileSync(resolve(root, READER_FOUNDATION_G16_PATH), "utf8"),
+    loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
+  );
+}
+export function loadReaderDraftWithFoundationOpening(root: string): string {
+  const manuscript = loadReaderDraftWithBootstrapPrelude(root);
+  const intro = loadReaderFoundationOpening(root);
+  if (intro.publication !== "blocked" || intro.authorApproval !== "not-recorded") {
+    fail("G16 may not promote editorial candidate to published content");
+  }
+  const beforeBasis = manuscript.indexOf("### Исходные обозначения корневого базиса");
+  if (beforeBasis < 0) fail("G16 reader prelude missing");
+  const inserted = [
+    "### Предмет МТС и четыре локальных случая самоинцидентности", "",
+    intro.candidateRu, "",
+    "Этот вводный текст предложен для авторского и научного рассмотрения; публикация заблокирована.", "",
+  ].join("\n");
+  return manuscript.slice(0, beforeBasis) + inserted + manuscript.slice(beforeBasis);
+}

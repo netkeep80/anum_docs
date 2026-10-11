@@ -10,7 +10,8 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS,
   loadReaderDraftPreview, projectReaderDraftPreview,
   loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure,
-  loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude }
+  loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude,
+  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -407,3 +408,39 @@ assert.throws(()=>p15(g15Yaml,v13Contract,{
   ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
 }),/inconsistent inherited U\/L\/R/);
 console.log("G15: R O C L U inherited basis and model-derived Russian reader prelude.");
+
+
+const g16Yaml = readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml"),"utf8");
+const g16 = loadReaderFoundationOpening(root);
+assert.equal(g16.acceptedId,"V14-L1");
+assert.equal(g16.historicalSha256,g4.statement.sha256);
+assert.ok(g4.statement.ru.startsWith(g16.historicalOpening));
+assert.ok(!g16.candidateRu.includes(g16.historicalOpening));
+assert.ok(g16.candidateRu.includes("11") && g16.candidateRu.includes("01"));
+assert.ok(g16.candidateRu.includes("START_K") && g16.candidateRu.includes("END_K"));
+assert.equal(g16.exclusions.length,3);
+assert.equal(g16.authorApproval,"not-recorded");
+assert.equal(g16.publication,"blocked");
+const introduced = loadReaderDraftWithFoundationOpening(root);
+const firstDefinition=introduced.indexOf("### Предмет МТС и четыре локальных случая");
+const basisDefinition=introduced.indexOf("### Исходные обозначения корневого базиса");
+const firstChapter=introduced.search(/^## /m);
+assert.ok(firstDefinition>=0 && firstDefinition<basisDefinition && basisDefinition<firstChapter);
+assert.equal((introduced.match(/^## /gm)??[]).length,13);
+assert.equal((introduced.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((introduced.match(/^#### /gm)??[]).length,104);
+const g16Parse=(text:string,model=g4)=>parseReaderFoundationOpening(text,model);
+assert.throws(()=>g16Parse(g16Yaml.replace("status: proposed","status: accepted")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("publication: blocked","publication: ready")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("historical_sha256: b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5",
+  "historical_sha256: altered")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("accepted_id: V14-L1","accepted_id: V14-L2")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("  - ","  - ")
+  .replace("exclusions:\n","exclusions:\n  - \"\" \n")),
+ /G16 needs three separate scientific noninference boundaries/);
+console.log("G16: original historic source unchanged; standalone blocked scientific prelude candidate.");
