@@ -78,8 +78,15 @@ assert.throws(() => parse(original.replace('id: "g4:foundation"',
   'id: "g4:forged"')), /forged\/missing original source/);
 assert.throws(() => parse(original.replace('source_owner: G4\n    source_atom: "foundation"',
   'source_owner: G15\n    source_atom: "foundation"')), /forged\/missing original source/);
-assert.throws(() => parse(original.replace('reader_requires: ["g4:foundation"]',
-  'reader_requires: ["g4:not-existent"]')), /dangling first-use reference/);
+const dangling = original.replace(
+  /id: "g7:link-identity"([\s\S]*?)reader_requires: \[([^\n]*)\]/,
+  (all, middle: string, deps: string) => {
+    assert.ok(deps.includes('"concept:anet-term"'));
+    return 'id: "g7:link-identity"' + middle +
+      'reader_requires: [' + deps.replace('"concept:anet-term"', '"g7:not-existent"') + ']';
+  });
+assert.notEqual(dangling, original);
+assert.throws(() => parse(dangling), /dangling first-use reference/);
 assert.throws(() => parse(original.replace('id: "g4:incidence"',
   'id: "g4:foundation"')), /invalid\/duplicate node/);
 const rootBlock =
