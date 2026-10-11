@@ -9,6 +9,7 @@ import {loadReaderR44W4} from "./mts-reader-r44-w4.js";
 import {loadReaderR44W5} from "./mts-reader-r44-w5.js";
 import {loadReaderF01F02P01} from "./mts-reader-review-f01-f02-p01.js";
 import {loadReaderF03F04F05} from "./mts-reader-review-f03-f04-f05.js";
+import {loadReaderF06F07} from "./mts-reader-review-f06-f07.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -115,6 +116,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const r43=loadReaderR43(root),w3=loadReaderR44W3(root),w4=loadReaderR44W4(root),w5=loadReaderR44W5(root);
  const scientificReview=loadReaderF01F02P01(root);
  const structuralReview=loadReaderF03F04F05(root);
+ const inversionReview=loadReaderF06F07(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -152,7 +154,8 @@ export function renderReaderW6(root:string):ReaderW6Document{
    main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"");
   }
   if(chapter.id==="grounded-inverse-context"){
-   main.push(structuralReview.groundedMd,"",structuralReview.identityMd,"");
+   main.push(structuralReview.groundedMd,"",structuralReview.identityMd,"",
+    inversionReview.inversionMd,"",inversionReview.orientationMd,"");
   }
   if(chapter.id==="proof-and-refinement"){
    main.push(scientificReview.assuranceMd,"");

@@ -1258,6 +1258,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-f01-f02-p01.ts",
   // F03–F05 scientific commentary only: no semantic runtime modifications.
   "ts/src/tooling/mts-reader-review-f03-f04-f05.ts",
+  // F06/F07 render source-anchored INV/CTX proof commentary only.
+  "ts/src/tooling/mts-reader-review-f06-f07.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);

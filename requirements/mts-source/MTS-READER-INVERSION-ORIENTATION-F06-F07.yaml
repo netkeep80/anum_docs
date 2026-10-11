@@ -1,0 +1,49 @@
+# Scientific reviewer wave F06 + F07: strictly source-owned explanatory model.
+schema: mts-v015-review-inversion-chirality-orientation-f06-f07/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-BASIS-GROUNDED-IDENTITY-F03-F04-F05.yaml
+review_packages: [F06, F07]
+reviewer_question_refs: ["2.4", "2.5", "6.2", "10.2", "10.3"]
+proof_sources:
+  lean: proofs/lean4/MtsFoundation.lean
+  rocq: proofs/coq/MtsFoundation.v
+inversion:
+  heading_ru: "F06. Структурная инверсия J: реляционная сигнатура, область и инволюция"
+  signature_ru: "Формализация определяет не тотальную глобальную операцию Link→Link, а индуктивное отношение RecursiveInversion(F,D,x,y) над единственным носителем Link. Здесь D : RecursiveInversionDomain(F,E), где E : F2F3OneSidedExistence(F); D предоставляет рекурсивные формы startForm, endForm, их уравнения неподвижных точек, согласование при R и LocalSelfDecision для Grounded-связей. Поэтому область инверсии зависит от объявленного математического интерфейса, а не произвольно от любых циклических объектов."
+  rules_ru: "Индуктивное отношение имеет ровно четыре структурных правила: ROOT↦ROOT; START(a)↦END(J(a)); END(a)↦START(J(a)); PAIR(a,b)↦PAIR(J(b),J(a)). Это запись смысла доказательных конструкторов root, start, finish и pair, а не четыре независимые онтологические команды. Для пары порядок двух инвертированных полюсов обращается, что отличает J от простой замены этикеток."
+  functional_ru: "Существование образа следует из INV_01_recursive_inversion_total(F,a1,E,D,gx): при A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain и Grounded(x) предъявляется y с RecursiveInversion(F,D,x,y). Отдельная теорема recursive_inversion_functional утверждает, что два образа одного x, если они существуют как рёбра отношения, равны; в ней не требуется Normalization. Следовательно, INV_01_recursive_inversion_unique_total даёт ∃! y на именно этой Grounded-области, не вводя недоказанную глобальную J для произвольного Link."
+  involution_ru: "Теорема INV_02_recursive_inversion_involutive: если RecursiveInversion(x,y) и RecursiveInversion(y,z), то z=x при A1RecursiveSeparation, F2F3GroundedNormalization, E и D. В отличие от единственности образа INV-01, повторная инволюция требует ещё N:F2F3GroundedNormalization. Существование второго ребра на Grounded-области подтверждается Grounded(y) из recursive_inversion_image_grounded и повторным применением INV-01; это формально объединено в INV_02_unique_total_involution."
+  scope_ru: "На объявленном конечном Grounded-домене J является единственной инволютивной функцией в смысле графа отношения. Отсюда внутри этого домена следует биективность J на себя: J(J(x))=x, поэтому J инъективно и сюръективно на Grounded. Но это математическое следствие относится к совместно выполненным предпосылкам INV-02; оно не утверждает ни глобальной биективности на всех Link, ни автоматической реализуемости J в произвольном production backend."
+  example_ru: "Для базисных представителей принятая теорема INV_06_root_basis предъявляет J(R)=R, J(O)=C, J(C)=O, J(L)=L и J(U)=U как рёбра отношения. Эти равенства используют выбранные имена O/C и доказательную модель с A1, N, E и D; они не объявляют START/END абсолютным свойством наблюдателя. Важное различие: инверсия L и U сохраняет каждый объект, хотя сами L≠U."
+  gap_ru: "Два вопроса остаются отдельными научными обязательствами: расширяется ли структура J на неграундированные циклические значения без дополнительных принципов, и существует ли формально проверенный мост от реляционного J к конкретной вычислительной Γ-процедуре. Успешный внешний Lean4/Rocq proof по Grounded не доказывает production TypeScript алгоритм для всех входов."
+orientation:
+  heading_ru: "F07. Хиральность, относительная Z₂-симметрия и выбор ориентации в контексте"
+  classes_ru: "Хиральность здесь означает пару объективно различимых односторонних структурных классов StartOnly и FinishOnly до выбора контекста. ProperOneSided(F,x) является дизъюнкцией принадлежности этим двум классам. Термин не означает автоматически трёхмерную геометрическую хиральность или ориентируемость многообразия; такие внешние геометрические отождествления не входят в доказательства."
+  z2_ru: "В принятой формализации явно определены SameChiralClass и OppositeChiralClass как бинарные отношения односторонних Связей. RelativeZ2Law проверяет тождественное и зеркальное относительные преобразования и их таблицу композиции, а CTX_03_relational_z2_support дополнительно связывает зеркальный переход с реляционным J. Обозначение Z₂ является математическим языком внешней проекции доказательства, не вторым онтологическим сортом и не универсальным групповым действием на всех Link."
+  mirror_ru: "INV_07_objective_chirality доказывает, что при допустимом ребре J класс StartOnly превращается в FinishOnly, и наоборот; исходная и отражённая односторонние Связи различаются, а PairLocal остаётся PairLocal. Вместе с INV-02 эти факты дают двухэлементную зеркальную орбиту односторонних представителей, существующую до выбора наблюдателя, как установлено CTX_03_objective_chiral_orbit_before_context."
+  context_ru: "ContextOrientationMarker(F,D,body,selected) означает, что выбранный маркер selected равен либо D.startForm(body), либо D.endForm(body). После выбора определяются ContextLocalStartRole(selected,candidate) по SameChiralClass и ContextLocalEndRole по OppositeChiralClass. Это контекстно-относительные роли: одна и та же Link не получает абсолютного признака START для всех контекстов. CTX_03_context_selection_induces_local_roles доказывает существование различимых локальных маркеров при A1,E,D."
+  chi_ru: "Теорема CTX_03_context_marker_selects_unique_chi связывает выбор одного из двух маркеров с уникальным ContextChiWitness в данной математической схеме. Она не является внешним Bool-выбором нового семантического примитива. Теоремы CTX_03_simultaneous_inversion_covariance и CTX_03_context_relative_gauge показывают, что одновременная инверсия двух маркеров сохраняет их отношение Same/Opposite; инверсия не создаёт абсолютного направления."
+  semantic_ru: "CTX_03_semantic_covariance_capstone дополнительно изучает согласованность направленных структурных свидетельств и обобщённого MP при J; там же явно отделяется техническое обращение к первому полюсу start от семантически ковариантного преобразования. Это результат выбранного внешнего интерфейса для CTX-03, а не доказательство реализации полного исполнительного пути Γ с J0, S1, S2 и атомарной публикацией."
+  boundary_ru: "Следует различать (1) математическую Link-связь body, выбранный маркер и относительные роли K внутри CTX-03; (2) контекст интерпретации в версии v0.15; (3) операционное состояние и snapshot у Γ. Отождествление этих трёх объектов требует явного отображения и доказанных законов сохранения смысла. В нынешней рукописи такой end-to-end bridge не заявляется доказанным; никакой новый тип Context или ориентирующий Bool не добавляется к принятой онтологии."
+  gap_ru: "Научные вопросы для дальнейшей проверки: точный язык контекстных ролей ANet и их зависимость от K; пределы связи относительной хиральности с групповой геометрией; доказательства корректного переноса из CTX-03 через FORMAL/JSON в Γ. Пока это отдельные обязательства, а не завершённые результаты FRM-07 или разрешение на изменения принятого v0.15."
+theorem_evidence:
+  - { id: INV-01-TOTAL, symbol: INV_01_recursive_inversion_total, assumptions: [A1, E, D, Grounded], scope: "exists-image-grounded" }
+  - { id: INV-01-FUNCTIONAL, symbol: recursive_inversion_functional, assumptions: [D, Edge(x,y), Edge(x,z)], scope: "unique-existing-image" }
+  - { id: INV-01-UNIQUE, symbol: INV_01_recursive_inversion_unique_total, assumptions: [A1, E, D, Grounded], scope: "unique-total-grounded" }
+  - { id: INV-02-RELATIONAL, symbol: INV_02_recursive_inversion_involutive, assumptions: [A1, N, E, D, Edge(x,y), Edge(y,z)], scope: "involution-two-edges" }
+  - { id: INV-02-TOTAL, symbol: INV_02_unique_total_involution, assumptions: [A1, N, E, D, Grounded], scope: "total-involution-grounded" }
+  - { id: INV-06, symbol: INV_06_root_basis, assumptions: [A1, N, E, D], scope: "root-basis-evidence" }
+  - { id: INV-07, symbol: INV_07_objective_chirality, assumptions: [A1, N, E, D, Edge(x,y)], scope: "one-sided-chiral-mirror" }
+  - { id: CTX-03-Z2, symbol: CTX_03_relational_z2_support, assumptions: [A1, N, E, D], scope: "proper-one-sided-relational-z2" }
+  - { id: CTX-03-MARKER, symbol: CTX_03_context_selection_induces_local_roles, assumptions: [A1, E, D, ContextOrientationMarker], scope: "local-role-existence" }
+  - { id: CTX-03-ORBIT, symbol: CTX_03_objective_chiral_orbit_before_context, assumptions: [A1, N, E, D], scope: "objective-chiral-two-element-orbit" }
+  - { id: CTX-03-CHI, symbol: CTX_03_context_marker_selects_unique_chi, assumptions: [A1, E, D, ContextOrientationMarker], scope: "unique-local-chi" }
+  - { id: CTX-03-COVARIANCE, symbol: CTX_03_simultaneous_inversion_covariance, assumptions: [A1, N, E, D, Edge(a,ja), Edge(b,jb)], scope: "same-opposite-covariance" }
+  - { id: CTX-03-GAUGE, symbol: CTX_03_context_relative_gauge, assumptions: [A1, N, E, D], scope: "context-relative-gauge" }
+  - { id: CTX-03-SEMANTIC, symbol: CTX_03_semantic_covariance_capstone, assumptions: [A1, N, E, D], scope: "chosen-semantic-mp-slice" }
+open_obligations: [INVERSION_NON_GROUNDED_EXTENSION, CTX_GAMMA_REFINEMENT_BRIDGE, GLOBAL_Z2_ACTION_NOT_CLAIMED]
