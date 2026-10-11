@@ -1235,6 +1235,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-coverage.ts",
   // #2132/G20: source-owned editorial DAG validation; proof/status authority remains elsewhere.
   "ts/src/tooling/mts-reader-g20.ts",
+  // #2132/G42: literary chapter projection and proof citations, no native runtime ownership.
+  "ts/src/tooling/mts-reader-g42.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);
