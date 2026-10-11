@@ -3,7 +3,7 @@ import { loadMtsSemanticIr, type MtsRequirementProjection } from "./mts-compiler
 
 export type ReaderSection = "foundations" | "inversion-and-context" | "representation" |
   "arithmetic" | "formal-notation" | "execution" | "architecture" |
-  "worked-examples" | "assurance" | "governance" | "documentation" | "terminology";
+  "worked-examples" | "proofs" | "assurance" | "governance" | "documentation" | "terminology";
 
 const V14: Readonly<Record<string, ReaderSection>> = Object.freeze({
   "V14-L1": "foundations",
@@ -26,7 +26,7 @@ const V15: Readonly<Record<string, ReaderSection>> = Object.freeze({
   STRUCT: "foundations", CLOSE: "architecture", FRESH: "assurance",
   NAME: "formal-notation", JSON: "formal-notation", VERT: "assurance",
   AND: "worked-examples", CTX: "execution", GAMMA: "execution",
-  FORMAL_PROOF: "assurance", STAGE: "architecture", FALS: "assurance",
+  FORMAL_PROOF: "proofs", STAGE: "architecture", FALS: "assurance",
   GOV: "governance", CORPUS: "assurance", DOCS: "documentation",
   READY: "governance", AUTHOR_JSON: "governance", REG: "assurance",
 });
