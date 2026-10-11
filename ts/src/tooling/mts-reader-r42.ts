@@ -142,7 +142,7 @@ export function parseReaderR42(text: string, root: string): R42ScientificReview 
     "\"DUP_FF : [F,F]\"","\"LINK_FT : F->T\"",
     "same(empty, f.basis.R","pairFT !== pairTF","dupFF !== singleF","linkFT !== pairFT"];
   demand(anchors.every(s=>exact.includes(s)),"R42 ExactSequence witness source not complete");
-  const obs=arr(ex.observations,"observations").map(v=>string(v,"observation",35));
+  const obs=arr(ex.observations,"observations").map(v=>string(v,"observation",24));
   demand(obs.length===4 && obs[0]!.includes("R") && obs[1]!.includes("[F,T]") &&
     obs[2]!.includes("[F,F]") && obs[3]!.includes("F->T"),
     "R42 sequential test cases missing");
