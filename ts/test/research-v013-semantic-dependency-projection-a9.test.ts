@@ -1277,6 +1277,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m01.ts",
   // #2217 M02: scientific end-to-end witness, not the production semantic executor.
   "ts/src/tooling/mts-reader-review-m02.ts",
+  // #2252 M03: reader-only disambiguation of object syntax and proof metalanguage.
+  "ts/src/tooling/mts-reader-review-m03.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
