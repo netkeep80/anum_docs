@@ -29,7 +29,7 @@ source_documents:
     page_count: 6
     question_count: 43
 expected_question_counts: {A: 38, B: 97, C: 43, total: 178}
-primary_owner_count: 26
+work_package_count: 26
 historical_r40_open: 9
 claims_of_scientific_resolution: 0
 entries:
