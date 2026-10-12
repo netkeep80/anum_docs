@@ -1279,6 +1279,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m02.ts",
   // #2252 M03: reader-only disambiguation of object syntax and proof metalanguage.
   "ts/src/tooling/mts-reader-review-m03.ts",
+  // #2254 M04: proof-status reader, not runtime or author semantic authority.
+  "ts/src/tooling/mts-reader-review-m04.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
