@@ -1,0 +1,65 @@
+# Proposed P02/P03: independently scoped FRM-07 premises and reproducibility.
+schema: mts-v015-review-refinement-reproducibility-p02-p03/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-GAMMA-AND-G01-G02-G03.yaml
+review_packages: [P02, P03]
+source_paths:
+  formal_assurance: proofs/v015-formal-proof-assurance.json
+  formal_evidence: proofs/v015-evidence/formal-bootstrap-frm01-06.json
+  accepted_registry: requirements/mts-v0.15.json
+  formal_lean: proofs/lean4/MtsV015Formal.lean
+  formal_rocq: proofs/coq/MtsV015Formal.v
+  production_ts: ts/test/v015-formal-production-refinement-f1.test.ts
+  formal_guard: ts/test/v015-formal-proof-assurance-f0.test.ts
+  replay_guard: ts/test/v015-frozen-replay-artifact-integrity.test.ts
+  replay_package: ts/test/v015-boolean-package-replay-a2.test.ts
+  proof_toolchains: proofs/external-toolchains.json
+  ci: .github/workflows/ci.yml
+  observer: .github/workflows/contract-observatory-pages.yml
+  pdf_workflow: .github/workflows/reader-preview.yml
+  pdf_renderer: tools/reader-preview/render.mjs
+  human_reader: requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml
+refinement:
+  heading_ru: "P02. FRM-07: условная теорема и исчерпываемость производственных обязательств"
+  scope_ru: "Формальная теорема FRM_07_approved_artifact_refinement сформулирована в метаязыке Lean4/Rocq над типами Formal, Json, Source, Semantic, Recursive. Она не вводит пять самостоятельных сортов в онтологию МТС: это внешние средства представления и проверки единственного Link-мира. У теоремы две конкретные содержательные предпосылки: равенство native source ANet для двух выбранных входных представлений и закон decode(compile(s))=s для выбранного semantic-значения. Результатом является равенство декодированного формального пути с денотацией JSON-источника; доказательство сводится к переписыванию по двум посылкам."
+  formal_ru: "При F=formal и J=json, P.fromFormal(F)=P.fromJson(J), s=P.denote(P.fromFormal(F)) и P.decode(P.compile(s))=s, имеем P.decode(P.compile(P.denote(P.fromFormal(F))))=P.denote(P.fromJson(J)). Это математическая импликация при заданном ProductionArtifactRefinement, а не анализ исходного TypeScript компилятора. В принятом FRM_05 равенство денотаций также следует только из общего исходного native source; FRM_06 предполагает предварительно доказанный roundTrip для абстрактного MetaCompiler. Ни одна из этих лемм не устанавливает свои условия самопроизвольно."
+  exact_ru: "Третья строка предпосылок assurance-манифеста FRM-07 — production ExactSequence read(materialize(values))=values на канонической области — относится к дополнительному обязательству сквозного refinement. Она не входит отдельным аргументом в буквальную сигнатуру FRM_07_approved_artifact_refinement. Из неё через отдельную принятую теорему FRM_07_exact_sequence_injective_from_left_inverse следует инъективность encode при наличии заданных encode/read, но из проверенных 156 примеров не следует универсальный закон для произвольных последовательностей Link. Поэтому матрица доказательств должна показывать отдельно прямые теоремные посылки и относящиеся к реализации дополнительные проверки."
+  samples_ru: "Конкретный TS gate v015-formal-production-refinement-f1.test.ts перечисляет все длины 0,1,2,3 над выбранным алфавитом пяти базисных Links R,O,C,L,U: 1+5+25+125=156 носителей ExactSequence. Для них проверяются позиционное восстановление и отсутствие столкновений. Это полный перебор лишь для конечной декларированной сетки, не доказательство для длины 4+, произвольных других Links или неграундированных циклов. Обозначать результат как 156 проверенных векторов, не как 'доказано для всех последовательностей'."
+  artifacts_ru: "Тот же production F1 gate проверяет ровно два утверждённых fixture-профиля grounded-zero-role и two-role-meta-rule: source ANet равен для FORMAL/JSON, member count равен 1 и 3 соответственно, произведённая рекурсивная запись из алфавита 8/9/6/1 совпадает с сохранёнными файлами. Каждая полученная запись затем материализуется в новой Memory с иным allocation noise и повторно сериализуется с проверкой байт рекурсивного представления. Этот успешный регрессионный roundtrip не означает исходного побайтового JSON↔FORMAL roundtrip и не распространяется автоматически на все шесть канонических регрессионных JSON, произвольные cyclic bindings или все backend."
+  verdict_ru: "Принятое assurance явно классифицирует FRM-07 как PROVED_UNDER_EXPLICIT_PRODUCTION_REFINEMENT_PREMISES, а productionRefinement как GREEN_FOR_DECLARED_V015_EXECUTION_FRAGMENT. Проверенный точный статус поэтому: парные Lean4/Rocq теоремы математически доказаны при своих посылках; выбранные production свидетельства зелёные на конечной области; глобальное соответствие самого TypeScript и всеобщность предпосылок не доказаны в ядре. Названия GREEN, VERIFIED, ACCEPTED относятся к разным границам; ни один из этих статусов не разрешает молчаливо объявить произвольный runtime математически верифицированным."
+  missing_ru: "Чтобы действительно снять все обязательства сквозного FRM-07 для production, необходимо зафиксировать выразительный предметный носитель supported-семантики, область валидных FORMAL/JSON и зависимость от Context/Theory; формально задать функции компиляции и декодирования конкретного production-фрагмента; доказать паритет source, его общее разрешение, для каждого s левую обратимость, и отдельно ExactSequence для произвольной допустимой длины. Требуется проверяемая симуляция конкретного TypeScript алгоритма в Lean4/Rocq либо явно ограниченное trusted-code assumption с отдельным статусом. Без этого результаты F1 сохраняются как executable witnesses, а открытое обязательство не закрывается."
+reproducibility:
+  heading_ru: "P03. Воспроизводимость, сила свидетельств и граница авторской власти"
+  tooling_ru: "Воспроизводимая сборка математических свидетельств использует внешний Lean4 4.34.1 с зафиксированными tag, commit и SHA-256 release-архива, а также Rocq 9.2.0 с зафиксированным commit и digest контейнерного образа. Их версии являются только инфраструктурой проверки и не являются новыми конструкторами МТС. Accepted конфигурация external-toolchains.json не предоставляет онтологической власти ни Lean-типам, ни Rocq Prop. Проверки CI компилируют оба пути и отдельно отслеживают разрешённые глобальные аксиомы: в formal-assurance списки lean4/rocq пусты."
+  evidence_ru: "Для научного утверждения требуется замкнутая тройка: точная формулировка математического утверждения и все premises, точное имя и исходник парной Lean4/Rocq теоремы, реальный исполняемый регрессионный свидетель с зафиксированной областью. Хеши и digest контролируют неизменность соответствующего source artifact, но не доказывают его истинность, адекватность выбранной модели или отсутствие пробелов между production и verifier. Для F1 указать отдельно 2 артефакта, 156 вариантов последовательностей и свежую Memory; frozen-replay guard дополнительно защищает шесть источников более широкого утверждённого корпуса, но не расширяет границы самого F1."
+  time_ru: "Отчёт CI относится к точному head SHA, workflow run ID и конкретным компиляторам, а не ко всей будущей ветке; успешный предыдущий head нельзя переносить на новый. Нормативно принятая МТС v0.15 остаётся на проверенном immutable main, а научная редакция в stacked Draft имеет статус proposed и не становится accepted даже после triple GREEN. Любая правка, меняющая исходный нормативный JSON, требует отдельного одобрения Автора по точной ревизии. Merge научных слоёв или публикация монографии являются самостоятельными решениями."
+  evidence_ladder_ru: "Различать четыре степени: (а) утверждение только в тексте без свидетельств, (б) конечная исполняемая проверка, (в) теорема в Lean4/Rocq при явных предпосылках, (г) формальная симуляция/refinement конкретного production алгоритма. Утверждение (в) с premises нельзя цитировать как доказательство (г); даже нулевой список глобальных аксиом не делает внешне переданную гипотезу истинной. Reproducibility включает негативные тесты, индивидуальные метатребования, исходную формулировку, привязку к SHA и неповреждённость исторических фрагментов."
+  manuscript_ru: "Рукопись строится в модели Russian source YAML→генератор→Markdown→HTML→PDF и не допускает самостоятельного текстового редактирования сгенерированных страниц в обход источника. Контроль включает 119/119 исходных фрагментов, девять отдельных OPEN R40 замечаний, A4, проверку кириллических символов и формул, Unicode-гарнитур и ручную инспекцию всех растровых страниц. Исторические изображения нельзя удалять или произвольно переатрибутировать; отсутствие привязки в исходном owner следует классифицировать как отдельное открытое обязательство, а не заменять картинку гипотезой."
+  publication_ru: "До индивидуальной научной рецензии каждого вопроса из 178, подтверждения неизменности всех 119 исходных атомов и явного решения Автора публикация и merge запрещены. Ветка main является accepted semantic source, а библиотечные handoff, issue-комментарии, CI-метки и preview PDF только воспроизводят её состояние либо предлагают новое исследование. Нельзя закрывать P02 по одному CI, P03 по наличию хеша или весь мастер-план по 64 страницам: эти величины относятся к разным проверкам и не свидетельствуют сами по себе о завершённости научной экспертизы."
+evidence:
+  - {id: P02-FRM05, origin: formal, key: FRM_05_shared_source_implies_shared_denotation, scope: same-native-source-premise}
+  - {id: P02-FRM06, origin: formal, key: FRM_06_metacompiler_preserves_semantics, scope: explicit-roundtrip-record}
+  - {id: P02-FRM07, origin: formal, key: FRM_07_approved_artifact_refinement, scope: same-source-plus-recursive-left-inverse}
+  - {id: P02-SEQ, origin: formal, key: FRM_07_exact_sequence_injective_from_left_inverse, scope: separate-left-inverse-premise}
+  - {id: P02-EXACT-156, origin: executable, key: EXACT_SEQUENCE_LEFT_INVERSE_SAMPLED=156, scope: five-basis-length-zero-to-three}
+  - {id: P02-ARTIFACTS-2, origin: executable, key: APPROVED_ARTIFACTS=2, scope: grounded-and-two-role-fixtures-only}
+  - {id: P02-FRESH, origin: executable, key: FRESH_MEMORY_RECONSTRUCTION=GREEN, scope: recursive-wire-identity-fresh-memory}
+  - {id: P03-PROOF-CI, origin: workflow, key: Print Assumptions, scope: pinned-two-kernels-current-head}
+  - {id: P03-REPLAY, origin: replay, key: packageSha256, scope: frozen-six-artifact-integrity-only}
+  - {id: P03-PDF, origin: pdf, key: all_pages_inspected_as_images, scope: non-authoritative-preview-QA}
+negative_cases: [FRM07_NOT_TYPESCRIPT_PROOF, EXACT_156_NOT_UNIVERSAL,
+  TWO_ARTIFACTS_NOT_SIX_F1, SEMANTIC_ROUNDTRIP_NOT_ORIGINAL_BYTES,
+  FRM05_REQUIRES_SAME_SOURCE, FRM06_REQUIRES_ROUNDTRIP,
+  NO_FICTIONAL_EXACT_PREMISE_IN_FRM07_SIGNATURE,
+  HASH_NOT_SEMANTIC_TRUTH, PAST_CI_NOT_CURRENT_HEAD,
+  GREEN_NOT_AUTHOR_ACCEPT, ZERO_AX_ALLOWLIST_NOT_NO_HYPOTHESES,
+  PDF_NOT_INDEPENDENT_MATH_REVIEW]
+open_obligations: [FRM07_FULL_PRODUCTION_REFINEMENT,
+  EXACT_SEQUENCE_UNIVERSAL_LEFT_INVERSE,
+  ALL_APPROVED_CORPUS_EXTENDED_REFINEMENT_SCOPE,
+  INDIVIDUAL_178_QUESTION_REVIEW_AND_AUTHOR_DECISION]
