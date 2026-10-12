@@ -1,0 +1,71 @@
+# Proposed M02 full end-to-end scientific walkthrough; no change to accepted formal/JSON.
+schema: mts-v015-review-worked-foundation-gamma-m02/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-MATHEMATICAL-POSITION-M01.yaml
+review_packages: [M02]
+source_paths:
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  exact_sequence_ts: ts/src/exact-sequence.ts
+  formal: formal/v0.15/regression/compact-and.formal
+  json: formal/v0.15/regression/compact-and.json
+  recursive: formal/v0.15/regression/compact-and.recursive
+  approved_integrity: ts/test/v015-compact-and-approved-source-integrity.test.ts
+  and_test: ts/test/v015-compact-and-role-bundle-a1.test.ts
+  and_package_test: ts/test/v015-boolean-package-replay-a2.test.ts
+  source_formal_ts: ts/src/v015-direct-formal-source.ts
+  source_json_ts: ts/src/v015-direct-json-source.ts
+  source_anet_ts: ts/src/v015-source-anet.ts
+  gamma_kernel: profiles/mts-v015-meta-interpreter-kernel.json
+  gamma_lean: proofs/lean4/MtsV015GeneralizedReactionCore.lean
+  gamma_rocq: proofs/coq/MtsV015GeneralizedReactionCore.v
+  gamma_refinement_lean: proofs/lean4/MtsV015GeneralizedReactionRefinement.lean
+  gamma_refinement_rocq: proofs/coq/MtsV015GeneralizedReactionRefinement.v
+  historical_version: requirements/mts-v0.15.json
+artifact_pins:
+  formal_sha256: 4a5bc92e661ee1d4e0c2c5d51769805b5406651bb491345200d088c9ad23e5f3
+  json_sha256: cf5028f68500bba04ee10e06ac5512eec223078d8b428f4d5de1de6433ba5941
+  recursive_sha256: 37b2c02b927eed6cdd061931b60930d0a31d674a49bc585b075401a5cb5ddcb0
+scientific:
+  heading_ru: "M02. Сквозной пример: один Link-фундамент, одна ANet и реакция AND"
+  aim_ru: "Рассмотрим полностью определённый путь на неизменяемом авторски утверждённом корпусе Boolean AND. Проверяем единый носитель Link, формирование R/O/C/L/U, построение точных последовательностей ArgsTT и ImageT, исходные FORMAL/JSON, совпадение native source ANet и четыре отношения допуска Theory, один положительный вход AND(T,T), два отрицательных сценария и границы применимости Γ. Результат сквозного примера является составным: математические равенства Foundation подтверждаются ядрами Lean4/Rocq; конкретный compiler/matcher/replay подтверждён исполняемым TS на выбранном корпусе; атомарное исполнение полного production backend не доказано одним этим тестом."
+  foundation_ru: "На уровне принятого Foundation существуют Link R и тотальная операция form с проекциями start/finish. Для выбранной ориентированной нотации ∞ означает R, O=♂∞ задаёт START(R), C=∞♀ задаёт END(R), L=form(O,C), U=form(C,O). Связи L и U используются как выбранные репрезентанты T=L и F=U. В исходнике буквально присутствуют O : ♂∞, C : ∞♀, L : O->C, U : C->O, T : L, F : U. Различение ориентированных случаев и их свойства относятся к принятым основаниям; символьные T и F не добавляют двух первичных типов и не превращают FORMAL в вычислительный opcode."
+  operator_ru: "Имя AND определяется через обычные Links: AND_SEED=form(R,L), AND=form(AND_SEED,O). Поэтому строка AND_SEED : R->L и следующая AND : AND_SEED->O являются именованными bindings к Link-конструкциям. Отдельный локальный V0 : {} создаёт пустой пучок ролей. Нельзя отождествлять источник V0:{} с отсутствующим объявлением V0, произвольно считать V0 новым сортом или выдумывать специальный host-класс BooleanInstruction. Все четыре правила имеют одну универсальную форму grounded Rule с пустыми ролями."
+  positional_ru: "ArgsTT определён как точная последовательность [T,T] = [L,L], сохраняющая обе равные позиции. ArgsTF=[T,F], ArgsFT=[F,T], ArgsFF=[F,F] являются другими позиционными carriers. ImageT=[T] и ImageF=[F] — одноэлементные точные образы. В принятой TypeScript-реализации materializeExactSequence начинает с R и для каждой позиции строит payload=form(previous,value), затем self-start-closed Cell, а readExactSequence делает обратное чтение по цепи до R. Эта реализация подтверждает конкретный путь позиций, но не разрешает заменить [T,T] множеством {T} и не даёт равенства точных носителей при совпавшей экстенсиональной свёртке."
+  rule_ru: "Положительный RuleTT описан буквально RuleTT : V0->((AND->ArgsTT)->ImageT). Через form это role-anchored Rule с antecedent form(AND,ExactSequence([L,L])) и image ExactSequence([L]); таким образом, правило структурно сопоставляет один текущий Link, а не два независимо прочитанных члена current. Остальные RuleFF, RuleFT, RuleTF аналогично выдают [F]. Контекст Theory представлен Link-именем, а четыре выражения Theory->RuleFF, Theory->RuleFT, Theory->RuleTF, Theory->RuleTT — bare-отношениями допуска в semantic ANet. Bindings самих Rule не означают автоматически their currentness."
+  source_ru: "FORMAL-оригинал и JSON-оригинал являются двумя представлениями одного выбранного примера: в FORMAL используются T : L и Theory->RuleTT, в JSON — строковый binding ключа T со значением L и bare-свидетельство ключа Theory->RuleTT со значением null. Для массивов JSON использует только ExactSequence; дубликаты ключей отвергаются до обычного JSON.parse. Оба действительных компилятора вызываются в одной Memory с одинаковой native Grammar и source ANet profile. В принятом A1 тесте проверяется точное равенство возвращённых sourceAset по Link handle; после единого resolver/denotation проверяется semantic membership ровно четырёх отношений Theory⟼RuleXX. Совпадение native sourceAset не утверждает исходную побайтовую идентичность FORMAL и JSON."
+  run_ru: "Пусть текущая асеть для локальной иллюстрации содержит ровно a=form(AND,ExactSequence([T,T])) и выбрана допустившая четыре Rule Theory. Источник A1 теста создаёт current через memory.ensure(AND,materializeExactSequence([T,T])), проходит по denotation.members, проверяет, что member есть допуск form(Theory,Rule), извлекает Rule poles, делает unifyStructuralRuleTemplate над a, затем instantiateV013StructuralTemplate и readExactSequence. При RuleTT получается ровно один вывод T, как фиксируется в TRUTH_TABLE=4_OF_4. Остальные три antecedent не совпадают с a в этом профиле. Эту локальную вычислительную проверку нельзя некорректно описывать как прямой вызов production Γ — в тесте helper называется reactGeneric и использует совместимый matcher, а не полный атомарный исполнитель."
+  transition_ru: "Если отдельно выполнены принятые предпосылки универсальной Γ — полный S1 по снимку Mₜ, каноническое S2, атомарная публикация всех результатов, отсутствие read-your-own-writes — и единственный current Link равен a, то экстенсиональное ожидаемое следующее множество есть Mₜ₊₁={T}. Это условный вывод из положительного полного сопоставления и принятых законов профиля, не эмпирическое свидетельство реального backend для полного перехода. GPR_01_decomposition_iff_single_gamma_step и GPR_01_gamma_successor_unique в Lean4/Rocq доказывают соответствующие свойства абстрактно заданной функции Gamma при фиксированной декомпозиции, но не refinement production A-memory. Происхождение rule-event и физическое число хранимых Link здесь не выводятся из одного экстенсионального набора."
+  negatives_ru: "Первая отрицательная проверка: X — Link, не равный выбранным Boolean T/F, а current=form(AND,ExactSequence([T,X])). Ни одно из четырёх оснований antecedent не совпадает, поэтому A1 helper возвращает нуль outputs и помечает сценарий NON_BOOLEAN_OPERANDS=NO_MATCH; при настоящей Γ с теми же полными предпосылками NO_MATCH обязан сохранить current, а не создать Boolean false. Вторая проверка удаляет только bare-допуск Theory->RuleTT, не изменяя definition RuleTT: вход (T,T) становится NO_MATCH, но FF/FT/TF ещё вычисляются. Третья проверка выбирает ForeignTheory и получает отсутствие допуска, даже когда физический RuleTT имеется. Отрицательные сценарии показывают власть semantic membership, а не случайных имён или наличия физической записи."
+  replay_ru: "В принятом A2 package/replay gate четыре Boolean пакета AND/NOT/OR/XOR компилируются из уже утверждённых исходников, а для AND сохранённые FORMAL/JSON/recursive артефакты проверяются по digest. A1 реализует 4/4 положительных строки AND и негативные мутации; тест точности source закрепляет SHA-256 трёх файлов. Это два разных свидетельства: A1 — локальное сопоставление структурных правил, A2 — совместимость packaging/replay с историческими адаптерами; ни один не подменяет полное независимое доказательство end-to-end Γ. Все новые комментарии в данном M02 являются только научной редакцией, без нового формального или JSON-артефакта."
+  verdict_ru: "Связный положительный маршрут от Link-полей до точного одноэлементного образа [T] воспроизведён на принятом корпусе. Уровни уверенности: Foundation — парные theorem-посылки; точная последовательность и source parity — конкретные TS-векторы; локальный RuleTT match — A1 executable; атомарный successor Γ — условная семантическая модель и всё ещё открытый production refinement. Именно такое разделение делает пример научно проверяемым: видны точные Links, имена исходников, схема допустимых правил, где возникает результат и что ещё необходимо доказать, прежде чем говорить о полностью работающей самоисполняемой МТС."
+evidence:
+  - {id: M02-FOUNDATION, source: foundation, symbol: fnd13_form_injective, scope: link-constructor-not-codec}
+  - {id: M02-POSITIONS, source: exact, symbol: materializeExactSequence, scope: positions-two-T-and-one-T}
+  - {id: M02-FORMAL, source: compiler, symbol: compileV015DirectFormalSourceAnet, scope: same-fixture-source-anet}
+  - {id: M02-JSON, source: compiler, symbol: compileV015DirectJsonSourceAnet, scope: approved-json-only}
+  - {id: M02-DENOTE, source: anet, symbol: denoteV015ResolvedSourceAnet, scope: four-theory-admissions}
+  - {id: M02-AND-MATCH, source: a1, symbol: MTS_V015_COMPACT_AND_A1=GREEN, scope: four-local-matcher-rows}
+  - {id: M02-AND-REPLAY, source: a2, symbol: compact-and.recursive, scope: approved-artifact-replay}
+  - {id: M02-GAMMA-STEP, source: gamma, symbol: GPR_01_decomposition_iff_single_gamma_step, scope: conditional-pure-gamma-step}
+  - {id: M02-GAMMA-UNIQUE, source: gamma, symbol: GPR_01_gamma_successor_unique, scope: fixed-decomposition-only}
+  - {id: M02-GAMMA-CONTRACT, source: kernel, symbol: GAMMA_STRUCTURAL_ASET, scope: j0-snapshot-s1-s2-atomic}
+negative_cases: [EXACTSEQUENCE_TT_NOT_SET_T,
+  FOUR_BINDINGS_NOT_FOUR_ADMISSIONS,
+  SOURCE_PARITY_NOT_BYTE_PARITY,
+  A1_MATCHER_NOT_PRODUCTION_GAMMA,
+  NO_MATCH_NOT_FALSE_OUTPUT,
+  REMOVE_TT_ADMISSION_ONLY,
+  FOREIGN_THEORY_NOT_AUTHORITY,
+  PHYSICAL_RULE_NOT_SEMANTIC_ADMISSION,
+  NO_NEW_JSON_WITHOUT_AUTHOR,
+  CONDITIONAL_GAMMA_STEP_NOT_E2E_PROOF]
+open_obligations: [M02_FULL_GAMMA_TRANSITION_EXECUTABLE_WITNESS,
+  M02_FORMAL_TO_GAMMA_PRODUCTION_REFINEMENT,
+  M02_EXACTSEQUENCE_UNIVERSAL_CODEC_PROOF,
+  M02_INDEPENDENT_MATH_REVIEW_AND_AUTHOR_ACCEPT]

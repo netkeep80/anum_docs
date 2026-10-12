@@ -1275,6 +1275,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-p02-p03.ts",
   // #2217 M01: mathematical-position manuscript-only audit, no MTS semantic execution.
   "ts/src/tooling/mts-reader-review-m01.ts",
+  // #2217 M02: scientific end-to-end witness, not the production semantic executor.
+  "ts/src/tooling/mts-reader-review-m02.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
