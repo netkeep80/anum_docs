@@ -18,7 +18,7 @@ for(const s of ["FRM_07_approved_artifact_refinement",
  "grounded-zero-role","two-role-meta-rule","APPROVED_ARTIFACTS"])
  assert.ok(p.refinementMd.includes(s),"P02 source/evidence detail "+s);
 for(const s of ["Lean4 4.34.1","Rocq 9.2.0","178","119/119",
- "Docker","production","PDF"])
+ "контейнерного образа","production","PDF"])
  assert.ok(p.reproducibilityMd.includes(s),"P03 reproduce "+s);
 const book=renderReaderW6(root);
 assert.equal(book.publication,"blocked");
