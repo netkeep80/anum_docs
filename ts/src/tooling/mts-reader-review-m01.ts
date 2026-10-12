@@ -132,7 +132,8 @@ export function parseReaderM01(raw:string,root:string):M01 {
   exactKeys(e,["id","title","url","relation","nonclaim"],"comparator citation");
   check(e.id===w[0]&&e.url===w[1]&&e.relation===w[2]&&e.nonclaim===w[3],
    "mathematical comparator changed "+w[0]);
-  const name=prose(e.title,"title",15);
+  check(typeof e.title==="string"&&e.title.length>=15,"external bibliography title");
+  const name=e.title as string;
   return "- ["+name+"]("+w[1]+"): "+w[2]+"; оговорка: "+w[3]+".";
  });
  check(Array.isArray(m.evidence)&&m.evidence.length===witness.length,
