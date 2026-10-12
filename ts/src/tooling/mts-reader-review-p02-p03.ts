@@ -24,7 +24,7 @@ const paths={
  replay_package:"ts/test/v015-boolean-package-replay-a2.test.ts",
  proof_toolchains:"proofs/external-toolchains.json",
  ci:".github/workflows/ci.yml",
- observer:".github/workflows/contract-observatory-pages.yml",
+ observer:".github/workflows/pages.yml",
  pdf_workflow:".github/workflows/reader-preview.yml",
  pdf_renderer:"tools/reader-preview/render.mjs",
  human_reader:"requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
