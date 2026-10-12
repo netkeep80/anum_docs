@@ -1,0 +1,97 @@
+# M03 terminology candidate; YAML-only editorial source, no accepted law or JSON changes.
+schema: mts-v015-review-notation-m03/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+package_issue: 2252
+upstream_review: requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml
+heading_ru: "M03. Языковые уровни и точное употребление математических обозначений"
+intro_ru: "В научном тексте необходимо различать четыре уровня: выбранную одноcортную онтологию Link; синтаксис FORMAL/JSON с именами, пучками ролей и точными последовательностями; внешний математический язык, в котором Lean4/Rocq проверяют теоремы; и исполняемые TypeScript-свидетельства выбранных алгоритмов. Одинаковый печатный символ не делает операции различных уровней эквивалентными. Следующие десять определений закрепляют области употребления и намеренно не вводят новые принятые аксиомы."
+source_paths:
+  foundation: proofs/lean4/MtsFoundation.lean
+  roles: ts/src/v015-formal-roles.ts
+  formal: formal/v0.15/regression/compact-and.formal
+  json: formal/v0.15/regression/compact-and.json
+  sequence: ts/src/exact-sequence.ts
+  anet: ts/src/v015-source-anet.ts
+  kernel: profiles/mts-v015-meta-interpreter-kernel.json
+  m02: requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml
+entries:
+  - id: M03-LINK
+    level: foundation
+    notation: "Link, form, start, finish"
+    definition_ru: "В принятой внешней модели Foundation носитель Link одноcортен. Операция form: Link×Link→Link тотальна; start и finish являются тотальными проекциями в том же носителе. Стрелка ⟼ служит научным обозначением образования Связи, а запись -> в корпусе FORMAL соответствует структурному источнику, но не объявляет второй математический тип."
+    example_ru: "Для a,b∈Link: start(form(a,b))=a и finish(form(a,b))=b — равенства во внешнем языке доказательства; FORMAL O->C создаёт форму из двух Link."
+    exclusion_ru: "Не следует ни ассоциативность form, ни равенство произвольных x,y по полюсам без дополнительных предпосылок."
+    source_keys: [foundation, formal]
+  - id: M03-EQUALITY
+    level: meta-vs-object
+    notation: "=; Lean/Rocq equality; Link-valued =; TS ==="
+    definition_ru: "Знак = в математическом доказательстве Lean4/Rocq обозначает метатеоретическое равенство двух термов Link. Объектное равенство МТС в принятом FORMAL v0.15 — отдельная Link-identity операция с результатом L либо U, а не host boolean. В коде TypeScript === представляет сравнение внутренних дескрипторов; это проверка реализации, а не введение второго логического примитива МТС."
+    example_ru: "Метатеоретическое утверждение form(R,R)=R доказывается в Foundation; значение объекта x=y должно интерпретироваться по FORMAL-правилу Link identity, не подменяясь утверждением типа Prop."
+    exclusion_ru: "Не путать семантику Link-истины с доказательством формулы, не импортировать === в онтологию и не утверждать, что любое печатное = имеет одинаковую роль."
+    source_keys: [foundation, roles]
+  - id: M03-BINDING
+    level: formal
+    notation: "A : X; A->B; Theory->RuleTT"
+    definition_ru: "Двоеточие в принятом выбранном синтаксисе обозначает определение имени A для значения X в явном scope. Само по себе такое связывание не добавляет X в семантическую асеть. Отдельная bare-запись структурного отношения Theory->RuleTT допускает правило в выбранной Theory; физическое существование RuleTT и определение его имени не равны полномочию его применять."
+    example_ru: "В утверждённом compact-and.formal есть RuleTT : V0->((AND->ArgsTT)->ImageT), а отдельной строкой Theory->RuleTT; только второе выступает источником допущенного semantic membership."
+    exclusion_ru: "Нельзя заключать активность правила из одного RuleTT : ..., либо прочитывать A : X как структурное ребро с полюсами A и X."
+    source_keys: [formal, anet]
+  - id: M03-ASSOCIATION
+    level: formal
+    notation: "A⟼B⟼C; (A⟼B)⟼C; A⟼(B⟼C)"
+    definition_ru: "Принятая прямая последовательная ассоциация формирует цепь слева направо: при отсутствии явно заданной иной группировки A⟼B⟼C понимается как (A⟼B)⟼C. Скобки несут синтаксическое структурное различие. Это правило чтения выражения, а не алгебраический закон для всего носителя Link."
+    example_ru: "Из X⟼Y⟼Z получается структурный терм form(form(X,Y),Z); запись X⟼(Y⟼Z) представляет другой терм и без отдельного доказательства не отождествляется с первым."
+    exclusion_ru: "Запрещено делать вывод об ассоциативности form либо переносить правила группировки источника на произвольные термовые графы."
+    source_keys: [roles, formal]
+  - id: M03-ROOT
+    level: foundation-vs-representation
+    notation: "R, ∞, O, C, L, U, T, F"
+    definition_ru: "R обозначает выделенный Link-корень Foundation, также представляемый знаком ∞ в выбранной нотации. Формы O=START(R), C=END(R), L=form(O,C), U=form(C,O) образуют составные Связи; T=L и F=U являются именами выбранных Link-репрезентантов истины и лжи в принятом корпусе AND. Это не четыре дополнительных примитивных команды и не два новых сорта."
+    example_ru: "В компактном примере определены O : ♂∞, C : ∞♀, L : O->C, U : C->O, T : L, F : U. Исходная одна операция form сохраняется."
+    exclusion_ru: "Не принимать ROOT за отсутствие Link; не переносить T/F на внешнюю метатеоретическую логику как доказанный изоморфизм."
+    source_keys: [foundation, formal]
+  - id: M03-SEQUENCE
+    level: representation
+    notation: "[], [R], [T,T]"
+    definition_ru: "ExactSequence — упорядоченная позиционная последовательность с точным числом позиций. Пустой носитель в принятой конкретной TypeScript-реализации materializeExactSequence представлен корнем R, тогда как одноэлементная [R] создаёт ячейку и отличима от []. Повтор T в [T,T] означает два вхождения, даже если их значения совпадают. Эту последовательность нельзя заменять ни множеством, ни списком допусков ANet."
+    example_ru: "ArgsTT : [T,T] содержит две позиции; ImageT : [T] — одну. readExactSequence извлекает позиции через цепь self-closed Cell, не свёртку в неупорядоченное множество."
+    exclusion_ru: "Равенство экстенсиональных элементов не доказывает равенства carriers; конкретный TS codec сам по себе не есть универсальная теорема обо всех моделях."
+    source_keys: [sequence, formal]
+  - id: M03-BUNDLE
+    level: formal-json
+    notation: "{}, omitted, JSON null, []"
+    definition_ru: "Синтаксис {} у V0 : {} создаёт явно пустой пучок ролей; отсутствие объявления V0 не тождественно этому пучку. В утверждённом JSON для компактного AND ключ Theory->RuleTT со значением null кодирует только bare-entry в общем source-маршруте; [] задаёт позиционную пустую последовательность. Обозначения относятся к различным синтаксическим уровням и не заменяют друг друга."
+    example_ru: "В approved JSON V0: {}, ArgsTT: [\"T\",\"T\"], \"Theory->RuleTT\": null. Сопоставление с FORMAL производится через compile и денотацию source ANet."
+    exclusion_ru: "Нельзя объявить JSON null значением Link U, трактовать {} как [] или считать отсутствие ключа эквивалентом null."
+    source_keys: [formal, json, anet]
+  - id: M03-ANET
+    level: semantics
+    notation: "ANet membership, physical Link, admission"
+    definition_ru: "ANet — семантическая сеть членства, где факт существования физической Link-структуры недостаточен для её включения в выбранное состояние или для допущения Rule. Компиляция FORMAL и JSON строит один native source ANet при заданных условиях, после чего общая денотация выделяет действительные отношения членства Theory. Имена хоста не дают скрытых полномочий."
+    example_ru: "RuleTT существует как Link после определения, однако удаление именно bare Theory->RuleTT прекращает его применимость, не уничтожая RuleTT и не изменяя остальных трёх допусков."
+    exclusion_ru: "Нельзя выводить semantic membership из наличия Link, текстового имени Theory либо совпадения исходных строк FORMAL и JSON."
+    source_keys: [anet, formal, json]
+  - id: M03-RESULT
+    level: execution
+    notation: "NO_MATCH, Matched([]), Matched(nonempty), error"
+    definition_ru: "Для реакции Γ необходимо различать отсутствие сопоставления NO_MATCH, успешное сопоставление с пустым ExactSequence-образом, успешное сопоставление с непустым образом и ошибку исполнения. В принятом профиле NO_MATCH сохраняет членство current, а matched empty даёт нулевой вклад в successor и не эквивалентен отсутствию правила. Ошибка не является одним из этих двух семантических результатов."
+    example_ru: "AND(T,X) при неподходящем X и отсутствии допущенного правила даёт NO_MATCH, тогда как корректно допущенное правило с пустым образом может удалить текущий элемент в следующем поколении."
+    exclusion_ru: "Нельзя интерпретировать NO_MATCH как F, подменять matched [] отсутствием правила или смешивать исключение реализации с нормативным нулевым образом."
+    source_keys: [kernel, formal]
+  - id: M03-GAMMA
+    level: semantics-vs-implementation
+    notation: "Γ, J0, S1, S2, snapshot, atomic publish"
+    definition_ru: "Γ обозначает выбранную реакционную семантику: структурная унарная J0, одно поколение чтения из неизменяемого snapshot, S1 для сопоставления, S2 для построения образа и атомарное опубликование завершённого successor без read-own-writes. Доказательства GPR-01 для абстрактной функции и локальный тест reactGeneric не удостоверяют автоматически refinement полной production реализации."
+    example_ru: "В M02 локальный reactGeneric подтверждает четыре строки AND и отрицательные сценарии; утверждение Mₜ₊₁={T} зависит от выполнения всего контракта Γ и требований к начальной асети."
+    exclusion_ru: "Запрещено повышать локальные тесты до proof of production atomicity либо считать прохождение CI научной приёмкой Автора."
+    source_keys: [kernel, m02]
+open_obligations:
+  - M03_SCIENTIFIC_NOTATION_INDIVIDUAL_REVIEW
+  - M03_OBJECT_LANGUAGE_META_LANGUAGE_SCOPE_AUDIT
+  - M03_PRODUCTION_GAMMA_REFINEMENT_STILL_OPEN
+  - M03_AUTHOR_ACCEPTANCE_NOT_RECORDED
