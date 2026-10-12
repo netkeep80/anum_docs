@@ -1,0 +1,155 @@
+# M04 proposed epistemic taxonomy, not a new mathematical axiom or release.
+schema: mts-v015-review-epistemic-m04/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+package_issue: 2254
+upstream_review: requirements/mts-source/MTS-READER-NOTATION-SEMANTICS-M03.yaml
+heading_ru: "M04. Доказательное положение математических утверждений и границы применимости"
+intro_ru: "Следующая матрица не заменяет доказательство теорем и не является простым перечнем зелёных проверок. Она разделяет нормативные решения, теоремы внешних ядер, утверждения при дополнительных предпосылках, конечные исполняемые свидетельства и ещё открытые исследовательские вопросы. Для каждой строки указаны точный источник, содержание, необходимая область интерпретации и специально исключаемое усиление. Математическая достоверность, техническое воспроизведение и авторская санкция сохраняют самостоятельный статус."
+legend:
+  KERNEL_THEOREM: "Вывод проверен ядрами Lean4 и Rocq в явно заданной внешней модели; математические ограничения области действия остаются в сигнатуре и не переносятся автоматически на production реализацию."
+  CONDITIONAL_THEOREM: "Ядра доказывают импликацию при названных предпосылках; применимость посылок к выбранному runtime, codec либо конкретной модели должна устанавливаться отдельным доказательством."
+  EXECUTABLE_WITNESS: "Конкретный исполняемый TypeScript тест проверяет строго объявленные входные данные и отрицательные сценарии. Результат подтверждает тестированный фрагмент, но не универсальную математическую теорему."
+  ACCEPTED_SEMANTIC_CONTRACT: "Статус означает нормативно принятое автором правило семантики v0.15, а не механическую проверку любого backend на соответствие этому правилу."
+  OPEN_RESEARCH: "Сформулированный математический вопрос или инженерный refinement не разрешён приложенными источниками. Никакие проверенные частные примеры не повышают его статус автоматически."
+  AUTHOR_DECISION: "Зафиксированное решение Автора относится к конкретному релизу и архивной границе, а не к будущим редакционным предложениям."
+  AUTHOR_DECISION_PENDING: "Предложенная научная редакция ещё не прошла самостоятельную авторскую приёмку; ни зелёная сборка, ни успешная проверка источника не заменяют это решение."
+source_paths:
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  f03_lean: proofs/lean4/MtsBasisFiveDistinct.lean
+  f03_rocq: proofs/coq/MtsBasisFiveDistinct.v
+  assurance: proofs/v015-formal-proof-assurance.json
+  formal_lean: proofs/lean4/MtsV015Formal.lean
+  formal_rocq: proofs/coq/MtsV015Formal.v
+  gamma_lean: proofs/lean4/MtsV015GeneralizedReactionCore.lean
+  gamma_rocq: proofs/coq/MtsV015GeneralizedReactionCore.v
+  exact_f1: ts/test/v015-formal-production-refinement-f1.test.ts
+  and_a1: ts/test/v015-compact-and-role-bundle-a1.test.ts
+  kernel: profiles/mts-v015-meta-interpreter-kernel.json
+  release: traceability/mts-v0.15.json
+  m01: requirements/mts-source/MTS-READER-MATHEMATICAL-POSITION-M01.yaml
+  m02: requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml
+  m03: requirements/mts-source/MTS-READER-NOTATION-SEMANTICS-M03.yaml
+claims:
+  - id: M04-FND
+    grade: KERNEL_THEOREM
+    evidence_symbol: "fnd13_form_injective"
+    source_keys: [foundation_lean,foundation_rocq]
+    thesis_ru: "Законы двух тотальных проекций принуждают form быть инъективной на упорядоченных парах. Отсюда следует вывод о невозможности нетривиального конечного Foundation, но инъективность конструктора не есть глобальное равенство Link по совпадающим полюсам."
+    premises_ru: "Утверждение сделано относительно явно данного Foundation; различимость R/O/C/L/U и FND-13 требуют дополнительных условий, если речь идёт о произвольных Link и не только о форме form(a,b)."
+    nonclaim_ru: "Не выводить global pole-extensionality, алгебраическую ассоциативность либо математический приоритет формализма из этой теоремы."
+  - id: M04-F03
+    grade: CONDITIONAL_THEOREM
+    evidence_symbol: "F03_basis_five_pairwise_distinct"
+    source_keys: [f03_lean,f03_rocq]
+    thesis_ru: "Десять попарных неравенств представителей R/O/C/L/U доказаны отдельными ядрами Lean4 и Rocq при совместной предпосылке F2F3OneSidedExistence над Foundation. Это содержательное условное усиление оснований, а не новое безусловное свойство любой модели."
+    premises_ru: "Единственное дополнительное семейство посылок — свидетель E:F2F3OneSidedExistence F; принятое доказательство не требует A1, Grounded или Normalization. Независимая оценка текста и минимальности всё ещё отдельна от компиляции."
+    nonclaim_ru: "Нельзя заключать, что в одноэлементном Foundation обязательно существуют пять различных Link; нельзя объявить наличие E автоматически без доказательства."
+  - id: M04-FRM03
+    grade: KERNEL_THEOREM
+    evidence_symbol: "FRM_03_direct_sequential_association_three"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-03 подтверждает правило чтения прямой последовательной ассоциации ровно для трёх элементов bootstrap-области: цепь слева направо соответствует form(form(a,b),c). Теорема относится к синтаксической структуре цепочки, не к равенству альтернативных форм."
+    premises_ru: "Проверенная формальная область — трёхчленная последовательность выбранного внешнего FORMAL-моделирования. Распространение на произвольное число элементов следует оформлять отдельной индукционной леммой с точной областью."
+    nonclaim_ru: "Нельзя заменять (a⟼b)⟼c на a⟼(b⟼c) по мнимой ассоциативности; такой закон не доказан и не принят."
+  - id: M04-FRM04
+    grade: CONDITIONAL_THEOREM
+    evidence_symbol: "FRM_04_single_root_distinct_from_empty"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-04 различает точную пустую последовательность и одноэлементную последовательность из корня в абстрактной модели. Формальная сила результата прямо зависит от инъективного кодирования позиционных списков Link."
+    premises_ru: "Условиями служат declared root для [] и ExactSequence injectivity; они не доказываются самой формулировкой FRM-04 для любого production encoder."
+    nonclaim_ru: "Нельзя объявить универсальную корректность произвольного ExactSequence codec по тому, что построенная абстрактная последовательность инъективна."
+  - id: M04-FRM05
+    grade: CONDITIONAL_THEOREM
+    evidence_symbol: "FRM_05_shared_source_implies_shared_denotation"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-05 даёт одинаковую денотацию FORMAL и канонического JSON при равенстве их native source ANet. Согласованность двух поверхностных представлений формулируется как следствие общей семантической формы, а не совпадение исходных байтов."
+    premises_ru: "Необходимо отдельно установить совпадение native source ANet для рассматриваемых текстов. Без этой посылки теорема не устанавливает ничего о двух произвольно выбранных документах."
+    nonclaim_ru: "Нельзя распространять результат на произвольные JSON и FORMAL или утверждать lossless посимвольный roundtrip исходных файлов."
+  - id: M04-FRM06
+    grade: CONDITIONAL_THEOREM
+    evidence_symbol: "FRM_06_metacompiler_preserves_semantics"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-06 сохраняет семантическое значение при условии заранее заданного закона decode(compile(s))=s на выбранной области Recursive. Это доказанная композиционная импликация при наличии корректной пары кодировщик-декодировщик."
+    premises_ru: "Левая обратимость для каждого допустимого s является отдельной содержательной посылкой о конкретном production метакомпиляторе."
+    nonclaim_ru: "Нельзя заключать, что все рекурсивные байтовые строки валидны или что произвольный компилятор удовлетворяет условию без независимого свидетельства."
+  - id: M04-FRM07
+    grade: CONDITIONAL_THEOREM
+    evidence_symbol: "FRM_07_approved_artifact_refinement"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-07 связывает FORMAL, JSON и рекурсивное представление через общую source ANet и semantic left inverse. В ядрах Lean4 и Rocq проверена логика перехода при заданных premises, а не исполнение исходного TypeScript."
+    premises_ru: "Буквальная сигнатура FRM-07 требует same native source и recursive left inverse; дополнительное обязательство ExactSequence указано отдельно в assurance манифесте и не притворяется третьим аргументом самой теоремы."
+    nonclaim_ru: "Нельзя называть FRM-07 формальной верификацией production TypeScript и автоматически распространять GREEN_FOR_DECLARED_V015_EXECUTION_FRAGMENT на любые входы."
+  - id: M04-FRM08
+    grade: KERNEL_THEOREM
+    evidence_symbol: "FRM_08_structural_aspect_denotation"
+    source_keys: [formal_lean,formal_rocq,assurance]
+    thesis_ru: "FRM-08 проверяет интерпретацию ROOT/START/END/PAIR как структурных аспектов Link в выбранной математической модели. Верифицированная декларация не создаёт дополнительный онтологический тип аспектов либо host-команду для каждого случая."
+    premises_ru: "Результат относится к выбранным конструкциям bootstrap-семантики и принятому представлению аспектов; произвольные рекурсивные binding-графы не включены в проверенный фрагмент."
+    nonclaim_ru: "Нельзя считать произвольный cyclic FORMAL корректно разобранным production parser на основании FRM-08."
+  - id: M04-F1
+    grade: EXECUTABLE_WITNESS
+    evidence_symbol: "EXACT_SEQUENCE_LEFT_INVERSE_SAMPLED=156"
+    source_keys: [exact_f1]
+    thesis_ru: "Продукционный тест ExactSequence проверяет длины от нуля до трёх над пятью представителями R/O/C/L/U: 1+5+25+125=156 конкретных векторов. Для этого конечного набора подтверждены обратное чтение и отсутствие коллизий на проверяемой области."
+    premises_ru: "Тест ограничен выбранными пятью атомами, длинами до трёх включительно и текущей реализацией; вне области конечного перебора отдельного математического результата нет."
+    nonclaim_ru: "Не утверждать доказательство восстановления любых конечных последовательностей, всех Link или длин четыре и более."
+  - id: M04-A1
+    grade: EXECUTABLE_WITNESS
+    evidence_symbol: "MTS_V015_COMPACT_AND_A1=GREEN"
+    source_keys: [and_a1]
+    thesis_ru: "Утверждённый compact AND тест проверяет четыре строки булевой таблицы через structural matcher и instantiate, а также отрицательные сценарии отсутствующего допуска и не-Boolean аргумента. Он воспроизводит конкретную исполняемую семантику правила."
+    premises_ru: "Локальный reactGeneric подтверждает selected matcher-and-image fragment, но не реализует полный атомарный производственный переход Γ в рамках одного теста."
+    nonclaim_ru: "Нельзя заменить NO_MATCH значением F или считать четыре локальных результата формальным доказательством полного Γ production backend."
+  - id: M04-GPR01
+    grade: KERNEL_THEOREM
+    evidence_symbol: "GPR_01_gamma_successor_unique"
+    source_keys: [gamma_lean,gamma_rocq]
+    thesis_ru: "Теорема GPR-01 устанавливает единственность уже определённого значения Γ для фиксированных параметров внешней модели ReactionDecomposition. Она помогает проверить внутреннюю композиционную согласованность формального описания шага."
+    premises_ru: "Предпосылкой является конкретная заданная декомпозиция и функция Γ; доказательство не моделирует всё физическое состояние production A-memory и не проверяет её атомарность."
+    nonclaim_ru: "Нельзя утверждать уникальную стратегию исполнения любого rewrite engine либо соответствие конкретного runtime одной абстрактной теореме."
+  - id: M04-GAMMA
+    grade: ACCEPTED_SEMANTIC_CONTRACT
+    evidence_symbol: "GAMMA_STRUCTURAL_ASET"
+    source_keys: [kernel]
+    thesis_ru: "Принятое исполнительное правило Γ содержит структурную унарную J0, фазу анализа S1 на общем snapshot, фазу синтеза S2 и атомарную публикацию полного successor. В том же контракте NO_MATCH сохраняет current, а matched empty даёт нулевой вклад."
+    premises_ru: "Здесь зафиксирована выбранная семантика v0.15; production A-memory refinement прямо исключён из авторитета этого kernel-манифеста."
+    nonclaim_ru: "Нельзя путать наличие утверждённого контракта с доказательством реализации его всех условий в каждом backend."
+  - id: M04-NOVELTY
+    grade: OPEN_RESEARCH
+    evidence_symbol: "PRECISE_CATEGORY_OF_MTS_MODELS"
+    source_keys: [m01]
+    thesis_ru: "Сопоставление со свободной магмой, term graphs и не-фундированными множествами выявляет известные конструктивные аналоги. Применимость общей категории моделей и математическая неэквивалентность МТС требуют отдельного явного отображения и контрпримера либо изоморфизма."
+    premises_ru: "Пока отсутствуют минимальная общая категория сравнения, сохраняющий операции функтор и независимая проверка результатов литературы; внутреннее доказательство Foundation не заменяет этот этап."
+    nonclaim_ru: "Нельзя объявлять уникальность МТС либо первенство циклических структур без опубликованного точного математического сравнения."
+  - id: M04-REFINEMENT
+    grade: OPEN_RESEARCH
+    evidence_symbol: "M02_FULL_GAMMA_TRANSITION_EXECUTABLE_WITNESS"
+    source_keys: [m02]
+    thesis_ru: "Полный сквозной production trace FORMAL/JSON→native ANet→Γ с атомарной S1/S2 публикацией ещё не был формально сопоставлен с абстрактным функциональным шагом. M02 демонстрирует только ограниченное исполняемое воспроизведение AND."
+    premises_ru: "Необходимы тотальная область представления текущего состояния, допустимых правил и выбора Theory, симуляционное отношение и доказательство сохранения наблюдаемых состояний через фактический backend."
+    nonclaim_ru: "Нельзя переносить успешный локальный reactGeneric на полноценную production атомарность или закрывать обязательство без нового выполнения тестов и proof."
+  - id: M04-ACCEPT
+    grade: AUTHOR_DECISION
+    evidence_symbol: "ACCEPT_MTS_V0_15"
+    source_keys: [release]
+    thesis_ru: "Версия МТС v0.15 принята Автором и отмечена как ACCEPTED в нормативной трассировке. Установленный статус относится к конкретной семантической базе и её зарегистрированному переходу через #1876/#2078."
+    premises_ru: "Историческая авторская приёмка не распространяется на будущие русские научные редакции и самостоятельные исследовательские гипотезы."
+    nonclaim_ru: "Нельзя присваивать монографии статус принято или разрешение на публикацию по одному историческому решению о v0.15."
+  - id: M04-READER
+    grade: AUTHOR_DECISION_PENDING
+    evidence_symbol: "author_approval: not-recorded"
+    source_keys: [m03]
+    thesis_ru: "Нынешняя научная монография является предложенной русскоязычной редакцией с сохранённым историческим корпусом, новыми ограниченными свидетельствами и ещё открытыми вопросами математической экспертизы. Техническая сборка не означает авторского утверждения нового текста."
+    premises_ru: "До независимого прохождения научного аудита 178 вопросов и явного решения Автора документ остаётся DRAFT, publication blocked; отдельные результаты M01–M04 не исчерпывают общей проверки."
+    nonclaim_ru: "Нельзя автоматически изменять accepted v0.15, закрывать девять R40 или выпускать научную редакцию на основании triple GREEN."
+open_obligations:
+  - M04_INDIVIDUAL_MATH_REVIEW_OF_ALL_CLAIMS
+  - M04_PRODUCTION_REFINEMENT_NOT_PROVED
+  - M04_178_QUESTIONS_AND_NINE_R40_NOT_DISCHARGED
+  - M04_AUTHOR_SCIENTIFIC_ACCEPT_NOT_RECORDED
