@@ -1281,6 +1281,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m03.ts",
   // #2254 M04: proof-status reader, not runtime or author semantic authority.
   "ts/src/tooling/mts-reader-review-m04.ts",
+  // #2257 M05: archival provenance reader; approved image protection remains its own test.
+  "ts/src/tooling/mts-reader-review-m05.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
