@@ -87,6 +87,16 @@ jobs:
           grep -Fq 'does not depend on any axioms' /tmp/mts-f03-lean.log
           ! grep -Fq 'sorryAx' /tmp/mts-f03-lean.log
 
+          # #2259: proposed M06-W2 paired exact-source proofs; accepted originals stay unchanged.
+          cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean proofs/lean4/MtsM06W2External.lean > /tmp/MtsM06W2External.lean
+          for symbol in M06_W2_badStart_not_form_image M06_W2_reverse_law_fails M06_W2_poles_nonextensional M06_W2_joint_model_witness; do
+            printf '\n#print axioms MTS.External.Model1796.%s\n' "$symbol" >> /tmp/MtsM06W2External.lean
+          done
+          /tmp/mts-lean/bin/lean /tmp/MtsM06W2External.lean 2>&1 | tee /tmp/mts-m06-w2-lean.log
+          test "$(grep -Fc 'does not depend on any axioms' /tmp/mts-m06-w2-lean.log)" -eq 4
+          ! grep -Fq 'sorryAx' /tmp/mts-m06-w2-lean.log
+          echo "M06_W2_KERNEL_LEAN=4_OF_4_ZERO_AXIOMS"
+
           cp proofs/lean4/MtsFoundation.lean /tmp/MtsFoundationAssurance.lean
           node <<'NODE'
           const fs = require("node:fs");
@@ -279,6 +289,18 @@ jobs:
             sh -lc 'cp /input/MtsBasisFiveDistinct.v /tmp/MtsBasisFiveDistinct.v && cd /tmp && rocq compile MtsBasisFiveDistinct.v' \
             2>&1 | tee /tmp/mts-f03-rocq.log
           grep -Fq 'Closed under the global context' /tmp/mts-f03-rocq.log
+
+          # #2259: same explicit model and untouched accepted Rocq Foundation.
+          mkdir -p /tmp/mts-m06-w2-rocq
+          cat proofs/coq/MtsFoundation.v proofs/coq/MtsExplicitModel.v proofs/coq/MtsM06W2External.v > /tmp/mts-m06-w2-rocq/MtsM06W2External.v
+          for symbol in M06_W2_bad_start_not_form_image M06_W2_reverse_law_fails M06_W2_poles_nonextensional M06_W2_joint_model_witness; do
+            printf '\nPrint Assumptions %s.\n' "$symbol" >> /tmp/mts-m06-w2-rocq/MtsM06W2External.v
+          done
+          docker run --rm -v "/tmp/mts-m06-w2-rocq:/input:ro" "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsM06W2External.v /tmp/MtsM06W2External.v && cd /tmp && rocq compile MtsM06W2External.v' \
+            2>&1 | tee /tmp/mts-m06-w2-rocq.log
+          test "$(grep -Fc 'Closed under the global context' /tmp/mts-m06-w2-rocq.log)" -eq 4
+          echo "M06_W2_KERNEL_ROCQ=4_OF_4_CLOSED"
 
           rm -rf /tmp/mts-coq-assurance
           mkdir -p /tmp/mts-coq-assurance
