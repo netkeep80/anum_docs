@@ -30,10 +30,9 @@ Theorem M06_W2_poles_nonextensional :
   model_start model_bad_start = model_start model_bad_finish /\
   model_finish model_bad_start = model_finish model_bad_finish.
 Proof.
-  repeat split.
-  - apply model_bad_start_ne_bad_finish.
-  - reflexivity.
-  - reflexivity.
+  split.
+  - exact model_bad_start_ne_bad_finish.
+  - split; reflexivity.
 Qed.
 
 Theorem M06_W2_joint_model_witness :
