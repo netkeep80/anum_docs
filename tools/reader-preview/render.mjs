@@ -96,8 +96,8 @@ function pdfQA(pdf,md) {
   // Recognize actual PDF truth-table rows, not prose merely mentioning
   // RuleFF/RuleTT.  Scientific G03 deliberately names all four rules earlier.
   const table=pages.findIndex(s=>
-    /(?:^|\\n)\\s*F,F\\s+RuleFF\\s+F(?=\\s|$)/m.test(s) &&
-    /(?:^|\\n)\\s*T,T\\s+RuleTT\\s+T(?=\\s|$)/m.test(s)
+    /(?:^|\n)\s*F,F\s+RuleFF\s+F(?=\s|$)/m.test(s) &&
+    /(?:^|\n)\s*T,T\s+RuleTT\s+T(?=\s|$)/m.test(s)
   );
   const fontInfo=run("pdffonts",[pdf]);
   required(n===pages.length,"text-extraction page count must match PDF");
