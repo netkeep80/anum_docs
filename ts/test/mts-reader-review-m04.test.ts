@@ -69,8 +69,8 @@ assert.throws(()=>mutate("grade: CONDITIONAL_THEOREM","grade: KERNEL_THEOREM"),
 assert.throws(()=>mutate("evidence_symbol: \"FRM_07_approved_artifact_refinement\"",
  "evidence_symbol: \"FRM_07_full_TypeScript_proof\""),
  /claim identity, status or theorem scope drift/);
-assert.throws(()=>mutate("source_keys: [formal_lean, formal_rocq, assurance]",
- "source_keys: [formal_lean, assurance]"),
+assert.throws(()=>mutate("source_keys: [formal_lean,formal_rocq,assurance]",
+ "source_keys: [formal_lean,assurance]"),
  /claim evidence owners/);
 assert.throws(()=>mutate("M04_PRODUCTION_REFINEMENT_NOT_PROVED",
  "M04_PRODUCTION_REFINEMENT_PROVED"),/open M04 gates/);
