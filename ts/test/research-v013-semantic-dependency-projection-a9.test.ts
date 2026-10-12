@@ -1289,6 +1289,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m06-w1.ts",
   // #2259 M06-W2: reader-only evidence verification without Link runtime semantics.
   "ts/src/tooling/mts-reader-review-m06-w2.ts",
+  // #2259 M06-W3: external proof-boundary documentation, not runtime Link semantics.
+  "ts/src/tooling/mts-reader-review-m06-w3.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
