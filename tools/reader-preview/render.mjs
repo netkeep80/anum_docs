@@ -57,6 +57,12 @@ function transformHTML(text, style) {
     return table;
   });
   required(small===1, "expected exactly one recognized four-row AND example table");
+  // Keep the source-owned accepted AND explanation and table on one print page.
+  // Only the preview layout is affected; canonical Markdown/source remains unchanged.
+  const andExample=/<h3\\b[^>]*>Пример на принятых источниках: AND<\\/h3>[\\s\\S]*?<table class="compact-table">[\\s\\S]*?<\\/table>/g;
+  const found=[...text.matchAll(andExample)];
+  required(found.length===1,"expected one accepted AND heading/compact-table pair");
+  text=text.replace(andExample,html=>'<div class="and-example-group">'+html+'</div>');
   required(text.includes("</head>"),"missing HTML head");
   text=text.replace("</head>","<style>\n"+style+"\n</style>\n</head>");
   return text;
