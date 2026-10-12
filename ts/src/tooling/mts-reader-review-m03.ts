@@ -112,7 +112,8 @@ export function parseReaderM03(raw:string,root:string):M03{
   check(x.id===spec[0]&&x.level===spec[1],
    "entry order/id or language level drift "+spec[0]);
   same(x.source_keys,spec[2],"exact evidence owners "+spec[0]);
-  const label=ru(x.notation,"notation",1);
+  check(typeof x.notation==="string"&&x.notation.trim().length>=1,"notation surface");
+  const label=x.notation as string;
   const definition=ru(x.definition_ru,"definition "+spec[0],190);
   const example=ru(x.example_ru,"example "+spec[0],95);
   const exclusion=ru(x.exclusion_ru,"false inference "+spec[0],90);
