@@ -22,6 +22,7 @@ import {loadReaderM04} from "./mts-reader-review-m04.js";
 import {loadReaderM05} from "./mts-reader-review-m05.js";
 import {loadReaderM06} from "./mts-reader-review-m06.js";
 import {loadReaderM06W1} from "./mts-reader-review-m06-w1.js";
+import {loadReaderM06W2} from "./mts-reader-review-m06-w2.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -141,6 +142,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const historicalImages=loadReaderM05(root);
  const sourceQuestions=loadReaderM06(root);
  const questionWave1=loadReaderM06W1(root);
+ const questionWave2=loadReaderM06W2(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -290,6 +292,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  annex.push(historicalImages.archiveMd);
  annex.push(sourceQuestions.archiveMd);
  annex.push(questionWave1.archiveMd);
+ annex.push(questionWave2.archiveMd);
  const mainText=main.join("\n"),annexes=annex.join("\n");
  check(!/^\*\*(?:g4:|g7:|g8:|g10:|g11:|basis:|concept:|editorial:)/m.test(mainText),
    "source metadata appears as a reader-body heading");

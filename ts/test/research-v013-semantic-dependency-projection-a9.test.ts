@@ -1287,6 +1287,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m06.ts",
   // #2259 M06-W1: nonsemantic individual review evidence validator.
   "ts/src/tooling/mts-reader-review-m06-w1.ts",
+  // #2259 M06-W2: reader-only evidence verification without Link runtime semantics.
+  "ts/src/tooling/mts-reader-review-m06-w2.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(

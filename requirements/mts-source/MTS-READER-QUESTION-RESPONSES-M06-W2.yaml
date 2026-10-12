@@ -1,0 +1,140 @@
+# M06-W2: четырe вопроса B/C; научные вердикты OPEN, источник PDF — только транскрипция.
+schema: mts-v015-m06-question-replies-w2/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+review_issue: 2259
+upstream_inventory: requirements/mts-source/MTS-READER-QUESTIONS-M06-INDEX.yaml
+upstream_wave: requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W1.yaml
+review_scope: [C-01, B-1.3, C-02, C-03]
+scientific_verdict: OPEN
+source_note: "Дословность проверена по постраничным текстовым извлечениям; байтовое совпадение с оригинальными PDF НЕ доказано."
+source_blobs:
+  lean_foundation: f283192148ef5381f02a0b23d50b9884cf10b0c0
+  rocq_foundation: 66db1fb851724898112cfcd9ba5022c4d766b35d
+  lean_model: 744309364e08dc9b554bde7c3138b7ba84387a72
+  rocq_model: 6dd9823754e3ac52d8cd7f4184ff8b71d496f8c3
+cases:
+  - id: C-01
+    reviewer: C
+    owner: F01
+    original_question_ru: >-
+      В §1.1 указаны form, start, finish и R, причём start(form(a,b))=a и finish(form(a,b))=b.
+      Принято ли также уравнение form(start(x),finish(x))=x для любого x? Если нет,
+      что представляют собой Связи, не лежащие в образе form, и как для них
+      определяется структурное представление?
+    evidence_class: COUNTERMODEL_FROM_ACCEPTED_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, decode, decode_form, start, finish]
+    answer_ru: >-
+      Нет. Одно-сортный Foundation постулирует тотальные form, start, finish,
+      R, законы обеих проекций и form(R,R)=R, но не обратное равенство
+      для произвольного x. В принятой модели носитель Link=List Bool:
+      badStart=[false], badFinish=[true]; decode(badStart)=none,
+      start(badStart)=badStart, finish(badStart)=badFinish. При этом
+      decode(form(a,b))=some(a,b) для любых a,b. Следовательно, badStart
+      не содержится в образе form и form(start(badStart),finish(badStart))
+      не может совпадать с badStart. У элемента вне образа конструктора
+      существуют тотальные полюса, но нет глобальной гарантии
+      канонического рекурсивного представления; она требует специальных
+      предпосылок Grounded-нормализации и её области определения.
+    limitation_ru: >-
+      Вывод опирается на принятые определения и доказательства внешней
+      модели, однако отдельная вновь добавленная парная именованная
+      Lean4/Rocq лемма обратного неравенства отсутствует. Нельзя заявлять
+      глобальную полюсную экстенсиональность, поддержку всех ambient
+      Link в production или физическую интерпретацию «лишних» Link.
+    scientific_status: OPEN
+  - id: B-1.3
+    reviewer: B
+    owner: F01
+    original_question_ru: >-
+      Предполагается ли обратное уравнение form(start(x),finish(x))=x для
+      произвольного x? Если нет, то Foundation допускает «лишние» Link,
+      не лежащие в образе form, и даже разные такие Link с одинаковыми
+      проекциями. Это намеренная особенность модели?
+    evidence_class: COUNTERMODEL_FROM_ACCEPTED_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, badStart_ne_badFinish, FND_13_identity_by_poles]
+    answer_ru: >-
+      Да, это допустимая свобода слабого математического Foundation.
+      Из законов проекций следует инъективность form, но не его
+      сюръективность. В явной модели badStart=[false] и badFinish=[true]
+      различны, но оба имеют start=badStart и finish=badFinish. Такие
+      элементы могут иметь одинаковые полюса без тождества самих Link.
+      FND-13 устанавливает экстенсиональность только для двух Grounded
+      Link при отдельной F2F3GroundedNormalization, а не на всём
+      носителе. Свобода нетождественных ambient элементов математическая
+      и не означает различие физических дескрипторов одного объекта.
+    limitation_ru: >-
+      Свидетели badStart и badFinish доказанно не Grounded. Поэтому
+      перенос условной FND-13 на них запрещён. Нельзя считать отказ
+      от глобальной экстенсиональности новой теоремой об уникальности МТС
+      или выводом об устройстве A-memory без отдельного доказательства.
+    scientific_status: OPEN
+  - id: C-02
+    reviewer: C
+    owner: F02
+    original_question_ru: >-
+      Можно предъявить хотя бы одну полностью описанную математическую модель,
+      одновременно удовлетворяющую Foundation, A1RecursiveSeparation,
+      F2F3OneSidedExistence, Grounded-нормализации и требуемому
+      RecursiveInversionDomain? Нужны носитель, интерпретации операций
+      и проверка совместности предпосылок, а не только ссылки на условные теоремы.
+    evidence_class: JOINT_TYPED_WITNESSES_IN_ACCEPTED_MODEL
+    evidence_symbols: [ExplicitFoundation, ExplicitOneSided, ExplicitInversionDomain, ExplicitGroundedNormalization, explicit_a1]
+    answer_ru: >-
+      В принятых моделях Lean4 и Rocq дан один и тот же носитель
+      ModelLink=List Bool, R=[] и тотальные form, start, finish через
+      однозначные коды ROOT, START, END и PAIR и декодер с явно
+      заданной fallback-парой. Именно для одного ExplicitFoundation
+      одновременно построены ExplicitOneSided:F2F3OneSidedExistence,
+      ExplicitInversionDomain:RecursiveInversionDomain с явной
+      зависимостью от ExplicitOneSided,
+      ExplicitGroundedNormalization:F2F3GroundedNormalization
+      и доказательство explicit_a1:A1RecursiveSeparation.
+      Все поля соответствующих интерфейсов проверяются внешними
+      формальными ядрами. Это совместная реализация посылок, а не
+      четыре несвязанных примера на разных носителях.
+    limitation_ru: >-
+      Совместная внешняя модель не доказывает корректность production Γ,
+      возможность физически хранить бесконечный носитель, глобальную
+      полюсную экстенсиональность или полноту описания реализации.
+      Дополнительный именованный joint-witness сертификат полезен,
+      но пока не составлен и не принят независимым рецензентом.
+    scientific_status: OPEN
+  - id: C-03
+    reviewer: C
+    owner: F01
+    original_question_ru: >-
+      Из двух уравнений проекций следует инъективность form: Link×Link → Link.
+      Поэтому конечный носитель Link, если в нём более одного элемента,
+      невозможен. Является ли бесконечность всякой нетривиальной модели
+      установленным следствием МТС и учитывается ли это в реализации?
+    evidence_class: FINITE_CARDINALITY_CONSEQUENCE_OF_ACCEPTED_INJECTION
+    evidence_symbols: [fnd13_form_injective, form_start, form_finish]
+    answer_ru: >-
+      В полной обычной set-theoretic модели да. Проекции дают инъекцию
+      form:Link×Link→Link, доказанную в Lean4/Rocq как
+      fnd13_form_injective. При конечной мощности n константа R
+      обеспечивает n≥1; инъекция произведения даёт n²≤n, откуда
+      n=1. Следовательно, всякая нетривиальная полная модель
+      Foundation бесконечна. Это следствие известных законов
+      проекции и арифметики конечных множеств, а не самостоятельная
+      новая аксиома или доказательство математической уникальности МТС.
+    limitation_ru: >-
+      Из этого нельзя выводить необходимость бесконечной физической
+      памяти: конечное хранилище может содержать лишь часть Link.
+      Его конечный фрагмент при этом не обязан быть тотальной моделью
+      Foundation, замкнутой относительно form. Парная Lean4/Rocq
+      теорема finite→singleton пока отдельно не компилировалась;
+      указанная оценка мощности приведена как математический вывод.
+    scientific_status: OPEN
+open_obligations:
+  - M06_W2_FOUR_SCIENTIFIC_VERDICTS_PENDING
+  - M06_W2_REVERSE_LAW_PAIRED_KERNEL_LEMMA_MISSING
+  - M06_W2_FINITE_CARRIER_PAIRED_KERNEL_THEOREM_MISSING
+  - M06_W2_JOINT_MODEL_CERTIFICATE_PENDING
+  - M06_A_38_VERBATIM_ORIGINALS_NOT_RECOVERED
+  - M06_BC_PDF_ORIGINAL_BYTES_UNAVAILABLE
