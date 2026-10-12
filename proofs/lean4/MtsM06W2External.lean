@@ -33,4 +33,56 @@ theorem M06_W2_joint_model_witness :
       ⟨ExplicitGroundedNormalization,
         ⟨ExplicitInversionDomain, trivial⟩⟩⟩⟩
 
+
+/--
+If a weak Foundation has two different Links, the iterated right-pole
+construction embeds Nat into its carrier. No F2F3/A1/Grounded premise.
+-/
+def M06_W2_two_point_orbit
+    (F : Foundation) (a b : F.Link) : Nat → F.Link
+  | 0 => F.form F.R b
+  | n + 1 => F.form (M06_W2_two_point_orbit F a b n) a
+
+theorem M06_W2_two_point_orbit_succ_ne_zero
+    (F : Foundation) {a b : F.Link} (hab : a ≠ b) (n : Nat) :
+    M06_W2_two_point_orbit F a b (n + 1) ≠
+      M06_W2_two_point_orbit F a b 0 := by
+  intro h
+  have hp := congrArg F.finish h
+  have hEq : a = b := by
+    simpa only [M06_W2_two_point_orbit, F.form_finish] using hp
+  exact hab hEq
+
+theorem M06_W2_two_point_orbit_injective
+    (F : Foundation) {a b : F.Link} (hab : a ≠ b) :
+    Function.Injective (M06_W2_two_point_orbit F a b) := by
+  intro m
+  induction m with
+  | zero =>
+      intro n h
+      cases n with
+      | zero => rfl
+      | succ n =>
+          exact False.elim
+            (M06_W2_two_point_orbit_succ_ne_zero F hab n h.symm)
+  | succ m ih =>
+      intro n h
+      cases n with
+      | zero =>
+          exact False.elim
+            (M06_W2_two_point_orbit_succ_ne_zero F hab m h)
+      | succ n =>
+          have hPrev :
+              M06_W2_two_point_orbit F a b m =
+                M06_W2_two_point_orbit F a b n := by
+            have hPoles := congrArg F.start h
+            simpa only [M06_W2_two_point_orbit, F.form_start] using hPoles
+          exact congrArg Nat.succ (ih hPrev)
+
+theorem M06_W2_two_distinct_implies_nat_injection
+    (F : Foundation) (a b : F.Link) (hab : a ≠ b) :
+    HasNatInjection F :=
+  ⟨M06_W2_two_point_orbit F a b,
+   M06_W2_two_point_orbit_injective F hab⟩
+
 end MTS.External.Model1796
