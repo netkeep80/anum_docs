@@ -73,9 +73,15 @@ function verify(root:string){
   const [id,kind,name]=v;
   const pair=kind==="foundation"?["foundation_lean","foundation_rocq"]:
     kind==="explicit"?["model_lean","model_rocq"]:["gamma_core_lean","gamma_core_rocq"];
-  for(const p of pair)
-   check(sources[p]?.includes(name),id+" paired theorem/source missing from "+p);
+  for(const p of pair){
+   const proofName=id==="M01-SHARING"&&p==="model_rocq"?
+    "shared_grounded_parent_start":name;
+   check(sources[p]?.includes(proofName),id+" paired theorem/source missing from "+p);
+  }
  }
+ check(sources.model_lean?.includes("sharedGroundedParent_grounded")&&
+  sources.model_rocq?.includes("shared_grounded_parent_grounded"),
+  "paired semantic sharing Grounded theorem missing");
  for(const [path,text] of [
   ["foundation_lean","root_self : form R R = R"],
   ["foundation_lean","form_start : ∀ a b"],
