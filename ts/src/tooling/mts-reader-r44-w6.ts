@@ -19,6 +19,7 @@ import {loadReaderM01} from "./mts-reader-review-m01.js";
 import {loadReaderM02} from "./mts-reader-review-m02.js";
 import {loadReaderM03} from "./mts-reader-review-m03.js";
 import {loadReaderM04} from "./mts-reader-review-m04.js";
+import {loadReaderM05} from "./mts-reader-review-m05.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -135,6 +136,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const workedExample=loadReaderM02(root);
  const notationReview=loadReaderM03(root);
  const epistemicReview=loadReaderM04(root);
+ const historicalImages=loadReaderM05(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -281,6 +283,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
   "), [Rocq]("+evidence("proofs/coq/MtsV015Formal.v")+
   "), [реестр FRM]("+evidence("proofs/v015-formal-proof-assurance.json")+").","",
   "**Исторические изображения:** "+w4.images,"");
+ annex.push(historicalImages.archiveMd);
  const mainText=main.join("\n"),annexes=annex.join("\n");
  check(!/^\*\*(?:g4:|g7:|g8:|g10:|g11:|basis:|concept:|editorial:)/m.test(mainText),
    "source metadata appears as a reader-body heading");
