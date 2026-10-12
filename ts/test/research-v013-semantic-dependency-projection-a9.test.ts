@@ -1283,6 +1283,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m04.ts",
   // #2257 M05: archival provenance reader; approved image protection remains its own test.
   "ts/src/tooling/mts-reader-review-m05.ts",
+  // #2259 M06: source provenance and question index, not a semantic runtime action.
+  "ts/src/tooling/mts-reader-review-m06.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
