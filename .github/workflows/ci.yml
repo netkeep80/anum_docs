@@ -93,9 +93,37 @@ jobs:
             printf '\n#print axioms MTS.External.Model1796.%s\n' "$symbol" >> /tmp/MtsM06W2External.lean
           done
           /tmp/mts-lean/bin/lean /tmp/MtsM06W2External.lean 2>&1 | tee /tmp/mts-m06-w2-lean.log
-          test "$(grep -Fc 'does not depend on any axioms' /tmp/mts-m06-w2-lean.log)" -eq 5
-          ! grep -Fq 'sorryAx' /tmp/mts-m06-w2-lean.log
-          echo "M06_W2_KERNEL_LEAN=5_OF_5_ZERO_AXIOMS"
+          # Scope the host metalanguage axiom explicitly, without weakening accepted proof assurance.
+          node <<'M06_W2_LEAN_ASSURANCE'
+          const fs = require("node:fs");
+          const log = fs.readFileSync("/tmp/mts-m06-w2-lean.log", "utf8");
+          const ns = "MTS.External.Model1796.";
+          const model = [
+            "M06_W2_badStart_not_form_image",
+            "M06_W2_reverse_law_fails",
+            "M06_W2_poles_nonextensional",
+            "M06_W2_joint_model_witness",
+          ];
+          const generic = "M06_W2_two_distinct_implies_nat_injection";
+          const exactLine = (symbol, suffix) => "'" + ns + symbol + "' " + suffix;
+          const found = log.split(/\r?\n/).filter((line) =>
+            line.startsWith("'" + ns + "M06_W2_") &&
+            (line.includes("depends on axioms:") ||
+              line.includes("does not depend on any axioms")));
+          if (found.length !== 5) {
+            throw new Error("Expected five M06-W2 #print axioms reports; observed " + found.length);
+          }
+          for (const symbol of model) {
+            const expected = exactLine(symbol, "depends on axioms: [propext]");
+            if (!found.includes(expected)) throw new Error("Model-only proof assumption drift: " + symbol);
+          }
+          if (!found.includes(exactLine(generic, "does not depend on any axioms"))) {
+            throw new Error("Weak Foundation Nat-injection theorem must be axiom-free");
+          }
+          if (log.includes("sorryAx") || log.includes("Classical.choice") ||
+              log.includes("Quot.sound")) throw new Error("Unexpected Lean axiom marker");
+          console.log("M06_W2_KERNEL_LEAN=4_EXACT_PROPEXT_ONLY_PLUS_1_ZERO");
+          M06_W2_LEAN_ASSURANCE
 
           cp proofs/lean4/MtsFoundation.lean /tmp/MtsFoundationAssurance.lean
           node <<'NODE'
