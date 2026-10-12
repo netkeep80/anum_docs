@@ -18,6 +18,7 @@ import {loadReaderP02P03} from "./mts-reader-review-p02-p03.js";
 import {loadReaderM01} from "./mts-reader-review-m01.js";
 import {loadReaderM02} from "./mts-reader-review-m02.js";
 import {loadReaderM03} from "./mts-reader-review-m03.js";
+import {loadReaderM04} from "./mts-reader-review-m04.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -133,6 +134,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const mathematicalPosition=loadReaderM01(root);
  const workedExample=loadReaderM02(root);
  const notationReview=loadReaderM03(root);
+ const epistemicReview=loadReaderM04(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -185,7 +187,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
     inversionReview.inversionMd,"",inversionReview.orientationMd,"");
   }
   if(chapter.id==="proof-and-refinement"){
-   main.push(scientificReview.assuranceMd,"",assuranceReview.refinementMd,"",assuranceReview.reproducibilityMd,"",mathematicalPosition.noveltyMd,"",workedExample.walkthroughMd,"",notationReview.notationMd,"");
+   main.push(scientificReview.assuranceMd,"",assuranceReview.refinementMd,"",assuranceReview.reproducibilityMd,"",mathematicalPosition.noveltyMd,"",workedExample.walkthroughMd,"",notationReview.notationMd,"",epistemicReview.evidenceMd,"");
   }
   let paragraph=0;
   for(const id of chapter.atomIds){
