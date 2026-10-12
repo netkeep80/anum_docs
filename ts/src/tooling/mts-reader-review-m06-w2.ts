@@ -32,11 +32,27 @@ const pins={
  rocq_model:"6dd9823754e3ac52d8cd7f4184ff8b71d496f8c3"
 } as const;
 const obligations=["M06_W2_FOUR_SCIENTIFIC_VERDICTS_PENDING",
- "M06_W2_REVERSE_LAW_PAIRED_KERNEL_LEMMA_MISSING",
- "M06_W2_FINITE_CARRIER_PAIRED_KERNEL_THEOREM_MISSING",
- "M06_W2_JOINT_MODEL_CERTIFICATE_PENDING",
+ "M06_W2_KERNEL_RESULTS_REQUIRE_INDEPENDENT_SCIENTIFIC_REVIEW",
+ "M06_W2_PRODUCTION_REFINEMENT_NOT_ESTABLISHED",
+ "M06_W2_WORKFLOW_GOVERNANCE_AUTHORIZATION_PENDING",
  "M06_A_38_VERBATIM_ORIGINALS_NOT_RECOVERED",
  "M06_BC_PDF_ORIGINAL_BYTES_UNAVAILABLE"] as const;
+const candidatePaths={
+ lean4:"proofs/lean4/MtsM06W2External.lean",
+ rocq:"proofs/coq/MtsM06W2External.v"
+} as const;
+const candidatePins={
+ lean4:"75433cb107048148cefe12630e59b4042f550dd3",
+ rocq:"f9e45f6d5808258e64b4c84450e70b011c4a208a"
+} as const;
+const kernelSymbols=[
+ {lean4:["M06_W2_badStart_not_form_image","M06_W2_reverse_law_fails"],
+  rocq:["M06_W2_bad_start_not_form_image","M06_W2_reverse_law_fails"]},
+ {lean4:["M06_W2_poles_nonextensional"],rocq:["M06_W2_poles_nonextensional"]},
+ {lean4:["M06_W2_joint_model_witness"],rocq:["M06_W2_joint_model_witness"]},
+ {lean4:["M06_W2_two_distinct_implies_nat_injection"],
+  rocq:["M06_W2_two_distinct_implies_nat_injection"]}
+] as const;
 export interface W2Entry{
  readonly id:string;readonly original:string;readonly answer:string;
  readonly limitation:string;readonly grade:string;readonly status:"OPEN";
@@ -75,7 +91,7 @@ export function parseReaderM06W2(raw:string,root:string):W2{
  shape(d,["schema","status","author_approval","publication","semantic_change",
   "accepted_main_sha","master_issue","review_issue","upstream_inventory",
   "upstream_wave","review_scope","scientific_verdict","source_note",
-  "source_blobs","cases","open_obligations"],"root");
+  "source_blobs","candidate_proof_blobs","kernel_evidence","cases","open_obligations"],"root");
  ok(d.schema==="mts-v015-m06-question-replies-w2/v0.1"&&
   d.status==="proposed"&&d.author_approval==="not-recorded"&&
   d.publication==="blocked"&&d.semantic_change===false&&
@@ -96,6 +112,33 @@ export function parseReaderM06W2(raw:string,root:string):W2{
   ok(blob(read(root,sourcePaths[key]))===pins[key],
    "accepted source blob changed "+key);
  }
+ const candidate=map(d.candidate_proof_blobs,"M06-W2 candidate kernel proof blobs");
+ shape(candidate,Object.keys(candidatePins),"candidate sources");
+ for(const key of Object.keys(candidatePins) as (keyof typeof candidatePins)[]){
+  same(candidate[key],candidatePins[key],"candidate proof pin "+key);
+  ok(blob(read(root,candidatePaths[key]))===candidatePins[key],
+   "candidate exact proof bytes changed "+key);
+ }
+ const ke=map(d.kernel_evidence,"external kernel evidence");
+ shape(ke,["run_id","exact_head","ci_conclusion","lean_model_axioms",
+  "lean_foundation_injection_axioms","rocq_global_assumptions","publication_authority"],
+  "kernel evidence");
+ ok(ke.run_id===38318851278&&
+   ke.exact_head==="e0005cb07d67910a6b70321eccb415f01bd51f04"&&
+   ke.ci_conclusion==="SUCCESS"&&ke.publication_authority==="none",
+   "unverified kernel run or authority escalation");
+ same(ke.lean_model_axioms,["propext"],"four model-only Lean axiom scopes");
+ same(ke.lean_foundation_injection_axioms,[],"weak Foundation axiom-free");
+ same(ke.rocq_global_assumptions,[],"paired Rocq global assumptions");
+ const candidateSources={lean4:read(root,candidatePaths.lean4),
+  rocq:read(root,candidatePaths.rocq)};
+ for(const symbols of kernelSymbols)for(const prover of ["lean4","rocq"] as const)
+  for(const sym of symbols[prover])
+   ok(candidateSources[prover].includes("Theorem "+sym+" ")||
+      candidateSources[prover].includes("Theorem "+sym+" :")||
+      candidateSources[prover].includes("theorem "+sym+" ")||
+      candidateSources[prover].includes("theorem "+sym+"\n"),
+      "pair-specific candidate kernel theorem missing "+prover+" "+sym);
  const lf=read(root,sourcePaths.lean_foundation),rf=read(root,sourcePaths.rocq_foundation);
  const lm=read(root,sourcePaths.lean_model),rm=read(root,sourcePaths.rocq_model);
  for(const f of [lf,rf]){
@@ -128,11 +171,17 @@ export function parseReaderM06W2(raw:string,root:string):W2{
  for(let i=0;i<4;i++){
   const e=map(d.cases[i],"case "+i),id=ids[i]!;
   shape(e,["id","reviewer","owner","original_question_ru","evidence_class",
-   "evidence_symbols","answer_ru","limitation_ru","scientific_status"],"case "+id);
+   "evidence_symbols","kernel_theorems","answer_ru","limitation_ru","scientific_status"],"case "+id);
   ok(e.id===id&&e.reviewer===id[0]&&e.owner===owners[i]&&
    e.evidence_class===grades[i]&&e.scientific_status==="OPEN",
    "question evidence/status mismatch "+id);
-  same(e.evidence_symbols,symbols[i],"exact evidence symbols "+id);
+  same(e.evidence_symbols,symbols[i],"exact accepted evidence symbols "+id);
+  const theoremPair=map(e.kernel_theorems,"case "+id+" paired kernel symbols");
+  shape(theoremPair,["lean4","rocq"],"case "+id+" paired symbols");
+  same(theoremPair.lean4,kernelSymbols[i]!.lean4,
+   "exact reviewed Lean theorem set "+id);
+  same(theoremPair.rocq,kernelSymbols[i]!.rocq,
+   "exact reviewed Rocq theorem set "+id);
   const source=index.entries.find(x=>x.id===id);
   ok(source!==undefined&&source.status==="PDF_INDEXED_EXTRACTION"&&
    source.owner===owners[i]&&source.page!==null&&source.line!==null&&
@@ -152,13 +201,16 @@ export function parseReaderM06W2(raw:string,root:string):W2{
  const lines=["## Приложение Л. M06-W2 — четыре индивидуальных научных вопроса","",
   "**Все четыре научных вердикта OPEN; ответы предложены, но не приняты.**",
   "Исходные B/C PDF представлены вторичными постраничными текстовыми извлечениями, не оригинальными PDF-байтами. Полные тексты 38 вопросов A ещё не восстановлены.",
-  "Принятые доказательные исходники Lean4/Rocq сверены по четырём точным Git blob SHA. Новых парных теорем о контрмодели и конечной мощности этот пакет не заявляет.",""];
+  "Принятые исходники Foundation/ExplicitModel сверены по четырём точным Git blob SHA. Дополнительные proof-candidate-файлы сверены по двум SHA.",
+  "**Парная формальная проверка:** Lean4: четыре теоремы имеют внешнюю зависимость только от propext; конструктивная теорема C-03 не использует аксиом. Rocq: пять теорем закрыты без дополнительных глобальных предположений.",
+  "Проверено в [CI #38318851278](https://github.com/netkeep80/anum_docs/actions/runs/38318851278) на точном head e0005cb07d67910a6b70321eccb415f01bd51f04. Проверка ядрами не является независимым научным вердиктом или решением Автора.",""];
  for(const e of entries)lines.push("### "+e.id+" · "+e.grade,"",
   "**Дословный вопрос по PDF-транскрипции:** "+e.original,"",
   "**Предлагаемый ответ:** "+e.answer,"",
   "**Доказательная граница:** "+e.limitation,"",
   "**Научный статус:** OPEN — независимая рецензия и решение Автора отсутствуют.","");
- lines.push("**Открытые обязательства:** "+obligations.join("; ")+".","");
+ lines.push("**Открытые обязательства:** "+obligations.join("; ")+".",
+  "**Код проверенных кандидатных доказательств:** [Lean4](https://github.com/netkeep80/anum_docs/blob/e0005cb07d67910a6b70321eccb415f01bd51f04/proofs/lean4/MtsM06W2External.lean), [Rocq](https://github.com/netkeep80/anum_docs/blob/e0005cb07d67910a6b70321eccb415f01bd51f04/proofs/coq/MtsM06W2External.v).","");
  return {entries,archiveMd:lines.join("\n"),publication:"blocked"};
 }
 export function loadReaderM06W2(root:string):W2{
