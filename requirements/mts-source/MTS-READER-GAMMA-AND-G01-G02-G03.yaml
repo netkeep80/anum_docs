@@ -1,0 +1,65 @@
+# Proposal for scientific review G01/G02/G03; accepted MTS authority not changed.
+schema: mts-v015-review-gamma-determinism-and-g01-g02-g03/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-FORMAL-DAS-GAMMA-L01-L02-L03.yaml
+review_packages: [G01, G02, G03]
+source_paths:
+  accepted_kernel: profiles/mts-v015-meta-interpreter-kernel.json
+  design_evidence: profiles/mts-v015-generalized-reaction-candidate.json
+  core_lean: proofs/lean4/MtsV015GeneralizedReactionCore.lean
+  core_rocq: proofs/coq/MtsV015GeneralizedReactionCore.v
+  refinement_lean: proofs/lean4/MtsV015GeneralizedReactionRefinement.lean
+  refinement_rocq: proofs/coq/MtsV015GeneralizedReactionRefinement.v
+  reduction_ts: ts/test/v015-parallel-reaction-reduction-a11.test.ts
+  gamma_ts: ts/test/v015-structural-aset-gamma-core-a9a.test.ts
+  compact_and_ts: ts/test/v015-compact-and-role-bundle-a1.test.ts
+  boolean_replay_ts: ts/test/v015-boolean-package-replay-a2.test.ts
+  and_formal: formal/v0.15/regression/compact-and.formal
+  and_json: formal/v0.15/regression/compact-and.json
+  formal_spec: docs/specs/Формальная нотация МТС.md
+transition:
+  heading_ru: "G01. Одно поколение Γ: NO_MATCH, успешный пустой образ и публикация"
+  state_ru: "Пусть Mₜ — семантическая ANet членств текущего поколения, выбранная через структуры Link и контекстную принадлежность. Для объявленной Theory и её допущенных структурных Rule в начале шага фиксируется неизменяемый снимок Mₜ. Состояния результата удобнее описывать внешней проверочной суммой NO_MATCH или MATCHED(Image), где Image есть точная конечная последовательность Link. Это классификация события внешней модели, не второе множество онтологических типов и не отдельный машинный opcode МТС."
+  cases_ru: "NO_MATCH означает, что для выбранного текущего члена не найдено ни одного допущенного правила, удовлетворяющего matcher на исходном снимке: тогда этот член сохраняется в successor. MATCHED([]) означает существование допустимого совпадения с точным пустым образом, поэтому локальный вклад равен нулю. MATCHED([b₁,…,bₙ]) при n≥1 создаёт результаты только после завершения S1. NO_MATCH и MATCHED([]) имеют одинаковую пустую совокупность новых образов, но различный флаг matched, и их склеивание ошибочно меняет переход."
+  phases_ru: "Принятый контракт Γ требует S1=STRUCTURAL_MATCH_BIND с readOnly=true над одним исходным снимком, S2=CANONICAL_SUBSTITUTION_AND_LINK_CONSTRUCTION после completePlanBeforeSynthesis и атомарную публикацию полного семантического successor. Семантически значимым шагом является только Mₜ→Mₜ₊₁, промежуточный план или staged-Links не являются самостоятельными поколениями. newly admitted Theory, созданная во второй фазе, может действовать только в следующем поколении, если допущена там. Запрет sameGenerationReadOwnWrites предотвращает каскадное выполнение новосозданных правил в том же шаге."
+  identity_ru: "Активная identity-реакция может построить тот же итоговый набор членств, что был в Mₜ, однако она отличается от NO_MATCH фактом допустимого срабатывания правила и наличием события/происхождения. Наоборот, если один текущий член одновременно совпал с двумя правилами, включая успешный пустой образ, локальное решение зависит от полного набора совпадений, а не от раннего выхода первого обработанного Rule. Состояния ошибки разбора, отсутствующего admission и нулевого образа не являются синонимами."
+  proof_ru: "Парные GPR_01_decomposition_iff_single_gamma_step и GPR_01_gamma_successor_unique доказывают совпадение внешней композиции analyze→synthesize→publish с одной заданной функцией Gamma и единственность её результата для фиксированного входа. Это не доказательство, что произвольные реальные scheduler, storage, concurrent backend или адаптеры удовлетворяют соответствующему контракту. GPR_03_analysis_ignores_staged_candidate и GPR_03_one_generation_stops_at_B дополнительно фиксируют отсутствие собственного чтения результатов S2; область каждой теоремы следует проверять по принятым предпосылкам."
+reduction:
+  heading_ru: "G02. Несколько правил: объединение вкладов, матчи и детерминизм"
+  model_ru: "Для одного входного Link a и конечного набора допущенных правил Rₜ рассмотрим все локальные наблюдения (matchedᵢ, Outputsᵢ), вычисленные над тем же снимком. Определим их редукцию (m₁,O₁)⊕(m₂,O₂)=(m₁∨m₂,O₁∪O₂). Пустая комбинация есть (false,∅). Операция OR сохраняет факт хотя бы одного успешного матча независимо от размера выходов, а объединение по Link identity сводит повторяющиеся итоговые членства, не меняя точные исходные Image-списки и события provenance."
+  rules_ru: "Если r₁ для a даёт пустую ExactSequence, а r₂ даёт [b], то итоговая комбинация равна (true,{b}), независимо от порядка рассмотрения. При двух совпадениях, дающих [b,c] и [c,d], семантический successor содержит b,c,d, но в отдельных исходных последовательностях повторённый c не исчезает. Одновременные правила не имеют неявного приоритета, приказа выбора первого или автоматической семантики логического конфликта. Если требуются взаимоисключение или приоритет, они должны быть выражены в допущенной структуре и доказаны отдельно."
+  confluence_ru: "Парные GPR_04_merge_associative_observation, GPR_04_merge_commutative_observation и GPR_04_merge_idempotent_observation доказали алгебру именно внешних наблюдений (matched, set outputs). GPR_04_two_dimensional_partition_refinement рассматривает разбиение как по текущим членам, так и по правилам при её явных предпосылках. GPR_04_local_no_match_cannot_publish_global_no_match запрещает shard локально объявить отсутствие реакции до глобального сведения. Следовательно, при одном фиксированном снимке, полном наборе правил и корректной операции публикации разбиение не меняет экстенсиональный результат; это ещё не доказательство детерминизма любого параллельного backend."
+  limits_ru: "Порядок позиций ExactSequence не уничтожается законом коммутативности объединения semantic membership. При составлении двух исходных правил их изображения остаются упорядоченными Link-носителями; равенство результирующей асети не утверждает равенство трассировок, количества событий или точных последовательностей. Возможность конфликта между несопоставимыми редукциями, неполное перечисление Theory, гонка с новой admission и неатомарная публикация не покрываются теоремами GPR-04 без дополнительных обязанностей и отказов."
+and:
+  heading_ru: "G03. Вычислительный пример AND: четыре grounded правила на точных Link-парах"
+  construction_ru: "Утверждённый Автором корпус compact-and.formal и compact-and.json задаёт Bool-область двумя выбранными Link-значениями T=L и F=U. Метка AND является разрешаемым именем Link, а пара аргументов кодируется единой positional ExactSequence([left,right]); повторения не устраняются. Правила RuleFF, RuleFT, RuleTF, RuleTT имеют один и тот же структурный вид V0⟼((AND⟼ArgsXY)⟼ImageZ), где V0 обозначает явный пустой пучок ролей. Это четыре zero-role grounded случая универсального Rule; специального host opcode AND нет."
+  table_ru: "Полная истинностная таблица принятых четырёх правил: AND(F,F)=F посредством RuleFF; AND(F,T)=F посредством RuleFT; AND(T,F)=F посредством RuleTF; AND(T,T)=T посредством RuleTT. Каждая правая часть является точным одноэлементным образом [F] либо [T]. Имена ArgsFF, ArgsFT, ArgsTF, ArgsTT — ссылки на Link-carrier последовательностей, а не специальные типы или встроенные пары host-значений."
+  authority_ru: "В исходной семантической ANet присутствуют ровно четыре допущенных отношения Theory⟼RuleFF, Theory⟼RuleFT, Theory⟼RuleTF, Theory⟼RuleTT. Простые binding имён Rule не подменяют такой допуск. Для current AND(F,X) и AND(T,X) при X вне {T,F} нет допустимого совпадения, результат NO_MATCH; случайный произвольный X не превращается в true/false. При удалении только допуска Theory⟼RuleTT именно вход (T,T) перестаёт обрабатываться; остальные три остаются рабочими. ForeignTheory не наделяет допуском локальную Theory."
+  proof_ru: "Принятый executable gate v015-compact-and-role-bundle-a1.test.ts проверяет FORMAL/JSON parity, четыре строки, строгую Boolean-область, отрицательные мутации допуска и семантическую инвариантность при переименовании. Обобщённая теорема GPR_07_grounded_zero_role_refinement в Lean4/Rocq формально сводит zero-role Rule к общему matcher/instantiator при явных посылках emptyRolesMatch и emptySubstitutionIdentity. Нельзя выдавать четыре TypeScript результата за универсальное доказательство корректности всех Boolean программ, доказательство полного production Γ или за отдельную арифметическую теорему о классе всех Link."
+evidence:
+  - {id: G01-STEP, origin: core, symbol: GPR_01_decomposition_iff_single_gamma_step, scope: declared-pure-decomposition}
+  - {id: G01-UNIQUE, origin: core, symbol: GPR_01_gamma_successor_unique, scope: functional-gamma-fixed-state}
+  - {id: G01-READ-ONLY, origin: refinement, symbol: GPR_03_analysis_ignores_staged_candidate, scope: fixed-snapshot-no-own-writes}
+  - {id: G01-BOUNDARY, origin: refinement, symbol: GPR_03_one_generation_stops_at_B, scope: bounded-generation-example}
+  - {id: G02-ASSOCIATIVE, origin: refinement, symbol: GPR_04_merge_associative_observation, scope: matched-flag-plus-set-union}
+  - {id: G02-COMMUTATIVE, origin: refinement, symbol: GPR_04_merge_commutative_observation, scope: matched-flag-plus-set-union}
+  - {id: G02-IDEMPOTENT, origin: refinement, symbol: GPR_04_merge_idempotent_observation, scope: matched-flag-plus-set-union}
+  - {id: G02-PARTITION, origin: refinement, symbol: GPR_04_two_dimensional_partition_refinement, scope: fixed-two-dimensional-partition}
+  - {id: G02-NO-MATCH, origin: refinement, symbol: GPR_04_local_no_match_cannot_publish_global_no_match, scope: complete-snapshot-only}
+  - {id: G03-ZERO-ROLE, origin: core, symbol: GPR_07_grounded_zero_role_refinement, scope: conditional-empty-role-laws}
+  - {id: G03-AND, origin: executable, symbol: MTS_V015_COMPACT_AND_A1=GREEN, scope: four-author-approved-boolean-vectors}
+negative_cases: [NO_MATCH_VS_MATCHED_EMPTY, NO_MATCH_VS_ACTIVE_IDENTITY,
+  NEW_THEORY_SAME_GENERATION, READ_OWN_WRITES_FORBIDDEN,
+  DETERMINISM_NOT_ANY_BACKEND, LOCAL_NO_MATCH_NOT_GLOBAL,
+  RULE_ORDER_NOT_PRIORITY, SEQUENCE_NOT_SEMANTIC_SET,
+  AND_NON_BOOLEAN_NO_MATCH, REMOVE_TT_ONLY,
+  FOREIGN_THEORY_NO_AUTHORITY, AND_NO_SPECIAL_OPCODE]
+open_obligations: [GAMMA_FULL_PRODUCTION_REFINEMENT,
+  CONCURRENT_ATOMIC_PUBLICATION_PROOF,
+  EXACT_PROVENANCE_ORDER_VS_SEMANTIC_CONVERGENCE,
+  CANONICAL_AND_RUNTIME_REFINEMENT]

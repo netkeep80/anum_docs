@@ -13,6 +13,7 @@ import {loadReaderF06F07} from "./mts-reader-review-f06-f07.js";
 import {loadReaderR01R02} from "./mts-reader-review-r01-r02.js";
 import {loadReaderR03R04} from "./mts-reader-review-r03-r04.js";
 import {loadReaderL01L03} from "./mts-reader-review-l01-l02-l03.js";
+import {loadReaderG01G03} from "./mts-reader-review-g01-g02-g03.js";
 
 export const READER_W6_PATH="requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 type Dict=Record<string,unknown>;
@@ -123,6 +124,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
  const relationalReview=loadReaderR01R02(root);
  const representationReview=loadReaderR03R04(root);
  const languageReview=loadReaderL01L03(root);
+ const gammaReview=loadReaderG01G03(root);
  const v015=JSON.parse(read(root,model.history.evidenceSource)) as {
    status:string;currentAccepted:{mtsVersion:string};
    authorDecision:{state:string;decision:string;ownerIssue:number;decisionEvidence:string}};
@@ -168,7 +170,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
    main.push(representationReview.arithmeticMd,"");
   }
   if(chapter.id==="v015-execution"){
-   main.push(languageReview.executionMd,"");
+   main.push(languageReview.executionMd,"",gammaReview.transitionMd,"",gammaReview.reductionMd,"");
   }
   if(chapter.id==="grounded-inverse-context"){
    main.push(structuralReview.groundedMd,"",structuralReview.identityMd,"",
@@ -217,7 +219,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
     "[релизный PR #2078](https://github.com/netkeep80/anum_docs/pull/2078).","");
   }
   if(chapter.id==="v015-execution"){
-   main.push("### Пример на принятых источниках: AND","",r43.examples.andRu,"",
+   main.push(gammaReview.andMd,"","### Пример на принятых источниках: AND","",r43.examples.andRu,"",
    "| Вход | Правило | Результат |","|---|---|---|",
    "| F,F | RuleFF | F |","| F,T | RuleFT | F |",
    "| T,F | RuleTF | F |","| T,T | RuleTT | T |","",

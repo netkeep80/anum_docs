@@ -1269,6 +1269,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-r03-r04.ts",
   // #2217 L01/L02/L03: reader-only FORMAL/DAS/Γ contract proof-scope validator.
   "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
+  // #2217 G01/G02/G03: science-only Γ and AND crosswalk; no executable semantics.
+  "ts/src/tooling/mts-reader-review-g01-g02-g03.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
