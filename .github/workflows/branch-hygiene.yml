@@ -18,6 +18,9 @@ jobs:
     name: Ensure draft PR for side branch
     if: github.event_name == 'push' && github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch
     runs-on: ubuntu-latest
+    concurrency:
+      group: branch-hygiene-${{ github.repository }}-${{ github.ref_name }}
+      cancel-in-progress: false
     steps:
       - name: Ensure open draft PR
         env:
@@ -30,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          existing="$(gh api --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f base="$BASE" --jq 'length')"
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
 
           if [ "$existing" -gt 0 ]; then
             echo "Open PR already exists for $BRANCH."
@@ -47,6 +50,13 @@ jobs:
           ahead_by="$(jq -r '.ahead_by' <<< "$compare")"
           if [ "$ahead_by" = "0" ]; then
             echo "Branch $BRANCH has no unique commits relative to $BASE; draft PR creation is deferred until the first unique commit."
+            exit 0
+          fi
+
+          # A stacked PR can be opened/retargeted while compare is running.
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
+          if [ "$existing" -gt 0 ]; then
+            echo "An open exact-head PR now exists, including stacked bases; no new PR."
             exit 0
           fi
 
@@ -93,6 +103,14 @@ jobs:
 
           if grep -Fq "No commits between" <<< "$error_text"; then
             echo "::notice::GitHub reports no PR-eligible commits between $BASE and $BRANCH; creation deferred."
+            exit 0
+          fi
+
+          # If another actor won the race, the existing exact-head PR
+          # is the authoritative outcome; do not treat it as a second create.
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
+          if [ "$existing" -gt 0 ]; then
+            echo "::notice::Exact-head PR already exists after concurrent create attempt."
             exit 0
           fi
 
