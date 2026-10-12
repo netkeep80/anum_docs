@@ -1273,6 +1273,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-g01-g02-g03.ts",
   // #2217 P02/P03: manuscript-only proof/reproducibility reviewer, not a semantic engine.
   "ts/src/tooling/mts-reader-review-p02-p03.ts",
+  // #2217 M01: mathematical-position manuscript-only audit, no MTS semantic execution.
+  "ts/src/tooling/mts-reader-review-m01.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(
