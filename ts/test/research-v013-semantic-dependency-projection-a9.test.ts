@@ -1285,6 +1285,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/mts-reader-review-m05.ts",
   // #2259 M06: source provenance and question index, not a semantic runtime action.
   "ts/src/tooling/mts-reader-review-m06.ts",
+  // #2259 M06-W1: nonsemantic individual review evidence validator.
+  "ts/src/tooling/mts-reader-review-m06-w1.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(

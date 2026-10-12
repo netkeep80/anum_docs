@@ -1,0 +1,152 @@
+# M06 W1 — five individually reviewed source questions, scientific verdicts still OPEN.
+schema: mts-v015-m06-question-specific-replies-w1/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+review_issue: 2259
+upstream_inventory: requirements/mts-source/MTS-READER-QUESTIONS-M06-INDEX.yaml
+review_scope: [C-04, C-05, B-1.4, B-1.7, B-1.8]
+verdict: INDIVIDUAL_EVIDENCE_REVIEW_PENDING
+question_status: OPEN
+source_note: "Основание — постраничные текстовые извлечения PDF; байтовое совпадение с оригинальными PDF пока НЕ доказано."
+cases:
+  - id: C-04
+    reviewer: C
+    owner: F03
+    original_question_ru: >-
+      Равенства O=form(O,R) и C=form(R,C) следует понимать как аксиомы существования
+      выделенных элементов, как определения через неподвижную точку или как теоремы? При
+      каких предпосылках доказаны O≠R, C≠R, O≠C и, возможно, единственность
+      соответствующих элементов?
+    classification: CONDITIONAL_PROOF
+    evidence_grade: ACCEPTED_EXTERNAL_THEOREMS_WITH_EXPLICIT_PREMISES
+    evidence_symbols: [F2F3OneSidedExistence, ContextOneSidedNames, FND_03_derived_aspect_basis, f2f3_start_root_pattern, f2f3_finish_root_pattern]
+    answer_ru: >-
+      Минимальный Foundation содержит только R, form, start и finish с законами
+      проекций и form(R,R)=R. Он не постулирует выделенных O/C. Принятая
+      F2F3OneSidedExistence(F) отдельно предоставляет свидетелей startRoot и
+      finishRoot с уравнениями startRoot=form(startRoot,R),
+      finishRoot=form(R,finishRoot) и явными неравенствами startRoot≠R и
+      finishRoot≠R. ContextOneSidedNames(F,E,O,C) лишь отождествляет
+      контекстные имена O/C с уже данными свидетелями. FND_03 требует также
+      A1RecursiveSeparation для уникальности полного ROOT, но не постулирует
+      единственность всех возможных односторонних фиксированных точек.
+    limitation_ru: >-
+      O≠C выводится из полюсов и обоих неравенств с R, но отдельная парная
+      теорема уникальности любого решения уравнения x=form(x,R) в слабом
+      Foundation здесь не предъявлена. Нельзя подменять «выбранные свидетели»
+      словом «единственные глобальные решения». Предлагаемый ответ не принят Автором.
+    scientific_status: OPEN
+  - id: C-05
+    reviewer: C
+    owner: F05
+    original_question_ru: >-
+      Допустимы ли в слабом Foundation различные x и y с start(x)=start(y) и
+      finish(x)=finish(y)? Если допустимы, каков смысл их различия до введения
+      F2F3GroundedNormalization и на каком именно классе оно исчезает?
+    classification: EXISTING_MODEL_COUNTEREXAMPLE
+    evidence_grade: COUNTEREXAMPLE_DERIVED_FROM_ACCEPTED_EXPLICIT_MODEL_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, decode, start, finish, FND_13_identity_by_poles, badStart_not_grounded, badFinish_not_grounded]
+    answer_ru: >-
+      Да, слабый Foundation допускает глобальную неэкстенсиональность.
+      Принятая явная модель с носителем List Bool имеет разные Link
+      badStart=[false] и badFinish=[true]. Для обоих одиночных кодов decode
+      возвращает none; по определениям start/finish у обоих полюса равны
+      (badStart,badFinish). Следовательно, x≠y, но start(x)=start(y) и
+      finish(x)=finish(y). Эти Link не находятся в образе form: иначе закон
+      decode_form дал бы some. Это математический контрпример, а не совпадение
+      двух физических хендлов одного и того же Link.
+    limitation_ru: >-
+      Принятые доказательства badStart_not_grounded и
+      badFinish_not_grounded показывают, что свидетели находятся вне Grounded.
+      FND_13_identity_by_poles доказывает полюсную экстенсиональность только
+      для двух Grounded Links при отдельной F2F3GroundedNormalization.
+      Условная теорема не противоречит контрпримеру и не даёт глобального
+      равенства для произвольных Link.
+    scientific_status: OPEN
+  - id: B-1.4
+    reviewer: B
+    owner: F05
+    original_question_ru: >-
+      Если Link онтологически определяется через две полюсные позиции, почему
+      экстенсиональность по полюсам не является базовой аксиомой, а появляется лишь условно
+      для Grounded-области в FND-13? Какую математическую свободу даёт отказ от глобальной
+      экстенсиональности? (стр. 7)
+    classification: EXISTING_MODEL_COUNTEREXAMPLE
+    evidence_grade: COUNTEREXAMPLE_DERIVED_FROM_ACCEPTED_EXPLICIT_MODEL_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, decode, FND_13_identity_by_poles]
+    answer_ru: >-
+      Закон start(form(a,b))=a и finish(form(a,b))=b устанавливает инъективность
+      конструктора form, но не требует его сюръективности. Любой x вне образа
+      form не обязан совпадать с form(start(x),finish(x)); различные такие
+      Links могут иметь одинаковые полюса. В принятой List Bool модели
+      x=[false] и y=[true] являются двумя разными noncanonical Links,
+      причём для обоих (start,finish)=([false],[true]). Эта свобода
+      сохраняет ambient неграундированные элементы, не разрушая инъективность
+      form на парах.
+    limitation_ru: >-
+      FND_13_identity_by_poles даёт условное равенство только на Grounded
+      области при полноте нормализации. Расширение на весь Link требует
+      новой аксиомы или теоремы с дополнительными предпосылками; такой
+      глобальный закон не следует из Foundation. Не объявлять отсутствие
+      глобальной экстенсиональности доказательством философской новизны.
+    scientific_status: OPEN
+  - id: B-1.7
+    reviewer: B
+    owner: F03
+    original_question_ru: >-
+      Уравнения O=O⟼R и C=R⟼C на стр. 4–5 даны как определения именованных Link. Но
+      на стр. 6 существование собственных односторонних представителей вводится отдельной
+      предпосылкой F2F3OneSidedExistence. O и C являются именно этими свидетелями,
+      независимыми константами, или только удобными именами при наличии такой
+      предпосылки?
+    classification: CONDITIONAL_PROOF
+    evidence_grade: ACCEPTED_EXTERNAL_THEOREMS_WITH_EXPLICIT_PREMISES
+    evidence_symbols: [F2F3OneSidedExistence, ContextOneSidedNames, FND_01_context_names_only, FND_03_derived_aspect_basis]
+    answer_ru: >-
+      O и C не константы минимального Foundation; объектный источник FORMAL
+      вводит лишь bindings выбранных Link-значений. В принятой внешней
+      модели свидетели startRoot и finishRoot входят в явно передаваемую
+      F2F3OneSidedExistence, а ContextOneSidedNames указывает, что именно
+      они получили имена O/C. FND_01_context_names_only выводит
+      StartOnly(O), FinishOnly(C), PairLocal(form(O,C)) уже при этой посылке.
+      FND_03 добавляет A1 для отдельного вывода уникальности ROOT.
+    limitation_ru: >-
+      Языковое «определение O и C» без указания F2F3OneSidedExistence
+      создавало ложное впечатление безусловной конструктивной существуемости
+      собственной односторонней неподвижной точки в любой Foundation.
+      Нельзя перенести эту существуемость в слабый Foundation без новой
+      посылки или отдельного доказательства.
+    scientific_status: OPEN
+  - id: B-1.8
+    reviewer: B
+    owner: F03
+    original_question_ru: >-
+      Где и при каких предпосылках доказано O≠R и C≠R? Без этих неравенств O и C могут
+      схлопнуться в R и перестать быть представителями случаев 10 и 01.
+    classification: CONDITIONAL_PROOF
+    evidence_grade: ACCEPTED_PREMISE_NOT_UNCONDITIONAL_THEOREM
+    evidence_symbols: [F2F3OneSidedExistence, startRootNeRoot, finishRootNeRoot, f2f3_start_root_pattern, f2f3_finish_root_pattern]
+    answer_ru: >-
+      Неравенства O≠R и C≠R непосредственно поставляются полями
+      startRootNeRoot и finishRootNeRoot структуры F2F3OneSidedExistence,
+      после контекстного назначения O=startRoot и C=finishRoot. Это
+      явные предпосылки существования собственных односторонних Links,
+      а не безусловные следствия root_self и проекций Foundation.
+      Теоремы f2f3_start_root_pattern и f2f3_finish_root_pattern
+      выводят соответствующие локальные аспекты из этих полей.
+    limitation_ru: >-
+      Одноэлементная модель минимального Foundation делает оба уравнения
+      O=form(O,R) и C=form(R,C) истинными при O=C=R, но не удовлетворяет
+      условию их собственной отличимости. Поэтому логически необходимо
+      отделять запись рекурсивного уравнения от утверждения существования
+      отличного от R решения; оба поля в E нужны.
+    scientific_status: OPEN
+open_obligations:
+  - M06_W1_FIVE_INDEPENDENT_QUESTION_VERDICTS_PENDING
+  - M06_W1_PAIRED_COUNTERMODEL_DERIVATION_NOT_NEW_KERNEL_THEOREM
+  - M06_A_38_ORIGINALS_STILL_NOT_RECOVERED
+  - M06_BC_ORIGINAL_PDF_BYTES_UNAVAILABLE

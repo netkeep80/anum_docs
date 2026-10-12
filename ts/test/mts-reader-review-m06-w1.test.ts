@@ -1,0 +1,41 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {resolve} from "node:path";
+import {renderReaderW6} from "../src/tooling/mts-reader-r44-w6.js";
+import {loadReaderG20} from "../src/tooling/mts-reader-g20.js";
+import {loadReaderM06W1,parseReaderM06W1,REVIEW_M06_W1_PATH}
+ from "../src/tooling/mts-reader-review-m06-w1.js";
+const root=resolve("..");
+const original=readFileSync(resolve(root,REVIEW_M06_W1_PATH),"utf8");
+const m=loadReaderM06W1(root);
+assert.equal(m.publication,"blocked");
+assert.deepEqual(m.entries.map(z=>z.id),["C-04","C-05","B-1.4","B-1.7","B-1.8"]);
+assert.equal(m.entries.filter(x=>x.status==="OPEN").length,5);
+assert.ok(m.archiveMd.includes("x≠y"));
+assert.ok(m.archiveMd.includes("F2F3OneSidedExistence"));
+assert.ok(m.archiveMd.includes("badStart"));
+assert.ok(m.archiveMd.includes("badFinish"));
+assert.ok(m.archiveMd.includes("FND_13_identity_by_poles"));
+const reader=renderReaderW6(root);
+assert.equal(reader.publication,"blocked");
+assert.equal(reader.annexes.split("## Приложение К.").length-1,1);
+assert.equal(reader.annexes.split("## Приложение И.").length-1,1);
+assert.equal(reader.sourceFragments.size,119);
+assert.equal(reader.mainIds.length,102);
+assert.equal(reader.annexIds.length,17);
+for(const atom of loadReaderG20(root).ordered)
+ assert.equal(reader.sourceFragments.get(atom.id)?.join(""),atom.textRu);
+assert.equal((reader.annexes.match(/^### R40-(?:06|07|09|10|11|12|13|14|15) /gm)??[]).length,9);
+const bad=(a:string,b:string)=>{
+ assert.ok(original.includes(a),"missing fixture: "+a);
+ return parseReaderM06W1(original.replace(a,b),root);
+};
+assert.throws(()=>bad("publication: blocked","publication: ready"),/authority\/approval escalation/);
+assert.throws(()=>bad("author_approval: not-recorded","author_approval: recorded"),/authority\/approval escalation/);
+assert.throws(()=>bad("question_status: OPEN","question_status: ACCEPTED"),/authority\/approval escalation/);
+assert.throws(()=>bad("classification: CONDITIONAL_PROOF","classification: GLOBAL_THEOREM"),/class\/owner\/status mismatch/);
+assert.throws(()=>bad("scientific_status: OPEN","scientific_status: RESOLVED"),/class\/owner\/status mismatch/);
+assert.throws(()=>bad("Равенства O=form(O,R)","Равенства O=form(R,O)"),/question literal must match verbatim/);
+assert.throws(()=>bad("badStart_not_grounded","badStart_PROVED_GROUNDED"),/exact sources for/);
+assert.throws(()=>parseReaderM06W1(original+"\npublication: published\n",root),/invalid or duplicated source YAML/);
+console.log("M06-W1: 5 exact questions verified against original PDF-derived text, 5 OPEN, paired accepted model sources, 119 originals and 9 R40 intact.");
