@@ -93,7 +93,12 @@ function pdfQA(pdf,md) {
   const glyphs=["⟼","Γ","∞","♂","♀","₀","₁"];
   const glyphsMissing=glyphs.filter(s=>!text.includes(s));
   const example=pages.findIndex(s=>s.includes("Пример на принятых источниках"));
-  const table=pages.findIndex(s=>s.includes("RuleFF")&&s.includes("RuleTT"));
+  // Recognize actual PDF truth-table rows, not prose merely mentioning
+  // RuleFF/RuleTT.  Scientific G03 deliberately names all four rules earlier.
+  const table=pages.findIndex(s=>
+    /(?:^|\\n)\\s*F,F\\s+RuleFF\\s+F(?=\\s|$)/m.test(s) &&
+    /(?:^|\\n)\\s*T,T\\s+RuleTT\\s+T(?=\\s|$)/m.test(s)
+  );
   const fontInfo=run("pdffonts",[pdf]);
   required(n===pages.length,"text-extraction page count must match PDF");
   required(text.trim().length>=55000 && cyrillic>=20000,"PDF missing Russian scientific text");
