@@ -178,10 +178,6 @@ export function renderReaderW6(root:string):ReaderW6Document{
   const titleOverride=model.renamed.find(x=>x.id===chapter.id)?.title;
   main.push("## "+(ci+1)+". "+(titleOverride??chapter.titleRu),"",transition.reading,"",
     "**Граница применимости.** "+transition.limit,"");
-  if(chapter.id==="foundational-forms"){
-   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"",
-    relationalReview.anetMd,"");
-  }
   if(chapter.id==="representation-first-use"){
    main.push(relationalReview.sequenceMd,"",representationReview.representationMd,"",
     languageReview.formalMd,"",languageReview.dasMd,"");
@@ -227,6 +223,12 @@ export function renderReaderW6(root:string):ReaderW6Document{
   }
   check(ci===9||paragraph===model.headings[ci]?.length,
    "chapter paragraph count invalid after editorial repair");
+  // Reader-owned definitions precede their extended mathematical analysis.
+  // Do not edit or duplicate source atoms: only move the existing supplement.
+  if(chapter.id==="foundational-forms"){
+   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"",
+    relationalReview.anetMd,"");
+  }
   if(chapter.id==="governance-and-history"){
    check(paragraph===0&&chapter.atomIds.every(id=>toAnnex.has(id)),
     "historical chapter must be filled with attributed narrative, not duplicated governance axioms");

@@ -54,6 +54,17 @@ assert.equal(actualModel.headings.flat().length,102);
 assert.equal(new Set(actualModel.headings.flat()).size,102);
 assert.equal((document.mainText.match(/^\*\*\d+\.\d+\. /gm)??[]).length,102);
 assert.ok(document.mainText.includes("**1.1. Внешний математический интерфейс Foundation.**"));
+const foundationStart=document.mainText.indexOf("**1.1. ");
+const foundationLast=document.mainText.indexOf("**1.9. ");
+const foundationReview=document.mainText.indexOf("### F01. ");
+const modelReview=document.mainText.indexOf("### F02. ");
+const nextChapter=document.mainText.indexOf("## 2. ");
+assert.ok(foundationStart>=0&&foundationStart<foundationLast&&
+ foundationLast<foundationReview&&foundationReview<modelReview&&modelReview<nextChapter,
+ "the nine source-owned Foundation definitions must precede F01/F02 reviews in the rendered manuscript");
+assert.ok(document.mainText.indexOf("LocalSelfDecision")>=foundationStart&&
+ document.mainText.indexOf("LocalSelfDecision")<foundationReview,
+ "LocalSelfDecision must be introduced before its extended F01 analysis");
 assert.ok(document.mainText.includes("**2.14. Объективная хиральная пара без выбора контекста.**"));
 assert.ok(!document.mainText.includes("**1.1. Определение и математическое положение.**"));
 assert.ok(!document.mainText.includes("**7.1. Нормативное положение.**"));
