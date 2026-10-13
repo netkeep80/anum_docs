@@ -1,0 +1,219 @@
+# R39 W4: 30 individual direct ANet links in accepted v0.15 Russian exposition.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: 130d4b0b006e75a6f4feb655a8404926dad638e5
+review_boundary: explicit-term-use-vs-transitively-inherited-name
+review_count: 30
+entries:
+  - source: "concept:anet-term"
+    consumer: "g11:v15-auth-01"
+    decision: keep
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Общая исходная ANet прямо названа как объединённый результат FORMAL и JSON; прямое напоминание о значении ANet здесь делает центральное утверждение самодостаточным."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-auth-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Критерии FORMAL_MIGRATED и VERTICAL_GREEN проверяют source digest и evidence, а не независимо вводят ANet; первый концепт FORMAL/JSON уже несёт нужный термин."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-struct-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Сохранение ROOT/START/END/PAIR в общем FORMAL/JSON пути требует понятия FORMAL, а не повторной терминологической ссылки на ANet."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-fresh-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Fresh FORMAL replay предъявляет конкретное требование к новой Memory; ANet достигается по уже заданному общему source-маршруту."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-fresh-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "JSON replay в свежей Memory относится к каноническому JSON-источнику, который уже определён в общем FORMAL/JSON концепте."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-fresh-03"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Независимость от сторонних аллокаций — фальсификатор воспроизведения, а не отдельное первое употребление термина ANet."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-name-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Контекстный путь :A=R:A разъясняется внутри FORMAL-нотации; её вводный пункт уже определил source ANet."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-json-01"
+    decision: keep
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "В утверждении об отсутствии потерь прямо написана «исходная модель ANet», поэтому явная терминологическая ссылка помогает отличить source от JSON-транспорта."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-json-02"
+    decision: keep
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Тезис о равенстве source FORMAL/JSON буквально называет общую нативную ANet; непосредственное повторение определения ограничивает смысл этого равенства."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-json-03"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Правило мутационного фальсификатора относится к JSON source/denotation, где ANet уже объяснена; повтор не вводит дополнительной области."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-and-01"
+    decision: keep
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Boolean AND представлен как zero-role Rule непосредственно «в исходной ANet»; явная ссылка на её определение не даёт спутать таблицу с host-оператором."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-and-02"
+    decision: remove
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Matcher/Γ маршрут и NO_MATCH описаны через профиль Γ, уже связанный с ANet; отдельное прямое упоминание термина не требуется."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:gamma-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-and-03"
+    decision: remove
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Единственность операторной модели и условия backend lowering касаются канонического источника; он уже введён через Γ."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:gamma-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-and-04"
+    decision: remove
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Совместное использование Γ для NOT/OR/XOR явно следует после Γ; повторная стрелка к ANet не добавляет условия отсутствия opcode."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:gamma-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-gamma-01"
+    decision: remove
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Этапы J0/S1/S2 раскрывают введённую Γ; ANet достижима через вводный Γ-профиль, а не как самостоятельная предпосылка каждого этапа."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:gamma-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-formal-proof-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Границы Lean4/Rocq относятся к денотации FORMAL и ExactSequence; слово ANet здесь не является отдельным предметом формализации."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-formal-proof-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Парное формальное свидетельство касается двух поверхностей источника и рекурсивного алфавита, уже введённых через FORMAL."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-json-04"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Массив JSON и ExactSequence надо различать со свёрткой F_R; это точное уточнение FORMAL/JSON носителя, без нового ANet термина."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-stage-01"
+    decision: keep
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Стадии явно различают source ANet и semantic ANet; прямая ссылка на ANet удерживает различие между состояниями до и после денотации."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-fals-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Требование фальсификаторов касается мутаций, отсутствия authority и replay; ANet уже определена через FORMAL, нового локального терминологического определения нет."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-corpus-01"
+    decision: keep
+    indirect_via: "concept:gamma-first-use"
+    rationale_ru: "Регрессионный маршрут прямо называет source и semantic ANet как разные контрольные стадии; дополнительное пояснение ANet уместно в самом корпусе replay."
+    limitation_ru: "ANet здесь раскрывает исходное или семантическое членство Link, а не новый онтологический примитив и не принятый theorem premise."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-docs-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Детерминированная генерация «Формальной нотации МТС.md» использует исходные модели FORMAL/JSON; имя ANet там не образует отдельной предпосылки."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-ready-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Независимый аудит готовности проверяет скрытую host-семантику и полноту JSON; путь к ANet обеспечен глоссарием FORMAL, прямой дубль не нужен."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-author-json-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Ожидание авторского решения по JSON зависит от понятия канонического артефакта, а не от отдельного повторного определения ANet."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-author-json-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Пакет доказательств для Автора перечисляет FORMAL/JSON, round-trip и replay; начальный словарь источника уже раскрывает ANet."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-author-json-03"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Привязка авторского одобрения к ревизии JSON — вопрос точного происхождения, без нового определения математической асети."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-author-json-04"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Ограничение пакетного согласия относится к exact JSON revisions; термин ANet не является второй самостоятельной предпосылкой."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-reg-01"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Регрессионный корпус принимает утверждённый JSON; его смысл уже определён FORMAL/JSON, прямой ANet указатель дублирует прежний."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-reg-02"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Полный повторный прогон после правок source/backend связан с каноническим маршрутом FORMAL/JSON; отдельное прямое ANet основание не добавляет проверки."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-reg-03"
+    decision: remove
+    indirect_via: "concept:formal-json-first-use"
+    rationale_ru: "Запрет регенерации принятого JSON без новой приёмки относится к provenance источника, уже заданному термином FORMAL/JSON."
+    limitation_ru: "Точный accepted v0.15 закон и его исполняющие проверки не ослабляются; название ANet по-прежнему доступно через concept:formal-json-first-use."
+    review_status: proposed

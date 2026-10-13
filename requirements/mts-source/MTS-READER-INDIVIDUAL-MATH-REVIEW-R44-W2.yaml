@@ -1,0 +1,70 @@
+# R44-W2 scientific manuscript review: individual source-derived case judgements.
+schema: mts-reader-individual-math-review-r44-w2/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+scientific_coverage: six-targeted-claims-not-universal-119-atom-review
+upstream_review: requirements/mts-source/MTS-READER-INDEPENDENT-MATH-AUDIT-R44-W1.yaml
+source_foundation: requirements/mts-source/MTS-FND-V14-L1.yaml
+source_bootstrap: requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml
+source_arithmetic: requirements/mts-source/MTS-READER-V14-G7.yaml
+accepted_contract: contracts/mts-contract-v0.14.json
+proof_lean4: proofs/lean4/MtsFoundation.lean
+proof_rocq: proofs/coq/MtsFoundation.v
+accepted_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+proposed_source_sha: cb78e6b448d77d738e69f6e3effb84ef0b15d23f
+scientific_cases:
+  - id: R44-W2-01
+    chapter: foundational-forms
+    anchor: g4:foundation
+    source_step: foundation
+    finding: R40-07
+    state: individual-reviewed-author-review-required
+    scientific_ru: "Foundation задаёт Link, form, start, finish и R вместе с уравнениями полюсных проекций и form(R,R)=R. Вывод root_full_self устанавливает самоинцидентность данного R; единственность всякой полностью самозамкнутой Связи даёт уже отдельная FND_02_unique_root при A1RecursiveSeparation. Учебное введение не является доказательством единственности."
+    boundary_ru: "В G4 исторический абзац и редакционный G16 раскрывают один первичный предмет. При генерации сначала предъявляется предмет и форма, затем отдельный доказательный интерфейс: не удваивать онтологию и не выдавать канонизацию хранилища за новую операцию Link."
+  - id: R44-W2-02
+    chapter: foundational-forms
+    anchor: g4:local-exhaustiveness
+    source_step: local-exhaustiveness
+    finding: R40-07
+    state: individual-reviewed-author-review-required
+    scientific_ru: "Локальные 11/10/01/00 классифицируют два отношения самоинцидентности, а не четыре команды или четыре существующих объекта. Теорема local_self_incidence_exhaustive требует LocalSelfDecision для конкретной x; существование Grounded-свидетелей случаев 10, 01, 00 возникает в иной теореме FND_01_grounded_realizability только при F2F3OneSidedExistence."
+    boundary_ru: "Разрешимость двух локальных проверок не даёт глобального алгоритма равенства Link. Логическая исчерпываемость отличается от реализуемости каждого класса, а наличие четырёх классов не создаёт четыре самостоятельных сорта Связей."
+  - id: R44-W2-03
+    chapter: grounded-inverse-context
+    anchor: g4:identity-by-poles
+    source_step: identity-by-poles
+    finding: R40-12
+    state: individual-reviewed-author-review-required
+    scientific_ru: "FND_13_identity_by_poles устанавливает x=y тогда и только тогда, когда start(x)=start(y) и finish(x)=finish(y), при дополнительной структуре F2F3GroundedNormalization и двух явных свидетельствах Grounded(F,x), Grounded(F,y). Обратная импликация проходит через полноту нормализации N.complete, а не следует из одних законов проекций Foundation."
+    boundary_ru: "Глобальная экстенсиональность для всех циклических или не-Grounded Link из FND-13 не следует. Нельзя переносить вывод на весь носитель Foundation и нельзя путать математическое тождество Link с равенством внешних символьных имён."
+  - id: R44-W2-04
+    chapter: grounded-inverse-context
+    anchor: g4:chiral-orbit
+    source_step: chiral-orbit
+    finding: R40-12
+    state: individual-reviewed-author-review-required
+    scientific_ru: "CTX_03_objective_chiral_orbit_before_context выводит существование двух различных взаимно инверсных односторонних Связей противоположных хиральных классов. В сигнатуре есть A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence и RecursiveInversionDomain; ContextOrientationMarker не требуется. Теорема экзистенциальна и не выбирает глобальную W."
+    boundary_ru: "Наличие объективной пары до выбора контекста не порождает автоматически абсолютные обозначения START_K или END_K. Формальное существование орбиты нельзя смешивать с выбором локальной системы ориентации."
+  - id: R44-W2-05
+    chapter: grounded-inverse-context
+    anchor: g4:context-roles
+    source_step: context-roles
+    finding: R40-12
+    state: individual-reviewed-author-review-required
+    scientific_ru: "CTX_03_context_selection_induces_local_roles использует A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain и предъявленный ContextOrientationMarker для данного body и selected. Доказательство даёт два различных допустимых localStart/localEnd с относительными противоположными полюсными ролями. В его сигнатуре нет F2F3GroundedNormalization, нужной для отдельной теоремы об объективной орбите."
+    boundary_ru: "Контекст здесь означает внешний выбор body и selected, а не новый сорт Link или исполнительный Context Γ версии v0.15. Роль не приписывается произвольному контексту без маркера; предпосылки двух CTX-03 нельзя механически объединять."
+  - id: R44-W2-06
+    chapter: derived-and-context
+    anchor: g7:nat-degree-nonidentity
+    source_step: nat-degree-nonidentity
+    finding: R40-12
+    state: individual-reviewed-author-review-required
+    scientific_ru: "Принятый v0.14 контракт Nat задаёт N₀=U, Succ(N)=N⟼L и N₁=U⟼L, а отдельная Degree — D₁=L и NextDegree(D)=D⟼L. Контракт прямо указывает oneEqualsDegreeOne=false: совпадение числового индекса не означает тождества самих Связей. Исследовательский статус GREEN_RESEARCH у Nat не заменяет предъявленного доказательства всех арифметических законов в Lean4/Rocq."
+    boundary_ru: "U не равен корню пустой позиционной ExactSequence R по одному названию нулевого элемента; Nat, Degree, ExactSequence и онтология Link являются различными уровнями описания. Нельзя объявлять произвольные законы сложения и бесконечности Nat из формулы Succ(N)."
+unresolved:
+  prior_corrected: [R40-05]
+  awaiting_rereview: [R40-01, R40-02, R40-03, R40-04, R40-08]
+  remaining_open: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]
+  conclusion_ru: "R44-W2 подтверждает лишь шесть явно ограниченных исходных утверждений, не заменяет математическую проверку остальных атомов и не повышает статус ни одного R40 без решения Автора."

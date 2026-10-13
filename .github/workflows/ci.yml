@@ -80,6 +80,51 @@ jobs:
           cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean > /tmp/MtsFoundationWithExplicitModel.lean
           /tmp/mts-lean/bin/lean /tmp/MtsFoundationWithExplicitModel.lean
 
+          # #2222: new parameterized F03 kernel candidate; preserve accepted files.
+          cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsBasisFiveDistinct.lean > /tmp/MtsBasisFiveDistinct.lean
+          printf '\n#print axioms MTS.External.F03_basis_five_pairwise_distinct\n' >> /tmp/MtsBasisFiveDistinct.lean
+          /tmp/mts-lean/bin/lean /tmp/MtsBasisFiveDistinct.lean 2>&1 | tee /tmp/mts-f03-lean.log
+          grep -Fq 'does not depend on any axioms' /tmp/mts-f03-lean.log
+          ! grep -Fq 'sorryAx' /tmp/mts-f03-lean.log
+
+          # #2259: proposed M06-W2 paired exact-source proofs; accepted originals stay unchanged.
+          cat proofs/lean4/MtsFoundation.lean proofs/lean4/MtsExplicitModel.lean proofs/lean4/MtsM06W2External.lean > /tmp/MtsM06W2External.lean
+          for symbol in M06_W2_badStart_not_form_image M06_W2_reverse_law_fails M06_W2_poles_nonextensional M06_W2_joint_model_witness M06_W2_two_distinct_implies_nat_injection; do
+            printf '\n#print axioms MTS.External.Model1796.%s\n' "$symbol" >> /tmp/MtsM06W2External.lean
+          done
+          /tmp/mts-lean/bin/lean /tmp/MtsM06W2External.lean 2>&1 | tee /tmp/mts-m06-w2-lean.log
+          # Scope the host metalanguage axiom explicitly, without weakening accepted proof assurance.
+          node <<'M06_W2_LEAN_ASSURANCE'
+          const fs = require("node:fs");
+          const log = fs.readFileSync("/tmp/mts-m06-w2-lean.log", "utf8");
+          const ns = "MTS.External.Model1796.";
+          const model = [
+            "M06_W2_badStart_not_form_image",
+            "M06_W2_reverse_law_fails",
+            "M06_W2_poles_nonextensional",
+            "M06_W2_joint_model_witness",
+          ];
+          const generic = "M06_W2_two_distinct_implies_nat_injection";
+          const exactLine = (symbol, suffix) => "'" + ns + symbol + "' " + suffix;
+          const found = log.split(/\r?\n/).filter((line) =>
+            line.startsWith("'" + ns + "M06_W2_") &&
+            (line.includes("depends on axioms:") ||
+              line.includes("does not depend on any axioms")));
+          if (found.length !== 5) {
+            throw new Error("Expected five M06-W2 #print axioms reports; observed " + found.length);
+          }
+          for (const symbol of model) {
+            const expected = exactLine(symbol, "depends on axioms: [propext]");
+            if (!found.includes(expected)) throw new Error("Model-only proof assumption drift: " + symbol);
+          }
+          if (!found.includes(exactLine(generic, "does not depend on any axioms"))) {
+            throw new Error("Weak Foundation Nat-injection theorem must be axiom-free");
+          }
+          if (log.includes("sorryAx") || log.includes("Classical.choice") ||
+              log.includes("Quot.sound")) throw new Error("Unexpected Lean axiom marker");
+          console.log("M06_W2_KERNEL_LEAN=4_EXACT_PROPEXT_ONLY_PLUS_1_ZERO");
+          M06_W2_LEAN_ASSURANCE
+
           cp proofs/lean4/MtsFoundation.lean /tmp/MtsFoundationAssurance.lean
           node <<'NODE'
           const fs = require("node:fs");
@@ -263,6 +308,27 @@ jobs:
             -v "$PWD/proofs/coq:/input:ro" \
             "$ROCQ_IMAGE" \
             sh -lc 'cat /input/MtsFoundation.v /input/MtsExplicitModel.v > /tmp/MtsFoundationWithExplicitModel.v && cd /tmp && rocq compile MtsFoundationWithExplicitModel.v'
+
+          # #2222: compile the separate suffix against exact accepted Rocq source.
+          mkdir -p /tmp/mts-f03-rocq
+          cat proofs/coq/MtsFoundation.v proofs/coq/MtsBasisFiveDistinct.v > /tmp/mts-f03-rocq/MtsBasisFiveDistinct.v
+          printf '\nPrint Assumptions F03_basis_five_pairwise_distinct.\n' >> /tmp/mts-f03-rocq/MtsBasisFiveDistinct.v
+          docker run --rm -v "/tmp/mts-f03-rocq:/input:ro" "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsBasisFiveDistinct.v /tmp/MtsBasisFiveDistinct.v && cd /tmp && rocq compile MtsBasisFiveDistinct.v' \
+            2>&1 | tee /tmp/mts-f03-rocq.log
+          grep -Fq 'Closed under the global context' /tmp/mts-f03-rocq.log
+
+          # #2259: same explicit model and untouched accepted Rocq Foundation.
+          mkdir -p /tmp/mts-m06-w2-rocq
+          cat proofs/coq/MtsFoundation.v proofs/coq/MtsExplicitModel.v proofs/coq/MtsM06W2External.v > /tmp/mts-m06-w2-rocq/MtsM06W2External.v
+          for symbol in M06_W2_bad_start_not_form_image M06_W2_reverse_law_fails M06_W2_poles_nonextensional M06_W2_joint_model_witness M06_W2_two_distinct_implies_nat_injection; do
+            printf '\nPrint Assumptions %s.\n' "$symbol" >> /tmp/mts-m06-w2-rocq/MtsM06W2External.v
+          done
+          docker run --rm -v "/tmp/mts-m06-w2-rocq:/input:ro" "$ROCQ_IMAGE" \
+            sh -lc 'cp /input/MtsM06W2External.v /tmp/MtsM06W2External.v && cd /tmp && rocq compile MtsM06W2External.v' \
+            2>&1 | tee /tmp/mts-m06-w2-rocq.log
+          test "$(grep -Fc 'Closed under the global context' /tmp/mts-m06-w2-rocq.log)" -eq 5
+          echo "M06_W2_KERNEL_ROCQ=5_OF_5_CLOSED"
 
           rm -rf /tmp/mts-coq-assurance
           mkdir -p /tmp/mts-coq-assurance

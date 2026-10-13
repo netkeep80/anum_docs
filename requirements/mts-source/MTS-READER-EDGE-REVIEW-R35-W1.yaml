@@ -1,0 +1,251 @@
+# R35 Wave 1: 39 original nonredundant reader edges + one replacement.
+# Individual AI-scoped scholarly assessment. Not an author acceptance or theorem.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+original_dag_head: 026f515aac3315299ebeb49f0d80191aaa801afb
+revised_dag_commit: 20a52e19a2c629074f57ee5950bb6022c93814ed
+review_boundary: individual-editorial-science-not-proof
+review_count: 40
+entries:
+  - source: "concept:anet-term"
+    consumer: "g7:link-identity"
+    decision: keep
+    rationale_ru: "В русском абзаце о неизменности Link употреблено слово «асеть». Предварительное определение ANet отделяет изменяемое множество связей от неизменного тождества отдельной Link."
+    limitation_ru: "Это предпосылка терминологической ясности, не доказательство неизменности Link."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g7:nat-zero"
+    decision: keep
+    rationale_ru: "Первый числовой абзац использует N₀=U и шкалу Nat; раннее точное определение Nat не позволяет подменить нуль U корнем R."
+    limitation_ru: "Нельзя выводить принятые арифметические теоремы из краткой справки."
+    review_status: proposed
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g7:anum-carrier"
+    decision: remove
+    rationale_ru: "Anum в законе v0.14 определяется как кодировка последовательности Связей; v0.15 ExactSequence не является логически или исторически необходимым условием понимания Anum."
+    limitation_ru: "Не выводить обязательную зависимость старого кодека от более позднего JSON carrier."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "g7:objective-orbit-qualified"
+    decision: replace
+    rationale_ru: "Объективное существование инверсионной хиральной пары формулируется до выбора ContextOrientationMarker; связывание с уже введёнными относительными ролями искажает порядок научного основания."
+    limitation_ru: "CTX_03_objective_chiral_orbit_before_context нельзя превращать в следствие выбора START_K/END_K."
+    review_status: proposed
+  - source: "g4:chiral-orbit"
+    consumer: "g7:objective-orbit-qualified"
+    decision: keep
+    rationale_ru: "Предложенная замена ссылается непосредственно на исходный G4-атом о CTX_03_objective_chiral_orbit_before_context и его A1/N/E/D-предпосылках."
+    limitation_ru: "Точная теорема доказывает условное существование пары, а не универсальность J и глобальный выбор W."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:glyph-map"
+    decision: keep
+    rationale_ru: "Символы ∞/♂/♀/⟼ именуют уже различённые локальные случаи 11/10/01/00; сначала требуется различить полюсные совпадения."
+    limitation_ru: "Соответствие глифов не вводит четырёх новых операций form."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:ontology-level"
+    decision: remove
+    rationale_ru: "Утверждение, что единственная онтология — Link, имеет смысл сразу после Foundation и не требует предварительной классификации самоинцидентности."
+    limitation_ru: "Нельзя делать вторичную классификацию предпосылкой самого введения онтологии."
+    review_status: proposed
+  - source: "g7:q-codec"
+    consumer: "g10:v14-l3"
+    decision: keep
+    rationale_ru: "Различия Q13/Q14 имеют смысл только после определения Q как версионируемого кодека последовательностей."
+    limitation_ru: "Не переносить правила декодирования из Q13 в Q14."
+    review_status: proposed
+  - source: "g8:glyph-map"
+    consumer: "g10:v14-l4"
+    decision: keep
+    rationale_ru: "Текст результатов реакции использует START- и END-продолжения; раннее введение этих метаобозначений предотвращает смешение их с самостоятельными конструкторами."
+    limitation_ru: "Знание глифов не заменяет семантику результатов реакций."
+    review_status: proposed
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g10:v14-l7"
+    decision: keep
+    rationale_ru: "Count считает позиции ExactSequence, а не различные Link; без определения позиционного носителя его кратности невозможно корректно интерпретировать результат."
+    limitation_ru: "Повтор одной Link в двух позициях считается дважды, не один раз."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g10:v14-l7"
+    decision: keep
+    rationale_ru: "Результат Count лежит в шкале Nat, отличной от Degree; носитель и обозначения нужно дать до результата счёта."
+    limitation_ru: "Нельзя отождествить результат Count с простой длиной байтовой кодировки."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g10:v14-l8"
+    decision: keep
+    rationale_ru: "Сложение Add заявлено на Nat, поэтому его область определения должна быть показана до обсуждения тотальности и функциональности."
+    limitation_ru: "Не обобщать Add на произвольные Link без свидетельства Nat."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g10:v14-l9"
+    decision: keep
+    rationale_ru: "Отношение Le определяется через сложение в Nat; читатель должен понимать носитель до введения порядка."
+    limitation_ru: "Отсюда не следует произвольный порядок на всех Link."
+    review_status: proposed
+  - source: "concept:nat-first-use"
+    consumer: "g10:v14-l10"
+    decision: keep
+    rationale_ru: "Внеобластность умножения и полукольца v0.14 формулируется относительно именно Nat, а не произвольного алгебраического множества."
+    limitation_ru: "Нельзя записывать исследовательское умножение как принятый закон v0.14."
+    review_status: proposed
+  - source: "concept:gamma-first-use"
+    consumer: "g10:v14-l11"
+    decision: remove
+    rationale_ru: "Обобщённая реакция по Modus Ponens унаследована от принятой v0.13 цепочки A14→A16→A17→A72w. Более поздний операционный профиль Γ v0.15 не должен быть обязательной предпосылкой её понимания."
+    limitation_ru: "Недопустимо задним числом приписывать v0.14 необходимость J0/S1/S2 профиля v0.15."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "basis:R"
+    decision: keep
+    rationale_ru: "R и уравнение form(R,R)=R являются частью внешнего Foundation; сначала вводятся носитель Link и одна операция form."
+    limitation_ru: "Из равенства R=form(R,R) не вытекает единственность корня без A1."
+    review_status: proposed
+  - source: "basis:R"
+    consumer: "basis:O"
+    decision: keep
+    rationale_ru: "Определение O=O⟼R явно содержит R как второй полюс."
+    limitation_ru: "O не выбирает абсолютную START-ориентацию произвольного контекста."
+    review_status: proposed
+  - source: "basis:R"
+    consumer: "basis:C"
+    decision: keep
+    rationale_ru: "Определение C=R⟼C явно содержит R как первый полюс."
+    limitation_ru: "C не является глобально назначенной ролью END."
+    review_status: proposed
+  - source: "basis:O"
+    consumer: "basis:L"
+    decision: keep
+    rationale_ru: "Уравнение L=O⟼C невозможно прочитать без ранее введённого O."
+    limitation_ru: "Роль L в Degree не равна автоматически единице Nat."
+    review_status: proposed
+  - source: "basis:C"
+    consumer: "basis:L"
+    decision: keep
+    rationale_ru: "Уравнение L=O⟼C также явно содержит C; оба аргумента следует ввести отдельно."
+    limitation_ru: "Не подменять структурное равенство буквальным конструированием новой онтологии."
+    review_status: proposed
+  - source: "basis:C"
+    consumer: "basis:U"
+    decision: keep
+    rationale_ru: "Уравнение U=C⟼O требует ранее введённого C."
+    limitation_ru: "U — нуль Nat, но не R-корень пустой ExactSequence."
+    review_status: proposed
+  - source: "basis:O"
+    consumer: "basis:U"
+    decision: keep
+    rationale_ru: "То же уравнение U=C⟼O требует ранее введённого O."
+    limitation_ru: "Не считать O, C и U взаимозаменяемыми обозначениями."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "concept:anet-term"
+    decision: keep
+    rationale_ru: "ANet обозначает асеть Link; сначала необходимо определить Link как единственную первичную сущность."
+    limitation_ru: "Не считать ANet вторым онтологическим объектом рядом с Link."
+    review_status: proposed
+  - source: "basis:U"
+    consumer: "concept:nat-first-use"
+    decision: keep
+    rationale_ru: "Нуль Nat равен U, поэтому U как конкретную Link необходимо представить до шкалы."
+    limitation_ru: "Нуль Nat не совпадает с R по одному только именованию."
+    review_status: proposed
+  - source: "basis:L"
+    consumer: "concept:nat-first-use"
+    decision: keep
+    rationale_ru: "Операция Succ(N)=N⟼L явно использует L; первый элемент Degree и шаг Nat отличаются по роли."
+    limitation_ru: "Не приравнивать Degree и Nat через общую букву L."
+    review_status: proposed
+  - source: "basis:R"
+    consumer: "concept:exact-sequence-first-use"
+    decision: keep
+    rationale_ru: "Пустая ExactSequence обозначается R; определение корневого базиса позволяет понять пустую позиционную конструкцию."
+    limitation_ru: "Не отождествлять carrier ExactSequence с производной свёрткой F_R."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "concept:exact-sequence-first-use"
+    decision: remove
+    rationale_ru: "Позиционный carrier из уже обозначенных Link можно определить после Link и R, не требуя предварительно термина ANet; здесь была искусственная терминологическая связь."
+    limitation_ru: "Не утверждать онтологическую производность ExactSequence из английского имени ANet."
+    review_status: proposed
+  - source: "concept:exact-sequence-first-use"
+    consumer: "concept:formal-json-first-use"
+    decision: keep
+    rationale_ru: "Пояснение общего FORMAL/JSON пути содержит JSON-массивы и позиции, для которых уже требуется различить ExactSequence и F_R."
+    limitation_ru: "Связь учебная, не формальное следование семантики FORMAL из носителя последовательностей."
+    review_status: proposed
+  - source: "concept:formal-json-first-use"
+    consumer: "concept:gamma-first-use"
+    decision: keep
+    rationale_ru: "Для выбранного изложения v0.15 сначала показывается каноническое исходное представление, затем его единая исполняющая реакция Γ."
+    limitation_ru: "Это педагогический маршрут для v0.15, не утверждение, что Γ математически определяется через JSON."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "editorial:foundation-ontology"
+    decision: keep
+    rationale_ru: "Новая русская вводная редакция уточняет существующий Foundation: полюса, form и единственную Link-онтологию."
+    limitation_ru: "Она не замещает принятую аксиоматику и не делает внешние проекции внутренними сущностями."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "editorial:local-self-classification"
+    decision: keep
+    rationale_ru: "Пояснение четырёх случаев опирается на уже заданные предикаты самоинцидентности."
+    limitation_ru: "Локальная классификация не является свидетельством существования представителей."
+    review_status: proposed
+  - source: "editorial:foundation-ontology"
+    consumer: "editorial:local-self-classification"
+    decision: keep
+    rationale_ru: "Новые связные русские определения должны сначала назвать form/start/finish, затем проверять равенства полюсных позиций."
+    limitation_ru: "Это объяснение способа чтения, не новое доказательство полного разбиения."
+    review_status: proposed
+  - source: "editorial:local-self-classification"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    rationale_ru: "После различения случаев можно объяснить, какие корневые примеры действительно предъявлены и какие требуют отдельной гипотезы."
+    limitation_ru: "Не путать четыре возможных случая с четырьмя гарантированными существованиями."
+    review_status: proposed
+  - source: "basis:L"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    rationale_ru: "Корневой абзац перечисляет R, O, C и L=O⟼C; последний требует подготовленного уравнения L."
+    limitation_ru: "Полная самозамкнутость не доказывает уникальность R."
+    review_status: proposed
+  - source: "g4:one-sided-realizability"
+    consumer: "editorial:root-basis-witnesses"
+    decision: keep
+    rationale_ru: "Рассуждение о наличии односторонних представителей прямо ссылается на FND_01_grounded_realizability и дополнительную E-предпосылку."
+    limitation_ru: "Не объявлять FND_01 доказательством существования из Foundation без E."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "editorial:relative-chiral-orientation"
+    decision: keep
+    rationale_ru: "Вводный абзац одновременно объясняет объективную орбиту и *последующий* выбор относительных START_K/END_K; поэтому требует обе теоремы, в том числе контекстную."
+    limitation_ru: "В отличие от G7 objective-orbit этот абзац содержит и стадию после выбора ориентации."
+    review_status: proposed
+  - source: "editorial:root-basis-witnesses"
+    consumer: "editorial:relative-chiral-orientation"
+    decision: keep
+    rationale_ru: "Прежде чем обсуждать контекстно-относительный выбор, требуется раскрыть корневые и односторонние свидетели его области."
+    limitation_ru: "Их существование условно, не абсолютная теорема о W."
+    review_status: proposed
+  - source: "editorial:local-self-classification"
+    consumer: "editorial:representation-boundary"
+    decision: keep
+    rationale_ru: "Рекурсивный алфавит 8/9/6/1 описывает именно локальные случаи; они должны быть определены до обсуждения слоёв представления."
+    limitation_ru: "Четыре символа не являются командами создания Link."
+    review_status: proposed
+  - source: "g8:recursive-level"
+    consumer: "editorial:representation-boundary"
+    decision: keep
+    rationale_ru: "Обзорный абзац о слоях должен следовать за определением рекурсивного уровня и его границ относительно онтологии."
+    limitation_ru: "Слой репрезентации не создаёт новых математических базовых сущностей."
+    review_status: proposed
+  - source: "g7:recursive-codec"
+    consumer: "editorial:representation-boundary"
+    decision: keep
+    rationale_ru: "Граница между рекурсивным кодеком одной Link и Anum/Q-кодеками последовательностей должна быть предъявлена до их сравнения."
+    limitation_ru: "Не отождествлять структурную рекурсию и последовательностную сериализацию."
+    review_status: proposed

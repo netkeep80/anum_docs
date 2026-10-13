@@ -1,0 +1,29 @@
+# M05 historical picture provenance appendix: links only, no invented mathematical attribution.
+schema: mts-v015-reader-image-archive-m05/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+package_issue: 2257
+upstream_review: requirements/mts-source/MTS-READER-EPISTEMIC-CLAIMS-M04.yaml
+canonical_historical_manifest: profiles/mts-historical-images.json
+historical_manifest_git_blob: 4b2dd0522c0fb0d9dcc8b20b69be7c330e123263
+historical_readme: pics/README.md
+historical_protection_test: ts/test/historical-images-protection.test.ts
+banner_path: docs/assets/anum_docs-banner.jpg
+banner_git_blob: 13885bcd40c41c73959b8e7842285cbc8941beae
+history_count: 29
+banner_count: 1
+scientific_placement: unresolved-without-source-owned-caption
+archive_link_policy: link-to-exact-accepted-git-blob-no-inline-reinterpretation
+heading_ru: "M05. Архивные иллюстрации и граница научной атрибуции"
+intro_ru: "Исторические изображения являются самостоятельными исследовательскими свидетельствами, но сами по себе не заменяют сформулированное доказательство или принятое требование. В данном приложении перечислены все двадцать девять исторических файлов, сохранённых в pics и защищённых авторским реестром, а также отдельный исходный баннер README. Для каждого файла ведётся ссылка на фиксированный Git-коммит; исходный байтовый состав не меняется. Отсутствие научного размещения не позволяет автоматически считать историческую схему актуальной математической моделью МТС v0.15."
+caption_ru: "Ссылки далее являются архивными идентификаторами файлов, а не научными подписями. Даже если имя содержит термины МТС, семантическая интерпретация содержания и выбор главы требуют независимого сопоставления с исходными документами и авторского решения. PNG и SVG, имеющие близкие названия, остаются разными сохранёнными оригиналами; нельзя заменять один другим ради более красивой публикации."
+boundary_ru: "Проверено сохранение 29 файлов из неизменного реестра и одного README-баннера, но это не означает 29 научно атрибутированных и расположенных иллюстраций. Генератор пока не вставляет исторические изображения внутрь доказательств: отсутствуют подтверждённые источником подписи. Отдельные исходные изображения по-прежнему доступны по точным ссылкам. Научное размещение остаётся OPEN; весь текст монографии остаётся предложением и не утверждён Автором."
+open_obligations:
+  - M05_INDIVIDUAL_29_IMAGE_SCIENTIFIC_ATTRIBUTION
+  - M05_EDITORIAL_IMAGE_PLACEMENT_AND_VISUAL_REVIEW
+  - M05_INDEPENDENT_AUTHOR_IMAGE_DECISIONS
+  - M05_PUBLICATION_NOT_AUTHORIZED

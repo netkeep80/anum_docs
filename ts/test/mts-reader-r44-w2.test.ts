@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { renderReaderR44W1Preview } from "../src/tooling/mts-reader-r44.js";
+import { READER_R44_W2_PATH, loadReaderR44W2, parseReaderR44W2, renderReaderR44W2Preview } from "../src/tooling/mts-reader-r44-w2.js";
+const root=resolve("..");
+const original=readFileSync(resolve(root,READER_R44_W2_PATH),"utf8");
+const review=loadReaderR44W2(root),before=renderReaderR44W1Preview(root),after=renderReaderR44W2Preview(root);
+assert.equal(review.publication,"blocked");
+assert.equal(review.cases.length,6);
+assert.equal((after.match(/^\*\*(?:g4:|g7:|g8:|g10:|g11:|basis:|concept:|editorial:)/gm)??[]).length,119);
+assert.equal((after.match(/^## /gm)??[]).length,(before.match(/^## /gm)??[]).length);
+for(const c of review.cases){
+  assert.ok(after.includes("### "+c.id+" — проверка "+c.anchor));
+  assert.equal(after.split(c.scientificRu).length-1,1);
+  assert.equal(after.split(c.boundaryRu).length-1,1);
+}
+assert.ok(after.includes("A1RecursiveSeparation")&&after.includes("Grounded"));
+assert.ok(after.includes("CTX_03_objective_chiral_orbit_before_context"));
+assert.ok(after.includes("CTX_03_context_selection_induces_local_roles"));
+assert.ok(after.includes("oneEqualsDegreeOne=false"));
+assert.ok(after.includes("GREEN_RESEARCH"));
+assert.ok(after.includes("МТС")||after.includes("Link"));
+assert.ok(after.includes("ПУБЛИКАЦИЯ ЗАБЛОКИРОВАНА"));
+assert.ok(after.includes("R44-W2 подтверждает лишь шесть"));
+const check=(v:string)=>parseReaderR44W2(v,root);
+assert.throws(()=>check(original.replace("publication: blocked","publication: ready")),/cannot publish/);
+assert.throws(()=>check(original.replace("author_approval: not-recorded","author_approval: approved")),/cannot publish/);
+assert.throws(()=>check(original.replace("scientific_coverage: six-targeted-claims-not-universal-119-atom-review","scientific_coverage: all-proved")),/cannot publish/);
+assert.throws(()=>check(original.replace("proof_lean4: proofs/lean4/MtsFoundation.lean","proof_lean4: proofs/lean4/MtsExplicitModel.lean")),/cannot publish/);
+assert.throws(()=>check(original.replace("finding: R40-07","finding: R40-05")),/case identity\/scope changed/);
+assert.throws(()=>check(original.replace("prior_corrected: [R40-05]","prior_corrected: [R40-06]")),/may not close/);
+assert.throws(()=>check(original.replace("ContextOrientationMarker не требуется","ContextOrientationMarker всегда требуется")),/orbit may not require marker/);
+assert.throws(()=>check(original.replace("нет F2F3GroundedNormalization","требуется F2F3GroundedNormalization")),/context-selected roles must not import normalization/);
+assert.throws(()=>check(original+"\npublication: ready\n"),/malformed\/duplicate YAML/);
+console.log("R44-W2: six individually evidence-scoped mathematical reviews in read-only proposed manuscript; source G4/G7, accepted contract and Lean4/Rocq signatures guarded; no 119 science acceptance.");

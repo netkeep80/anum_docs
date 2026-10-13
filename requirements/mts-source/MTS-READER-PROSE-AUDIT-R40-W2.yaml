@@ -1,0 +1,206 @@
+# R40 wave 2: individualized prose audit of 29 accepted-v0.14 expository atoms G7/G8/G10.
+schema: mts-reader-prose-audit/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+source_model: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+accepted_semantics_change: false
+coverage: v014-followup-only
+review_count: 29
+entries:
+  - position: 43
+    node: "g7:link-rewrite"
+    disposition: retain
+    scope_note_ru: "Переписывание меняет членство в асети либо строит новые Связи; не формулировать изменение полюсов уже существующей Link."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 44
+    node: "g7:link-deletion-boundary"
+    disposition: retain
+    scope_note_ru: "Различие исключения из текущей асети и физического удаления из хранения необходимо сохранить как явную неэквивалентность."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 45
+    node: "g7:nat-zero"
+    disposition: retain
+    scope_note_ru: "Нуль Nat равен U; это не пустая последовательность, корень R и не произвольная Link."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 46
+    node: "g7:nat-successor"
+    disposition: retain
+    scope_note_ru: "Succ(N)=N⟼L вводит единый конструктор; не заявляет тотальность для произвольных Link без принадлежности Nat."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 47
+    node: "g7:degree-one"
+    disposition: retain
+    scope_note_ru: "Degree имеет единицу D₁=L и правило NextDegree, её нельзя отождествить с Nat."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 48
+    node: "g7:nat-degree-nonidentity"
+    disposition: retain
+    scope_note_ru: "Различие N₁=U⟼L и D₁=L сохраняет две независимые шкалы; не выводить их тождество по похожим именам."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 49
+    node: "g7:q-codec"
+    disposition: term-gap
+    scope_note_ru: "Действительное определение Q появляется после двух более ранних упоминаний Anum/Q; в итоговом тексте нужен ранний ввод Q."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 50
+    node: "g7:sequence-origin"
+    disposition: retain
+    scope_note_ru: "Локальное начало последовательности R не равно нулю Nat U по одному только слову «начало»."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 51
+    node: "g7:objective-orbit-qualified"
+    disposition: retain
+    scope_note_ru: "Объективная хиральность формулируется раньше выбора наблюдателя; не делать контекстный маркер её предпосылкой."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 52
+    node: "g7:context-marker-qualified"
+    disposition: retain
+    scope_note_ru: "CTX_03_context_selection_induces_local_roles доказана лишь после отдельного предъявления ContextOrientationMarker; не считать контекст автоматически ориентированным."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 53
+    node: "g7:context-local-names"
+    disposition: retain
+    scope_note_ru: "χ(K), START_K и END_K имеют относительную область имён выбранного контекста, не глобальные сущности."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 54
+    node: "g7:relative-z2"
+    disposition: retain
+    scope_note_ru: "Перенос типа Z₂ в {Id,J} описывается между ориентированными контекстами, не безусловной глобальной инверсией."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 55
+    node: "g7:orientation-authority-boundary"
+    disposition: retain
+    scope_note_ru: "Авторитет ориентации принадлежит контекстному Link-маркеру, а не глобальному W, host Boolean или кодеку."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 56
+    node: "g8:positional-forms"
+    disposition: retain
+    scope_note_ru: "Остенсивные формы ∞, ♂S, S♀ и A⟼B являются записью, а не новой онтологией."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 57
+    node: "g8:grammar-explicit"
+    disposition: retain
+    scope_note_ru: "Явная грамматика устанавливает правила разбора, но не создает новый математический конструктор Link."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 58
+    node: "g8:reject-ambiguity"
+    disposition: retain
+    scope_note_ru: "Отклонение неоднозначной записи необходимо привязывать к профилю v0.14, а не к универсальной невозможности последовательного разбора."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 59
+    node: "g8:no-implicit-associativity"
+    disposition: version-boundary
+    scope_note_ru: "implicitPairAssociativity=NONE относится к v0.14, не опровергает иной правилом заданный выбор группирования в v0.15."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 60
+    node: "g8:v015-das-version-boundary"
+    disposition: chapter-transition
+    scope_note_ru: "Версионная оговорка о прямой последовательной ассоциативности v0.15 должна быть явным отдельным подразделом после v0.14, чтобы не читалась как логическое противоречие."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 61
+    node: "g8:codecs-level"
+    disposition: retain
+    scope_note_ru: "Anum, ExactSequence, Q и рекурсивный Link codec классифицируются как способы представления, а не равнозначные кодеки."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 62
+    node: "g8:byte-text-level"
+    disposition: retain
+    scope_note_ru: "STRING/UTF-8 являются транспортом текста/байтов, не отдельным основанием полюсной денотации."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 63
+    node: "g8:symbolic-meta-level"
+    disposition: retain
+    scope_note_ru: "Имена, Dictionary, Grammar, Theory и FORMAL относятся к символической записи и её управлению, не к дополнительным Link-сортам."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 64
+    node: "g8:no-second-ontology"
+    disposition: retain
+    scope_note_ru: "Четыре уровня поверх нулевого не вводят дополнительных онтологических примитивов; нужна явная нумерация уровней 0–4."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 65
+    node: "g10:v14-l3"
+    disposition: retain
+    scope_note_ru: "Q13 и Q14 должны иметь отдельные алфавиты/профили; нельзя переносить их маркеры без версии."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 66
+    node: "g10:v14-l4"
+    disposition: retain
+    scope_note_ru: "Успешные пустой, тождественный, START- и END-результаты реакции нельзя схлопнуть в единственный хостовый Boolean."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 67
+    node: "g10:v14-l7"
+    disposition: retain
+    scope_note_ru: "Count считает позиции ExactSequence, а не число различных Link; повтор позиции обязан сохранять кратность."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 68
+    node: "g10:v14-l8"
+    disposition: retain
+    scope_note_ru: "Сложение Add утверждается функциональным в подтверждённой Nat-области, не в универсуме всех Связей."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 69
+    node: "g10:v14-l9"
+    disposition: retain
+    scope_note_ru: "Le выводится из Add; нельзя автоматически объявлять все привычные аксиомы порядка без дополнительных доказательств."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 70
+    node: "g10:v14-l10"
+    disposition: retain
+    scope_note_ru: "Умножение и полукольцо оставлены вне принятой v0.14; исследовательские примеры не могут менять status."
+    publication_effect: blocked
+    review: individual-proposed
+  - position: 71
+    node: "g10:v14-l11"
+    disposition: version-boundary
+    scope_note_ru: "Обобщённый MP наследует A14→A16→A17→A72w из v0.13; поздняя Γ v0.15 вводится раньше в глоссарии, но не является доказательной предпосылкой MP."
+    publication_effect: blocked
+    review: individual-proposed
+findings:
+  - id: R40-08
+    severity: high
+    first_use_consumer: "g7:q-codec"
+    first_use_symbols: [Q]
+    definition_node: "g7:q-codec"
+    remedy_ru: "Текущее первое определение Q на позиции 49 запаздывает относительно употреблений на позициях 38 и 39; требуется отдельная источник-принадлежащая ранняя дефиниция Q перед сравнением кодеков, без переноса Q13/Q14 на один профиль."
+    state: proposed
+  - id: R40-09
+    severity: medium
+    first_use_consumer: "g8:no-implicit-associativity"
+    first_use_symbols: [v014-v015-grammar]
+    definition_node: "g8:v015-das-version-boundary"
+    remedy_ru: "Разделить учебные заголовки грамматики v0.14 (NONE) и прямой последовательной ассоциативности v0.15; показать оба правила вместе с явной областью действия."
+    state: proposed
+  - id: R40-10
+    severity: medium
+    first_use_consumer: "g10:v14-l11"
+    first_use_symbols: [Modus-Ponens, Gamma]
+    definition_node: "concept:gamma-first-use"
+    remedy_ru: "В учебном тексте явно показать принятую последовательность развития MP v0.13→v0.14 и отдельно операционную Γ v0.15; не смешивать логическую реакцию с поздней реализацией."
+    state: proposed

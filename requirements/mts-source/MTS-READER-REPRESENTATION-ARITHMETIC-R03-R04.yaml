@@ -1,0 +1,61 @@
+# Proposed R03/R04 scientific reviewer response; NOT a normative source revision.
+schema: mts-v015-review-representation-arithmetic-r03-r04/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-ANET-EXACTSEQUENCE-R01-R02.yaml
+review_packages: [R03, R04]
+source_paths:
+  accepted: contracts/mts-contract-v0.14.json
+  accepted_v015: contracts/mts-contract-v0.15.json
+  source_spec: docs/specs/Ачисла и сериализация.md
+  arithmetic_spec: docs/theory/Система аксиом МТС.md
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  q14_ts: ts/test/v014-q14-versioned-interpreter.test.ts
+  exact_ts: ts/src/exact-sequence.ts
+  add_ts: ts/test/derived-nat-addition-proof.test.ts
+  order_ts: ts/test/research-v014-order-replay-mul-scope.test.ts
+  nat_ts: ts/test/derived-nat0-induction-closure.test.ts
+  formal_ts: ts/test/v015-formal-exact-sequence-b7.test.ts
+representation:
+  heading_ru: "R03. Структурный код 8/9/6/1, Anum и интерпретаторы Q13/Q14"
+  alphabet_ru: "После выбора ориентации Context четыре локальных класса ROOT, START_K, END_K, PAIR получают префиксные символы 8, 9, 6, 1 и синтаксическое правило S ::= 8 | 9 S | 6 S | 1 S S. Это рекурсивная грамматика описания одной конечной структурной Link, а не четыре порождающие онтологические операции, не физический набор команд и не алфавит Anum или Q. До ориентации START_K и END_K являются двумя реляционно различимыми, но хирально сопряжёнными классами."
+  example_ru: "При объявленных локальных именах фиксируются демонстрационные записи R=8, O=98, C=68, L=19868, U=16898. Например, 19868 читается как PAIR(START(ROOT), END(ROOT)); это порядок разбора двух полюсов, а не десятичное число 19868. Глиф 1 структурного PAIR нельзя без явной грамматики превратить в исторический Q13 token 1. Запись 98 представляет один структурный Link, не последовательность двух отдельных Links."
+  theorem_ru: "FND_05_recursive_description_total утверждает существование структурного RecursiveDescriptionCode для Grounded(x), только при a1:A1RecursiveSeparation(F) и D:FiniteRecursiveCarrierDecision(F). recursive_description_functional доказывает однозначность описания по данному Link, а FND_05_canonical_recursive_description_unique объединяет существование и единственность на той же области. Proof-тип RecursiveDescriptionCode — объект внешнего метаязыка Lean4/Rocq, а не новый сорт МТС; эти теоремы не доказывают глобальной канонизации всех циклических Link или корректности произвольного физического сериализатора."
+  anum_ru: "Anum — укоренённое в R компактное последовательностное кодирование Links; ExactSequence — носитель точного позиционного списка. Поэтому структурная запись одной Link, Anum последовательности Links, точный carrier ExactSequence и денотация свёртки F_R суть четыре разные операции или интерпретационные роли, даже если они представлены одним Link-носителем в физической памяти. Наличие одного символа R в последовательности не делает её пустой, а сокращение повторяющегося fold-образа не равнозначно устранению повторов позиций."
+  q_ru: "Q14 имеет ровно исходный алфавит [, ], T, F; исторический Q13 неизменяемо использует [, ], 1, 0. Смысл Q14-T равен L, Q14-F равен U при выбранной символической интерпретации; legacy Q13-1 и Q13-0 преобразуются соответственно в T и F лишь при явном versioned transcode. Алфавиты несовместимы для прямого парсинга: Q14 отвергает 1/0, Q13 отвергает T/F, смешанный source отвергается. Эти глифы не являются доказательством структурного или арифметического равенства."
+  qexample_ru: "Для принятого символического Q14-интерпретатора проверены исходные примеры: пустой source и [] денотируют R, T денотирует L, F — U, TF денотирует (L⟼U), [TF] денотирует (R⟼(L⟼U)), [[TF]] денотирует (R⟼(R⟼(L⟼U))). Это значения интерпретатора Q, а не значения позиционной ExactSequence; совпадение результата R для пустого source и [] — пример неинъективности интерпретации на уровне исходных строк."
+  transcode_ru: "Явная операция transcodeLegacyQ13ToV014Canonical переводит Q13 [10] в Q14 [TF], сохраняя выбранную Link-денотацию; комментарии и пробелы исходного текста канонизируются. Следовательно, equal_denotation(source₁,source₂) не влечёт source₁=source₂ как буквальной строки. В частности, точное восстановление исходных байт после такого transcode не является принятым законом. Проверенный roundtrip относится к конкретному поддерживаемому профилю/носителю и не переносится автоматически на все тексты, циклы и интерпретаторы."
+  limits_ru: "Приговоры о парсере и transcoding основаны на исполняемом TypeScript v0.14/Q14 корпусе; внешние парные kernel-леммы покрывают только оговоренную рекурсивную структуру FND-05 и разделение representation identities FND-11. Из них не следует end-to-end доказательство байтового roundtrip, семантики произвольной Q-версии или тотальности на неграундированных объектах. Исторические примеры и Q13 остаются неизменными свидетельствами предыдущих версий, но не альтернативным current-языком Q14."
+arithmetic:
+  heading_ru: "R04. Производные Nat, Degree, Count, Add и Le: конструктивная область и свидетельства"
+  nat_ru: "Принятая арифметическая шкала Nat задаётся внешней нотацией N₀=U и Succ(N)=N⟼L, то есть N₁=U⟼L, N₂=(U⟼L)⟼L. Она отделена от исторической шкалы Degree, в которой D₁=L и NextDegree(D)=D⟼L. При корректной выбранной Link-модели нельзя выводить N₁=D₁ только из сходства записи; контракт прямо требует oneEqualsDegreeOne=false. Ни одна из шкал не является вторым онтологическим типом поверх Link."
+  successor_ru: "Для канонической области Nat контракт v0.14 требует successorInjective=true, zeroNotSuccessor=true и uniquePredecessor=true. Инъективность шага на сформированных Связях структурно согласуется с fnd13_form_injective, но отрицание N₀=Succ(n) и свойства области Nat не должны приписываться одной этой общей инъективности без дополнительных посылок о U и кодировании. Замкнутость/минимальность выбранной Nat-области отмечены в контракте как GREEN_RESEARCH, а не произвольно глобальные свойства всех Link."
+  count_ru: "Count действует на канонической позиционной ExactSequence и возвращает Nat, представляющий число позиций: Count([])=N₀, Count([R])=N₁, Count([R,R])=N₂. Здесь повторяющиеся равные значения учитываются дважды, так как положение не определяется равенством элементов семантической ANet. Count не определён через количество физических Link в памяти, длину глифической строки, число уникальных значений или F_R: свёртка [] и [R] при принятом профиле может совпасть, тогда как Count различается."
+  add_ru: "Сложение Add объявлено отношением с конструкторной областью: BASE даёт Add(A,U,A); STEP требует предыдущее Add(A,B,C) плюс допустимые Succ(B,B₁) и Succ(C,C₁), после чего допускает Add(A,B₁,C₁). При выбранной системе canonical proof authority это даёт доказательства сложения по рекурсии второго аргумента. Однако один ambient Link, внешне похожий на Add, не проходит верификацию и не обладает authority. Принятые totality/functionality относятся к выбранной области Nat и допущенным конструкторным свидетельствам."
+  addexample_ru: "Например, при принятом BASE получаем Add(N₁,U,N₁); при одном легитимном STEP с Succ(U,N₁) и Succ(N₁,N₂) — Add(N₁,N₁,N₂). Это вывод внутри схемы BASE/STEP по заданным свидетельствам, а не host-операция сложения числовых идентификаторов. Порядок доказательного построения и полномочия Rule относятся к выбранной Theory; подложная метка ruleKind=add, отсутствие рекурсивной предпосылки или чужая Theory должны отвергаться."
+  order_ru: "Производный порядок Le(A,B) выводится при наличии авторизованного свидетельства Add(A,k,B) по правилу FROM_ADD с явным k; k — свидетель разности/добавки, а не скрытое арифметическое поле. В принятом тесте проверяется именно proof-replay от допустимого Add к Le и отказ forged/foreign/unadmitted доказательств. Следовательно, Le не допускает доказательство лишь по существованию физического похожего Link или по host-сравнению handles."
+  zero_ru: "Nat-ноль N₀=U нельзя смешивать с корневой Link R, отсутствием элемента ANet, пустым результатом Γ, пустой ExactSequence или source Q, денотирующим R. Это пять различных типов утверждений об отдельных семантических и представительных уровнях. Так, Count([])=U по принятой шкале Nat, но carrier([])=R по профилю ExactSequence; U и R являются различными базисными представителями при объявленной F03-модели."
+  proof_ru: "Статус доказательств необходимо разделять: конструкторные Nat/Add/Le и Count подтверждены принятыми исполняемыми v0.14 контрактами и TypeScript-векторами (включая отрицательные). В исследованных принятых MtsFoundation.lean/.v и MtsV015Formal.lean/.v нет специализированной парной теоремы, объявляющей весь Nat/Add/Le production-алгоритм верифицированным Lean4/Rocq. Поэтому kernel-ассуранса этих операций пока нельзя заявлять; построение точной формальной модели, её доказательства и refinement — отдельное открытое научное обязательство."
+  limits_ru: "В границах принятой v0.14 умножение, полное полукольцо и общая теория упорядоченных арифметических структур явно отложены: multiplicationScope.status=EXPLICITLY_DEFERRED. Не допускается вывод полной арифметики Пеано из показанных базисных уравнений, приписывание глобальной разрешимости любого Nat-предиката и перенос отдельно протестированных сценариев на произвольные циклические Link. Повышение исследовательского свидетельства до теоремы требует отдельной Lean4/Rocq-спецификации и авторского решения."
+evidence:
+  - {id: R03-CODE, origin: accepted, key: recursivePrefixCodec, scope: declared-contextual-finite-structure}
+  - {id: R03-ANUM, origin: accepted, key: sequenceSemantics, scope: rooted-sequential-carrier-not-link-grammar}
+  - {id: R03-Q14, origin: accepted, key: q14Interpreter, scope: strict-Q14-source-alphabet}
+  - {id: R03-Q13, origin: accepted, key: legacyQ13Compatibility, scope: explicit-denotation-preserving-transcode}
+  - {id: R03-FND05, origin: foundation, key: FND_05_canonical_recursive_description_unique, scope: Grounded-plus-A1-plus-decision}
+  - {id: R04-NAT, origin: accepted, key: natTheory, scope: selected-nat-evidence}
+  - {id: R04-DEGREE, origin: accepted, key: connectivityDegreeTheory, scope: distinct-degree-scale}
+  - {id: R04-COUNT, origin: accepted, key: countTheory, scope: exact-positional-sequence}
+  - {id: R04-ADD, origin: accepted, key: addTheory, scope: authorized-base-step}
+  - {id: R04-LE, origin: accepted, key: orderTheory, scope: from-canonical-add-proof}
+  - {id: R04-MUL, origin: accepted, key: multiplicationScope, scope: explicitly-deferred}
+negative_cases: [Q14_REJECT_1_0, Q13_REJECT_T_F, MIXED_SOURCE_REJECT, Q_TRANSCODE_NOT_BYTES,
+  RECURSIVE_CODE_NOT_ANUM, ROUNDTRIP_NOT_UNIVERSAL, COUNT_NOT_FOLD, DEGREE_NOT_NAT,
+  FORGED_ADD_REJECT, LE_REQUIRES_ADD, SEMIRING_NOT_ACCEPTED]
+open_obligations: [GLOBAL_NON_GROUNDED_RECURSIVE_CODEC, Q_CROSS_VERSION_BYTES_NOT_PRESERVED,
+  NAT_ADD_LE_PAIRED_KERNEL_FORMALIZATION, PRODUCTION_ARITHMETIC_REFINEMENT]

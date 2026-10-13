@@ -1,0 +1,173 @@
+# M06-W2: четыре вопроса B/C; научные вердикты OPEN, источник PDF — только транскрипция.
+schema: mts-v015-m06-question-replies-w2/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+review_issue: 2259
+upstream_inventory: requirements/mts-source/MTS-READER-QUESTIONS-M06-INDEX.yaml
+upstream_wave: requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W1.yaml
+review_scope: [C-01, B-1.3, C-02, C-03]
+scientific_verdict: OPEN
+source_note: "Дословность проверена по постраничным текстовым извлечениям; байтовое совпадение с оригинальными PDF НЕ доказано."
+source_blobs:
+  lean_foundation: f283192148ef5381f02a0b23d50b9884cf10b0c0
+  rocq_foundation: 66db1fb851724898112cfcd9ba5022c4d766b35d
+  lean_model: 744309364e08dc9b554bde7c3138b7ba84387a72
+  rocq_model: 6dd9823754e3ac52d8cd7f4184ff8b71d496f8c3
+candidate_proof_blobs:
+  lean4: 75433cb107048148cefe12630e59b4042f550dd3
+  rocq: f9e45f6d5808258e64b4c84450e70b011c4a208a
+kernel_evidence:
+  run_id: 38318851278
+  exact_head: e0005cb07d67910a6b70321eccb415f01bd51f04
+  ci_conclusion: SUCCESS
+  lean_model_axioms: [propext]
+  lean_foundation_injection_axioms: []
+  rocq_global_assumptions: []
+  publication_authority: none
+cases:
+  - id: C-01
+    reviewer: C
+    owner: F01
+    original_question_ru: >-
+      В §1.1 указаны form, start, finish и R, причём start(form(a,b))=a и finish(form(a,b))=b.
+      Принято ли также уравнение form(start(x),finish(x))=x для любого x? Если нет,
+      что представляют собой Связи, не лежащие в образе form, и как для них
+      определяется структурное представление?
+    evidence_class: COUNTERMODEL_FROM_ACCEPTED_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, decode, decode_form, start, finish]
+    kernel_theorems:
+      lean4: [M06_W2_badStart_not_form_image, M06_W2_reverse_law_fails]
+      rocq: [M06_W2_bad_start_not_form_image, M06_W2_reverse_law_fails]
+    answer_ru: >-
+      Нет. Одно-сортный Foundation постулирует тотальные form, start, finish,
+      R, законы обеих проекций и form(R,R)=R, но не обратное равенство
+      для произвольного x. В принятой модели носитель Link=List Bool:
+      badStart=[false], badFinish=[true]; decode(badStart)=none,
+      start(badStart)=badStart, finish(badStart)=badFinish. При этом
+      decode(form(a,b))=some(a,b) для любых a,b. Следовательно, badStart
+      не содержится в образе form и form(start(badStart),finish(badStart))
+      не может совпадать с badStart. У элемента вне образа конструктора
+      существуют тотальные полюса, но нет глобальной гарантии
+      канонического рекурсивного представления; она требует специальных
+      предпосылок Grounded-нормализации и её области определения.
+    limitation_ru: >-
+      Парные именованные свидетельства обратного неравенства добавлены и
+      компилируются в Lean4/Rocq отдельно от принятой Foundation.
+      В Lean4 эти модельные теоремы зависят от внешней аксиомы propext;
+      в Rocq их Print Assumptions показывает отсутствие зависимостей
+      от дополнительных аксиом. Это не доказывает поддержку всех ambient
+      Link в production, глобальную экстенсиональность или физический смысл
+      неканонических элементов. Независимая научная приёмка не выполнена.
+    scientific_status: OPEN
+  - id: B-1.3
+    reviewer: B
+    owner: F01
+    original_question_ru: >-
+      Предполагается ли обратное уравнение form(start(x),finish(x))=x для
+      произвольного x? Если нет, то Foundation допускает «лишние» Link,
+      не лежащие в образе form, и даже разные такие Link с одинаковыми
+      проекциями. Это намеренная особенность модели?
+    evidence_class: COUNTERMODEL_FROM_ACCEPTED_DEFINITIONS
+    evidence_symbols: [ExplicitFoundation, badStart, badFinish, badStart_ne_badFinish, FND_13_identity_by_poles]
+    kernel_theorems:
+      lean4: [M06_W2_poles_nonextensional]
+      rocq: [M06_W2_poles_nonextensional]
+    answer_ru: >-
+      Да, это допустимая свобода слабого математического Foundation.
+      Из законов проекций следует инъективность form, но не его
+      сюръективность. В явной модели badStart=[false] и badFinish=[true]
+      различны, но оба имеют start=badStart и finish=badFinish. Такие
+      элементы могут иметь одинаковые полюса без тождества самих Link.
+      FND-13 устанавливает экстенсиональность только для двух Grounded
+      Link при отдельной F2F3GroundedNormalization, а не на всём
+      носителе. Свобода нетождественных ambient элементов математическая
+      и не означает различие физических дескрипторов одного объекта.
+    limitation_ru: >-
+      Свидетели badStart и badFinish доказанно не Grounded. Поэтому
+      перенос условной FND-13 на них запрещён. Парная модельная теорема
+      M06_W2_poles_nonextensional прошла проверку обоими ядрами;
+      в Lean4 она зависит от propext. Нельзя считать её теоремой о
+      математической уникальности МТС или об устройстве A-memory.
+    scientific_status: OPEN
+  - id: C-02
+    reviewer: C
+    owner: F02
+    original_question_ru: >-
+      Можно предъявить хотя бы одну полностью описанную математическую модель,
+      одновременно удовлетворяющую Foundation, A1RecursiveSeparation,
+      F2F3OneSidedExistence, Grounded-нормализации и требуемому
+      RecursiveInversionDomain? Нужны носитель, интерпретации операций
+      и проверка совместности предпосылок, а не только ссылки на условные теоремы.
+    evidence_class: JOINT_TYPED_WITNESSES_IN_ACCEPTED_MODEL
+    evidence_symbols: [ExplicitFoundation, ExplicitOneSided, ExplicitInversionDomain, ExplicitGroundedNormalization, explicit_a1]
+    kernel_theorems:
+      lean4: [M06_W2_joint_model_witness]
+      rocq: [M06_W2_joint_model_witness]
+    answer_ru: >-
+      В принятых моделях Lean4 и Rocq дан один и тот же носитель
+      ModelLink=List Bool, R=[] и тотальные form, start, finish через
+      однозначные коды ROOT, START, END и PAIR и декодер с явно
+      заданной fallback-парой. Именно для одного ExplicitFoundation
+      одновременно построены ExplicitOneSided:F2F3OneSidedExistence,
+      ExplicitInversionDomain:RecursiveInversionDomain с явной
+      зависимостью от ExplicitOneSided,
+      ExplicitGroundedNormalization:F2F3GroundedNormalization
+      и доказательство explicit_a1:A1RecursiveSeparation.
+      Все поля соответствующих интерфейсов проверяются внешними
+      формальными ядрами. Это совместная реализация посылок, а не
+      четыре несвязанных примера на разных носителях.
+    limitation_ru: >-
+      Совместная внешняя модель не доказывает корректность production Γ,
+      возможность физически хранить бесконечный носитель, глобальную
+      полюсную экстенсиональность или полноту описания реализации.
+      Именованный совместный свидетель M06_W2_joint_model_witness
+      теперь скомпилирован в Lean4/Rocq; его доказательство в Lean4
+      использует внешний propext. Он не заменяет независимую
+      научную рецензию или авторскую приёмку.
+    scientific_status: OPEN
+  - id: C-03
+    reviewer: C
+    owner: F01
+    original_question_ru: >-
+      Из двух уравнений проекций следует инъективность form: Link×Link → Link.
+      Поэтому конечный носитель Link, если в нём более одного элемента,
+      невозможен. Является ли бесконечность всякой нетривиальной модели
+      установленным следствием МТС и учитывается ли это в реализации?
+    evidence_class: FINITE_CARDINALITY_CONSEQUENCE_OF_ACCEPTED_INJECTION
+    evidence_symbols: [fnd13_form_injective, form_start, form_finish]
+    kernel_theorems:
+      lean4: [M06_W2_two_distinct_implies_nat_injection]
+      rocq: [M06_W2_two_distinct_implies_nat_injection]
+    answer_ru: >-
+      В полной обычной set-theoretic модели да. Проекции дают инъекцию
+      form:Link×Link→Link, доказанную в Lean4/Rocq как
+      fnd13_form_injective. При конечной мощности n константа R
+      обеспечивает n≥1; инъекция произведения даёт n²≤n, откуда
+      n=1. Следовательно, всякая нетривиальная полная модель
+      Foundation бесконечна. Более сильная конструктивная теорема
+      M06_W2_two_distinct_implies_nat_injection выводит инъекцию
+      натуральных чисел в Link непосредственно из двух различных Links:
+      t(0)=form(R,b), t(n+1)=form(t(n),a) при a≠b. Проекции
+      доказывают попарную различимость всех t(n). Теорема проверена
+      в Lean4 без аксиом и в Rocq без глобальных предположений, не
+      использует A1, F2F3 или Grounded. Это не новая аксиома МТС.
+    limitation_ru: >-
+      Из этого нельзя выводить необходимость бесконечной физической
+      памяти: конечное хранилище может содержать лишь часть Link.
+      Его конечный фрагмент при этом не обязан быть тотальной моделью
+      Foundation, замкнутой относительно form. Существование инъекции
+      натуральных чисел установлено формально для каждого нетривиального
+      Foundation; отдельная теорема finite→singleton не требуется
+      для этого вывода. Это не утверждение о бесконечности хранилища.
+    scientific_status: OPEN
+open_obligations:
+  - M06_W2_FOUR_SCIENTIFIC_VERDICTS_PENDING
+  - M06_W2_KERNEL_RESULTS_REQUIRE_INDEPENDENT_SCIENTIFIC_REVIEW
+  - M06_W2_PRODUCTION_REFINEMENT_NOT_ESTABLISHED
+  - M06_W2_WORKFLOW_GOVERNANCE_AUTHORIZATION_PENDING
+  - M06_A_38_VERBATIM_ORIGINALS_NOT_RECOVERED
+  - M06_BC_PDF_ORIGINAL_BYTES_UNAVAILABLE

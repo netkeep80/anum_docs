@@ -1,0 +1,154 @@
+# R36: newly exposed 24 edges after transitive reduction of R35.
+# Source-owned individual scientific review, not proof or author approval.
+schema: mts-reader-edge-review/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+review_base_commit: 5034f11606a7d9abd11952b8ce5c61af3fe9a1c1
+review_boundary: second-order-nonredundant-didactic-not-theorem
+review_count: 24
+entries:
+  - source: "concept:exact-sequence-first-use"
+    consumer: "g7:exact-sequence"
+    decision: remove
+    rationale_ru: "Абзац принятой v0.14 самостоятельно определяет ExactSequence как позиционный носитель; предшествующий v0.15 глоссарий о JSON-массивах не является исторической необходимостью этого определения."
+    limitation_ru: "Не путать ранее принятое тождество позиционной последовательности с поздним JSON lowering."
+    review_status: proposed
+  - source: "g4:context-roles"
+    consumer: "g7:context-marker-qualified"
+    decision: keep
+    rationale_ru: "Абзац v0.14 излагает именно CTX_03_context_selection_induces_local_roles при выбранном маркере, поэтому прямая ссылка на G4-область относительных ролей необходима для корректного чтения."
+    limitation_ru: "Из CTX-03 не следует существование ContextOrientationMarker для каждого body."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g8:ontology-level"
+    decision: keep
+    rationale_ru: "Нулевой онтологический уровень обозначает ровно Link; Foundation вводит его до обсуждения надстроек представления."
+    limitation_ru: "Отдельные структурные формы не равны дополнительным сущностям."
+    review_status: proposed
+  - source: "g4:incidence"
+    consumer: "g8:recursive-level"
+    decision: keep
+    rationale_ru: "Рекурсивный алфавит 8/9/6/1 классифицирует совпадения полюсных позиций, описанные в G4 incidence."
+    limitation_ru: "Буквенный алфавит не становится четырьмя примитивами."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g10:v14-l11"
+    decision: keep
+    rationale_ru: "Обобщённая реляционная реакция Modus Ponens действует над Link; ввод Link предшествует её обсуждению, независимо от более поздней Γ."
+    limitation_ru: "Не переносить J0/S1/S2 v0.15 как предпосылки унаследованной v0.13 цепочки."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-term-01"
+    decision: keep
+    rationale_ru: "Нормативное англоязычное имя ANet относится к асети Link; сначала необходимо определить Link, после чего термин допустимо определить в самом пункте."
+    limitation_ru: "Не объявлять ANet вторым онтологическим объектом."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-onto-01"
+    decision: keep
+    rationale_ru: "Утверждение «единственный базовый объект Link» прямо ссылается на предмет Foundation."
+    limitation_ru: "Ни один хост-кодек или runtime-тип не расширяет базовую онтологию."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-onto-03"
+    decision: keep
+    rationale_ru: "Символическое имя представляет конкретную Link и должно рассматриваться после определения тождества предмета."
+    limitation_ru: "Инвариантность топологии при переименовании не есть новая host-семантика."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-close-01"
+    decision: remove
+    rationale_ru: "VERTICAL_GREEN и closure требований формулируются на уровне свидетельств проекта и могут объясняться независимо от математического Foundation."
+    limitation_ru: "Не выводить статус completion из уравнений form/start/finish."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-close-02"
+    decision: remove
+    rationale_ru: "Классификация внешней версии зависимости — процедура assurance, для определения которой конкретная полюсная структура Link не обязательна."
+    limitation_ru: "Не считать policy-метаданные математическим следствием Link."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-close-03"
+    decision: remove
+    rationale_ru: "Нулевой бюджет специальной host-семантики — запрет архитектурной реализации, а не теорема Foundation."
+    limitation_ru: "Его нарушение обнаруживается аудитом кода, не доказательством root_full_self."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-vert-01"
+    decision: remove
+    rationale_ru: "Полнота VERTICAL_GREEN определяется evidence и контрактами исполнения; прямое исходное уравнение Foundation не требуется, чтобы сформулировать gate."
+    limitation_ru: "Совпадение терминов не является доказательством вертикали."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-vert-02"
+    decision: remove
+    rationale_ru: "Ограничение повышения статусов по реестру — правило governance, не функция двух полюсов Link."
+    limitation_ru: "Зелёный заголовок PR не заменяет evidence."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-onto-02"
+    decision: remove
+    rationale_ru: "Принцип минимальной Grammar-выразимости опирается на Link и ExactSequence, а не на английское слово ANet как независимую терминологическую предпосылку."
+    limitation_ru: "Не изобретать онтологическую сущность из обозначения ANet."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-ctx-01"
+    decision: keep
+    rationale_ru: "Исполнительный Context определяется membership в семантической ANet; термин асети нужен для правильного отличия членства от host-указателя."
+    limitation_ru: "Это не выбор хиральной ориентации ContextOrientationMarker."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-ctx-02"
+    decision: keep
+    rationale_ru: "Роли конкретной Link зависят от контекстной принадлежности в ANet; заранее требуется объяснить область этих отношений."
+    limitation_ru: "Смена имени без смены membership не меняет роль."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "g11:v15-stage-02"
+    decision: remove
+    rationale_ru: "Read-only стадии и запрет неявной материализации относятся к безопасности обработки независимо от имени native ANet."
+    limitation_ru: "Не путать разделение read/write стадий с нативной денотацией."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-gov-01"
+    decision: remove
+    rationale_ru: "Машинная власть реестра требований — правило документооборота и не требует теоремы о form(R,R)."
+    limitation_ru: "Нормативный status не создаётся полюсами Link."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-gov-02"
+    decision: remove
+    rationale_ru: "Аудит hardcoded host-логики может быть описан без математической аксиоматики Foundation."
+    limitation_ru: "Сам CI не доказывает семантическую корректность Γ."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-gov-03"
+    decision: remove
+    rationale_ru: "Детерминированная проекция roadmap является требованием tooling, не следствием определения носителя Связей."
+    limitation_ru: "Нельзя редактировать generated doc как семантический источник."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-gov-04"
+    decision: remove
+    rationale_ru: "Обязательные CI и защита от обходов — процессуальные safeguards, независимые от специальных свойств R."
+    limitation_ru: "Механизм emergency bypass не меняет принятую теорию."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-ready-01"
+    decision: remove
+    rationale_ru: "RELEASE_READY определяется закрытием обязательных требований, не непосредственно Foundation."
+    limitation_ru: "Один зелёный пример не заменяет целый приемочный комплект."
+    review_status: proposed
+  - source: "g4:foundation"
+    consumer: "g11:v15-ready-03"
+    decision: remove
+    rationale_ru: "Только авторское ACCEPT/REJECT определяет статус версии; математическое введение Link не является его prerequisite."
+    limitation_ru: "Выполненный workflow не означает авторский ACCEPT."
+    review_status: proposed
+  - source: "concept:anet-term"
+    consumer: "concept:formal-json-first-use"
+    decision: keep
+    rationale_ru: "Фраза о конвергенции FORMAL и прямого JSON прямо содержит native source ANet; термин желательно ввести прежде."
+    limitation_ru: "Это читательская предпосылка, не математическая доказуемость denotation."
+    review_status: proposed

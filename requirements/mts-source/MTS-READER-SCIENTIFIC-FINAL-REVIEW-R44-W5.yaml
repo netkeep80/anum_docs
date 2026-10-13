@@ -1,0 +1,118 @@
+# R44-W5: bounded independent manuscript/science review and stack cutover prerequisites.
+schema: mts-reader-scientific-final-review-r44-w5/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+scope: nine-open-r40-individual-audit-plus-merging-preconditions
+upstream_reader: requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml
+upstream_reader_source_sha: 2501f9e82d9b06ac2035c93ccb187dc842ce2904
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+review_basis:
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W1.yaml
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W2.yaml
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W3.yaml
+  - requirements/mts-source/MTS-READER-SCIENTIFIC-SECOND-PASS-R42.yaml
+review_cases:
+  - id: R40-06
+    original_wave: R40-W1
+    source_atom: "renderReaderG20Preview"
+    title_ru: "Плотность технических идентификаторов"
+    original_status: open
+    editorial_assessment: technical-prose-remains
+    assessment_ru: "R44-W4 добавляет научную аннотацию, десять переходов, предметные разборы и таблицы доказательств. Но 119 исходных меток остаются видимы непосредственно среди абзацев; это делает текст проверяемым, но не полностью пригодным для последовательного академического чтения."
+    outstanding_ru: "Проверить итоговый рендер глазами и привести иерархию определение → лемма → доказательство → пример к читательскому виду. Отделить техническую трассировку от основного текста, не потеряв ни одного из 119 точных оригиналов."
+    author_question_ru: "Является ли требование читаемости выполненным только после просмотра полной сформированной рукописи, а не по прохождению проверок количества атомов?"
+  - id: R40-07
+    original_wave: R40-W1
+    source_atom: "editorial:foundation-ontology"
+    title_ru: "Повтор Foundation и G16"
+    original_status: open
+    editorial_assessment: duplicate-opening-still-visible
+    assessment_ru: "W4 доказательно разводит исходный интерфейс g4:foundation и пояснение G16 и сохраняет обе исходные формулировки. Тем не менее отдельная поясняющая секция может по-прежнему повторять определение form/start/finish сразу после G4."
+    outstanding_ru: "Проверить непосредственно первый разворот, и либо визуально маркировать G16 как читательский комментарий, либо перестроить композицию без изменения исходных байтов; не дублировать аксиомы как независимые утверждения."
+    author_question_ru: "Достаточна ли существующая маркировка или требуется собственный авторский вариант введения с единственным основным определением?"
+  - id: R40-09
+    original_wave: R40-W2
+    source_atom: "g8:no-implicit-associativity"
+    title_ru: "Ограниченная последовательная группировка"
+    original_status: open
+    editorial_assessment: source-scoped-fix-pending-author
+    assessment_ru: "R44-W1 показывает implicitPairAssociativity=NONE именно как отсутствие соглашения синтаксической группировки v0.14. Для v0.15 отдельно показано A⟼B⟼C=(A⟼B)⟼C; FRM-03 относится лишь к трёхчленному чтению в выбранной модели."
+    outstanding_ru: "Сверить формулировку с принятым формальным языком и подтвердить Автором отсутствие утверждения универсального алгебраического равенства (A⟼B)⟼C=A⟼(B⟼C)."
+    author_question_ru: "Достаточна ли иллюстрация трёх членов как научная граница DAS без постулирования алгебраической ассоциативности?"
+  - id: R40-10
+    original_wave: R40-W2
+    source_atom: "g10:v14-l11"
+    title_ru: "Историческая реакция MP и Γ"
+    original_status: open
+    editorial_assessment: continuity-not-formal-equivalence
+    assessment_ru: "R44-W3 предъявляет цепочку A14→A16→A17→A72w как свидетельство обобщённого MP v0.13/v0.14, а J0/snapshot/S1/S2/атомарную публикацию как исполнительный контракт Γ v0.15."
+    outstanding_ru: "Нужна формальная диаграмма соответствия правил реакции, их входных областей и наблюдаемых выходов. Нельзя утверждать строгую эквивалентность исторического MP и Γ без отдельного теоремного или исполняемого refinement."
+    author_question_ru: "Должна ли рукопись доказывать отношение refinement между историческим MP и Γ или достаточно точного исторического описания разных профилей?"
+  - id: R40-11
+    original_wave: R40-W3
+    source_atom: "g11:v15-ready-03"
+    title_ru: "Авторская приёмка v0.15"
+    original_status: open
+    editorial_assessment: documented-await-author-reader-review
+    assessment_ru: "В R44-W1 введены точные авторские свидетельства issue #1876, PR #2078, историческое время 2026-10-07T23:17:15Z и merge SHA 813a1569300b241a3b70eb282eecd8231db15e4b. Историческая английская цитата V15-READY-03 отделена от состояния ACCEPTED."
+    outstanding_ru: "Проверить сквозной текст на оставшиеся обороты, будто cutover v0.15 ещё ожидается; не путать нынешний SHA main с историческим merge SHA."
+    author_question_ru: "Подтверждает ли Автор, что приведённая хронология корректна и никакой текущий выпуск v0.15 не ожидает повторного ACCEPT?"
+  - id: R40-12
+    original_wave: R40-W3
+    source_atom: "g11:v15-gov-01"
+    title_ru: "Нормативная семантика и административные статусы"
+    original_status: open
+    editorial_assessment: category-separated-await-author-review
+    assessment_ru: "48 требований прошли индивидуальное редакционное рассмотрение. Для каждого отделена семантическая область, исполнительный контракт, условие свидетельства или правило управления; статусы GREEN и ACCEPTED не названы теоремами."
+    outstanding_ru: "Проверить все переходы между главами о математике, runtime и governance на скрытые обобщения; отдельные редакционные категории не становятся новыми нормативными типами требований."
+    author_question_ru: "Приемлемо ли явно вынести правила AUTHOR_REVIEW и CI из математического корпуса в методологическое приложение?"
+  - id: R40-13
+    original_wave: R40-W3
+    source_atom: "g11:v15-formal-proof-01"
+    title_ru: "Теоремы и границы формальных свидетельств"
+    original_status: open
+    editorial_assessment: eight-source-references-await-reader-check
+    assessment_ru: "В W4 добавлены восемь FRM-01…08 с парными идентификаторами Lean4/Rocq, принятыми classifications, premises и exclusions. FRM-04/05/06/07 условны; FRM-08 имеет отдельный production witness, а не доказательство кода TypeScript."
+    outstanding_ru: "Провести фразу-за-фразой соответствие утверждений рукописи точным теоремным сигнатурам. Проверить ссылки по рендеру и не подменять доказанное в модели обещаниями корректности production."
+    author_question_ru: "Все ли восемь FRM-случаев полностью соответствуют исходным формулировкам для научной публикации, включая exclusions?"
+  - id: R40-14
+    original_wave: R40-W3
+    source_atom: "g11:v15-and-02"
+    title_ru: "Канонический AND и отрицательный NO_MATCH"
+    original_status: open
+    editorial_assessment: approved-source-example-await-science-review
+    assessment_ru: "R43 воспроизводит из утверждённых compact-and FORMAL/JSON четыре правила FF/FT/TF/TT, а NO_MATCH предъявляет отдельно по отрицательному тесту вне T/F. Пятого утверждённого JSON-правила здесь нет."
+    outstanding_ru: "Проверить, что исходные четыре zero-role правила и trace их исполнения доступны рядом с примером, а строгая область T/F не размыта при редакционной правке."
+    author_question_ru: "Нужен ли полный пошаговый trace Γ для одного случая AND в основном тексте вместо простого источника и таблицы?"
+  - id: R40-15
+    original_wave: R40-W3
+    source_atom: "g11:v15-json-04"
+    title_ru: "ExactSequence и свёртка F_R"
+    original_status: open
+    editorial_assessment: positional-test-not-general-theorem
+    assessment_ru: "R42/R43 сохраняют проверяемые []=R, [F,T]≠[T,F], дублирование [F,F] и различие F→T от [F,T]. Production FRM-04 опирается на отдельную предпосылку инъективности ExactSequence."
+    outstanding_ru: "Запрещено выводить позиционное тождество только из одного значения F_R; доказательство неинъективности конкретной F_R или конкретная коллизия должны предъявляться лишь как проверенный отдельный математический свидетель."
+    author_question_ru: "Следует ли отдельно формализовать свойства F_R и искать конструктивный контрпример его достаточности для позиционного тождества в рамках v0.16?"
+stack_checkpoint:
+  snapshot_kind: audited-live-github-not-a-future-execution-license
+  original_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+  branch_hygiene_pr: 2157
+  branch_hygiene_head: 7dac7cc1629803a755cc6d47e9ea8f02b532add9
+  sequence:
+    - {pr: 2138, commits: 55, head: c3dad577e40d0929a9f740038b56285dfffceef7, base_pr: 0}
+    - {pr: 2153, commits: 15, head: a82f7a8a4d5c792adee0e11f7d32ee93ec496143, base_pr: 2138}
+    - {pr: 2164, commits: 9, head: 431ebbd0d8dbf0c202bedf0faaca8f85f38c04ef, base_pr: 2153}
+    - {pr: 2173, commits: 79, head: 2501f9e82d9b06ac2035c93ccb187dc842ce2904, base_pr: 2164}
+  safe_gate_ru: "Четыре ветви выстраиваются по прямой линии 55+15+9+79=158 коммитов, без расхождения относительно исходного main. Автоматические проверки TypeScript/Observatory на точных исходных head были успешны, но blocking repo-guard в Draft имеет статус SKIPPED: это ещё не разрешение на слияние."
+  premerge_ru: "Перед каждым merge заново проверить main и все SHA; убедиться в корректном base PR, отсутствии новых чужих коммитов и успешном (не SKIPPED) обязательном repo-guard. Сначала согласовать независимый PR #2157 либо явно зафиксировать безопасный порядок его интеграции; затем последовательно #2138 → #2153 → #2164 → #2173 с переустановкой base и повторным запуском проверок по фактическому состоянию."
+  exclusions_ru: "Этот YAML — снимок фактического состояния стека, а не управляющий скрипт GitHub. Нельзя автоматически принять рукопись, изменить нормативную v0.15, закрыть R40, merge ветку или удалить исторические изображения только по успешному аудиту истории."
+author_science_gate:
+  state: hold-for-author-science-review
+  required_before_publication: [source-provenance-review, complete-mathematical-claim-review, nine-open-r40-individual-decisions, explicit-author-publication-approval]
+  source_atoms: 119
+  accepted_requirements: 48
+  formal_cases: 8
+  remaining_open: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]
+  statement_ru: "Девять пунктов остаются открытыми: текущая рукопись имеет проверенные происхождение, структуру и источники свидетельств, но ни машинный test PASS, ни поверхностная рецензия не превращают её целиком в научно принятую публикацию."

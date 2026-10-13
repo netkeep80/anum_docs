@@ -11,7 +11,12 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderDraftPreview, projectReaderDraftPreview,
   loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure,
   loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude,
-  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening }
+  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening,
+  loadReaderReverseNormativeAudit, parseReaderReverseNormativeAudit, deriveReaderReverseNormativeEdges,
+  renderReaderReverseNormativeAudit,
+  loadReaderChapterCycleAudit, deriveReaderChapterCycles, parseReaderChapterCycleAudit,
+  renderReaderChapterCycleAudit,
+  loadReaderEarlyConcepts, parseReaderEarlyConcepts, loadReaderDraftWithEarlyConcepts }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -455,3 +460,128 @@ assert.throws(()=>g16Parse(g16Yaml,g4,{
   }
 }),/accepted v0.13 structural witnesses drift/);
 console.log("G16: original historic source unchanged; standalone blocked scientific prelude candidate.");
+
+
+const g17Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-INVERSION-G17.yaml"),"utf8");
+const g17=loadReaderReverseNormativeAudit(root);
+assert.equal(g17.schema,"mts-reader-inversion-audit/v0.1");
+assert.equal(g17.normativeEdgeCount,100);
+assert.equal(g17.reversedChapterEdges.length,17);
+assert.equal(g17.authorApproval,"not-recorded");
+assert.equal(g17.publication,"blocked");
+assert.equal(g17.readerDag,"scientific-review-pending");
+assert.ok(g17.reversedChapterEdges.every(x=>x.review==="pending" &&
+  x.riskRu.length>=85 && x.proposalRu.length>=85));
+assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V14-L6"&&x.consumer==="V14-L7"));
+assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V15-TERM-01"&&x.consumer==="V15-NAME-01"));
+assert.deepEqual(deriveReaderReverseNormativeEdges(plan,routes).map(x=>[x.prerequisite,x.consumer]),
+  g17.reversedChapterEdges.map(x=>[x.prerequisite,x.consumer]));
+assert.ok(renderReaderReverseNormativeAudit(g17).includes("Авторски утверждённых reader DAG переходов: 0."));
+const g17Parse=(text:string,coverage=plan,routeModel=routes)=>
+  parseReaderReverseNormativeAudit(text,coverage,routeModel);
+assert.throws(()=>g17Parse(g17Source.replace("status: proposed","status: accepted")),
+  /cannot approve editorial or normative\/reader DAG equivalence/);
+assert.throws(()=>g17Parse(g17Source.replace("normative_edges_are_reader_edges: false",
+  "normative_edges_are_reader_edges: true")),
+  /cannot approve editorial or normative\/reader DAG equivalence/);
+assert.throws(()=>g17Parse(g17Source.replace("  - prerequisite: V14-L6",
+  "  - prerequisite: V14-L5")),/accepted normalized dependency\/chapter relation drift/);
+assert.throws(()=>g17Parse(g17Source.replace("    review: pending","    review: green")),
+  /each inversion needs individual unapproved scientific rationale/);
+assert.throws(()=>g17Parse(g17Source.replace("observations:\n","observations:\n  - prerequisite: V14-L6\n    prerequisite: V14-L6\n")),
+  /G17 invalid inversion YAML/);
+const alteredPlan={...plan,rows:plan.rows.map(x=>x.id==="V14-L7"?{
+  ...x,normativeDependsOn:["V14-L13"],
+}:x)};
+assert.throws(()=>g17Parse(g17Source,alteredPlan),/accepted normative dependency source drift/);
+console.log("G17: 100 normative edges; 17 individually reviewed chapter inversions, zero accepted reader DAG edges.");
+
+
+const g18Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-CHAPTER-CYCLES-G18.yaml"),"utf8");
+const g18=loadReaderChapterCycleAudit(root);
+assert.equal(g18.schema,"mts-reader-chapter-cycle-audit/v0.1");
+assert.equal(g18.acceptedNormativeEdges,100);
+assert.equal(g18.normativeLawDagAcyclic,true);
+assert.equal(g18.crossChapterEdges,37);
+assert.equal(g18.components.length,2);
+assert.deepEqual(g18.components.map(x=>x.members),[
+  ["architecture","arithmetic","formal-notation","foundations","representation"],
+  ["assurance","documentation","governance","proofs","worked-examples"],
+]);
+assert.deepEqual(g18.singletonSections,[
+  "execution","inversion-and-context","terminology",
+]);
+assert.ok(g18.components.every(x=>x.review==="pending" && x.riskRu.length>=110 &&
+  x.repairRu.length>=110));
+assert.equal(g18.authorApproval,"not-recorded");
+assert.equal(g18.publication,"blocked");
+const derivedCycles=deriveReaderChapterCycles(plan,routes);
+assert.equal(derivedCycles.crossChapterEdges,37);
+assert.equal(derivedCycles.normativeLawDagAcyclic,true);
+assert.deepEqual(derivedCycles.cyclicComponents,g18.components.map(x=>x.members));
+assert.ok(renderReaderChapterCycleAudit(g18).includes("не противоречие в принятых законах"));
+const g18Parse=(text:string,coverage=plan,routeModel=routes,audit=g17)=>
+  parseReaderChapterCycleAudit(text,coverage,routeModel,audit);
+assert.throws(()=>g18Parse(g18Source.replace("status: proposed","status: accepted")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("normative_edges_are_reader_edges: false",
+  "normative_edges_are_reader_edges: true")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("cross_chapter_edges: 37",
+  "cross_chapter_edges: 36")),
+  /cannot approve chapter ordering or conflate distinct graphs/);
+assert.throws(()=>g18Parse(g18Source.replace("  - id: foundation-architecture-loop",
+  "  - id: proof-assurance-governance-loop")),
+  /chapter SCC is altered or scientific explanation missing/);
+assert.throws(()=>g18Parse(g18Source.replace("singletons: [execution, inversion-and-context, terminology]",
+  "singletons: [terminology, execution, inversion-and-context]")),
+  /isolated chapter set drift/);
+assert.throws(()=>g18Parse(g18Source.replace("components:\n",
+  "components:\n  - id: fake\n    id: fake\n")),/G18 invalid cycle YAML/);
+const normativeCycle={...plan,rows:plan.rows.map(x=>x.id==="V14-L1"?{
+  ...x,normativeDependsOn:["V14-L2"],
+}:x)};
+assert.throws(()=>deriveReaderChapterCycles(normativeCycle,routes),
+  /accepted law graph has a dependency cycle/);
+console.log("G18: two 5-chapter SCCs over 37 cross-chapter edges; no chapter-level DAG.");
+
+
+const g19Source=readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml"),"utf8");
+const g19=loadReaderEarlyConcepts(root);
+assert.equal(g19.schema,"mts-reader-early-concepts/v0.1");
+assert.equal(g19.definitions.length,5);
+assert.deepEqual(g19.definitions.map(x=>x.acceptedId),[
+  "V15-TERM-01","V14-L6","V15-JSON-04","V15-JSON-02","V15-GAMMA-01",
+]);
+assert.ok(g19.definitions.every(x=>x.review==="pending" && x.introductoryRu.length>=190));
+assert.equal(g19.publication,"blocked");
+assert.equal(g19.authorApproval,"not-recorded");
+const g19Draft=loadReaderDraftWithEarlyConcepts(root);
+assert.ok(g19Draft.indexOf("### Минимальные определения перед первым использованием")>
+  g19Draft.indexOf("### Исходные обозначения корневого базиса"));
+assert.ok(g19Draft.indexOf("### Минимальные определения перед первым использованием")<
+  g19Draft.search(/^## /m));
+assert.equal((g19Draft.match(/^## /gm)??[]).length,13);
+assert.equal((g19Draft.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((g19Draft.match(/^#### /gm)??[]).length,104);
+const acceptedG19=new Map([...v14,...v15].map(x=>[x.id,x.statement]));
+const parse19=(txt:string,laws:ReadonlyMap<string,string>=acceptedG19,
+  contract=v14Contract)=>parseReaderEarlyConcepts(txt,laws,contract);
+assert.throws(()=>parse19(g19Source.replace("status: proposed","status: accepted")),
+  /cannot promote glossary to accepted theory or publication/);
+assert.throws(()=>parse19(g19Source.replace("publication: blocked","publication: ready")),
+  /cannot promote glossary to accepted theory or publication/);
+assert.throws(()=>parse19(g19Source.replace("    accepted_id: V15-TERM-01",
+  "    accepted_id: V15-ONTO-01")),/duplicate\/forged\/missing source-owned/);
+assert.throws(()=>parse19(g19Source,new Map([...acceptedG19].map(([id,law])=>
+  [id,id==="V15-TERM-01"?"forged":law]))),/duplicate\/forged\/missing source-owned/);
+assert.throws(()=>parse19(g19Source,acceptedG19,{
+  ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
+}),/Nat \/ Degree first-use authority drift/);
+assert.throws(()=>parse19(g19Source.replace("definitions:\n",
+  "definitions:\n  - id: false\n    id: false\n")),
+  /G19 invalid early-concepts YAML/);
+console.log("G19: five exact-source first-use terms with no promotion of 62 laws or 104 atoms.");

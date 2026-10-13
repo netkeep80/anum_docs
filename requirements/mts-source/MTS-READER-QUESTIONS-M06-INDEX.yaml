@@ -1,0 +1,1643 @@
+# M06 proposed question source inventory; does not contain approved responses.
+schema: mts-v015-review-questions-m06-inventory/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+package_issue: 2259
+upstream_review: requirements/mts-source/MTS-READER-HISTORICAL-IMAGES-M05.yaml
+owner_plan: "MTS_v015_единый_план_по_трём_рецензиям.md (ChatGPT Library extracted text; master #2217)"
+classification: UNREVIEWED
+question_verdict: OPEN
+source_recovery:
+  A: CHAT_ORIGINAL_FULL_TEXT_NOT_RECOVERED
+  B: INDEXED_PDF_TEXT_TRANSCRIPTION_NOT_ORIGINAL_BYTES
+  C: INDEXED_PDF_TEXT_TRANSCRIPTION_NOT_ORIGINAL_BYTES
+source_documents:
+  B:
+    source_filename: mts-v015-reader-questions.pdf
+    extracted_text_path: reviews/m06/reviewer-b-97-indexed-extraction.txt
+    git_blob_sha1: 80fa8d078da9647030d323e12c96d8c50e849309
+    page_count: 8
+    question_count: 97
+  C:
+    source_filename: mts_v015_voprosy_nezavisimogo_matematika.pdf
+    extracted_text_path: reviews/m06/reviewer-c-43-indexed-extraction.txt
+    git_blob_sha1: df05bb5da124ddb113fee28c6f8f77654c1eb2f5
+    page_count: 6
+    question_count: 43
+expected_question_counts: {A: 38, B: 97, C: 43, total: 178}
+work_package_count: 26
+historical_r40_open: 9
+claims_of_scientific_resolution: 0
+entries:
+  - id: "A-1.1"
+    reviewer: A
+    question_id: "1.1"
+    primary_package: F01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-1.2"
+    reviewer: A
+    question_id: "1.2"
+    primary_package: F01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-1.3"
+    reviewer: A
+    question_id: "1.3"
+    primary_package: F03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-1.4"
+    reviewer: A
+    question_id: "1.4"
+    primary_package: F04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-1.5"
+    reviewer: A
+    question_id: "1.5"
+    primary_package: F03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-2.1"
+    reviewer: A
+    question_id: "2.1"
+    primary_package: F04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-2.2"
+    reviewer: A
+    question_id: "2.2"
+    primary_package: F05
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-2.3"
+    reviewer: A
+    question_id: "2.3"
+    primary_package: F05
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-2.4"
+    reviewer: A
+    question_id: "2.4"
+    primary_package: F06
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-2.5"
+    reviewer: A
+    question_id: "2.5"
+    primary_package: F06
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-3.1"
+    reviewer: A
+    question_id: "3.1"
+    primary_package: R01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-3.2"
+    reviewer: A
+    question_id: "3.2"
+    primary_package: R02
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-3.3"
+    reviewer: A
+    question_id: "3.3"
+    primary_package: R01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-3.4"
+    reviewer: A
+    question_id: "3.4"
+    primary_package: R03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-4.1"
+    reviewer: A
+    question_id: "4.1"
+    primary_package: R04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-4.2"
+    reviewer: A
+    question_id: "4.2"
+    primary_package: R04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-4.3"
+    reviewer: A
+    question_id: "4.3"
+    primary_package: R04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-5.1"
+    reviewer: A
+    question_id: "5.1"
+    primary_package: L01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-5.2"
+    reviewer: A
+    question_id: "5.2"
+    primary_package: L03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-5.3"
+    reviewer: A
+    question_id: "5.3"
+    primary_package: R03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-6.1"
+    reviewer: A
+    question_id: "6.1"
+    primary_package: R01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-6.2"
+    reviewer: A
+    question_id: "6.2"
+    primary_package: F07
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-7.1"
+    reviewer: A
+    question_id: "7.1"
+    primary_package: G01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-7.2"
+    reviewer: A
+    question_id: "7.2"
+    primary_package: G01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-7.3"
+    reviewer: A
+    question_id: "7.3"
+    primary_package: G01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-8.1"
+    reviewer: A
+    question_id: "8.1"
+    primary_package: P01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-8.2"
+    reviewer: A
+    question_id: "8.2"
+    primary_package: P01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-8.3"
+    reviewer: A
+    question_id: "8.3"
+    primary_package: P02
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-9.1"
+    reviewer: A
+    question_id: "9.1"
+    primary_package: G02
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-9.2"
+    reviewer: A
+    question_id: "9.2"
+    primary_package: P02
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-10.1"
+    reviewer: A
+    question_id: "10.1"
+    primary_package: P01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-10.2"
+    reviewer: A
+    question_id: "10.2"
+    primary_package: F01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-10.3"
+    reviewer: A
+    question_id: "10.3"
+    primary_package: M01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-10.4"
+    reviewer: A
+    question_id: "10.4"
+    primary_package: L01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-10.5"
+    reviewer: A
+    question_id: "10.5"
+    primary_package: M04
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-11.1"
+    reviewer: A
+    question_id: "11.1"
+    primary_package: M03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-11.2"
+    reviewer: A
+    question_id: "11.2"
+    primary_package: L01
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "A-11.3"
+    reviewer: A
+    question_id: "11.3"
+    primary_package: M03
+    source_status: SOURCE_RECOVERY_REQUIRED
+    extracted_page: null
+    extracted_line: null
+    first_line_ru: null
+    scientific_status: OPEN
+  - id: "B-1.1"
+    reviewer: B
+    question_id: "1.1"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 29
+    first_line_ru: "Правильно ли я понимаю Foundation как одно-сортную теорию с носителем Link,"
+    scientific_status: OPEN
+  - id: "B-1.2"
+    reviewer: B
+    question_id: "1.2"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 34
+    first_line_ru: "Из двух уравнений для start и finish следует инъективность form: form(a,b)=form(c,d) ⇒"
+    scientific_status: OPEN
+  - id: "B-1.3"
+    reviewer: B
+    question_id: "1.3"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 37
+    first_line_ru: "Предполагается ли обратное уравнение form(start(x),finish(x))=x для произвольного x?"
+    scientific_status: OPEN
+  - id: "B-1.4"
+    reviewer: B
+    question_id: "1.4"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 40
+    first_line_ru: "Если Link онтологически определяется через две полюсные позиции, почему"
+    scientific_status: OPEN
+  - id: "B-1.5"
+    reviewer: B
+    question_id: "1.5"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 44
+    first_line_ru: "Какой тип моделей имеется в виду: обычные множества с тотальными функциями,"
+    scientific_status: OPEN
+  - id: "B-1.6"
+    reviewer: B
+    question_id: "1.6"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 47
+    first_line_ru: "Предъявлена ли явная нетривиальная модель Foundation, содержащая одновременно R,"
+    scientific_status: OPEN
+  - id: "B-1.7"
+    reviewer: B
+    question_id: "1.7"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 50
+    first_line_ru: "Уравнения O=O⟼R и C=R⟼C на стр. 4–5 даны как определения именованных Link. Но"
+    scientific_status: OPEN
+  - id: "B-1.8"
+    reviewer: B
+    question_id: "1.8"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 55
+    first_line_ru: "Где и при каких предпосылках доказано O≠R и C≠R? Без этих неравенств O и C могут"
+    scientific_status: OPEN
+  - id: "B-1.9"
+    reviewer: B
+    question_id: "1.9"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 57
+    first_line_ru: "Где доказаны необходимые различия между R, O, C, L и U? Какие из них теоремы, а"
+    scientific_status: OPEN
+  - id: "B-1.10"
+    reviewer: B
+    question_id: "1.10"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 65
+    first_line_ru: "Используемая логика конструктивна или классична? Текст систематически выделяет"
+    scientific_status: OPEN
+  - id: "B-2.1"
+    reviewer: B
+    question_id: "2.1"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 73
+    first_line_ru: "Четыре класса FullSelf/StartOnly/FinishOnly/PairLocal определяются только сравнением"
+    scientific_status: OPEN
+  - id: "B-2.2"
+    reviewer: B
+    question_id: "2.2"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 76
+    first_line_ru: "LocalSelfDecision(F,x) требует решимости ровно двух равенств. Откуда такие"
+    scientific_status: OPEN
+  - id: "B-2.3"
+    reviewer: B
+    question_id: "2.3"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 80
+    first_line_ru: "Можно ли сформулировать точное индуктивное определение Grounded? Фраза «для"
+    scientific_status: OPEN
+  - id: "B-2.4"
+    reviewer: B
+    question_id: "2.4"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 83
+    first_line_ru: "Является ли Grounded свойством Link или свойством пары (Foundation-модель, Link),"
+    scientific_status: OPEN
+  - id: "B-2.5"
+    reviewer: B
+    question_id: "2.5"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 86
+    first_line_ru: "Существует ли простой структурный критерий Grounded в терминах конечного"
+    scientific_status: OPEN
+  - id: "B-2.6"
+    reviewer: B
+    question_id: "2.6"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 89
+    first_line_ru: "Distinguishable определяется индуктивно. Какова его точная симметрия: доказывается"
+    scientific_status: OPEN
+  - id: "B-2.7"
+    reviewer: B
+    question_id: "2.7"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 92
+    first_line_ru: "A1RecursiveSeparation утверждает ¬Distinguishable(x,y) ⇒ x=y для Grounded. Почему"
+    scientific_status: OPEN
+  - id: "B-2.8"
+    reviewer: B
+    question_id: "2.8"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 95
+    first_line_ru: "Насколько сильна A1 относительно Foundation? Есть ли модель Foundation, где A1"
+    scientific_status: OPEN
+  - id: "B-2.9"
+    reviewer: B
+    question_id: "2.9"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 98
+    first_line_ru: "F2F3GroundedNormalization вводит normalForm и compose. Каковы их типы и полный"
+    scientific_status: OPEN
+  - id: "B-2.10"
+    reviewer: B
+    question_id: "2.10"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 102
+    first_line_ru: "В FND-13 обратное направление «равенство обоих полюсов ⇒ x=y» опирается на"
+    scientific_status: OPEN
+  - id: "B-2.11"
+    reviewer: B
+    question_id: "2.11"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 105
+    first_line_ru: "Если FND-13 действует только на Grounded, существуют ли в допустимых моделях"
+    scientific_status: OPEN
+  - id: "B-3.1"
+    reviewer: B
+    question_id: "3.1"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 112
+    first_line_ru: "Что именно математически делает RecursiveInversion? Нужна явная рекурсивная схема:"
+    scientific_status: OPEN
+  - id: "B-3.2"
+    reviewer: B
+    question_id: "3.2"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 115
+    first_line_ru: "INV-01 утверждает существование инверсии для Grounded, а INV-02 — инволютивность"
+    scientific_status: OPEN
+  - id: "B-3.3"
+    reviewer: B
+    question_id: "3.3"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 126
+    first_line_ru: "Если единственность доказана, почему не определить J как функцию на Grounded-"
+    scientific_status: OPEN
+  - id: "B-3.4"
+    reviewer: B
+    question_id: "3.4"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 129
+    first_line_ru: "Какие дополнительные предпосылки нужны, чтобы инверсия сохраняла Grounded? Это"
+    scientific_status: OPEN
+  - id: "B-3.5"
+    reviewer: B
+    question_id: "3.5"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 132
+    first_line_ru: "Объективная хиральная пара w,jw на стр. 8 существует экзистенциально. Можно ли"
+    scientific_status: OPEN
+  - id: "B-3.6"
+    reviewer: B
+    question_id: "3.6"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 135
+    first_line_ru: "ContextOrientationMarker(body,m) допускает m=startForm(body) или endForm(body)."
+    scientific_status: OPEN
+  - id: "B-3.7"
+    reviewer: B
+    question_id: "3.7"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 138
+    first_line_ru: "CTX_03_context_selection_induces_local_roles утверждает существование двух различных"
+    scientific_status: OPEN
+  - id: "B-3.8"
+    reviewer: B
+    question_id: "3.8"
+    primary_package: F07
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 141
+    first_line_ru: "Что такое Context K как математический объект? В одном месте K — ориентационный"
+    scientific_status: OPEN
+  - id: "B-3.9"
+    reviewer: B
+    question_id: "3.9"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 145
+    first_line_ru: "Контракт A4′ говорит о переносе между ориентированными контекстами элементами"
+    scientific_status: OPEN
+  - id: "B-3.10"
+    reviewer: B
+    question_id: "3.10"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 148
+    first_line_ru: "«Ковариантность семантических законов» при переносе — это теорема, схема"
+    scientific_status: OPEN
+  - id: "B-4.1"
+    reviewer: B
+    question_id: "4.1"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 155
+    first_line_ru: "Как формально определён рекурсивный кодек 8/9/6/1? Если Link может содержать"
+    scientific_status: OPEN
+  - id: "B-4.2"
+    reviewer: B
+    question_id: "4.2"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 158
+    first_line_ru: "Маркеры 8/9/6/1 соответствуют ROOT/START/END/PAIR. Достаточно ли одного маркера на"
+    scientific_status: OPEN
+  - id: "B-4.3"
+    reviewer: B
+    question_id: "4.3"
+    primary_package: R02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 161
+    first_line_ru: "ExactSequence названа «каноническим позиционным носителем уже разрешённых"
+    scientific_status: OPEN
+  - id: "B-4.4"
+    reviewer: B
+    question_id: "4.4"
+    primary_package: R02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 164
+    first_line_ru: "Пустая ExactSequence соответствует R, но FRM-04 отдельно требует различать [] и [R]."
+    scientific_status: OPEN
+  - id: "B-4.5"
+    reviewer: B
+    question_id: "4.5"
+    primary_package: R02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 168
+    first_line_ru: "Что такое корневая свёртка F_R: точная рекурсивная формула, тип и область? Почему"
+    scientific_status: OPEN
+  - id: "B-4.6"
+    reviewer: B
+    question_id: "4.6"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 171
+    first_line_ru: "Anum описан как «корневое компактное представление или кодировка"
+    scientific_status: OPEN
+  - id: "B-4.7"
+    reviewer: B
+    question_id: "4.7"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 180
+    first_line_ru: "Q назван одновременно версионируемым кодеком и интерпретатором"
+    scientific_status: OPEN
+  - id: "B-4.8"
+    reviewer: B
+    question_id: "4.8"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 183
+    first_line_ru: "Q13 и Q14 имеют разные маркеры. Есть ли формальная версия-tagged semantics, в"
+    scientific_status: OPEN
+  - id: "B-4.9"
+    reviewer: B
+    question_id: "4.9"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 186
+    first_line_ru: "Nat определяется N₀=U и Succ(N)=N⟼L. Что именно является множеством Nat:"
+    scientific_status: OPEN
+  - id: "B-4.10"
+    reviewer: B
+    question_id: "4.10"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 189
+    first_line_ru: "Какие теоремы гарантируют, что Nₙ попарно различны и Succ инъективен на Nat? Без"
+    scientific_status: OPEN
+  - id: "B-4.11"
+    reviewer: B
+    question_id: "4.11"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 192
+    first_line_ru: "Аналогично Degree: D₁=L, NextDegree(D)=D⟼L. Доказано ли, что последовательность"
+    scientific_status: OPEN
+  - id: "B-4.12"
+    reviewer: B
+    question_id: "4.12"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 195
+    first_line_ru: "На стр. 11 говорится, что N₁ и D₁ специально различаются и равенство N₁=D₁"
+    scientific_status: OPEN
+  - id: "B-4.13"
+    reviewer: B
+    question_id: "4.13"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 198
+    first_line_ru: "Count возвращает Nat-значение длины ExactSequence. Где доказано, что рекурсивное"
+    scientific_status: OPEN
+  - id: "B-4.14"
+    reviewer: B
+    question_id: "4.14"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 201
+    first_line_ru: "Add заявлена функциональной и тотальной на выбранном Nat. Из каких точных"
+    scientific_status: OPEN
+  - id: "B-4.15"
+    reviewer: B
+    question_id: "4.15"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 204
+    first_line_ru: "Le определяется через Add. Какова точная формула: a≤b ⇔ ∃c, Add(a,c)=b? Какие"
+    scientific_status: OPEN
+  - id: "B-5.1"
+    reviewer: B
+    question_id: "5.1"
+    primary_package: L01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 210
+    first_line_ru: "В v0.14 implicitPairAssociativity=NONE означает отсутствие синтаксического соглашения"
+    scientific_status: OPEN
+  - id: "B-5.2"
+    reviewer: B
+    question_id: "5.2"
+    primary_package: L01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 215
+    first_line_ru: "Можно ли дать BNF/EBNF или индуктивное определение FORMAL-грамматики целиком?"
+    scientific_status: OPEN
+  - id: "B-5.3"
+    reviewer: B
+    question_id: "5.3"
+    primary_package: L02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 218
+    first_line_ru: "Что такое DAS, через которое должны сходиться FORMAL и JSON? Это функция"
+    scientific_status: OPEN
+  - id: "B-5.4"
+    reviewer: B
+    question_id: "5.4"
+    primary_package: L02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 221
+    first_line_ru: "Что именно значит «FORMAL и canonical JSON реконструируют одну native source ANet»:"
+    scientific_status: OPEN
+  - id: "B-5.5"
+    reviewer: B
+    question_id: "5.5"
+    primary_package: R01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 224
+    first_line_ru: "Если одна и та же Link может иметь разные роли из-за membership, как формально"
+    scientific_status: OPEN
+  - id: "B-5.6"
+    reviewer: B
+    question_id: "5.6"
+    primary_package: L01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 228
+    first_line_ru: "Контекстное разрешение имени :A как R:A предполагает систему путей. Как"
+    scientific_status: OPEN
+  - id: "B-5.7"
+    reviewer: B
+    question_id: "5.7"
+    primary_package: R01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 239
+    first_line_ru: "Инвариантность при переименовании сформулирована нормативно. Есть ли формальная"
+    scientific_status: OPEN
+  - id: "B-5.8"
+    reviewer: B
+    question_id: "5.8"
+    primary_package: L01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 242
+    first_line_ru: "Какие циклические FORMAL bindings запрещены и почему? Запрет связан с"
+    scientific_status: OPEN
+  - id: "B-6.1"
+    reviewer: B
+    question_id: "6.1"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 249
+    first_line_ru: "Можно ли записать Γ как математическую функцию или отношение вида Γ : State×Input"
+    scientific_status: OPEN
+  - id: "B-6.2"
+    reviewer: B
+    question_id: "6.2"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 252
+    first_line_ru: "Что такое «текущий конец», на котором J0 выполняет структурную проверку? Это"
+    scientific_status: OPEN
+  - id: "B-6.3"
+    reviewer: B
+    question_id: "6.3"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 254
+    first_line_ru: "Как формально разделены S1 и S2: какие операции разрешены S1 и какие эффекты"
+    scientific_status: OPEN
+  - id: "B-6.4"
+    reviewer: B
+    question_id: "6.4"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 257
+    first_line_ru: "Что является результатом 0/1/N: ноль, одна или несколько новых Link; позиции"
+    scientific_status: OPEN
+  - id: "B-6.5"
+    reviewer: B
+    question_id: "6.5"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 260
+    first_line_ru: "«Атомарная публикация следующего состояния» — математический закон Γ или"
+    scientific_status: OPEN
+  - id: "B-6.6"
+    reviewer: B
+    question_id: "6.6"
+    primary_package: G02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 263
+    first_line_ru: "Что гарантирует детерминизм Γ? Если в ANet применимы несколько Rule, как"
+    scientific_status: OPEN
+  - id: "B-6.7"
+    reviewer: B
+    question_id: "6.7"
+    primary_package: G03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 266
+    first_line_ru: "Boolean T и F в примере AND — какие конкретно Link и как они строятся из базиса? Я не"
+    scientific_status: OPEN
+  - id: "B-6.8"
+    reviewer: B
+    question_id: "6.8"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 269
+    first_line_ru: "NO_MATCH — значение в онтологии Link, внешний статус результата, исключение"
+    scientific_status: OPEN
+  - id: "B-6.9"
+    reviewer: B
+    question_id: "6.9"
+    primary_package: G03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 272
+    first_line_ru: "Почему четыре правила AND называются «zero-role Rule»? Что такое role у Rule и что"
+    scientific_status: OPEN
+  - id: "B-6.10"
+    reviewer: B
+    question_id: "6.10"
+    primary_package: G02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 274
+    first_line_ru: "Тезис «нулевая программно-специфическая host-семантика» является архитектурным"
+    scientific_status: OPEN
+  - id: "B-6.11"
+    reviewer: B
+    question_id: "6.11"
+    primary_package: G02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 278
+    first_line_ru: "Есть ли определённое отношение observational equivalence между каноническим Γ-"
+    scientific_status: OPEN
+  - id: "B-7.1"
+    reviewer: B
+    question_id: "7.1"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 285
+    first_line_ru: "Lean4 и Rocq называются независимыми формализациями. Они формализуют буквально"
+    scientific_status: OPEN
+  - id: "B-7.2"
+    reviewer: B
+    question_id: "7.2"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 295
+    first_line_ru: "Есть ли единый каталог, где для каждой FRM-теоремы приведена полная формальная"
+    scientific_status: OPEN
+  - id: "B-7.3"
+    reviewer: B
+    question_id: "7.3"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 298
+    first_line_ru: "FRM-04 различает [], [R], [R,R] при предположенной инъективности encoding. Что"
+    scientific_status: OPEN
+  - id: "B-7.4"
+    reviewer: B
+    question_id: "7.4"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 302
+    first_line_ru: "FRM-05 выводит общую денотацию из предпосылки, что FORMAL и JSON реконструируют"
+    scientific_status: OPEN
+  - id: "B-7.5"
+    reviewer: B
+    question_id: "7.5"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 306
+    first_line_ru: "FRM-06 предполагает decode(compile(semantic))=semantic и заключает сохранение"
+    scientific_status: OPEN
+  - id: "B-7.6"
+    reviewer: B
+    question_id: "7.6"
+    primary_package: P02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 309
+    first_line_ru: "FRM-07 зависит от трёх production-предпосылок. Каким механизмом исполняемые тесты"
+    scientific_status: OPEN
+  - id: "B-7.7"
+    reviewer: B
+    question_id: "7.7"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 312
+    first_line_ru: "FRM-08 имеет отдельный production witness. Что такое witness по типу: сертификат, хэш"
+    scientific_status: OPEN
+  - id: "B-7.8"
+    reviewer: B
+    question_id: "7.8"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 315
+    first_line_ru: "Есть ли доказательство относительной непротиворечивости всего совместно"
+    scientific_status: OPEN
+  - id: "B-7.9"
+    reviewer: B
+    question_id: "7.9"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 318
+    first_line_ru: "Какие theorem statements из разделов 1–5 действительно находятся в Lean/Rocq, а"
+    scientific_status: OPEN
+  - id: "B-8.1"
+    reviewer: B
+    question_id: "8.1"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 326
+    first_line_ru: "Что именно считается наблюдаемым поведением артефакта при сравнении двух fresh"
+    scientific_status: OPEN
+  - id: "B-8.2"
+    reviewer: B
+    question_id: "8.2"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 329
+    first_line_ru: "Требование независимости от сторонних аллокаций говорит о одинаковом"
+    scientific_status: OPEN
+  - id: "B-8.3"
+    reviewer: B
+    question_id: "8.3"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 332
+    first_line_ru: "Мутационные тесты JSON классифицируются как семантические и транспортные. Есть"
+    scientific_status: OPEN
+  - id: "B-8.4"
+    reviewer: B
+    question_id: "8.4"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 335
+    first_line_ru: "Транзитивное замыкание зависимостей VERTICAL_GREEN — это граф"
+    scientific_status: OPEN
+  - id: "B-8.5"
+    reviewer: B
+    question_id: "8.5"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 338
+    first_line_ru: "Каков критерий достаточности «полного комплекта свидетельств»? Он задан закрытым"
+    scientific_status: OPEN
+  - id: "B-8.6"
+    reviewer: B
+    question_id: "8.6"
+    primary_package: P02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 341
+    first_line_ru: "Регрессионный корпус зафиксирован на A-memory 0.175.0. Какие утверждения"
+    scientific_status: OPEN
+  - id: "B-9.1"
+    reviewer: B
+    question_id: "9.1"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 354
+    first_line_ru: "На титуле сказано «научный черновик — не принято», а в разделе 10 — «МТС v0.15 уже"
+    scientific_status: OPEN
+  - id: "B-9.2"
+    reviewer: B
+    question_id: "9.2"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 358
+    first_line_ru: "Какая минимальная часть документа собственно является математической теорией"
+    scientific_status: OPEN
+  - id: "B-9.3"
+    reviewer: B
+    question_id: "9.3"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 361
+    first_line_ru: "Можно ли в начале дать таблицу «слой → объект → тип утверждения»: Link/Foundation,"
+    scientific_status: OPEN
+  - id: "B-9.4"
+    reviewer: B
+    question_id: "9.4"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 364
+    first_line_ru: "Текст часто использует слова «принятый», «нормативный», «канонический»,"
+    scientific_status: OPEN
+  - id: "B-9.5"
+    reviewer: B
+    question_id: "9.5"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 368
+    first_line_ru: "Приложение В сохраняет 119 исходных атомов без перефразирования. Является ли"
+    scientific_status: OPEN
+  - id: "B-9.6"
+    reviewer: B
+    question_id: "9.6"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 372
+    first_line_ru: "Незакрытые вопросы R40 уже фиксируют часть проблем читабельности и границ"
+    scientific_status: OPEN
+  - id: "B-9.7"
+    reviewer: B
+    question_id: "9.7"
+    primary_package: M02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 376
+    first_line_ru: "Есть ли план дать один полностью разобранный математический пример от Foundation"
+    scientific_status: OPEN
+  - id: "B-10.1"
+    reviewer: B
+    question_id: "10.1"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 384
+    first_line_ru: "Какова одна точная формальная спецификация «ядра МТС» — сигнатура, аксиомы,"
+    scientific_status: OPEN
+  - id: "B-10.2"
+    reviewer: B
+    question_id: "10.2"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 386
+    first_line_ru: "Покажите одну явную модель, в которой одновременно существуют R,O,C,L,U и"
+    scientific_status: OPEN
+  - id: "B-10.3"
+    reviewer: B
+    question_id: "10.3"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 389
+    first_line_ru: "Какие из R,O,C,L,U являются обязательными константами теории, а какие должны"
+    scientific_status: OPEN
+  - id: "B-10.4"
+    reviewer: B
+    question_id: "10.4"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 391
+    first_line_ru: "Что является математическим равенством Link глобально, и почему равенство по двум"
+    scientific_status: OPEN
+  - id: "B-10.5"
+    reviewer: B
+    question_id: "10.5"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 393
+    first_line_ru: "Каково точное определение RecursiveInversion и доказана ли его функциональность,"
+    scientific_status: OPEN
+  - id: "B-10.6"
+    reviewer: B
+    question_id: "10.6"
+    primary_package: R01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 395
+    first_line_ru: "Как формально определены ANet, ExactSequence, DAS и Γ — с типами входов/выходов и"
+    scientific_status: OPEN
+  - id: "B-10.7"
+    reviewer: B
+    question_id: "10.7"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 397
+    first_line_ru: "Какие свойства Nat действительно доказаны и позволяют называть его натуральными"
+    scientific_status: OPEN
+  - id: "B-10.8"
+    reviewer: B
+    question_id: "10.8"
+    primary_package: P02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 399
+    first_line_ru: "Где проходит формальная граница между семантикой МТС и свойствами конкретного"
+    scientific_status: OPEN
+  - id: "B-10.9"
+    reviewer: B
+    question_id: "10.9"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 7
+    extracted_line: 401
+    first_line_ru: "Какой самый сильный математический результат v0.15 доказан без production-"
+    scientific_status: OPEN
+  - id: "B-10.10"
+    reviewer: B
+    question_id: "10.10"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 8
+    extracted_line: 409
+    first_line_ru: "Какой один документ следует считать главным источником математической истины"
+    scientific_status: OPEN
+  - id: "C-01"
+    reviewer: C
+    question_id: "01"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 49
+    first_line_ru: "стр. 4–5 Полная сигнатура и аксиомы"
+    scientific_status: OPEN
+  - id: "C-02"
+    reviewer: C
+    question_id: "02"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 54
+    first_line_ru: "стр. 4–8 Конкретная нетривиальная модель"
+    scientific_status: OPEN
+  - id: "C-03"
+    reviewer: C
+    question_id: "03"
+    primary_package: F01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 1
+    extracted_line: 61
+    first_line_ru: "стр. 4 Мощность носителя Link"
+    scientific_status: OPEN
+  - id: "C-04"
+    reviewer: C
+    question_id: "04"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 79
+    first_line_ru: "стр. 4–5, 6 Статус уравнений для O и C"
+    scientific_status: OPEN
+  - id: "C-05"
+    reviewer: C
+    question_id: "05"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 85
+    first_line_ru: "стр. 4, 6–7 Тождество и одинаковые полюса"
+    scientific_status: OPEN
+  - id: "C-06"
+    reviewer: C
+    question_id: "06"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 90
+    first_line_ru: "стр. 4 Исчерпываемость при конструктивной логике"
+    scientific_status: OPEN
+  - id: "C-07"
+    reviewer: C
+    question_id: "07"
+    primary_package: F03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 96
+    first_line_ru: "стр. 5, 10–11 Различимость базисных элементов"
+    scientific_status: OPEN
+  - id: "C-08"
+    reviewer: C
+    question_id: "08"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 105
+    first_line_ru: "стр. 6–7 Точное индуктивное определение Grounded"
+    scientific_status: OPEN
+  - id: "C-09"
+    reviewer: C
+    question_id: "09"
+    primary_package: F02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 111
+    first_line_ru: "стр. 6 Содержательный статус A1RecursiveSeparation"
+    scientific_status: OPEN
+  - id: "C-10"
+    reviewer: C
+    question_id: "10"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 116
+    first_line_ru: "стр. 6 Что означает Distinguishable"
+    scientific_status: OPEN
+  - id: "C-11"
+    reviewer: C
+    question_id: "11"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 2
+    extracted_line: 121
+    first_line_ru: "стр. 7 Нормальная форма и доказательство FND-13"
+    scientific_status: OPEN
+  - id: "C-12"
+    reviewer: C
+    question_id: "12"
+    primary_package: F04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 139
+    first_line_ru: "стр. 6–7 Доказательство реализуемости четырёх случаев"
+    scientific_status: OPEN
+  - id: "C-13"
+    reviewer: C
+    question_id: "13"
+    primary_package: F05
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 144
+    first_line_ru: "стр. 7, 9 Разрыв между математическим и вычислимым равенством"
+    scientific_status: OPEN
+  - id: "C-14"
+    reviewer: C
+    question_id: "14"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 153
+    first_line_ru: "стр. 7 Функциональность структурной инверсии"
+    scientific_status: OPEN
+  - id: "C-15"
+    reviewer: C
+    question_id: "15"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 159
+    first_line_ru: "стр. 7 Замкнутость области инверсии"
+    scientific_status: OPEN
+  - id: "C-16"
+    reviewer: C
+    question_id: "16"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 164
+    first_line_ru: "стр. 7–8 Существование рекурсивных односторонних форм"
+    scientific_status: OPEN
+  - id: "C-17"
+    reviewer: C
+    question_id: "17"
+    primary_package: F07
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 170
+    first_line_ru: "стр. 8, 12, 35 Два разных значения Context"
+    scientific_status: OPEN
+  - id: "C-18"
+    reviewer: C
+    question_id: "18"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 175
+    first_line_ru: "стр. 8, 12 Маркер и объективная пара"
+    scientific_status: OPEN
+  - id: "C-19"
+    reviewer: C
+    question_id: "19"
+    primary_package: F06
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 3
+    extracted_line: 181
+    first_line_ru: "стр. 12 Перенос между контекстами по Z₂"
+    scientific_status: OPEN
+  - id: "C-20"
+    reviewer: C
+    question_id: "20"
+    primary_package: R02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 202
+    first_line_ru: "стр. 9–10, 18, 20 Математический тип ExactSequence"
+    scientific_status: OPEN
+  - id: "C-21"
+    reviewer: C
+    question_id: "21"
+    primary_package: R02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 208
+    first_line_ru: "стр. 10, 18, 41 ExactSequence и свёртка F_R"
+    scientific_status: OPEN
+  - id: "C-22"
+    reviewer: C
+    question_id: "22"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 213
+    first_line_ru: "стр. 9–10, 13–14 Обратимость переходов между представлениями"
+    scientific_status: OPEN
+  - id: "C-23"
+    reviewer: C
+    question_id: "23"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 218
+    first_line_ru: "стр. 11, 14 Nat как действительно натуральная шкала"
+    scientific_status: OPEN
+  - id: "C-24"
+    reviewer: C
+    question_id: "24"
+    primary_package: R04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 223
+    first_line_ru: "стр. 14 Обоснование Count и Add"
+    scientific_status: OPEN
+  - id: "C-25"
+    reviewer: C
+    question_id: "25"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 228
+    first_line_ru: "стр. 10, 14 Проверяемое различие Q13 и Q14"
+    scientific_status: OPEN
+  - id: "C-26"
+    reviewer: C
+    question_id: "26"
+    primary_package: R03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 233
+    first_line_ru: "стр. 9, 17, 33 Циклические структуры и граница поддержки"
+    scientific_status: OPEN
+  - id: "C-27"
+    reviewer: C
+    question_id: "27"
+    primary_package: R01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 242
+    first_line_ru: "стр. 16–18 Строгое определение ANet и членства"
+    scientific_status: OPEN
+  - id: "C-28"
+    reviewer: C
+    question_id: "28"
+    primary_package: L01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 4
+    extracted_line: 247
+    first_line_ru: "стр. 13, 17 Полная грамматика и ошибки разрешения имён"
+    scientific_status: OPEN
+  - id: "C-29"
+    reviewer: C
+    question_id: "29"
+    primary_package: L02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 264
+    first_line_ru: "стр. 17, 20, 22 Критерий одинаковой исходной ANet"
+    scientific_status: OPEN
+  - id: "C-30"
+    reviewer: C
+    question_id: "30"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 270
+    first_line_ru: "стр. 10, 18 Γ как математическая функция или отношение перехода"
+    scientific_status: OPEN
+  - id: "C-31"
+    reviewer: C
+    question_id: "31"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 275
+    first_line_ru: "стр. 18 Зона ответственности J0, S1 и S2"
+    scientific_status: OPEN
+  - id: "C-32"
+    reviewer: C
+    question_id: "32"
+    primary_package: G01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 280
+    first_line_ru: "стр. 14, 18 Отличие NO_MATCH от успешного пустого результата"
+    scientific_status: OPEN
+  - id: "C-33"
+    reviewer: C
+    question_id: "33"
+    primary_package: G02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 285
+    first_line_ru: "стр. 18, 23 Конфликт правил и атомарная публикация"
+    scientific_status: OPEN
+  - id: "C-34"
+    reviewer: C
+    question_id: "34"
+    primary_package: G03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 290
+    first_line_ru: "стр. 18, 23 Достаточность примера AND"
+    scientific_status: OPEN
+  - id: "C-35"
+    reviewer: C
+    question_id: "35"
+    primary_package: G02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 295
+    first_line_ru: "стр. 18, 23 Отсутствие специальной host-семантики"
+    scientific_status: OPEN
+  - id: "C-36"
+    reviewer: C
+    question_id: "36"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 304
+    first_line_ru: "стр. 19–21 Точные утверждения FRM-01…FRM-08"
+    scientific_status: OPEN
+  - id: "C-37"
+    reviewer: C
+    question_id: "37"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 5
+    extracted_line: 309
+    first_line_ru: "стр. 20 Независимое содержание FRM-05 и FRM-06"
+    scientific_status: OPEN
+  - id: "C-38"
+    reviewer: C
+    question_id: "38"
+    primary_package: P02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 327
+    first_line_ru: "стр. 20–21 Что реально переносится на TypeScript"
+    scientific_status: OPEN
+  - id: "C-39"
+    reviewer: C
+    question_id: "39"
+    primary_package: P01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 333
+    first_line_ru: "стр. 19–21 Независимость двух proof assistants"
+    scientific_status: OPEN
+  - id: "C-40"
+    reviewer: C
+    question_id: "40"
+    primary_package: P03
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 338
+    first_line_ru: "стр. 22–23 Фальсифицируемый контракт воспроизведения"
+    scientific_status: OPEN
+  - id: "C-41"
+    reviewer: C
+    question_id: "41"
+    primary_package: M04
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 343
+    first_line_ru: "стр. 24, 32–38 Принятие документа и доказательство теории"
+    scientific_status: OPEN
+  - id: "C-42"
+    reviewer: C
+    question_id: "42"
+    primary_package: M02
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 353
+    first_line_ru: "стр. 4–18 Единый сквозной учебный пример"
+    scientific_status: OPEN
+  - id: "C-43"
+    reviewer: C
+    question_id: "43"
+    primary_package: M01
+    source_status: PDF_INDEXED_EXTRACTION
+    extracted_page: 6
+    extracted_line: 358
+    first_line_ru: "стр. 3, 39–41 Структура самостоятельной научной публикации"
+    scientific_status: OPEN
+open_obligations:
+  - M06_A_38_ORIGINAL_QUESTION_TEXT_NOT_RECOVERED
+  - M06_BC_140_PDF_BYTES_NOT_MATERIALIZED
+  - M06_INDIVIDUAL_178_QUESTION_REVIEW_NOT_COMPLETED
+  - M06_NINE_R40_STILL_OPEN
+  - M06_AUTHOR_PUBLICATION_ACCEPTANCE_NOT_RECORDED

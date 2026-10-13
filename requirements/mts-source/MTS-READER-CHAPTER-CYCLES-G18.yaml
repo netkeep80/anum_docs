@@ -1,0 +1,22 @@
+# G18 computed chapter SCC over accepted normative deps; NOT a reader-proven DAG.
+schema: mts-reader-chapter-cycle-audit/v0.1
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+publication: blocked
+normative_edges_are_reader_edges: false
+reader_dag: scientific-review-pending
+accepted_normative_edges: 100
+cross_chapter_edges: 37
+components:
+  - id: foundation-architecture-loop
+    review: pending
+    members: [architecture, arithmetic, formal-notation, foundations, representation]
+    risk_ru: "Схема разделов объединяет онтологические формы, запись FORMAL/JSON, арифметику, представления и архитектуру в цикл после проекции нормативных зависимостей. Простой перенос целой главы не даст корректного порядка введения каждой предпосылки."
+    repair_ru: "Разбить главы на вводные определения и развёрнутые формальные части: рано задать Link и R/O/C/L, затем Nat и ExactSequence, кратко определить FORMAL/JSON-путь, после чего ссылаться на подробные доказательства и архитектурную границу."
+  - id: proof-assurance-governance-loop
+    review: pending
+    members: [assurance, documentation, governance, proofs, worked-examples]
+    risk_ru: "Таблицы логических примеров, внешние доказательства, регрессионные свидетельства, документация и решения Автора взаимно зависят друг от друга на уровне нормативной приёмки. Это не делает цикл доказательств математически корректным без явного порядка обоснования."
+    repair_ru: "Сначала дать условно определённые примеры и критерии свидетельств; отделить доказанные теоремы от исполняемых тестов и авторского статуса; затем собрать полную цепочку подтверждения и правила выпуска, не приписывая ей обратного доказательного эффекта."
+singletons: [execution, inversion-and-context, terminology]

@@ -1,0 +1,79 @@
+# Proposed scientific reviewer wave L01/L02/L03. Accepted MTS v0.15 unchanged.
+schema: mts-v015-review-formal-das-gamma-l01-l02-l03/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-REPRESENTATION-ARITHMETIC-R03-R04.yaml
+review_packages: [L01, L02, L03]
+source_paths:
+  accepted_registry: requirements/mts-v0.15.json
+  accepted_formal: docs/specs/Формальная нотация МТС.md
+  accepted_kernel: profiles/mts-v015-meta-interpreter-kernel.json
+  formal_lean: proofs/lean4/MtsV015Formal.lean
+  formal_rocq: proofs/coq/MtsV015Formal.v
+  gamma_lean: proofs/lean4/MtsV015GeneralizedReactionRefinement.lean
+  gamma_rocq: proofs/coq/MtsV015GeneralizedReactionRefinement.v
+  source_common: ts/src/v015-direct-source.ts
+  source_formal: ts/src/v015-direct-formal-source.ts
+  source_json: ts/src/v015-direct-json-source.ts
+  semantic_das: ts/src/v015-source-anet.ts
+  association_ts: ts/src/v015-direct-association.ts
+  exact_sequence: ts/src/exact-sequence.ts
+  dual_regression: ts/test/v015-direct-json-denotation-das-a2b.test.ts
+  formal_refinement: ts/test/v015-formal-production-refinement-f1.test.ts
+  semantic_regression: ts/test/v015-source-anet-denotation-core-das-a2a.test.ts
+  gamma_regression: ts/test/v015-structural-aset-gamma-core-a9a.test.ts
+  gamma_authority: docs/specs/Апамять и управление сетью связей.md
+formal:
+  heading_ru: "L01. Синтаксис FORMAL, структурная последовательная ассоциация и области определения"
+  grammar_ru: "В принятой v0.15 FORMAL записывает однотипную онтологию Link, но исходные символы являются метанотацией, разрешаемой в выбранной Grammar и Theory, а не самостоятельными конструкторами второго типа. Обозначения ∞, ♂S, S♀, A⟼B раскрывают ROOT, START, END, PAIR над уже разрешёнными Links. Контекстное имя :A разрешается как R:A, тогда как квалифицированный путь наследует явно указанный контекст. Порядок грамматического разбора и семантическая конструкторная операция различаются."
+  association_ru: "Для списка разрешённых Links [a₁,…,aₙ] при n≥1 прямая последовательная ассоциация есть лево-свёртка dsa([a₁])=a₁ и dsa([a₁,…,aₙ₊₁])=form(dsa([a₁,…,aₙ]),aₙ₊₁). Поэтому A⟼B⟼C интерпретируется как (A⟼B)⟼C; явные скобки могут задать A⟼(B⟼C). Равенство обеих скобочных форм для произвольных A,B,C из этого не следует: бинарная операция form не объявлена алгебраически ассоциативной. Это метаязыковая рекурсия разбора исходного текста, а не исходное выражение оператора исполняемого тождества = МТС."
+  empty_ru: "Пустой аргумент [] как ExactSequence допустим и кодируется корневым carrier R, но пустая прямая последовательная ассоциация без первого Link операнда не определена. Исполняемый directSequentialAssociation выбирает запрет empty-semantic-source-order, а singleton возвращает сам элемент; это описание определённого finite-фрагмента, не доказательство универсального парсинга всех Link. Логическая эквивалентность исходных скобочных представлений не выводится из совпадения одного частного результата."
+  proof_ru: "В принятом Lean4/Rocq FRM_01_absolute_contextual_name подтверждает один шаг абсолютного имени :A=R:A как внешнее уравнение, FRM_03_direct_sequential_association_three подтверждает лишь случай трёх элементов. Для общей формулы по всем n≥1 сам исполняемый TS-код использует цикл, но отдельная парная induction-лемма с точной областью до данного исследования не обнаружена. Её необходимо доказать отдельно; нельзя именовать её уже принятой kernel-теоремой. Вывод не зависит от предположения form(form(a,b),c)=form(a,form(b,c))."
+  expression_ru: "Грамматические строки A:{} (явно пустой именованный пучок), A:X (binding), {A} (bare в форме исходной асети) и [A,B] (точная последовательность, сохраняющая кратность) имеют разные категории разбора и разные операции публикации membership. Внешние пояснения Den([])=R и :A=R:A — утверждения о денотации и внешнем построении, не подстроки исполняемой FORMAL, использующие его оператор =, который возвращает L/U. Поэтому выражение x=x в документе без метаязыковой пометы может вводить математического читателя в заблуждение."
+  errors_ru: "Текущий ограниченный прямой FORMAL-парсер различает invalid-utf8, invalid-formal, invalid-shape, duplicate-local-name, cyclic-binding; синтаксические формы с неразрешимым контекстным путём и неграундированными рекурсивными ссылками должны отвергаться до ложного утверждения о семантическом Link. Независимая формальная модель оперирует структурными функциями, а конкретная реализация хранит и валидирует native SyntaxAset. Нельзя переходить от принятия малого грамматического фрагмента к утверждению о бесконечной тотальной грамматике без отдельного источника и доказательства."
+  limits_ru: "Принятый FRM-08 проверяет выбранную структурно-аспектную денотацию, но сам по себе не удостоверяет произвольные пользовательские Grammar или интерактивные расширения. Правило v0.15 требует сперва обычные Link, ExactSequence и самоссылочную топологию; новый тип или специальный opcode добавлять нельзя лишь ради удобства парсера. Универсальная таблица синтаксических ошибок, рекурсивная корректность произвольного n и независимое production refinement всего языка остаются открытыми формальными обязательствами."
+das:
+  heading_ru: "L02. Единая исходная ANet: FORMAL и JSON сходятся до DAS, а не после него"
+  pipeline_ru: "Принятая семантическая цепь для покрытого фрагмента такова: FORMAL text или canonical JSON → V015DirectSourceEntry → общая compileV015DirectSourceEntries → native source ANet/SyntaxAset → разрешение contextual bindings → denoteV015ResolvedSourceAnet → semantic ANet membership и Link-carried роли. Идентичность выбранного semantic-состояния сравнивается после общего resolver/denotation, а не по сходству байтов, host-объектов или формату JSON. JSON не вводит альтернативную семантическую машину и не является вторым языком МТС."
+  roles_ru: "Прямая исходная модель различает bare, binding, bundle и positional sequence. На корневом уровне одиночный bare публикует семантическую принадлежность, а binding вида A:X только задаёт разрешение имени и не обязан сам добавлять X в current-множество. В контекстном bundle выражения квалифицируются anchor; явно пустой bundle остаётся отличным от отсутствующего объявления. FRM_02_root_source_role_separation и FRM_02_nested_source_role_membership доказаны поточечно только для заявленных ролей и выбранного парного выражения контекста."
+  json_ru: "В поддерживаемой канонической JSON-проекции значение null для ключа-элемента означает bare; строковая правая часть — binding, массив — positional ExactSequence, вложенный объект — source-bundle с явно заданным anchor. [] имеет carrier R, но [R] и [R,R] остаются отличными позиционными носителями. Повторяющийся декодированный ключ должен быть отвергнут; обычный JSON.parse, уже уничтоживший первое вхождение, не удовлетворяет этому требованию. Отвергаются top-level null, недопустимое null внутри массива и неизвестные формы входа."
+  equality_ru: "Равная native source ANet при одной Grammar, Theory и resolver даёт равную денотацию при общей детерминированной функции D — условный вывод FRM_05_shared_source_implies_shared_denotation. Обратное неверно вообще: разные source-фрагменты могут денотировать одну Link. FRM_06_metacompiler_preserves_semantics принимает отдельный закон preservation и не доказывает любую произвольную реализацию parser/compiler. FRM_07_approved_artifact_refinement также требует точно заданный левый обратный для объявленной области, поэтому объявлять глобальный soundness всех production-кодеков некорректно."
+  examples_ru: "В действующем DАS-A2 корпусе ключ Rule со строкой V->Body и ключ Theory->Rule с null представляют разные исходные роли — разрешение и bare membership. Пары Empty:[], OneR:[R], TwoR:[R,R] разрешаются в разные точные carrier, но не создают три новые самобытные онтологические сорта. Пример V:{X:null,Y:null} задаёт вложенный anchor-контекст; простое физическое наличие Link не эквивалентно публикации currentness. Переименование локальной presentation-строки не должно менять семантику при сохранении всех отношений."
+  limits_ru: "Принятые TS DAS-A2 и F1 показывают равенство выбранного FORMAL/JSON корпуса, включая отрицательные контрпримеры. Однако исследованный bounded parser не является формальным доказательством паритета для всех мыслимых документов и циклических имён. Отдельные условия — та же Grammar, тот же исходный профиль, успешное разрешение имен и отсутствие ошибок — должны быть заявлены. Байтовый roundtrip, физический namespace, произвольный JSON и runtime-исполнение A-memory остаются самостоятельными границами доказательства."
+execution:
+  heading_ru: "L03. Исторический Modus Ponens и современная Γ: одно ядро, разные уровни"
+  history_ru: "В текстах v0.13 и v0.14 обобщённый Modus Ponens иногда записывался как K⟼{A}, A⟼[B], K⟼{B}; исторические фигурные скобки и квадратные образы являются метасхемой, а не синтаксисом принятой FORMAL v0.15. Нынешняя исходная Rule имеет структурный вид V⟼(Antecedent⟼ExactSequence(ImageTemplates)), где grounded-случай означает отсутствие свободных ролей V, а не отдельную исполнительную команду или особую семантику нулевого образа. Указание исторического происхождения не делает старый парсер нормативным."
+  profile_ru: "Принятое ядро profiles/mts-v015-meta-interpreter-kernel.json фиксирует одну универсальную Γ над semantic ANet: J0=STRUCTURAL_UNARY, одна текущая точка сопоставления antecedent, S1=read-only STRUCTURAL_MATCH_BIND над снимком начала реакции, S2=CANONICAL_SUBSTITUTION_AND_LINK_CONSTRUCTION после полного S1, затем атомарную публикацию целого successor. J1 cross-member join не требуется выбранному профилю, но это не утверждение о невозможности любых иных исследовательских реакций. Истинность роли даёт semantic membership, не host scheduler или название Function."
+  result_ru: "Три исхода должны оставаться различимыми: NO_MATCH означает отсутствие допустимого совпавшего правила, так что текущая Link сохраняет членство; MATCHED с ExactSequence([]) означает успешную реакцию с нулевым вкладом данного совпадения; MATCHED с непустой ExactSequence означает один или несколько вкладов. Состояние successor нельзя восстановить из одного факта непустоты образа, так как другие текущие члены могли породить ту же Link. Активный переход A→A не равен покою NO_MATCH даже при одинаковом экстенсиональном составе до и после."
+  snapshot_ru: "Все разрешённые совпадения одного запуска Γ читаются из одного начала M_t. Newly created Theory admission во время S2 не становится полномочием для S1 этой же реакции; при условии допуска оно будет видно следующей Γ. Аналогично S2-записи не читаются как новые входы собственного поколения; это запрет read-your-own-writes. Теоремы GPR_03_prepublication_current_is_reaction_start и GPR_03_analysis_ignores_staged_candidate выражают формальную проекцию границы, а GPR_04_local_no_match_cannot_publish_global_no_match отделяет локальный отрицательный результат от глобального."
+  causal_ru: "Идемпотентная семантическая принадлежность сближает одинаковые результатные Links, но не стирает multiplicity ExactSequence и не заставляет физическое хранилище удалять исходные истории. В выбранном ядре порядок создания Link-записей не является смысловой последовательностью исполнения. Материализация разрешена во второй фазе, но внешняя команда grounder и отдельный program-specific host-dispatch не обладают властью Γ. Правило применяется лишь при структурно доказанном admission в выбранной Theory."
+  limitations_ru: "Парные GPR-02/03/04/05/09 Lean4/Rocq формализуют определённые отношения snapshot, partition, membership и refinement, не весь производственный A-memory. Профиль frozen A-memory 0.175.0 используется как совместимостный исполнительный свидетель; он не становится новым нормативным источником и не доказывает полную self-hosted реализацию. Теория произвольных неограниченных поколений, тотальность Γ для неграундированных циклов и end-to-end production refinement — отдельные незакрытые работы, не повод менять принятую v0.15."
+evidence:
+  - {id: L01-NAME, origin: formal, key: FRM_01_absolute_contextual_name, scope: absolute-one-step-name}
+  - {id: L01-DSA, origin: formal, key: FRM_03_direct_sequential_association_three, scope: three-terms-only}
+  - {id: L01-DIRECT-TS, origin: executable, key: directSequentialAssociation, scope: nonempty-list-left-fold}
+  - {id: L01-ASPECT, origin: formal, key: FRM_08_structural_aspect_denotation, scope: declared-aspect-fragment}
+  - {id: L02-ROOT, origin: formal, key: FRM_02_root_source_role_separation, scope: root-roles-only}
+  - {id: L02-NESTED, origin: formal, key: FRM_02_nested_source_role_membership, scope: selected-nested-roles}
+  - {id: L02-DUAL, origin: formal, key: FRM_05_shared_source_implies_shared_denotation, scope: common-source-common-denotation}
+  - {id: L02-COMPILER, origin: formal, key: FRM_06_metacompiler_preserves_semantics, scope: conditional-preservation-premise}
+  - {id: L02-REFINEMENT, origin: formal, key: FRM_07_approved_artifact_refinement, scope: conditional-refinement-premise}
+  - {id: L02-JSON, origin: registry, key: V15-JSON-02, scope: declared-direct-json-formal-parity}
+  - {id: L03-SNAPSHOT, origin: gamma, key: GPR_03_prepublication_current_is_reaction_start, scope: projection-on-before-staged}
+  - {id: L03-STAGING, origin: gamma, key: GPR_03_analysis_ignores_staged_candidate, scope: no-read-own-writes}
+  - {id: L03-NO-MATCH, origin: gamma, key: GPR_04_local_no_match_cannot_publish_global_no_match, scope: global-partition-completion}
+  - {id: L03-EXECUTION, origin: kernel, key: GAMMA_STRUCTURAL_ASET, scope: accepted-one-command-J0-S1-S2}
+negative_cases: [DSA_NO_EMPTY_UNIT, DSA_NOT_ALGEBRAIC_ASSOCIATIVITY,
+  FRM03_NOT_ALL_N_KERNEL, MTS_EQUALITY_NOT_META_EQUALITY, BARE_NOT_BINDING,
+  EMPTY_BUNDLE_NOT_BARE, JSON_DUPLICATE_KEY_REJECT, JSON_NULL_ARRAY_REJECT,
+  JSON_NOT_SECOND_LANGUAGE, COMMON_DENOTATION_NOT_BYTES,
+  NO_MATCH_NOT_MATCHED_EMPTY, ACTIVE_IDENTITY_NOT_QUIESCENCE,
+  NO_READ_OWN_WRITES, HISTORICAL_MP_NOT_FORMAL_SOURCE]
+open_obligations: [FRM03_GENERAL_N_INDUCTION_PAIR,
+  UNIVERSAL_GRAMMAR_CYCLIC_NAME_BOUNDARY,
+  GLOBAL_FORMAL_JSON_COMPILER_REFINEMENT,
+  GAMMA_END_TO_END_PRODUCTION_REFINEMENT]

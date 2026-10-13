@@ -1,0 +1,61 @@
+# R01/R02 post-v0.15 scientific reviewer dossier. Author acceptance is NOT inferred from CI.
+schema: mts-v015-review-anet-exactsequence-r01-r02/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+remediation_issue: 2231
+upstream_review: requirements/mts-source/MTS-READER-INVERSION-ORIENTATION-F06-F07.yaml
+review_packages: [R01, R02]
+sources:
+  gpr_lean: proofs/lean4/MtsV015GeneralizedReactionRefinement.lean
+  gpr_rocq: proofs/coq/MtsV015GeneralizedReactionRefinement.v
+  formal_lean: proofs/lean4/MtsV015Formal.lean
+  formal_rocq: proofs/coq/MtsV015Formal.v
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  semantic_ts: ts/src/v015-source-anet.ts
+  exact_ts: ts/src/exact-sequence.ts
+  regression: ts/test/v015-formal-exact-sequence-b7.test.ts
+  gpr_evidence: proofs/v015-evidence/gpr02-canonical-anet-convergence.json
+  registry: requirements/mts-v0.15.json
+anet:
+  heading_ru: "R01. Асеть связей (ANet): математическая принадлежность и семантические роли"
+  universe_ru: "Пусть F:Foundation — внешняя односортная математическая интерпретация с носителем F.Link. Для исследования семантической асети выбираем предикат принадлежности M:F.Link→Prop и пишем x∈A тогда и только тогда, когда M(x). Эта запись означает внешнюю логическую проекцию асети, а не введение в МТС второй онтологической сущности Set, отдельного вида Link или дополнительной конструктивной операции над Link. В общей постановке не предполагаются ни конечность A, ни разрешимость M(x)."
+  equality_ru: "Для внешних предикатных представлений A,B определим A≈B :⇔ ∀x:F.Link, (x∈A ↔ x∈B). Это экстенсиональная эквивалентность запросов принадлежности, а не подмена собственным логическим равенством = в МТС: исполняемое МТС-сравнение Связей возвращает L/U. Вывод GPR-02 записан поточечно через ↔; превращение эквивалентности предикатов в равенство функций потребовало бы дополнительных принципов внешнего метаязыка, и для данной цели не требуется."
+  membership_ru: "Добавление канонической Связи a к семантической асети определяется предикатом Add(A,a)(x) :⇔ (x=a)∨(x∈A), где = внутри формулы есть равенство внешнего проверочного метаязыка на F.Link. Для любого x логически следует Add(Add(A,a),a)(x)↔Add(A,a)(x). Для любых a,b, x следует Add(Add(A,a),b)(x)↔Add(Add(A,b),a)(x). Эти результаты не требуют конечного носителя, глобального алгоритма разрешения равенств, сортировки, хеширования или особой команды удаления дубликатов."
+  layers_ru: "Следует строго различать четыре уровня: (1) наличие или канонизация Связи в памяти; (2) вхождение source ANet с его синтаксической ролью и координатой; (3) результат разрешения имён и денотации DAS, включая возможность ошибки; (4) принадлежность канонической Link семантической ANet. Различные исходные вхождения могут обозначать одну Link, однако источник и события доказательства не обязаны исчезать. Обратное неверно: физическое присутствие объекта Link ещё не доказывает его принадлежность выбранной асети."
+  provenance_ru: "Два события (a,p₁), (a,p₂) могут сохраняться как два элемента внешней последовательности свидетельств, хотя семантический запрос x∈Add(Add(A,a),a) идемпотентен. Теорема GPR_02_duplicate_provenance_events_are_preserved доказывает длину именно списка из двух событий и наличие события для a, а не неравенство самих p₁ и p₂. Поэтому нельзя делать из неё вывод о двух различных происхождениях, если p₁=p₂, или о физическом числе записей в хранилище."
+  context_ru: "Контекстно выбранные роли Theory, Rule, entry, result и отношение currentness не принадлежат Связи вне контекста как внутренний host-тег. Их смысл задаётся принадлежностью и отношениями Link внутри выбранной семантической асети. Одна Link может иметь разные роли при различных контекстах только если соответствующие отношения принадлежности различны; различие файловых имён или дескрипторов не создаёт семантической роли. Внешняя таблица отношений — средство исследования, не независимая онтология."
+  decidability_ru: "Включение Link в математическое представление асети не требует, чтобы любое произвольное M(x) можно было вычислить. Конкретная материализованная finite-сессия может предоставить конечные перечисления и разрешимые запросы при заданном memory/interface, но это дополнительный алгоритмический контракт. Из GPR-02 не следует полное перечисление всех возможных ANet, тождество source с semantic ANet или тотальность Γ на произвольных неграундированных структурах."
+  limits_ru: "Теоремы GPR-02 доказаны для внешнего предиката принадлежности, списка событий provenance и отдельно сконструированного ExactPackedLink. Они не доказывают глобальной нормализации всех Link, уникальности физической записи, корректности всякой реализации DAS или формального refinement всего production Γ. Проверенные v0.15 источники разделяют семантическую авторитетность и технические формы; устранение этой границы было бы новым недоказанным утверждением."
+sequence:
+  heading_ru: "R02. ExactSequence и F_R: позиционная кратность, левый обратный и коллизия свёртки"
+  definition_ru: "Позиционная ExactSequence — конечная последовательность [x₁,…,xₙ] элементов одного Link-носителя с сохранением длины, порядка и повторений. Во внешней проекции используется отображение encode:List(Link)→Link с выделенным носителем для [] и частичным или условным обратным read на корректных carrier. Список является инструментом метатеории Lean4/Rocq для проверки последовательности, а не новым сортом МТС. Утверждения о равенстве carrier относятся к принятому ExactSequence-профилю, а не ко всем возможным сериализациям."
+  construction_ru: "В принятом TypeScript-профиле materializeExactSequence начинает с R и для каждого значения v формирует payload=form(prev,v), затем Cell(prev,v)=ensureStartSelfClosed(payload); новое значение prev — получившаяся Link. При чтении readExactSequence проверяет start(Cell)=Cell, извлекает полюса payload и движется к R, отвергая циклы и некорректные структуры без материализации новых Связей. Здесь ensureStartSelfClosed — операция формирования самозамкнутого начала, а не проекция start(x). Утверждение roundtrip ограничено корректно созданными carrier и предпосылками поддерживаемой реализации."
+  examples_ru: "При корректном инъективном кодировании [] означает ноль позиций и кодируется выделенным R; [R] имеет одну позицию, содержащую R; [R,R] — две позиции со значением R. Поэтому encode([])≠encode([R]), encode([R])≠encode([R,R]), а также encode([X])≠encode([X,X]). Перестановка [X,Y] и [Y,X] даёт различные carrier при X≠Y. Идемпотентность ANet membership к этим позиционным сравнениям неприменима."
+  proof_ru: "FRM_04_empty_exact_sequence_is_root следует из предпосылки K.emptyRoot; FRM_04_single_root_distinct_from_empty и FRM_04_two_roots_distinct_from_one используют K.injective. Независимая FRM_07_exact_sequence_injective_from_left_inverse выводит инъективность E.encode из условия ∀xs, E.read(E.encode(xs))=xs. Следовательно, FRM-04 не является доказательством произвольного производственного кодека без контракта инъективности, а FRM-07 не доказывает сам по себе существование тотального read для всех Link."
+  fold_ru: "F_R — отдельная производная свёртка последовательности, не её позиционный носитель и не её семантическая асеть. В AcceptedV014RepresentationDefinitions явно предусмотрены разные carrier exactEmpty≠exactOneRoot и предпосылки exactFold(exactEmpty)=R, exactFold(exactOneRoot)=R. Из них Lean4/Rocq доказывают exact_sequence_fold_collision: два разных carrier имеют одинаковый образ свёртки. Это условный результат для данного представительного интерфейса, а не запрет на любые инъективные кодирования последовательностей и не утверждение, что любая операция свёртки обязательно коллидирует."
+  surface_ru: "Канонические FORMAL-квадратные скобки и JSON-массивы проходят согласованный путь денотации через native source ANet и ExactSequence из уже разрешённых Link. Утверждение об их совпадении относится к одинаковому source и выбранному профилю; нельзя отождествлять байтовые записи, синтаксические вхождения и конечную семантическую Link. Исполнительное значение NO_MATCH относится к правилу Γ и не является элементом позиционной последовательности и не дополняет её грамматику."
+  counterexample_ru: "Контрпример смешению двух уровней: вклад a два раза не меняет ответ на запрос семантической принадлежности a, но последовательности [a] и [a,a] различаются. Контрпример неинъективности F_R: [] и [R] имеют различную длину и разные точные carrier, а объявленная в FND-11 свёртка переводит оба в R. Нельзя использовать F_R для восстановления длины, порядка или повторов исходной последовательности без дополнительного отдельного кода."
+  limits_ru: "Доказанные в Lean4/Rocq структурные законы, TypeScript B7 с FORMAL-паритетом и проверенный JSON-корпус подтверждают выбранные области применимости, но ещё не составляют единую глобальную теорему о безошибочности каждого production-парсера, сериализатора и хранилища. Вопросы полной kernel-связи с production и алгоритмической разрешимости произвольного Link остаются открытыми; авторская приёмка нового русского текста не проводилась."
+proof_catalogue:
+  - {id: R01-ADD-IDEMPOTENCE, source: gpr, symbol: GPR_02_duplicate_membership_idempotent, assumptions: [Link, member, derived, value], scope: extensional-pointwise}
+  - {id: R01-ADD-COMMUTATIVITY, source: gpr, symbol: GPR_02_membership_contribution_commutes, assumptions: [Link, member, first, second, value], scope: extensional-pointwise}
+  - {id: R01-EVENTS, source: gpr, symbol: GPR_02_duplicate_provenance_events_are_preserved, assumptions: [Link, Provenance, value, first_provenance, second_provenance], scope: two-list-occurrences}
+  - {id: R02-MULTIPLICITY, source: gpr, symbol: GPR_02_exact_sequence_multiplicity_not_collapsed, assumptions: [Atom, ExactPackedLink], scope: recursive-positional-carrier}
+  - {id: R02-EMPTY, source: formal, symbol: FRM_04_empty_exact_sequence_is_root, assumptions: [ExactSequenceKernel], scope: empty-root-premise}
+  - {id: R02-SINGLE, source: formal, symbol: FRM_04_single_root_distinct_from_empty, assumptions: [ExactSequenceKernel, injective], scope: conditional-injectivity}
+  - {id: R02-DOUBLE, source: formal, symbol: FRM_04_two_roots_distinct_from_one, assumptions: [ExactSequenceKernel, injective], scope: conditional-injectivity}
+  - {id: R02-LEFT-INVERSE, source: formal, symbol: FRM_07_exact_sequence_injective_from_left_inverse, assumptions: [ExactSequenceLeftInverse, leftInverse], scope: conditional-left-inverse}
+  - {id: R02-FOLD-COLLISION, source: foundation, symbol: exact_sequence_fold_collision, assumptions: [Foundation, AcceptedV014RepresentationDefinitions], scope: conditional-rooted-fold}
+negative_cases:
+  - {id: R01-EQUALITY, forbidden: "Подмена внешней эквивалентности предикатов исполняемым равенством Link L/U", remedy: "Разделить ↔ и =, явно написать A≈B"}
+  - {id: R01-PROVENANCE, forbidden: "Превратить два события provenance в два разных физически записанных Link", remedy: "События сохраняют кратность независимо от membership"}
+  - {id: R01-CONTEXT, forbidden: "Постулировать роль Rule или Theory из имени host-поля", remedy: "Привязать роль к отношению Link выбранной асети"}
+  - {id: R02-ONE-ROOT, forbidden: "Отождествить [] и [R] из-за одинакового значения R", remedy: "Различить carrier и результат производной свёртки"}
+  - {id: R02-GLOBAL-CODEC, forbidden: "Утверждать инъективность любого кодека без leftInverse или injective", remedy: "Указать отдельную условную математическую предпосылку"}
+  - {id: R02-MEMBERSHIP, forbidden: "Применить идемпотентность ANet к кратности [X,X]", remedy: "Оставить ExactSequence позиционным носителем"}
+open_obligations: [ANET_GLOBAL_MEMBERSHIP_DECIDABILITY, PRODUCTION_CODEC_TOTAL_KERNEL_REFINEMENT, CONTEXT_ROLE_GAMMA_REFINEMENT_BRIDGE]

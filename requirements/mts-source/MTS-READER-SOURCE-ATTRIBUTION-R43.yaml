@@ -1,0 +1,48 @@
+# R43: citations and scholarly first-use rendering, entirely non-normative.
+schema: mts-reader-source-attribution-r43/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+review_status: editorial-candidate-requires-author-review
+source_composition: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+source_review: requirements/mts-source/MTS-READER-SCIENTIFIC-SECOND-PASS-R42.yaml
+first_use_model: requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml
+main_source_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+q_attribution:
+  source_owner: G7
+  source_atom: g7:q-codec
+  accepted_id: V14-L13
+  heading_ru: "Первое определение Q — цитата из G7 / g7:q-codec (V14-L13)"
+  scope_ru: "Q вводится как версионируемый кодек последовательностей; здесь нельзя отождествлять Q с рекурсивным кодеком одной Link или назначать конкретный профиль Q13/Q14."
+basis_attributions:
+  - symbol: L
+    owner: G15
+    source_atom: basis:L
+    accepted_id: V14-L1
+    heading_ru: "Отложенный комментарий L — исходный G15 / basis:L (V14-L1)"
+    scope_ru: "Уравнение L=O⟼C уже дано до определения Degree. Пояснение о шкале размещается после её точного введения."
+  - symbol: U
+    owner: G15
+    source_atom: basis:U
+    accepted_id: V14-L1
+    heading_ru: "Отложенный комментарий U — исходный G15 / basis:U (V14-L1)"
+    scope_ru: "Уравнение U=C⟼O уже дано ранее. Пояснение о N₀ и корне ExactSequence допустимо после введения обеих понятий."
+proof_sources:
+  lean4: proofs/lean4/MtsV015Formal.lean
+  rocq: proofs/coq/MtsV015Formal.v
+  bootstrap: proofs/v015-evidence/formal-bootstrap-frm01-06.json
+  refinement: proofs/v015-evidence/formal-refinement-frm07-08.json
+  inventory: proofs/v015-formal-proof-assurance.json
+  cases: [FRM-03, FRM-04, FRM-07]
+examples:
+  formal: formal/v0.15/regression/compact-and.formal
+  json: formal/v0.15/regression/compact-and.json
+  negative: ts/test/v015-compact-and-role-bundle-a1.test.ts
+  exact: ts/test/v015-formal-exact-sequence-b7.test.ts
+  and_ru: "Четыре zero-role случая AND следуют из уже одобренного FORMAL/JSON. NO_MATCH отдельно воспроизводится отрицательным тестом вне T/F, а не пятым правилом JSON."
+  exact_ru: "Порядок, кратность и пустая позиционная ExactSequence проверяются тестом B7. []=R в указанном профиле; производная F_R не служит подтверждением позиционного тождества."
+  exclusions_ru: "Тесты не доказывают инъективность production ExactSequence encoder; пример коллизии F_R не предъявлен и поэтому не утверждается."
+outstanding:
+  open_findings: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]
+  boundary_ru: "Редакционная проекция R43 проверяет ссылки и происхождение формулировок; все девять открытых научно-редакционных замечаний R40 остаются открытыми до предметной независимой экспертизы."

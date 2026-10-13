@@ -1,0 +1,70 @@
+# M01 proposed scientific originality analysis; no accepted semantics changed.
+schema: mts-v015-review-mathematical-position-m01/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+upstream_review: requirements/mts-source/MTS-READER-REFINEMENT-REPRODUCIBILITY-P02-P03.yaml
+review_packages: [M01]
+source_paths:
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  model_lean: proofs/lean4/MtsExplicitModel.lean
+  model_rocq: proofs/coq/MtsExplicitModel.v
+  theorem_assurance: proofs/premise-classification-v0.14.json
+  gamma_core_lean: proofs/lean4/MtsV015GeneralizedReactionCore.lean
+  gamma_core_rocq: proofs/coq/MtsV015GeneralizedReactionCore.v
+  formal_assurance: proofs/v015-formal-proof-assurance.json
+  accepted_registry: requirements/mts-v0.15.json
+  model_test: ts/test/proof-explicit-model.test.ts
+comparison:
+  heading_ru: "M01. Положение МТС среди известных математических конструкций"
+  question_ru: "Математическая новизна — это не количество терминов и не факт воспроизведения известных операций над Links. Чтобы заявить новую теорему, нужна формальная формулировка с минимальными посылками, корректное доказательство и сравнение с опубликованным результатом, покрывающим тот же класс моделей. Для новой структуры нужен точный критерий неэквивалентности выбранной математической категории, а для новой вычислительной системы — определённая семантика исполнения и доказанный refinement. На текущей стадии предлагается честно разделить эти три возможные формы вклада; ни одна сама по себе не считается подтверждённой лишь фактом принятия v0.15."
+  signature_ru: "Минимальный Foundation принят как односортная внешняя структура над Link, с тотальными form:Link×Link→Link и start,finish:Link→Link, выбранным R, законами start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R. Следовательно, form инъективна как функция упорядоченной пары: если form(a,b)=form(c,d), то a=c и b=d. Теорема fnd13_form_injective в парных Lean4/Rocq доказывает именно инъективность конструктора, а не равенство произвольных Link по полюсам; последнему требуются дополнительные grounding/A1 предпосылки. Сама сигнатура не определяет ассоциативность, коммутативность либо единственную конечную модель."
+  finite_ru: "При конечном непустом носителе Link мощности n законы проекций делают form инъекцией Link×Link↪Link, поэтому n²≤n; для n≥1 следует n=1. Однако минимальный Foundation допускает одноэлементную модель form(R,R)=R и обе проекции равные R: значит утверждение «любая модель Foundation бесконечна» ложно без дополнительной аксиомы невырожденности. Если существует Link, отличный от R (например, принятый F2/F3 witness START(R)≠R), то конечная модель невозможна. Бесконечность при такой предпосылке — элементарное следствие уже известных свойств инъективного pairing, а не автоматически новая математическая теорема МТС."
+  free_ru: "Свободная магма на генераторах состоит из конечных бинарных термов, в которых обычный конструктор узла не равен собственному листу. Поэтому свободная магма без фактора по уравнениям не может быть тождественна модели Foundation с form(R,R)=R. В терминах универсальной алгебры МТС можно сравнивать с унарно-бинарной алгеброй с выделенной константой и уравнениями проекций и корня; само наличие такой сигнатуры не устанавливает новизну. Отдельно требуется доказать или опровергнуть эквивалентность выбранной подкатегории моделей известному классу алгебр, без подмены структурного Link объектом свободного терма."
+  graph_ru: "Термовые графы уже позволяют разделять общие подвыражения, а циклические term graphs представляют рекурсивные структуры. Поэтому сам факт общего потомка у двух полюсов или существования неграундированного цикла не является доказательством приоритета МТС. В принятой явной модели MtsExplicitModel носитель List Bool бесконечен и описывает единственную Link-сигнатуру, при этом fallback badStart/badFinish образуют двухузловой цикл, для которого доказано ¬Grounded. Наличие общего Grounded-потомка у родителя отдельно показано совместимым с Grounded: физический sharing и семантическое циклическое обязательство необходимо различать."
+  afa_ru: "Нефундированные множества и аксиома антифундирования Ацеля рассматривают доступные ориентированные графы, их декорации и бисимуляцию. Это близкий математический контекст для рекурсивных определений и циклических объектов, но равенство Link в МТС не определяется по умолчанию факторизацией любых графов по бисимуляции: такие свойства необходимо доказать отдельно из принятых аксиом или показать явную контрмодель. Следовательно, «МТС есть AFA» и «циклы впервые возможны в МТС» одинаково некорректные выводы; сходство математических инструментов не доказывает ни эквивалентность, ни независимость."
+  computational_ru: "Выполнение Γ v0.15 имеет более конкретную интерпретационную конструкцию: односортный Link, contextual ANet membership, авторизованные структурные Rules, единый snapshot S1, построение S2 и атомарная публикация. Это формулировка интеграции представления и вычисления, которую можно сравнивать с term-graph rewriting и правилами переходов, но сам пакет не объявляется математически новым без точного отображения моделей и результата, которого нет в опубликованных системах. GPR-01 доказывает единственность значения выбранной функции Γ на фиксированном состоянии, а не недоступную ранее теорему о любых переписывающих системах."
+  candidate_ru: "Допустимая исследовательская гипотеза: связка одной Link-онтологии, самополярных структурных случаев, относительной ориентации, точной позиционной последовательности и реакционной семантики Γ даёт удобное единое описание объектов, правил и вычислительной истории без программы из специальных host-команд. Однако это гипотеза об архитектурной выразительности, а не уже установленная строгая новизна. Нужно предъявить явное отображение к известной алгебре или термовому графу, указать какие структуры/операции сохраняются, затем либо доказать изоморфизм, либо построить доказанный инвариант и контрпример."
+  verdict_ru: "На текущем уровне доказано существование и внутренние свойства выбранного внешнего класса моделей МТС (при точно названных посылках), а также непротиворечивость конкретного фрагмента через парную явную модель. Пока не доказаны глобальная независимость от существующих математических теорий, категорическая неэквивалентность или уникальность универсальной конструкции. Формулировать вывод следует как «есть формально проверенный исследовательский формализм с содержательными открытыми вопросами о его математическом отличии», а не «вся математика впервые строится из Link»."
+comparators:
+  - id: FREE_MAGMA
+    title: Agda Universal Algebra — FreeMagma
+    url: https://agda-algebras.universalalgebra.org/Examples/Setoid/FreeMagma/
+    relation: finite-binary-term-algebra
+    nonclaim: Foundation-not-plain-free-magma-due-root-fixed-point
+  - id: TERM_GRAPH
+    title: Detlef Plump (1999) — Term Graph Rewriting
+    url: https://eprints.whiterose.ac.uk/id/eprint/243318/
+    relation: shared-subexpressions-and-rule-based-graph-transformation
+    nonclaim: sharing-and-rewriting-not-intrinsically-new
+  - id: NONWELLFOUNDED
+    title: Peter Aczel (1988) — Non-Well-Founded Sets
+    url: https://web.stanford.edu/group/cslipublications/cslipublications/site/0937073229.shtml
+    relation: anti-foundation-cyclic-set-models
+    nonclaim: non-well-foundedness-not-unique-to-MTS
+  - id: BISIMULATION
+    title: Stanford Encyclopedia — Non-wellfounded Set Theory
+    url: https://plato.stanford.edu/entries/nonwellfounded-set-theory/
+    relation: accessible-pointed-graphs-bisimulation
+    nonclaim: graph-bisimulation-not-proven-identical-to-link-equality
+evidence:
+  - {id: M01-FND, source: foundation, symbol: fnd13_form_injective, scope: constructor-injectivity-only}
+  - {id: M01-ONE-SIDED, source: explicit, symbol: ExplicitOneSided, scope: nondegenerate-accepted-model}
+  - {id: M01-MODEL, source: explicit, symbol: explicit_a1, scope: concrete-infinite-carrier-and-A1}
+  - {id: M01-CYCLE, source: explicit, symbol: fallback_cycle_not_grounded, scope: specific-two-link-obligation-cycle}
+  - {id: M01-SHARING, source: explicit, symbol: sharedGroundedParent_start, scope: shared-child-need-not-be-cycle}
+  - {id: M01-GAMMA, source: gamma, symbol: GPR_01_gamma_successor_unique, scope: fixed-functional-successor-only}
+negative_cases: [FREE_MAGMA_NOT_EQUAL_FOUNDATION,
+  ROOT_FIXED_POINT_REQUIRED, FINITE_SINGLETON_FOUNDATION_POSSIBLE,
+  NONTRIVIAL_FINITE_FOUNDATION_IMPOSSIBLE, PAIR_INJECTIVE_NOT_GLOBAL_POLE_EXT,
+  GRAPH_SHARING_NOT_CYCLE, AFA_NOT_MTS_EQUALITY,
+  GAMMA_NOT_ALL_REWRITE_SYSTEMS, NO_UNPROVED_ORIGINALITY_PRIORITY,
+  FORMAL_MODEL_NOT_PRODUCTION_PROOF]
+open_obligations: [PRECISE_CATEGORY_OF_MTS_MODELS,
+  COMPARATOR_FUNCTOR_AND_PRESERVATION,
+  ISOMORPHISM_OR_INVARIANT_COUNTERMODEL,
+  INDEPENDENT_LITERATURE_AND_NOVELTY_REVIEW]

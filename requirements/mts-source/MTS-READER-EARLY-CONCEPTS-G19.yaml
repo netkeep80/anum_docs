@@ -1,0 +1,43 @@
+# G19 first-use glossary: editorial prelude only, not five new accepted laws.
+schema: mts-reader-early-concepts/v0.1
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+publication: blocked
+reason: first-use-reader-clarification
+definitions:
+  - id: anet-term
+    accepted_id: V15-TERM-01
+    term_ru: "Асеть связей (ANet)"
+    exact_accepted_quote: "Normative English term for «асеть / асеть связей» is ANet. Aset is not an MTS English term; legacy Aset/aset code identifiers have no terminology or semantic authority."
+    introductory_ru: "ANet — нормативное англоязычное имя асети связей МТС. Термин именует область описания Связей и их взаимосвязей, но сам по себе не вводит второй онтологический объект рядом с Link. Исторические названия Aset/aset в коде остаются техническими идентификаторами и не обладают теоретической властью."
+    noninference_ru: "Не делать Aset альтернативным типом или вторым названием нормативной МТС-онтологии"
+    review: pending
+  - id: nat-first-use
+    accepted_id: V14-L6
+    term_ru: "Натуральная шкала Nat"
+    exact_accepted_quote: "Nat starts at U and uses uniform successor N⟼L; Degree remains a separate scale starting at L."
+    introductory_ru: "Nat — производная числовая конструкция над Связями принятой МТС: её нуль обозначен N₀=U, а последовательное продвижение задаётся Succ(N)=N⟼L. Эта шкала отлична от Degree, у которой D₁=L. Раннее введение обозначений требуется, чтобы смысл Count и Add был ясен до соответствующих доказательных разделов."
+    noninference_ru: "Не смешивать Nat и Degree или объявлять любую Link значением Nat без свидетельства"
+    review: pending
+  - id: exact-sequence-first-use
+    accepted_id: V15-JSON-04
+    term_ru: "Позиционная последовательность ExactSequence"
+    exact_accepted_quote: "JSON arrays lower canonically to ExactSequence of already-denoted element Links; []=R. R-rooted fold F_R is a separate derived projection, not the positional/execution carrier."
+    introductory_ru: "ExactSequence — канонический позиционный носитель уже разрешённых элементов Link; при переводе JSON-массивов сохраняются позиции и их кратность, а пустой массив соответствует R. Корневая свёртка F_R является отдельной производной проекцией и не подменяет позиционную семантику последовательности."
+    noninference_ru: "Не отождествлять ExactSequence с числом уникальных Link или результатом F_R"
+    review: pending
+  - id: formal-json-first-use
+    accepted_id: V15-JSON-02
+    term_ru: "Единый источник FORMAL и JSON"
+    exact_accepted_quote: "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics."
+    introductory_ru: "Запись FORMAL и прямой JSON являются двумя способами задания поддерживаемой канонической исходной ANet; оба должны сходиться в одни роли, контекстный резолвер и путь DAS-денотации до исполнения. Совпадение смысла не выводит алгебраическое тождество двух произвольно перегруппированных деревьев Link."
+    noninference_ru: "Не считать равенство денотаций разрешением произвольного неявного группирования"
+    review: pending
+  - id: gamma-first-use
+    accepted_id: V15-GAMMA-01
+    term_ru: "Универсальная реакция Γ"
+    exact_accepted_quote: "One repeated universal Γ is the shared v0.15 semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile."
+    introductory_ru: "Γ — одна общая операция семантической реакции для обычных и метаисполнительных асетей. Принятый профиль отделяет снимок текущего состояния, структурную проверку J0 для одного текущего конца, чтение S1, синтез S2, формирование упорядоченных образов 0/1/N и атомарную публикацию следующего состояния. Это не набор специальных команд для отдельных программ."
+    noninference_ru: "Не вводить программные host-opcode или второй runtime вместо универсальной реакции"
+    review: pending

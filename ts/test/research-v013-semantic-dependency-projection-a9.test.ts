@@ -1234,8 +1234,64 @@ const postV013ToolingDeltaFiles = new Set([
   // #2141: 62-ID reader coverage only projects accepted registry/doc ownership;
   // it contains no runtime decisions, writes, or new MTS semantic authorities.
   "ts/src/tooling/mts-reader-coverage.ts",
+  // #2132/G20: source-owned editorial DAG validation; proof/status authority remains elsewhere.
+  "ts/src/tooling/mts-reader-g20.ts",
+  // #2132/G42: literary chapter projection and proof citations, no native runtime ownership.
+  "ts/src/tooling/mts-reader-g42.ts",
+  // #2132/R42: editorial review/existing-evidence read-only projection; no native execution authority.
+  "ts/src/tooling/mts-reader-r42.ts",
+  // R43 displays provenance and accepted test evidence; no semantic execution.
+  "ts/src/tooling/mts-reader-r43.ts",
+  // R44 read-only scientific boundary/acceptance-history audit; non-semantic tooling.
+  "ts/src/tooling/mts-reader-r44.ts",
+  // R44-W2 scientific editorial prose is read-only and does not execute MTS semantics.
+  "ts/src/tooling/mts-reader-r44-w2.ts",
+  // R44-W3 source-attributed scientific reviewer appendix; no execution semantics.
+  "ts/src/tooling/mts-reader-r44-w3.ts",
+  // R44-W4 reader science transitions and bibliography are non-executable editorial content.
+  "ts/src/tooling/mts-reader-r44-w4.ts",
+  // W5 review/provenance appendix does not execute semantic model operations.
+  "ts/src/tooling/mts-reader-r44-w5.ts",
+  // W6 human-readable manuscript and CLI rearrange immutable science; no runtime semantics.
+  "ts/src/tooling/mts-reader-r44-w6.ts",
+  "ts/src/tooling/mts-reader-r44-w6-cli.ts",
+  // F01/F02/P01 reads pinned proofs to render non-authoritative scholarly context.
+  "ts/src/tooling/mts-reader-review-f01-f02-p01.ts",
+  // F03–F05 scientific commentary only: no semantic runtime modifications.
+  "ts/src/tooling/mts-reader-review-f03-f04-f05.ts",
+  // F06/F07 render source-anchored INV/CTX proof commentary only.
+  "ts/src/tooling/mts-reader-review-f06-f07.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
+  // #2231: reader-only R01/R02 scientific source validation, no semantic Memory access.
+  // Keep the frozen v0.13 S3 ownership counts immutable; classify only this new tooling file.
+  "ts/src/tooling/mts-reader-review-r01-r02.ts",
+  // #2217 R03/R04: source-only science/contract audit, no native Memory execution.
+  "ts/src/tooling/mts-reader-review-r03-r04.ts",
+  // #2217 L01/L02/L03: reader-only FORMAL/DAS/Γ contract proof-scope validator.
+  "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
+  // #2217 G01/G02/G03: science-only Γ and AND crosswalk; no executable semantics.
+  "ts/src/tooling/mts-reader-review-g01-g02-g03.ts",
+  // #2217 P02/P03: manuscript-only proof/reproducibility reviewer, not a semantic engine.
+  "ts/src/tooling/mts-reader-review-p02-p03.ts",
+  // #2217 M01: mathematical-position manuscript-only audit, no MTS semantic execution.
+  "ts/src/tooling/mts-reader-review-m01.ts",
+  // #2217 M02: scientific end-to-end witness, not the production semantic executor.
+  "ts/src/tooling/mts-reader-review-m02.ts",
+  // #2252 M03: reader-only disambiguation of object syntax and proof metalanguage.
+  "ts/src/tooling/mts-reader-review-m03.ts",
+  // #2254 M04: proof-status reader, not runtime or author semantic authority.
+  "ts/src/tooling/mts-reader-review-m04.ts",
+  // #2257 M05: archival provenance reader; approved image protection remains its own test.
+  "ts/src/tooling/mts-reader-review-m05.ts",
+  // #2259 M06: source provenance and question index, not a semantic runtime action.
+  "ts/src/tooling/mts-reader-review-m06.ts",
+  // #2259 M06-W1: nonsemantic individual review evidence validator.
+  "ts/src/tooling/mts-reader-review-m06-w1.ts",
+  // #2259 M06-W2: reader-only evidence verification without Link runtime semantics.
+  "ts/src/tooling/mts-reader-review-m06-w2.ts",
+  // #2259 M06-W3: external proof-boundary documentation, not runtime Link semantics.
+  "ts/src/tooling/mts-reader-review-m06-w3.ts",
 ]);
 
 const decisionSignatures = decisionCandidates.map(

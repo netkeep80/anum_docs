@@ -1,0 +1,66 @@
+# Independent reviewer response F01 + F02 + P01. Read-only academic source.
+schema: mts-v015-review-foundation-model-proof-dossier/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+accepted_main_sha: c64b7e21340c6add248c8f380f3fef1292616ac6
+master_issue: 2217
+original_questions: 178
+review_packages: [F01, F02, P01]
+provenance:
+  foundation_lean: proofs/lean4/MtsFoundation.lean
+  foundation_rocq: proofs/coq/MtsFoundation.v
+  model_lean: proofs/lean4/MtsExplicitModel.lean
+  model_rocq: proofs/coq/MtsExplicitModel.v
+  formal_lean: proofs/lean4/MtsV015Formal.lean
+  formal_rocq: proofs/coq/MtsV015Formal.v
+  assurance: proofs/v015-formal-proof-assurance.json
+  requirement_registry: requirements/mts-v0.15.json
+foundation:
+  heading_ru: "F01. Математический паспорт Foundation: сигнатура, логика и область утверждений"
+  carrier_ru: "Внешняя проверочная модель Foundation одно-сортна: Link : Type в метаязыке Lean4 (в Rocq — Type). Это носитель математической интерпретации МТС, а не утверждение, что в исходной онтологии МТС появляются внешние сорта или объекты категории. form : Link → Link → Link — тотальная бинарная операция; start, finish : Link → Link — тотальные проекции; R : Link — выделенная константа."
+  axioms_ru: "Три исходных закона: для всех a,b выполняются start(form(a,b))=a и finish(form(a,b))=b, а также form(R,R)=R. Обратное равенство form(start(x),finish(x))=x для произвольного x здесь НЕ постулируется. Следовательно, глобальная экстенсиональность по полюсам тоже не объявляется аксиомой Foundation."
+  logic_ru: "Lean4 и Rocq используют конструктивную логику внешнего доказательного метаязыка; решение локальных равенств задаётся отдельным доказательным входом LocalSelfDecision либо строится для конкретной модели. Это не запрет исследовать классические модели, но условные конструктивные выводы не должны молчаливо использовать закон исключённого третьего."
+  injectivity_ru: "Из двух проекционных уравнений следует без добавочных предпосылок: form(a,b)=form(c,d) тогда и только тогда, когда a=c и b=d. Доказательство прямого направления: применить соответственно start и finish; обратное — подстановка равных аргументов. Это доказано как fnd13_form_injective и не доказывает более сильного x=y ⇔ start(x)=start(y) ∧ finish(x)=finish(y) для произвольных x,y."
+  root_ru: "Выделенность R означает константу сигнатуры и уравнение form(R,R)=R. Единственность произвольного полностью самозамкнутого x не является аксиомой: FND_02_unique_root выводит x=R только при A1RecursiveSeparation. Нельзя путать назначение имени R с доказательством его единственности."
+  cardinality_ru: "В любой конечной модели с |Link|=n инъективная form : Link×Link→Link требовала бы n²≤n; поскольку R задана, n≥1. Поэтому конечная модель возможна только при n=1; всякая модель с хотя бы двумя Link бесконечна. Здесь используется обычное метаматематическое рассуждение о мощностях, а не отдельная новая аксиома МТС."
+  grounded_ru: "Grounded(F,x) — индуктивное свидетельство конечного дерева обязанностей: для каждого полюса, отличного от x, предъявляется Grounded соответствующего полюса. Непосредственная самоссылка не создаёт новой обязанности; двухузловой цикл через различные x,y без другого конечного основания не даёт Grounded. FND_13_identity_by_poles доказывается лишь при F2F3GroundedNormalization и двух Grounded-свидетельствах."
+  no_overclaim_ru: "Математическая сигнатура, свободный выбор класса моделей и вычислительная реализация — разные уровни. Инъективность form не означает её сюръективности; наличие R не утверждает единственность без A1; равенство кодов и равенство Link не отождествляются автоматически."
+  lean_symbols: [Foundation, fnd13_form_injective, FND_02_unique_root, Grounded, A1RecursiveSeparation, F2F3GroundedNormalization, FND_13_identity_by_poles]
+  rocq_symbols: [Foundation, fnd13_form_injective, FND_02_unique_root, Grounded, A1RecursiveSeparation, F2F3GroundedNormalization, FND_13_identity_by_poles]
+explicit_model:
+  heading_ru: "F02. Совместная нетривиальная модель и точные границы её свидетельств"
+  carrier_ru: "Внешняя модель Model1796 использует единый бесконечный носитель Link := List Bool. Корень представлен пустым списком []; самоссылочные формы START(a) и END(a) имеют разные двухбитовые префиксы, а общий PAIR(a,b) использует префикс 11 и саморазделяющееся кодирование левого полюса. Биты — только средство построения явной модели, не онтологические элементы МТС."
+  form_ru: "Единая total form выбирает ROOT для (R,R), подходящую фиксированную точку START/END для односторонних уравнений и PAIR-код в остальных случаях; доказаны проекционные законы start(form(a,b))=a, finish(form(a,b))=b. Это конструктивное свидетельство существования содержательной модели Foundation, а не гипотеза о том, что всякий Link обязан иметь такое кодирование."
+  witnesses_ru: "На одной ExplicitFoundation определены ExplicitOneSided (ненулевые односторонние представители), ExplicitInversionDomain, ExplicitGroundedNormalization и отдельно доказан explicit_a1. Тем самым для этих точно заданных интерфейсов совместность предпосылок не оставлена на уровне независимых условных аксиом. Нельзя заменять эту проверку ссылками на несвязанные модели для каждого свойства."
+  grounding_ru: "Модель содержит некорректные с точки зрения канонического образа значения badStart и badFinish: их зависимость образует нетривиальный цикл; доказано, что этот двухузловой цикл не Grounded. Для Grounded-связей доказано попадание в образ form; потому normalForm(x)=x и compose=form удовлетворяют именно принятому интерфейсу F2F3GroundedNormalization."
+  basis_ru: "Для выбранной модели можно положить O=startForm(R), C=endForm(R), L=form(O,C), U=form(C,O). Исходные доказательства предъявляют O≠R и C≠R как часть ExplicitOneSided; полную таблицу попарных неравенств R/O/C/L/U нельзя приписывать общему Foundation без самостоятельных предпосылок и лемм."
+  provenance_ru: "Точные доказательные объекты и их Rocq-аналоги: ExplicitFoundation, ExplicitOneSided, ExplicitInversionDomain, ExplicitGroundedNormalization, explicit_a1, fallback_cycle_not_grounded. Модель не объявляет доказанной полноту production-реализации, произвольных циклических FORMAL bindings, а также всех возможных моделей МТС."
+  remaining_ru: "Отдельно требуется независимая проверка таблицы отношений базиса, построение контрастной модели Foundation без A1 (если такая действительно возможна), проверка сквозного Foundation→Γ примера и отображение внешних List Bool-свидетелей на заявленный семантический домен. Это исследования, а не уже доказанные следствия принятой модели."
+  lean_symbols: [ExplicitFoundation, ExplicitOneSided, ExplicitInversionDomain, ExplicitGroundedNormalization, explicit_a1, fallback_cycle_not_grounded]
+  rocq_symbols: [ExplicitFoundation, ExplicitOneSided, ExplicitInversionDomain, ExplicitGroundedNormalization, explicit_a1, fallback_cycle_not_grounded]
+assurance:
+  heading_ru: "P01. Какую именно математическую силу имеют восемь FRM-целей"
+  intro_ru: "Машинная проверка Lean4 и Rocq устанавливает корректность утверждений в явно заданных внешних моделях относительно их гипотез. Она не снимает автоматически предпосылки конкретного parser/compiler, не доказывает полноту всего языка и не означает математической приёмки научной публикации. Ниже классификация взята из принятого реестра proof assurance, без повышения статусов."
+  note_ru: "Необходимо различать четыре результата: (1) безусловную лемму внутри выбранного определения; (2) условную теорему при явном математическом интерфейсе; (3) исполняемый тест конечного корпуса; (4) доказанный refinement production. Пункт (3) сам по себе не превращается в (4)."
+  cases:
+    - id: FRM-01
+      meaning_ru: "Абсолютное имя :A — один шаг разрешения пути от R. Доказательство сводится к вычислению определения resolvePath; реальные правила обработки имён parser ещё не проверены формально."
+    - id: FRM-02
+      meaning_ru: "Различение bare, binding и пустого bundle показано для конечного bootstrap-фрагмента SourceRole. Рекурсивные непустые bundle требуют отдельной верификации."
+    - id: FRM-03
+      meaning_ru: "Трёхчленная DAS-цепь читается как левая свёртка произвольной pair; это не алгебраическая ассоциативность. Для n>3 полезна отдельная индукционная лемма о foldl, а не дополнительная аксиома form."
+    - id: FRM-04
+      meaning_ru: "Различимость [], [R] и [R,R] следует из отдельно предположенной инъективности encode; производственная реализация инъективного позиционного кодека не доказана этим результатом."
+    - id: FRM-05
+      meaning_ru: "Совпадение denotation следует конгруэнцией функции denote из гипотезы о буквальном равенстве fromFormal(formal)=fromJson(json). Равенство результатов реальных парсеров здесь не доказано."
+    - id: FRM-06
+      meaning_ru: "decode(compile(s))=s выступает входным полем MetaCompiler.roundTrip; теорема воспроизводит этот закон, но сама не доказывает его для production-компилятора."
+    - id: FRM-07
+      meaning_ru: "Внешнее доказательство использует sameSource и recursiveLeftInverse, а отдельная FRM-07b показывает injective(encode) из read(encode(v))=v. Production-свидетельства для трёх декларированных обязательств требуют самостоятельной строгой классификации тест/инвариант/доказательство."
+    - id: FRM-08
+      meaning_ru: "Правила интерпретации ROOT/START/END/PAIR доказываются вычислением денотации StructuralAspectExpr. Это не доказательство обработки всех произвольных циклических связываний в FORMAL."
+  production_gate_ru: "Открытое доказательное обязательство: показать по каждому утверждённому артефакту соответствие формальной source-denotation, canonical JSON и реального TypeScript backend. Указать, где есть лишь тесты ограниченного корпуса, где инвариант алгоритма, где полное доказательство. Пока эту границу нельзя обозначать как end-to-end theorem."
+  formal_lean_symbols: [FRM_01_absolute_contextual_name, FRM_02_root_source_role_separation, FRM_03_direct_sequential_association_three, FRM_04_single_root_distinct_from_empty, FRM_05_shared_source_implies_shared_denotation, FRM_06_metacompiler_preserves_semantics, FRM_07_approved_artifact_refinement, FRM_08_structural_aspect_denotation]
+  formal_rocq_symbols: [FRM_01_absolute_contextual_name, FRM_02_root_source_role_separation, FRM_03_direct_sequential_association_three, FRM_04_single_root_distinct_from_empty, FRM_05_shared_source_implies_shared_denotation, FRM_06_metacompiler_preserves_semantics, FRM_07_approved_artifact_refinement, FRM_08_structural_aspect_denotation]

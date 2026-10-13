@@ -1,0 +1,85 @@
+# G42: scholarly organization of individually reviewed G20/G41 prose; all normative source files remain untouched.
+schema: mts-reader-academic-composition/v0.1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+semantic_change: false
+scientific_review: pending-independent-second-pass
+source_reader: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+first_use_projection: requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml
+r40_reviews:
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W1.yaml
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W2.yaml
+  - requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W3.yaml
+proof_inventory: proofs/v015-formal-proof-assurance.json
+coverage:
+  atoms: 119
+  findings: 15
+  reader_edges: 151
+  inherited_edges: 57
+proof_cases: [FRM-03, FRM-04, FRM-07]
+chapters:
+  - id: foundational-forms
+    title_ru: "Основания: связь, полюса и локальные формы"
+    bridge_ru: "Исходная онтология вводит Link и различимые полюсные позиции; описание локальных случаев не утверждает существование представителей каждой формы."
+    scope_ru: "До Grounded и тождества по полюсам необходимо установить локальные предпосылки и явные условия существования."
+    boundary_ru: "Не выводить глобальную экстенсиональность или существование каждой формы только из локальной исчерпываемости."
+    positions: [1, 11]
+  - id: grounded-inverse-context
+    title_ru: "Заземлённость, тождество, инверсия и контекстная ориентация"
+    bridge_ru: "Теперь вводятся ограничения Grounded, требуемые для условного тождества, затем инверсия и отдельные абсолютные и относительные утверждения о хиральности."
+    scope_ru: "FND-13 применимо после F2F3GroundedNormalization и при двух свидетельствах Grounded."
+    boundary_ru: "CTX-03 не требует глобального маркера контекста для объективного результата."
+    positions: [12, 29]
+  - id: representation-first-use
+    title_ru: "Представление асети и первые определения кодеков"
+    bridge_ru: "После онтологии вводятся знаки, уровни представления, ExactSequence, Q и операционный словарь; G41 показывает раннее определение Q без замены его позднего полного описания."
+    scope_ru: "Различать физическую Link-структуру, семантическую ANet, ExactSequence и внешние представления."
+    boundary_ru: "Не приравнивать декодированную строку к тождеству связи; исходные пояснения L и U выводятся позднее."
+    positions: [30, 42]
+  - id: derived-and-context
+    title_ru: "Производные шкалы, структурные преобразования и версии Q"
+    bridge_ru: "Различаются Nat и Degree, неотождествляемые без отдельного результата; полное определение Q вводится из исходного G7."
+    scope_ru: "Сохраняется версионирование кодеков и явная область применимости относительных ориентаций."
+    boundary_ru: "Отложенное пояснение L/U не является новой аксиомой; синтаксическое переписывание не доказывает семантическую эквивалентность."
+    positions: [43, 55]
+  - id: grammar-and-historical-mp
+    title_ru: "Нотация, последовательная ассоциация и историческое развитие MP"
+    bridge_ru: "Описание графических и символьных форм предшествует переходу от v0.14 к принятой v0.15; ранний обобщённый MP и поздняя исполняющая Γ имеют разные статусы."
+    scope_ru: "В остенсивной грамматике v0.14 implicitPairAssociativity=NONE означает отсутствие неявного правила группировки; это не закон алгебры Link. Отдельно v0.15 задаёт Direct Sequential Association для чтения цепочек в собственной области."
+    boundary_ru: "Не переписывать исторический текст так, будто Γ v0.15 является доказательной предпосылкой для MP v0.13/v0.14."
+    positions: [56, 71]
+  - id: v015-ontology
+    title_ru: "Семантическая область принятой v0.15"
+    bridge_ru: "Новая версия сохраняет единую онтологию Link. Ни роль контекста, ни имя, ни внешний кодек не добавляют второго математического сорта."
+    scope_ru: "Объяснять положения о Link, ANet, Theory/Context/Entry/Result отдельно от гарантий инфраструктуры."
+    boundary_ru: "Не переносить требования к CI, релизу или бэкенду в математические теоремы."
+    dispositions: [terminology, mathematical-scope]
+  - id: v015-execution
+    title_ru: "FORMAL, JSON, Γ и исполняемые примеры"
+    bridge_ru: "Отдельно рассматриваются денотация и роль структурных операторов, перенос из FORMAL/JSON в нативную ANet, S1/S2, AND и другие операции через одну Γ."
+    scope_ru: "AND должен демонстрировать FF/FT/TF/TT и NO_MATCH вне T/F; ExactSequence и F_R различаются. Примеры до второго прохода помечены как требующие source-owned evidence."
+    boundary_ru: "Любой новый исполняемый JSON требует отдельного явного авторского утверждения; здесь ничего исполняемого не добавлено."
+    dispositions: [formal-execution, execution-contract, notation-example, worked-example-needed]
+  - id: proof-and-refinement
+    title_ru: "Формально проверенный фрагмент и пределы свидетельств"
+    bridge_ru: "Парные Lean4/Rocq результаты предъявляются с точными идентификаторами, предпосылками и исключениями, считанными из принятого реестра."
+    scope_ru: "FRM-03: трёхчленная DSA не является алгебраической ассоциативностью; FRM-04 условна по ExactSequence injectivity; FRM-07 требует production refinement premises."
+    boundary_ru: "Нельзя заявлять ни доказательство TS-реализации Lean/Rocq, ни глобальную инъективность production encoder."
+    dispositions: [proof-evidence]
+  - id: reproducibility-assurance
+    title_ru: "Экспериментальная воспроизводимость и аудит реализации"
+    bridge_ru: "Здесь размещаются независимые регрессионные свидетельства, декодеры, полнота трасс, тестирование слоёв, отрицательные фальсификаторы и provenance."
+    scope_ru: "GREEN означает подтверждённый заявленный фрагмент на точном артефакте, не математическое доказательство всего компилятора."
+    boundary_ru: "Не считать отменённые/пропущенные CI успешными; не повышать статус проверки за пределы фактических jobs."
+    dispositions: [assurance-appendix]
+  - id: governance-and-history
+    title_ru: "Статус принятия, нормативные границы и история релизов"
+    bridge_ru: "Результат v0.15 уже принят автором: описания прежнего cutover приводятся как история, а не как ещё не выполненное условие."
+    scope_ru: "Принятые законы, внешние редакционные проекции и будущие исследования имеют различные полномочия."
+    boundary_ru: "Модель G42 не изменяет нормативную v0.15 и не предоставляет полномочий для merge или публикации."
+    dispositions: [governance-appendix, historical-version]
+finding_policy:
+  already_corrected: [R40-05]
+  mitigated_needs_rereview: [R40-01, R40-02, R40-03, R40-04, R40-08]
+  open_for_scientific_second_pass: [R40-06, R40-07, R40-09, R40-10, R40-11, R40-12, R40-13, R40-14, R40-15]

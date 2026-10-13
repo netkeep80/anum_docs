@@ -1181,3 +1181,373 @@ export function loadReaderDraftWithFoundationOpening(root: string): string {
   ].join("\n");
   return manuscript.slice(0, beforeBasis) + inserted + manuscript.slice(beforeBasis);
 }
+
+
+/** G17 diagnostic: later-chapter normative prerequisites; NOT asserted reader DAG edges. */
+export const READER_INVERSION_G17_PATH =
+  "requirements/mts-source/MTS-READER-INVERSION-G17.yaml";
+export interface ReaderReverseNormativeEdge {
+  readonly prerequisite: string;
+  readonly consumer: string;
+  readonly review: "pending";
+  readonly riskRu: string;
+  readonly proposalRu: string;
+}
+export interface ReaderReverseNormativeAudit {
+  readonly schema: "mts-reader-inversion-audit/v0.1";
+  readonly status: "proposed";
+  readonly authorApproval: "not-recorded";
+  readonly publication: "blocked";
+  readonly readerDag: "scientific-review-pending";
+  readonly normativeEdgeCount: 100;
+  readonly reversedChapterEdges: readonly ReaderReverseNormativeEdge[];
+}
+/** Chapter order is only a proposed presentation, never inferred mathematical truth. */
+export function deriveReaderReverseNormativeEdges(
+  coverage: ReaderCoveragePlan, routes: ReaderRoutes,
+): readonly {prerequisite:string; consumer:string}[] {
+  const chapterIds=Object.keys(routes.chapters) as ReaderSection[];
+  if (chapterIds.length!==13 || coverage.rows.length!==62) fail("G17 chapter or registry mismatch");
+  const chapterIndex=new Map(chapterIds.map((chapter,i)=>[chapter,i]));
+  const accepted=new Map(coverage.rows.map(row=>[row.id,row]));
+  if(accepted.size!==62)fail("G17 duplicate accepted law");
+  const edgeCount=coverage.rows.reduce((count,row)=>count+row.normativeDependsOn.length,0);
+  if(edgeCount!==100)fail("G17 accepted normative dependency source drift");
+  const inverted:{prerequisite:string;consumer:string}[]=[];
+  for(const row of coverage.rows)for(const dep of row.normativeDependsOn){
+    const source=accepted.get(dep);
+    if(!source)fail("G17 unresolved accepted normative prerequisite");
+    const indexSource=chapterIndex.get(source.proposedSection);
+    const indexConsumer=chapterIndex.get(row.proposedSection);
+    if(indexSource===undefined||indexConsumer===undefined)
+      fail("G17 section not in ordered editorial outline");
+    if(indexSource>indexConsumer)inverted.push({prerequisite:dep,consumer:row.id});
+  }
+  return Object.freeze(inverted.map(x=>Object.freeze(x)));
+}
+export function parseReaderReverseNormativeAudit(
+  text: string, coverage:ReaderCoveragePlan, routes:ReaderRoutes,
+): ReaderReverseNormativeAudit {
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G17 invalid inversion YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G17 inversion audit");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","reader_dag","normative_edges_are_reader_edges","observations"],"G17 inversion audit");
+  if(raw.schema!=="mts-reader-inversion-audit/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.reader_dag!=="scientific-review-pending"||
+     raw.normative_edges_are_reader_edges!==false)
+    fail("G17 cannot approve editorial or normative/reader DAG equivalence");
+  const derived=deriveReaderReverseNormativeEdges(coverage,routes);
+  if(derived.length!==17||!Array.isArray(raw.observations)||raw.observations.length!==17)
+    fail("G17 accepted edge inversion count mismatch");
+  const expectedKeys=new Set(derived.map(x=>x.prerequisite+"→"+x.consumer));
+  const seen=new Set<string>();
+  const entries:ReaderReverseNormativeEdge[]=raw.observations.map((entry,i)=>{
+    const x=object(entry,"G17 observation");
+    exactFields(x,["prerequisite","consumer","review","risk_ru","proposal_ru"],"G17 observation");
+    const key=String(x.prerequisite)+"→"+String(x.consumer);
+    if(!expectedKeys.has(key)||seen.has(key))
+      fail("G17 accepted normalized dependency/chapter relation drift");
+    seen.add(key);
+    if(x.review!=="pending"||typeof x.risk_ru!=="string"||x.risk_ru.trim().length<85||
+       typeof x.proposal_ru!=="string"||x.proposal_ru.trim().length<85)
+      fail("G17 each inversion needs individual unapproved scientific rationale");
+    return Object.freeze({
+      prerequisite:x.prerequisite as string,consumer:x.consumer as string,
+      review:"pending" as const,riskRu:x.risk_ru,proposalRu:x.proposal_ru,
+    });
+  });
+  if(seen.size!==expectedKeys.size)fail("G17 missing accepted inversion");
+  return Object.freeze({
+    schema:"mts-reader-inversion-audit/v0.1" as const,status:"proposed" as const,
+    authorApproval:"not-recorded" as const,publication:"blocked" as const,
+    readerDag:"scientific-review-pending" as const,normativeEdgeCount:100 as const,
+    reversedChapterEdges:Object.freeze(entries),
+  });
+}
+export function loadReaderReverseNormativeAudit(root:string):ReaderReverseNormativeAudit{
+  return parseReaderReverseNormativeAudit(
+    readFileSync(resolve(root,READER_INVERSION_G17_PATH),"utf8"),
+    loadReaderCoverage(root),loadReaderRoutes(root));
+}
+export function renderReaderReverseNormativeAudit(a:ReaderReverseNormativeAudit):string{
+  return [
+    "# Межраздельные зависимости научного черновика МТС","",
+    "**17 предметных редакционных рисков; ни одна нормативная зависимость не объявляется автоматически reader DAG.**","",
+    "Принятых нормативных зависимостей: "+a.normativeEdgeCount+".",
+    "Зависимостей из поздней главы в более раннюю: "+a.reversedChapterEdges.length+".",
+    "Авторски утверждённых reader DAG переходов: 0.","",
+    ...a.reversedChapterEdges.flatMap(e=>[
+      "## "+e.prerequisite+" → "+e.consumer,"",
+      "Диагностика: "+e.riskRu,"",
+      "Предлагаемое решение: "+e.proposalRu,"",
+      "Статус: научная проверка не завершена.","",
+    ]),
+  ].join("\n");
+}
+
+
+/** G18: cycles appear only AFTER chapter aggregation of accepted normative deps. */
+export const READER_CHAPTER_CYCLES_G18_PATH =
+  "requirements/mts-source/MTS-READER-CHAPTER-CYCLES-G18.yaml";
+export interface ReaderChapterCycleComponent {
+  readonly id:string;
+  readonly members:readonly ReaderSection[];
+  readonly review:"pending";
+  readonly riskRu:string;
+  readonly repairRu:string;
+}
+export interface ReaderChapterCycleGraph {
+  readonly acceptedNormativeEdges:100;
+  readonly normativeLawDagAcyclic:true;
+  readonly crossChapterEdges:number;
+  readonly cyclicComponents:readonly (readonly ReaderSection[])[];
+  readonly singletonSections:readonly ReaderSection[];
+}
+export interface ReaderChapterCycleAudit {
+  readonly schema:"mts-reader-chapter-cycle-audit/v0.1";
+  readonly publication:"blocked";
+  readonly authorApproval:"not-recorded";
+  readonly readerDag:"scientific-review-pending";
+  readonly acceptedNormativeEdges:100;
+  readonly normativeLawDagAcyclic:true;
+  readonly crossChapterEdges:37;
+  readonly components:readonly ReaderChapterCycleComponent[];
+  readonly singletonSections:readonly ReaderSection[];
+}
+export function deriveReaderChapterCycles(
+  coverage:ReaderCoveragePlan,routes:ReaderRoutes,
+):ReaderChapterCycleGraph {
+  const sections=Object.keys(routes.chapters) as ReaderSection[];
+  if(sections.length!==13||coverage.rows.length!==62)
+    fail("G18 accepted route/chapter source mismatch");
+  const accepted=new Map(coverage.rows.map(x=>[x.id,x]));
+  if(accepted.size!==62)fail("G18 duplicate accepted law");
+  // First confirm the original 62-law registry graph is acyclic. Aggregation
+  // into chapters may create new cycles without creating mathematical ones.
+  const visiting=new Set<string>(), completed=new Set<string>();
+  const visitNormative=(id:string):void=>{
+    if(visiting.has(id))fail("G18 accepted law graph has a dependency cycle");
+    if(completed.has(id))return;
+    const law=accepted.get(id);
+    if(!law)fail("G18 unknown accepted law during cycle check");
+    visiting.add(id);
+    for(const dep of law.normativeDependsOn)visitNormative(dep);
+    visiting.delete(id);completed.add(id);
+  };
+  for(const id of accepted.keys())visitNormative(id);
+  const edges=new Map<ReaderSection,Set<ReaderSection>>(
+    sections.map(x=>[x,new Set<ReaderSection>()]));
+  let normativeCount=0;
+  for(const consumer of coverage.rows){
+    for(const dep of consumer.normativeDependsOn){
+      normativeCount++;
+      const source=accepted.get(dep);
+      if(!source)fail("G18 unresolved accepted dependency");
+      if(source.proposedSection!==consumer.proposedSection){
+        const children=edges.get(source.proposedSection);
+        if(!children||!edges.has(consumer.proposedSection))
+          fail("G18 unknown routed chapter");
+        children.add(consumer.proposedSection);
+      }
+    }
+  }
+  if(normativeCount!==100)fail("G18 historical normative edge count drift");
+  const cross=[...edges.values()].reduce((sum,e)=>sum+e.size,0);
+  const discovered=new Map<ReaderSection,number>();
+  const low=new Map<ReaderSection,number>();
+  const stack:ReaderSection[]=[];
+  const active=new Set<ReaderSection>();
+  const components:ReaderSection[][]=[];
+  let next=0;
+  const visit=(v:ReaderSection):void=>{
+    const position=next++;
+    discovered.set(v,position);low.set(v,position);
+    stack.push(v);active.add(v);
+    for(const to of edges.get(v)??[]){
+      if(!discovered.has(to)){
+        visit(to);
+        low.set(v,Math.min(low.get(v)!,low.get(to)!));
+      }else if(active.has(to)){
+        low.set(v,Math.min(low.get(v)!,discovered.get(to)!));
+      }
+    }
+    if(low.get(v)===discovered.get(v)){
+      const component:ReaderSection[]=[];
+      let last:ReaderSection;
+      do{
+        const popped=stack.pop();
+        if(!popped)fail("G18 invalid Tarjan stack");
+        last=popped;active.delete(last);component.push(last);
+      }while(last!==v);
+      components.push(component.sort());
+    }
+  };
+  for(const v of sections)if(!discovered.has(v))visit(v);
+  const ordered=components.sort((a,b)=>a[0]!.localeCompare(b[0]!));
+  const cyclic=ordered.filter(x=>x.length>1);
+  const singletons=ordered.filter(x=>x.length===1).map(x=>x[0]!).sort();
+  if(cross!==37||cyclic.length!==2||cyclic.some(x=>x.length!==5)||
+     singletons.length!==3||[...cyclic,...singletons.map(x=>[x])].flat().length!==13)
+    fail("G18 chapter aggregation SCC changed");
+  return Object.freeze({
+    acceptedNormativeEdges:100 as const,normativeLawDagAcyclic:true as const,crossChapterEdges:cross,
+    cyclicComponents:Object.freeze(cyclic.map(x=>Object.freeze([...x]))),
+    singletonSections:Object.freeze(singletons),
+  });
+}
+export function parseReaderChapterCycleAudit(
+  text:string, coverage:ReaderCoveragePlan, routes:ReaderRoutes,
+  reverse:ReaderReverseNormativeAudit,
+):ReaderChapterCycleAudit{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G18 invalid cycle YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G18 chapter cycle audit");
+  exactFields(raw,["schema","status","semantic_change","author_approval","publication",
+    "normative_edges_are_reader_edges","reader_dag","accepted_normative_edges",
+    "cross_chapter_edges","components","singletons"],"G18 chapter cycle audit");
+  if(raw.schema!=="mts-reader-chapter-cycle-audit/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.normative_edges_are_reader_edges!==false||
+     raw.reader_dag!=="scientific-review-pending"||
+     raw.accepted_normative_edges!==100||raw.cross_chapter_edges!==37||
+     reverse.reversedChapterEdges.length!==17||reverse.publication!=="blocked")
+    fail("G18 cannot approve chapter ordering or conflate distinct graphs");
+  const derived=deriveReaderChapterCycles(coverage,routes);
+  const names=["foundation-architecture-loop","proof-assurance-governance-loop"];
+  if(!Array.isArray(raw.components)||raw.components.length!==2)
+    fail("G18 incomplete source-owned component review");
+  const components:ReaderChapterCycleComponent[]=raw.components.map((entry,i)=>{
+    const x=object(entry,"G18.component");
+    exactFields(x,["id","review","members","risk_ru","repair_ru"],"G18.component");
+    if(x.id!==names[i]||x.review!=="pending"||
+      !Array.isArray(x.members)||x.members.join(",")!==derived.cyclicComponents[i]!.join(",")||
+      typeof x.risk_ru!=="string"||x.risk_ru.length<110||
+      typeof x.repair_ru!=="string"||x.repair_ru.length<110)
+      fail("G18 chapter SCC is altered or scientific explanation missing");
+    return Object.freeze({
+      id:x.id as string,members:Object.freeze([...x.members]) as readonly ReaderSection[],
+      review:"pending" as const,riskRu:x.risk_ru,repairRu:x.repair_ru,
+    });
+  });
+  if(!Array.isArray(raw.singletons)||
+     raw.singletons.join(",")!==derived.singletonSections.join(","))
+    fail("G18 isolated chapter set drift");
+  return Object.freeze({
+    schema:"mts-reader-chapter-cycle-audit/v0.1" as const,
+    publication:"blocked" as const,authorApproval:"not-recorded" as const,
+    readerDag:"scientific-review-pending" as const,
+    acceptedNormativeEdges:100 as const,normativeLawDagAcyclic:true as const,crossChapterEdges:37 as const,
+    components:Object.freeze(components),
+    singletonSections: Object.freeze([...derived.singletonSections]),
+  });
+}
+export function loadReaderChapterCycleAudit(root:string):ReaderChapterCycleAudit{
+  return parseReaderChapterCycleAudit(
+    readFileSync(resolve(root,READER_CHAPTER_CYCLES_G18_PATH),"utf8"),
+    loadReaderCoverage(root),loadReaderRoutes(root),loadReaderReverseNormativeAudit(root));
+}
+export function renderReaderChapterCycleAudit(a:ReaderChapterCycleAudit):string{
+  return [
+    "# Циклы межраздельной научной маршрутизации МТС","",
+    "**Диагностика группировки, не противоречие в принятых законах.**","",
+    "Прямых нормативных зависимостей: "+a.acceptedNormativeEdges+".",
+    "Исходный нормативный граф 62 законов: без циклов.",
+    "Различных межраздельных направлений: "+a.crossChapterEdges+".",
+    "Сильно связных групп глав: "+a.components.length+".",
+    "Авторски утверждённых читательских графов: 0.","",
+    ...a.components.flatMap(c=>[
+      "## "+c.id,"","Главы: "+c.members.join(", ")+".","",
+      "Диагностика: "+c.riskRu,"",
+      "Редакционное предложение: "+c.repairRu,"",
+      "Статус: требует научной проверки.","",
+    ]),
+  ].join("\n");
+}
+
+
+/** G19: editorial *first-use* definitions, never complete proof replacements. */
+export const READER_EARLY_G19_PATH =
+  "requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml";
+export interface ReaderEarlyConcept {
+  readonly id:string;readonly acceptedId:string;readonly termRu:string;
+  readonly exactAcceptedQuote:string;readonly introductoryRu:string;
+  readonly noninferenceRu:string;readonly review:"pending";
+}
+export interface ReaderEarlyConcepts {
+  readonly schema:"mts-reader-early-concepts/v0.1";
+  readonly publication:"blocked";readonly authorApproval:"not-recorded";
+  readonly definitions:readonly ReaderEarlyConcept[];
+}
+export function parseReaderEarlyConcepts(text:string,
+  acceptedLaws:ReadonlyMap<string,string>,v14Contract:Record<string,unknown>):ReaderEarlyConcepts{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G19 invalid early-concepts YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G19 first-use definitions");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","reason","definitions"],"G19 first-use definitions");
+  if(raw.schema!=="mts-reader-early-concepts/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.reason!=="first-use-reader-clarification")
+    fail("G19 cannot promote glossary to accepted theory or publication");
+  const acceptedIds=["V15-TERM-01","V14-L6","V15-JSON-04","V15-JSON-02","V15-GAMMA-01"];
+  const ids=["anet-term","nat-first-use","exact-sequence-first-use",
+    "formal-json-first-use","gamma-first-use"];
+  if(!Array.isArray(raw.definitions)||raw.definitions.length!==ids.length)
+    fail("G19 requires five individually grounded definitions");
+  const definitions:ReaderEarlyConcept[]=raw.definitions.map((entry,i)=>{
+    const x=object(entry,"G19.definition");
+    exactFields(x,["id","accepted_id","term_ru","exact_accepted_quote",
+      "introductory_ru","noninference_ru","review"],"G19.definition");
+    if(x.id!==ids[i]||x.accepted_id!==acceptedIds[i]||x.review!=="pending"||
+       x.exact_accepted_quote!==acceptedLaws.get(acceptedIds[i]!)||
+       typeof x.term_ru!=="string"||x.term_ru.length<12||
+       typeof x.introductory_ru!=="string"||x.introductory_ru.length<190||
+       typeof x.noninference_ru!=="string"||x.noninference_ru.length<65)
+      fail("G19 duplicate/forged/missing source-owned first-use definition");
+    return Object.freeze({
+      id:x.id as string,acceptedId:x.accepted_id as string,termRu:x.term_ru,
+      exactAcceptedQuote:x.exact_accepted_quote as string,introductoryRu:x.introductory_ru,
+      noninferenceRu:x.noninference_ru,review:"pending" as const,
+    });
+  });
+  if(v14Contract.schema!=="mts-contract/v0.14"||v14Contract.accepted!==true)
+    fail("G19 v0.14 Nat source contract not accepted");
+  const nat=object(v14Contract.natTheory,"G19 Nat accepted facts");
+  const degree=object(v14Contract.connectivityDegreeTheory,"G19 Degree accepted facts");
+  if(nat.zero!=="N0 = U"||nat.successor!=="Succ(N) = N ⟼ L"||
+     degree.one!=="D1 = L")
+    fail("G19 Nat / Degree first-use authority drift");
+  return Object.freeze({
+    schema:"mts-reader-early-concepts/v0.1" as const,
+    publication:"blocked" as const,authorApproval:"not-recorded" as const,
+    definitions:Object.freeze(definitions),
+  });
+}
+export function loadReaderEarlyConcepts(root:string):ReaderEarlyConcepts{
+  const v14=loadMtsSemanticIr(root,"requirements/mts-v0.14.json").requirements;
+  const v15=loadMtsSemanticIr(root).requirements;
+  const laws=new Map([...v14,...v15].map(x=>[x.id,x.statement]));
+  return parseReaderEarlyConcepts(
+    readFileSync(resolve(root,READER_EARLY_G19_PATH),"utf8"),laws,
+    object(JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.14.json"),"utf8")),
+      "accepted v0.14 contract"));
+}
+export function loadReaderDraftWithEarlyConcepts(root:string):string{
+  const manuscript=loadReaderDraftWithFoundationOpening(root);
+  const intro=loadReaderEarlyConcepts(root);
+  if(intro.publication!=="blocked"||intro.authorApproval!=="not-recorded")
+    fail("G19 first-use concepts may not be published");
+  const firstChapter=manuscript.search(/^## /m);
+  if(firstChapter<0)fail("G19 no mathematical chapter in draft");
+  const glossary=[
+    "### Минимальные определения перед первым использованием","",
+    "Это краткие ориентиры, не замена полного нормативного изложения и доказательств.","",
+    ...intro.definitions.flatMap(x=>[
+      "**"+x.termRu+"** ("+x.acceptedId+"). "+x.introductoryRu,"",
+      "Граница: "+x.noninferenceRu+".","",
+    ]),
+  ].join("\n");
+  return manuscript.slice(0,firstChapter)+glossary+manuscript.slice(firstChapter);
+}
