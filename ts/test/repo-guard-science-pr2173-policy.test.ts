@@ -41,7 +41,7 @@ function pathsForSurfaces(names: readonly string[]): string[] {
 }
 function fingerprint(paths: readonly string[]): string {
   let hash = 2166136261;
-  for (const char of paths.join("\\n") + "\\n") {
+  for (const char of paths.join("\n") + "\n") {
     hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
   }
   return (hash >>> 0).toString(16).padStart(8, "0");
