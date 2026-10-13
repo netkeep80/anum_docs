@@ -180,10 +180,6 @@ export function renderReaderW6(root:string):ReaderW6Document{
   const titleOverride=model.renamed.find(x=>x.id===chapter.id)?.title;
   main.push("## "+(ci+1)+". "+(titleOverride??chapter.titleRu),"",transition.reading,"",
     "**Граница применимости.** "+transition.limit,"");
-  if(chapter.id==="representation-first-use"){
-   main.push(relationalReview.sequenceMd,"",representationReview.representationMd,"",
-    languageReview.formalMd,"",languageReview.dasMd,"");
-  }
   if(chapter.id==="derived-and-context"){
    main.push(representationReview.arithmeticMd,"");
   }
@@ -229,8 +225,13 @@ export function renderReaderW6(root:string):ReaderW6Document{
   // Reader-owned definitions precede their extended mathematical analysis.
   // Do not edit or duplicate source atoms: only move the existing supplement.
   if(chapter.id==="foundational-forms"){
-   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"",
-    relationalReview.anetMd,"");
+   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"");
+  }
+  // Explain ANet and ExactSequence only after their chapter-3 source definitions.
+  // Do not duplicate R01 in Foundation or move source-owned text itself.
+  if(chapter.id==="representation-first-use"){
+   main.push(relationalReview.anetMd,"",relationalReview.sequenceMd,"",
+    representationReview.representationMd,"",languageReview.formalMd,"",languageReview.dasMd,"");
   }
   if(chapter.id==="governance-and-history"){
    check(paragraph===0&&chapter.atomIds.every(id=>toAnnex.has(id)),
