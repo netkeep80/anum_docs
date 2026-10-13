@@ -20,6 +20,9 @@ assert.ok(shell.includes('workflow_path=".github/workflows/branch-hygiene.yml"')
 assert.ok(shell.includes('workflow_blob_sha "$BRANCH"'));
 assert.ok(shell.includes('workflow_blob_sha "$BASE"'));
 assert.ok(shell.includes("PR mutation suppressed"));
+assert.ok(shell.includes('HEAD_SHA'));
+assert.ok(shell.includes('repos/$REPO/commits/$HEAD_SHA'));
+assert.ok(shell.includes("Workflow-only synchronization"));
 const stub = [
   "#!/usr/bin/env bash",
   "set -euo pipefail",
@@ -31,6 +34,16 @@ const stub = [
   '  for ((i=0;i<${#args[@]};i++)); do if [[ "${args[$i]}" == "--jq" ]]; then filter="${args[$((i+1))]}"; fi; done',
   '  if [[ "$*" == *"ref=main"* ]]; then sha="$MOCK_BASE_WORKFLOW_SHA"; else sha="$MOCK_BRANCH_WORKFLOW_SHA"; fi',
   '  jq -n --arg sha "$sha" \'{type:"file",sha:$sha}\' | jq -r "$filter"',
+  'elif [[ "$*" == *"--method GET"* && "$*" == *"/commits/"* ]]; then',
+  '  if [[ "$MOCK_COMMIT_GET_FAIL" == 1 ]]; then echo "commit metadata GET failed" >&2; exit 1; fi',
+  '  filter=""',
+  '  args=("$@")',
+  '  for ((i=0;i<${#args[@]};i++)); do if [[ "${args[$i]}" == "--jq" ]]; then filter="${args[$((i+1))]}"; fi; done',
+  '  if [[ "$MOCK_SYNC_ONLY" == 1 ]]; then',
+  '    jq -n \'{parents:[{sha:"parent"}],files:[{filename:".github/workflows/branch-hygiene.yml",status:"modified"}]}\' | jq -r "$filter"',
+  '  else',
+  '    jq -n \'{parents:[{sha:"parent"}],files:[{filename:"src/feature.txt",status:"modified"}]}\' | jq -r "$filter"',
+  '  fi',
   'elif [[ "$*" == *"--method GET"* && "$*" == *"/pulls"* ]]; then',
   '  if [[ "$MOCK_GET_FAIL" == 1 ]]; then echo "API GET failed" >&2; exit 1; fi',
   '  n="$(cat "$MOCK_COUNT_FILE")"; n=$((n+1)); echo "$n" > "$MOCK_COUNT_FILE"',
@@ -59,7 +72,7 @@ const stub = [
 ].join("\n") + "\n";
 
 function check(label: string, counts: [number,number,number], expectedPosts: number,
-  options: { ahead?: number; getFail?: boolean; postFail?: boolean; success?: boolean; badShape?: boolean; multiPage?: boolean; prOwner?: string; staleWorkflow?: boolean; workflowGetFail?: boolean }={}): void {
+  options: { ahead?: number; getFail?: boolean; postFail?: boolean; success?: boolean; badShape?: boolean; multiPage?: boolean; prOwner?: string; staleWorkflow?: boolean; workflowGetFail?: boolean; syncOnly?: boolean; commitGetFail?: boolean }={}): void {
   if(process.platform==="win32") return;
   const directory=mkdtempSync(join(tmpdir(),"mts-branch-head-"));
   try {
@@ -70,7 +83,7 @@ function check(label: string, counts: [number,number,number], expectedPosts: num
     writeFileSync(postFile,"");writeFileSync(logFile,"");
     const result=spawnSync("bash",[scriptFile],{encoding:"utf8",env:{
       ...process.env,GH_TOKEN:"fixture",REPO:"netkeep80/anum_docs",
-      OWNER:"netkeep80",BRANCH:"side-feature",BASE:"main",
+      OWNER:"netkeep80",BRANCH:"side-feature",BASE:"main",HEAD_SHA:"head-sha",
       MOCK_COUNT1:String(counts[0]),MOCK_COUNT2:String(counts[1]),
       MOCK_COUNT3:String(counts[2]),MOCK_GET_FAIL:options.getFail?"1":"0",
       MOCK_POST_FAIL:options.postFail?"1":"0",MOCK_AHEAD:String(options.ahead??1),
@@ -79,6 +92,7 @@ function check(label: string, counts: [number,number,number], expectedPosts: num
       MOCK_BRANCH_WORKFLOW_SHA:options.staleWorkflow?"branch-old":"workflow-current",
       MOCK_BASE_WORKFLOW_SHA:"workflow-current",
       MOCK_WORKFLOW_GET_FAIL:options.workflowGetFail?"1":"0",
+      MOCK_SYNC_ONLY:options.syncOnly?"1":"0",MOCK_COMMIT_GET_FAIL:options.commitGetFail?"1":"0",
       MOCK_COUNT_FILE:counter,MOCK_POST_FILE:postFile,MOCK_LOG:logFile,
       PATH:directory+":"+(process.env.PATH??""),
     }});
@@ -107,4 +121,6 @@ check("more than 100 matches across pages",[101,101,101],0,{multiPage:true});
 check("fork with identical branch ref is not our head",[1,1,1],1,{prOwner:"fork-author"});
 check("stale historical workflow suppresses PR mutation",[0,0,0],0,{staleWorkflow:true});
 check("workflow metadata API failure fails closed",[0,0,0],0,{workflowGetFail:true,success:false});
-console.log("Branch hygiene regression: head-only, stacked, stale-instance, race and pagination guards checked.");
+check("workflow-only trusted synchronization creates no PR",[0,0,0],0,{syncOnly:true});
+check("commit metadata API failure fails closed",[0,0,0],0,{commitGetFail:true,success:false});
+console.log("Branch hygiene regression: head-only, stacked, stale-instance, sync-only, race and pagination guards checked.");
