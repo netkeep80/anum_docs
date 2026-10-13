@@ -32,7 +32,8 @@ assert.equal(book.publication,"blocked");
 assert.ok(book.mainText.includes("### F03. Основания R, O, C, L, U:"));
 assert.ok(book.mainText.includes("### F04. Конструктивная локальная классификация"));
 assert.ok(book.mainText.includes("### F05. A1, FND-02 и FND-13"));
-assert.ok(book.mainText.indexOf("### F03.")<book.mainText.indexOf("**1.1."));
+assert.ok(book.mainText.indexOf("**1.9.")<book.mainText.indexOf("### F03.")&&
+ book.mainText.indexOf("### F03.")<book.mainText.indexOf("## 2. "));
 assert.ok(book.mainText.indexOf("### F04.")<book.mainText.indexOf("**2.1."));
 assert.ok(book.mainText.indexOf("### F05.")<book.mainText.indexOf("**2.1."));
 assert.ok(book.mainText.indexOf("### F03.")>book.mainText.indexOf("### F02."));

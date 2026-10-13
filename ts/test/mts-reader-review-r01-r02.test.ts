@@ -37,7 +37,8 @@ assert.equal(doc.publication,"blocked");
 assert.ok(doc.mainText.includes("### R01. Асеть связей"));
 assert.ok(doc.mainText.includes("### R02. ExactSequence и F_R"));
 assert.ok(doc.mainText.indexOf("### R01.")>doc.mainText.indexOf("### F03."));
-assert.ok(doc.mainText.indexOf("### R01.")<doc.mainText.indexOf("**1.1."));
+assert.ok(doc.mainText.indexOf("**1.9.")<doc.mainText.indexOf("### R01.")&&
+ doc.mainText.indexOf("### R01.")<doc.mainText.indexOf("## 2. "));
 assert.ok(doc.mainText.indexOf("### R02.")>doc.mainText.indexOf("### F07."));
 assert.ok(doc.mainText.indexOf("### R02.")<doc.mainText.indexOf("**3.1."));
 assert.equal(doc.mainIds.length,102);
