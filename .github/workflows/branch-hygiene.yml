@@ -33,6 +33,22 @@ jobs:
         run: |
           set -euo pipefail
 
+          workflow_path=".github/workflows/branch-hygiene.yml"
+
+          workflow_blob_sha() {
+            local ref="$1"
+            gh api --method GET "repos/$REPO/contents/$workflow_path" \
+              -f ref="$ref" \
+              --jq 'if type == "object" and .type == "file" and (.sha | type == "string") then .sha else error("unexpected workflow metadata response") end'
+          }
+
+          branch_workflow_sha="$(workflow_blob_sha "$BRANCH")"
+          base_workflow_sha="$(workflow_blob_sha "$BASE")"
+          if [ "$branch_workflow_sha" != "$base_workflow_sha" ]; then
+            echo "::warning::Stale branch-hygiene workflow on $BRANCH ($branch_workflow_sha != $base_workflow_sha on $BASE); PR mutation suppressed."
+            exit 0
+          fi
+
           existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
 
           if [ "$existing" -gt 0 ]; then
@@ -69,6 +85,16 @@ jobs:
             "- policy issue: #1637" \
             "" \
             "Please replace this placeholder title/body with the task-specific PR description before marking the PR ready.")"
+
+          # Re-check the trusted workflow blob immediately before the write.
+          # If main changed while this run was evaluating the branch, fail closed
+          # and let a later run use the new policy instead of writing from stale code.
+          branch_workflow_sha="$(workflow_blob_sha "$BRANCH")"
+          base_workflow_sha="$(workflow_blob_sha "$BASE")"
+          if [ "$branch_workflow_sha" != "$base_workflow_sha" ]; then
+            echo "::warning::Branch-hygiene became stale during this run; PR mutation suppressed."
+            exit 0
+          fi
 
           error_file="$(mktemp)"
           if gh api --method POST "repos/$REPO/pulls" \
