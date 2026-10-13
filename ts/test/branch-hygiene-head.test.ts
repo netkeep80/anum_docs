@@ -16,11 +16,22 @@ assert.ok(shell.includes('-f head="$OWNER:$BRANCH"'));
 assert.ok(shell.includes('if type == "array" then .[].number else error("unexpected PR list response") end'));
 assert.ok(!shell.includes('-f head="$OWNER:$BRANCH" -f base="$BASE"'));
 assert.ok(workflow.includes("cancel-in-progress: false"));
+assert.ok(shell.includes('workflow_path=".github/workflows/branch-hygiene.yml"'));
+assert.ok(shell.includes('workflow_blob_sha "$BRANCH"'));
+assert.ok(shell.includes('workflow_blob_sha "$BASE"'));
+assert.ok(shell.includes("PR mutation suppressed"));
 const stub = [
   "#!/usr/bin/env bash",
   "set -euo pipefail",
   'echo "$*" >> "$MOCK_LOG"',
-  'if [[ "$*" == *"--method GET"* && "$*" == *"/pulls"* ]]; then',
+  'if [[ "$*" == *"--method GET"* && "$*" == *"/contents/.github/workflows/branch-hygiene.yml"* ]]; then',
+  '  if [[ "$MOCK_WORKFLOW_GET_FAIL" == 1 ]]; then echo "workflow metadata GET failed" >&2; exit 1; fi',
+  '  filter=""',
+  '  args=("$@")',
+  '  for ((i=0;i<${#args[@]};i++)); do if [[ "${args[$i]}" == "--jq" ]]; then filter="${args[$((i+1))]}"; fi; done',
+  '  if [[ "$*" == *"ref=main"* ]]; then sha="$MOCK_BASE_WORKFLOW_SHA"; else sha="$MOCK_BRANCH_WORKFLOW_SHA"; fi',
+  '  jq -n --arg sha "$sha" \'{type:"file",sha:$sha}\' | jq -r "$filter"',
+  'elif [[ "$*" == *"--method GET"* && "$*" == *"/pulls"* ]]; then',
   '  if [[ "$MOCK_GET_FAIL" == 1 ]]; then echo "API GET failed" >&2; exit 1; fi',
   '  n="$(cat "$MOCK_COUNT_FILE")"; n=$((n+1)); echo "$n" > "$MOCK_COUNT_FILE"',
   '  case "$n" in',
@@ -48,7 +59,7 @@ const stub = [
 ].join("\n") + "\n";
 
 function check(label: string, counts: [number,number,number], expectedPosts: number,
-  options: { ahead?: number; getFail?: boolean; postFail?: boolean; success?: boolean; badShape?: boolean; multiPage?: boolean; prOwner?: string }={}): void {
+  options: { ahead?: number; getFail?: boolean; postFail?: boolean; success?: boolean; badShape?: boolean; multiPage?: boolean; prOwner?: string; staleWorkflow?: boolean; workflowGetFail?: boolean }={}): void {
   if(process.platform==="win32") return;
   const directory=mkdtempSync(join(tmpdir(),"mts-branch-head-"));
   try {
@@ -65,6 +76,9 @@ function check(label: string, counts: [number,number,number], expectedPosts: num
       MOCK_POST_FAIL:options.postFail?"1":"0",MOCK_AHEAD:String(options.ahead??1),
       MOCK_BAD_SHAPE:options.badShape?"1":"0",MOCK_MULTI:options.multiPage?"1":"0",
       MOCK_PR_OWNER:options.prOwner??"netkeep80",
+      MOCK_BRANCH_WORKFLOW_SHA:options.staleWorkflow?"branch-old":"workflow-current",
+      MOCK_BASE_WORKFLOW_SHA:"workflow-current",
+      MOCK_WORKFLOW_GET_FAIL:options.workflowGetFail?"1":"0",
       MOCK_COUNT_FILE:counter,MOCK_POST_FILE:postFile,MOCK_LOG:logFile,
       PATH:directory+":"+(process.env.PATH??""),
     }});
@@ -91,4 +105,6 @@ check("GET API error fails closed",[0,0,0],0,{getFail:true,success:false});
 check("malformed JSON response fails closed",[0,0,0],0,{badShape:true,success:false});
 check("more than 100 matches across pages",[101,101,101],0,{multiPage:true});
 check("fork with identical branch ref is not our head",[1,1,1],1,{prOwner:"fork-author"});
-console.log("Branch hygiene regression: head-only, stacked, race and pagination guards checked.");
+check("stale historical workflow suppresses PR mutation",[0,0,0],0,{staleWorkflow:true});
+check("workflow metadata API failure fails closed",[0,0,0],0,{workflowGetFail:true,success:false});
+console.log("Branch hygiene regression: head-only, stacked, stale-instance, race and pagination guards checked.");
