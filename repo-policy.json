@@ -528,6 +528,26 @@
     }
   ],
   "surfaces": {
+    "science-corpus-pr2153-files": [
+      "requirements/mts-source/MTS-READER-INTRO-PROPOSAL.yaml",
+      "requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml",
+      "requirements/mts-source/MTS-READER-V14-G10.yaml",
+      "requirements/mts-source/MTS-READER-V14-G7.yaml",
+      "requirements/mts-source/MTS-READER-V14-G8.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W1.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W2.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W3.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W4.yaml",
+      "ts/src/tooling/mts-reader-coverage.ts",
+      "ts/test/mts-reader-coverage.test.ts"
+    ],
+    "science-foundation-pr2138-files": [
+      "requirements/mts-source/MTS-FND-V14-L1.yaml",
+      "ts/package.json",
+      "ts/package-lock.json",
+      "ts/src/tooling/mts-source-requirement.ts",
+      "ts/test/mts-source-requirement.test.ts"
+    ],
     "theorem-catalog-generated-doc": [
       "docs/theory/Теоремы МТС.md"
     ],
@@ -546,6 +566,9 @@
     ],
     "historical-pics-test": [
       "ts/test/historical-images-protection.test.ts"
+    ],
+    "science-shared-research-classification-test": [
+      "ts/test/research-v013-semantic-dependency-projection-a9.test.ts"
     ]
   },
   "new_file_classes": {
@@ -569,6 +592,38 @@
     ]
   },
   "change_profiles": {
+    "post-v015-science-source-corpus-technical-merge": {
+      "allow_surfaces": [
+        "science-corpus-pr2153-files",
+        "science-shared-research-classification-test"
+      ],
+      "require_surfaces": [
+        "science-corpus-pr2153-files",
+        "science-shared-research-classification-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 11,
+        "max_net_added_lines": 2050
+      }
+    },
+    "post-v015-science-source-foundation-technical-merge": {
+      "allow_surfaces": [
+        "science-foundation-pr2138-files",
+        "science-shared-research-classification-test"
+      ],
+      "require_surfaces": [
+        "science-foundation-pr2138-files",
+        "science-shared-research-classification-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 3,
+        "max_net_added_lines": 1800
+      }
+    },
     "generated-theorem-catalog": {
       "allow_surfaces": [
         "theorem-catalog-generated-doc",
