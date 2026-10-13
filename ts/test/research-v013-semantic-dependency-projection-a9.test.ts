@@ -1229,6 +1229,8 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/theorem-projection-contract.ts",
   "ts/src/tooling/theorem-projection-model.ts",
   "ts/src/tooling/mts-compiler.ts",
+  // #2127: post-v0.15 YAML publication/source governance is tooling-only.
+  "ts/src/tooling/mts-source-requirement.ts",
   "ts/src/tooling/test-runner.ts",
   "ts/src/tooling/test-tier.ts",
 ]);

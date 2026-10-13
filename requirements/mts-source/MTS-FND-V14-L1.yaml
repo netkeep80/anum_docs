@@ -1,0 +1,360 @@
+id: MTS-FND-V14-L1
+schema: mts-source-requirement/v0.1
+kind: foundation
+version_scope: post-v0.15-publication
+model_status: proposed
+semantic_change: false
+
+statement:
+  ru: |-
+    Первичен **`Link`**, а не четыре команды. Одна операция образования/канонизации `Link` допускает четыре и только четыре класса самоинцидентности относительно двух реляционно различимых позиций: `11/10/01/00`. До ориентации средние два образуют одну хиральную орбиту; имена `START_K/END_K` появляются только относительно ориентированного `Context` `K`.
+
+    `8/9/6/1` — рекурсивный структурный алфавит этих форм. Он не является алфавитом `Anum`, Q или физическим `ISA` процессора.
+  sha256: b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5
+  source_role: current-published-explanation
+  author_approval: not-recorded
+  source:
+    path: "docs/theory/Система аксиом МТС.md"
+    anchor: mts-v014-v14-l1
+    baseline_commit: c64b7e21340c6add248c8f380f3fef1292616ac6
+    blob_sha: 2c9d86389c17be273c64b53cb7d09ede166e427d
+
+clarification:
+  ru: |-
+    Записи `11/10/01/00` относятся к двум реляционно различимым полюсным позициям Link. В каждой позиции `1` означает, что соответствующий полюс совпадает с самой Link, а `0` — что не совпадает. Эти `0/1` являются внешними метаобозначениями ответа «нет/да» на два вопроса о самоинцидентности; они не вводят в МТС тип Bool, Nat или новые Link-значения.
+
+    Четыре комбинации являются четырьмя логически возможными и взаимно исключительными локальными случаями. Из одного такого разбиения не следует существование представителя каждого случая: реализуемость односторонних и парного случаев требует отдельного свидетельства `F2F3OneSidedExistence`; отождествление полностью самозамкнутого случая с ROOT использует `A1RecursiveSeparation`.
+  sha256: 5c8bd098e2a43c97386334330de4c0e3eb3ffa166a2d5adc27919bcf4189bafe
+  source_role: editorial-proposal
+  author_approval: not-recorded
+
+editorial_review:
+  status: blocked
+  author_approval: not-recorded
+  findings:
+    - id: V14-L1-ED01
+      category: orphaned-contrast
+      quote: 'Первичен **`Link`**, а не четыре команды.'
+      diagnosis_ru: 'Историческая полемика с инструкциями процессора не имеет введённого референта в математическом основании.'
+    - id: V14-L1-ED02
+      category: mixed-abstraction-levels
+      quote: 'операция образования/канонизации'
+      diagnosis_ru: 'Абстрактное образование Связи и техническая канонизация представления не должны молча отождествляться.'
+    - id: V14-L1-ED03
+      category: undefined-notation
+      quote: '11/10/01/00'
+      diagnosis_ru: 'До списка не объяснены обе позиции и значение метазнаков 0 и 1.'
+    - id: V14-L1-ED04
+      category: missing-premise-boundary
+      quote: 'четыре и только четыре класса самоинцидентности'
+      diagnosis_ru: 'Разбиение случаев не равно существованию представителей; конструктивная классификация требует LocalSelfDecision.'
+    - id: V14-L1-ED05
+      category: forward-reference
+      quote: 'средние два образуют одну хиральную орбиту'
+      diagnosis_ru: 'До этого предложения не определены инверсия, орбита и её область; место утверждения — после введения этих понятий.'
+    - id: V14-L1-ED06
+      category: representation-leak
+      quote: '`8/9/6/1` — рекурсивный структурный алфавит этих форм.'
+      diagnosis_ru: 'Коды структурного представления преждевременно смешаны с онтологической классификацией.'
+  proposed_statement:
+    ru: |-
+      МТС принимает одну первичную сущность — Связь (Link). У Связи различаются две полюсные позиции; образование Связи задаётся одной абстрактной операцией над двумя Связями. Во внешнем математическом описании обозначим проекции позиций s(x) и f(x), а образование — form(a,b), где s(form(a,b))=a и f(form(a,b))=b. Эти обозначения не вводят в МТС дополнительные сущности или машинные команды.
+
+      Для Связи x самоинцидентность первой позиции означает s(x)=x, второй — f(x)=x. Запись ab использует внешние метазнаки: 1 означает совпадение, 0 — несовпадение; первый знак относится к первой позиции, второй — ко второй. Случаи 11, 10, 01, 00 попарно несовместимы без предположения о разрешимости произвольного равенства. Если для x предъявлено LocalSelfDecision, эти четыре случая образуют также исчерпывающую конструктивную классификацию.
+
+      Разбиение случаев не утверждает существования представителей каждого случая. При A1RecursiveSeparation полностью самозамкнутая Связь (11) единственна и равна корню R (FND-02). При отдельной предпосылке F2F3OneSidedExistence существуют собственные односторонние представители 10 и 01, из которых общей операцией form строится представитель 00; их реализуемость в области Grounded установлена FND-01. Существование и единственность относятся к разным утверждениям.
+
+      До введения структурной инверсии и ориентированного контекста K случаи 10 и 01 различаются по позициям, но не получают абсолютных имён «начало» и «конец». Только после выбора Link-структурного ориентационного маркера возникают локальные роли START_K и END_K. Тогда четыре структурных случая обозначаются ROOT, START_K, END_K и PAIR, а их рекурсивное представление использует коды 8/9/6/1. Эти коды не являются алфавитом Anum или Q и не определяют систему команд процессора.
+    sha256: cc2673338708ca4dd245e1aa2b894d51a4859359960037bf25c5d7445d2c71c9
+    source_role: editorial-proposal
+    author_approval: not-recorded
+
+normative_origin:
+  release: v0.14
+  source: contracts/mts-contract-v0.14.json
+  record_id: V14-L1
+  english: |-
+    One Link ontology and one abstract Link-forming primitive induce exactly four self-incidence structural cases 11/10/01/00; after Context orientation these are named ROOT/START_K/END_K/PAIR and encoded by recursive 8/9/6/1, which is not the Anum/Q alphabet.
+  english_sha256: 3f54624df8e72ead62dce1f35a57f6190e69f544e2d640ba0a547ebf30c04910
+
+reader_definitions:
+  review_evidence:
+    issue: 2132
+    comment: 6103120355
+  proof_sources:
+    - proofs/lean4/MtsFoundation.lean
+    - proofs/coq/MtsFoundation.v
+  entries:
+    - id: reader-def-root
+      kind: definition
+      domain: "Foundation"
+      science_steps: [foundation, distinction, separation-a1, root-uniqueness]
+      prerequisites: []
+      proof_symbols: [FullSelf, root_full_self, FND_02_unique_root]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-local-decision
+      kind: definition
+      domain: "Foundation, конкретная Связь x"
+      science_steps: [incidence, local-decision, local-exhaustiveness]
+      prerequisites: [reader-def-root]
+      proof_symbols: [StartOnly, FinishOnly, PairLocal, LocalSelfDecision, local_self_incidence_exhaustive, local_self_incidence_exclusive]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-grounded
+      kind: definition
+      domain: "Foundation, Связь x"
+      science_steps: [grounded, grounded-normalization, identity-by-poles]
+      prerequisites: [reader-def-local-decision]
+      proof_symbols: [Grounded, F2F3GroundedNormalization, FND_13_identity_by_poles, INV_01_recursive_inversion_total]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-premise-one-sided-existence
+      kind: premise
+      domain: "Foundation с дополнительным F2F3OneSidedExistence"
+      science_steps: [one-sided-existence, one-sided-realizability]
+      prerequisites: [reader-def-root, reader-def-local-decision, reader-def-grounded]
+      proof_symbols: [F2F3OneSidedExistence, FND_01_grounded_realizability]
+      external_metanotation: true
+      author_approval: not-recorded
+    - id: reader-def-context-relative-role
+      kind: definition
+      domain: "Односторонние Связи, выбранный контекстный маркер и RecursiveInversionDomain"
+      science_steps: [inversion-domain, inversion-relation, inversion-total, inversion-involutive, chiral-classes, chiral-orbit, context-marker, context-roles]
+      prerequisites: [reader-def-local-decision, reader-premise-one-sided-existence]
+      proof_symbols: [ProperOneSided, SameChiralClass, OppositeChiralClass, RecursiveInversionDomain, ContextOrientationMarker, ContextLocalStartRole, ContextLocalEndRole, CTX_03_context_selection_induces_local_roles]
+      external_metanotation: true
+      author_approval: not-recorded
+
+reader_science:
+  schema: mts-reader-science/v0.2
+  status: proposed
+  proof_check: declarations-only
+  publication: blocked
+  author_approval: not-recorded
+  steps:
+    - id: foundation
+      role: definition
+      ru: |-
+        Во внешнем математическом интерфейсе Foundation задан носитель Link, одна операция образования form(a,b), две проекции полюсных позиций start(x) и finish(x) и выделенная Связь R. Приняты уравнения start(form(a,b))=a, finish(form(a,b))=b и form(R,R)=R. Поэтому start(R)=R и finish(R)=R; во внешнем доказательстве это установлено как root_full_self. Единственность полностью самозамкнутой Связи из этих уравнений сама по себе не следует. Проекции являются средствами внешнего описания двух полюсных позиций, а не дополнительными примитивами онтологии МТС.
+      proof_symbol: Foundation
+      requires: []
+      premises: []
+      domain: ["Foundation"]
+      exclusions: []
+    - id: incidence
+      role: definition
+      ru: |-
+        Для Связи x локальные предикаты FullSelf, StartOnly, FinishOnly и PairLocal различают соответственно оба совпадения start(x)=x и finish(x)=x, только первое, только второе и ни одного. Метаобозначения 11/10/01/00 фиксируют четыре попарно несовместимых локальных случая, а не четыре сорта Связей. Их определения сами по себе не утверждают существования представителей каждого случая.
+      proof_symbol: StartOnly
+      requires: [foundation]
+      premises: []
+      domain: ["Link"]
+      exclusions: []
+    - id: local-decision
+      role: definition
+      ru: |-
+        LocalSelfDecision(F,x) — внешняя предпосылка локальной разрешимости двух проверок самоинцидентности конкретной Связи x: предъявляются дизъюнкции start(x)=x или start(x)≠x, а также finish(x)=x или finish(x)≠x. Наличие этих логических свидетельств не доказывает существование общего исполнимого алгоритма сравнения произвольных Связей.
+      proof_symbol: LocalSelfDecision
+      requires: [incidence]
+      premises: []
+      domain: ["Foundation, x"]
+      exclusions: ["not a global equality algorithm"]
+    - id: local-exhaustiveness
+      role: conditional-theorem
+      ru: |-
+        Для данной Связи x с предъявленным LocalSelfDecision(F,x) теорема local_self_incidence_exhaustive устанавливает конструктивную дизъюнкцию FullSelf(F,x), StartOnly(F,x), FinishOnly(F,x) либо PairLocal(F,x). Это исчерпываемость локальных случаев для x при указанной предпосылке, а не доказательство существования всех четырёх типов представителей в каждой модели Foundation.
+      proof_symbol: local_self_incidence_exhaustive
+      requires: [local-decision]
+      premises: [LocalSelfDecision]
+      domain: ["Foundation, x"]
+      exclusions: ["does not prove realization of all four cases"]
+    - id: grounded
+      role: definition
+      ru: |-
+        Grounded(F,x) — внешнее индуктивное свидетельство конечного рекурсивного обоснования Связи x. Для полюса, совпадающего с x, новая обязанность не возникает; для каждого несовпадающего полюса предъявляется Grounded для соответствующей Связи. Конечность относится к доказательному объекту, а не запрещает существование иных циклических структур Связей и не устанавливает тотальность какой-либо операции.
+      proof_symbol: Grounded
+      requires: [foundation, incidence]
+      premises: []
+      domain: ["Link"]
+      exclusions: []
+    - id: distinction
+      role: definition
+      ru: |-
+        Distinguishable(F,x,y) — внешний индуктивный предикат конечной рекурсивной различимости двух Связей. Свидетельство предъявляет несовпадение локальных признаков самоинцидентности на одной из двух полюсных позиций либо рекурсивную различимость соответствующих несовпадающих полюсов. Сам предикат задаётся для произвольных x и y; ограничение Grounded появляется в последующей предпосылке A1, а не в определении Distinguishable.
+      proof_symbol: Distinguishable
+      requires: [grounded]
+      premises: []
+      domain: ["Link × Link"]
+      exclusions: []
+    - id: separation-a1
+      role: premise
+      ru: |-
+        A1RecursiveSeparation(F) — отдельная предпосылка внешней математической модели. Она утверждает: для двух Связей x и y, каждая из которых имеет Grounded-свидетельство, отсутствие Distinguishable(F,x,y) влечёт x=y. В проверенных теоремах A1 предъявляется как самостоятельная предпосылка; доказательство её логической независимости от более слабого Foundation здесь не заявляется.
+      proof_symbol: A1RecursiveSeparation
+      requires: [distinction]
+      premises: []
+      domain: ["Grounded"]
+      exclusions: []
+    - id: root-uniqueness
+      role: conditional-theorem
+      ru: |-
+        При A1RecursiveSeparation(F) теорема FND_02_unique_root утверждает: всякая Связь x с FullSelf(F,x) тождественна выделенной R. Для такого x Grounded следует из FullSelf; следовательно, доказательство единственности использует A1 и не требует постулировать единственность корня или равенство произвольных Связей по полюсам.
+      proof_symbol: FND_02_unique_root
+      requires: [incidence, separation-a1]
+      premises: [A1RecursiveSeparation]
+      domain: ["FullSelf"]
+      exclusions: ["not from Foundation alone"]
+    - id: one-sided-existence
+      role: premise
+      ru: |-
+        F2F3OneSidedExistence(F) — дополнительная предпосылка внешнего интерфейса, предъявляющая u и v с u=form(u,R), v=form(R,v), u≠R и v≠R. Она вводится отдельно от Foundation и от логической классификации 11/10/01/00; существование этих представителей нельзя выводить из одного перечня возможностей.
+      proof_symbol: F2F3OneSidedExistence
+      requires: [root-uniqueness]
+      premises: []
+      domain: ["Foundation"]
+      exclusions: []
+    - id: one-sided-realizability
+      role: conditional-theorem
+      ru: |-
+        Из F2F3OneSidedExistence(F) и законов Foundation теорема FND_01_grounded_realizability выводит FullSelf(F,R) и существование трёх Связей с Grounded-свидетельствами: представителя StartOnly, представителя FinishOnly и представителя PairLocal. Таким образом, логические случаи 10, 01 и 00 получают свидетелей при явно принятой дополнительной предпосылке; это не безусловное существование в любом Foundation.
+      proof_symbol: FND_01_grounded_realizability
+      requires: [one-sided-existence, grounded]
+      premises: [F2F3OneSidedExistence]
+      domain: ["constructed witnesses"]
+      exclusions: ["not from logical partition alone"]
+    - id: grounded-normalization
+      role: premise
+      ru: |-
+        F2F3GroundedNormalization(F) — дополнительный внешний интерфейс нормальных форм для конечного домена Grounded. Он задаёт normalForm, compose и рекурсивное уравнение нормализации. Поле complete утверждает лишь для двух Grounded-связей: равенство их нормальных форм влечёт равенство самих Связей; здесь не предполагается глобальная полнота нормализации для всех Link.
+      proof_symbol: F2F3GroundedNormalization
+      requires: [grounded, one-sided-realizability]
+      premises: []
+      domain: ["Grounded"]
+      exclusions: []
+    - id: identity-by-poles
+      role: conditional-theorem
+      ru: |-
+        При F2F3GroundedNormalization(F) и предъявленных Grounded(F,x), Grounded(F,y) теорема FND_13_identity_by_poles устанавливает эквивалентность x=y и одновременного равенства start(x)=start(y), finish(x)=finish(y). Существенный шаг обратного направления опирается на полноту grounded-нормализации. Теорема не устанавливает экстенсиональность всех возможных циклических Связей.
+      proof_symbol: FND_13_identity_by_poles
+      requires: [grounded-normalization]
+      premises: [F2F3GroundedNormalization]
+      domain: ["Grounded(x), Grounded(y)"]
+      exclusions: ["no claim for arbitrary ungrounded Links"]
+    - id: inversion-domain
+      role: premise
+      ru: |-
+        RecursiveInversionDomain(F,E), где E — ранее предъявленная F2F3OneSidedExistence(F), является отдельной предпосылкой внешнего доказательного интерфейса. Она задаёт рекурсивные односторонние формы startForm(a)=form(startForm(a),a) и endForm(a)=form(a,endForm(a)), совместимость этих форм с R и свидетельства LocalSelfDecision для Grounded-связей. Само существование такого D не следует из одних уравнений Foundation.
+      proof_symbol: RecursiveInversionDomain
+      requires: [one-sided-existence, grounded]
+      premises: []
+      domain: ["Foundation, E"]
+      exclusions: []
+    - id: inversion-relation
+      role: definition
+      ru: |-
+        RecursiveInversion(F,D,x,y) — внешнее индуктивное отношение структурной инверсии Связи x в Связь y при заданном RecursiveInversionDomain D. В Rocq параметр E интерфейса D выписан явно, в Lean он восстанавливается из параметров. Определение отношения ещё не задаёт безусловную глобальную функцию J на всех Связях.
+      proof_symbol: RecursiveInversion
+      requires: [inversion-domain, incidence]
+      premises: []
+      domain: ["Foundation, E, D"]
+      exclusions: []
+    - id: inversion-total
+      role: conditional-theorem
+      ru: |-
+        При A1RecursiveSeparation(F), F2F3OneSidedExistence(F), RecursiveInversionDomain(F,E) и Grounded(F,x) теорема INV_01_recursive_inversion_total утверждает существование y, для которого RecursiveInversion(F,D,x,y). Отдельная F2F3GroundedNormalization не является предпосылкой этой теоремы. Нельзя распространять установленное существование на произвольные Связи без Grounded.
+      proof_symbol: INV_01_recursive_inversion_total
+      requires: [inversion-relation, separation-a1]
+      premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Grounded(x)"]
+      exclusions: ["no totality on arbitrary ungrounded Links"]
+    - id: inversion-involutive
+      role: conditional-theorem
+      ru: |-
+        При A1RecursiveSeparation(F), F2F3GroundedNormalization(F), F2F3OneSidedExistence(F), RecursiveInversionDomain(F,E) и Grounded(F,x) теорема INV_02_unique_total_involution даёт Связи y и z, для которых существуют последовательные отношения инверсии x→y и y→z и выполнено z=x. Это условный реляционный результат, а не объявление глобальной примитивной функции J для всех Link.
+      proof_symbol: INV_02_unique_total_involution
+      requires: [inversion-total, grounded-normalization]
+      premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Grounded(x)"]
+      exclusions: ["not a global primitive J function"]
+    - id: chiral-classes
+      role: definition
+      ru: |-
+        ProperOneSided(F,x) означает StartOnly(F,x) либо FinishOnly(F,x). Для двух таких Связей внешний предикат SameChiralClass фиксирует совпадение позиционного класса, а OppositeChiralClass — противоположность классов. Эти отношения описывают полюсную хиральность, но не создают новых сортов Link и не назначают имена START_K/END_K до выбора контекста.
+      proof_symbol: SameChiralClass
+      requires: [incidence, inversion-relation]
+      premises: []
+      domain: ["ProperOneSided"]
+      exclusions: []
+    - id: chiral-orbit
+      role: conditional-theorem
+      ru: |-
+        При A1RecursiveSeparation(F), F2F3GroundedNormalization(F), F2F3OneSidedExistence(F) и RecursiveInversionDomain(F,E) теорема CTX_03_objective_chiral_orbit_before_context утверждает существование различных Связей w и jw, взаимно связанных структурной инверсией и принадлежащих противоположным односторонним классам. Эта экзистенциальная орбита не требует предварительно выбранного контекста и не назначает глобально фиксированную Связь W.
+      proof_symbol: CTX_03_objective_chiral_orbit_before_context
+      requires: [chiral-classes, inversion-involutive]
+      premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["Foundation"]
+      exclusions: ["no globally selected W"]
+    - id: context-marker
+      role: definition
+      ru: |-
+        ContextOrientationMarker(F,D,body,m) — внешний предикат допустимости контекстного маркера: m должен совпадать с D.startForm(body) или D.endForm(body) при предъявленном RecursiveInversionDomain D. Параметр E интерфейса D в Lean неявен, в Rocq явен. Выбор такого маркера необходим для относительной ориентации; у произвольного контекста наличие маркера не объявляется автоматически.
+      proof_symbol: ContextOrientationMarker
+      requires: [chiral-orbit, inversion-domain]
+      premises: []
+      domain: ["body, selected marker"]
+      exclusions: []
+    - id: context-roles
+      role: conditional-theorem
+      ru: |-
+        При A1RecursiveSeparation(F), F2F3OneSidedExistence(F), RecursiveInversionDomain(F,E) и предъявленном ContextOrientationMarker(F,D,body,selected) теорема CTX_03_context_selection_induces_local_roles устанавливает существование двух различных допустимых маркеров localStart и localEnd для данного body. Первый принадлежит тому же одностороннему классу, что selected, второй — противоположному. В этом изложении K обозначает контекстный выбор, представленный во внешней теореме параметрами body и selected; K не является дополнительным параметром или новой сущностью в доказательстве CTX-03. Имена START_K и END_K имеют смысл только относительно такого выбора, а не как абсолютные свойства всех Связей.
+      proof_symbol: CTX_03_context_selection_induces_local_roles
+      requires: [context-marker, separation-a1]
+      premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
+      domain: ["body, selected, ContextOrientationMarker"]
+      exclusions: ["no automatic orientation for arbitrary Context"]
+
+scientific_boundary:
+  logical_partition:
+    theorem: FND_01_local_partition
+    premises:
+      - LocalSelfDecision
+      - A1RecursiveSeparation
+  realizability:
+    theorem: FND_01_grounded_realizability
+    premises:
+      - F2F3OneSidedExistence
+  root_uniqueness:
+    theorem: FND_02_unique_root
+    premises:
+      - A1RecursiveSeparation
+  identity_by_poles:
+    theorem: FND_13_identity_by_poles
+    domain:
+      - Grounded
+    premises:
+      - F2F3GroundedNormalization.complete
+
+artifacts:
+  - path: requirements/mts-source/MTS-FND-V14-L1.yaml
+    relations: [requires]
+  - path: "docs/theory/Система аксиом МТС.md"
+    relations: [requires, documents]
+  - path: contracts/mts-contract-v0.14.json
+    relations: [requires, immutable]
+  - path: proofs/lean4/MtsFoundation.lean
+    relations: [requires, verifies]
+  - path: proofs/coq/MtsFoundation.v
+    relations: [requires, verifies]
+  - path: proofs/premise-classification-v0.14.json
+    relations: [requires, verifies]
+  - path: ts/package.json
+    relations: [requires, implements]
+  - path: ts/package-lock.json
+    relations: [requires, implements]
+  - path: ts/src/tooling/mts-source-requirement.ts
+    relations: [requires, implements]
+  - path: ts/test/mts-source-requirement.test.ts
+    relations: [requires, verifies]
+  - path: ts/test/research-v013-semantic-dependency-projection-a9.test.ts
+    relations: [requires, verifies]
