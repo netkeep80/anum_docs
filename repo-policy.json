@@ -150,7 +150,7 @@
           "pointer": "/jobs/policy-check/steps/1/uses",
           "type": "string"
         },
-        "value": "netkeep80/repo-guard@10f04af309fcb512dff3d690f595926472c52f40"
+        "value": "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2"
       },
       {
         "id": "branch-hygiene-permission-contents-write",
