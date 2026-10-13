@@ -18,8 +18,9 @@ type Policy = {
 };
 const p = JSON.parse(readFileSync(resolve("..", "repo-policy.json"), "utf8")) as Policy;
 const scienceName = "post-v015-science-source-reader-evidence-technical-merge";
-const science = p.change_profiles[scienceName];
-assert.ok(science, "exact scientific change profile required");
+const science: Profile = p.change_profiles[scienceName] ?? (() => {
+  throw new Error("exact scientific change profile required");
+})();
 assert.equal(science.allow_unclassified_surfaces, false);
 assert.deepEqual(science.budgets, {
   max_new_docs: 0,
