@@ -1,0 +1,82 @@
+# G11/W4: 12 proposed Russian source-owned first-pass claims.
+schema: mts-reader-v15-wave/v0.1
+wave: W4
+status: proposed
+author_approval: not-recorded
+publication: blocked
+argument_completeness: unverified
+scientific_review: pending-individual-exp
+proof_check: accepted-contract-only
+atoms:
+  - id: v15-gov-04
+    accepted_id: V15-GOV-04
+    source_quote: "Normal MTS merge paths cannot bypass required CI/repo-guard enforcement: broad always-bypass repository roles are removed or contained to an explicitly audited emergency actor/process, and an intentional RED repo-guard pull request is mechanically blocked from merging until restored GREEN."
+    ru: "Обычные изменения МТС должны быть защищены обязательными CI и repo-guard. Безусловные роли обхода исключаются либо ограничиваются отдельно аудируемой аварийной процедурой; проверка с намеренно красным результатом должна механически запрещать merge до восстановления корректного состояния."
+    domain: "Принятая нормативная область V15-GOV-04"
+    exclusions: ["Не приравнивать наличие check к реальной невозможности bypass"]
+  - id: v15-docs-01
+    accepted_id: V15-DOCS-01
+    source_quote: "The canonical «Формальная нотация МТС.md» is a deterministic generated projection of the current v0.15 execution-core FORMAL/JSON model, machine registries, selected Gamma/context profiles and Author-approved executable corpus; hand-maintained semantic prose and stale v0.14-only projection are forbidden."
+    ru: "Каноническая «Формальная нотация МТС.md» формируется детерминированно из действующей модели FORMAL/JSON, реестров, выбранных профилей Γ и Context и одобренного Автором корпуса. Ручная семантическая правка документа или устаревшая проекция исключительно v0.14 не заменяют модель."
+    domain: "Принятая нормативная область V15-DOCS-01"
+    exclusions: ["Не назначать сгенерированному Markdown новую семантическую власть"]
+  - id: v15-ready-01
+    accepted_id: V15-READY-01
+    source_quote: "RELEASE_READY is impossible while any mandatory requirement is below VERTICAL_GREEN or explicitly resolved release state."
+    ru: "Признак RELEASE_READY невозможен, если хотя бы одно обязательное требование не достигло VERTICAL_GREEN или другого явно разрешённого состояния выпуска. Успех отдельных примеров не предоставляет обхода замыкания обязательств, вычисляемого из единого реестра."
+    domain: "Принятая нормативная область V15-READY-01"
+    exclusions: ["Не выдавать релизный GREEN при открытом обязательном gate"]
+  - id: v15-ready-02
+    accepted_id: V15-READY-02
+    source_quote: "Independent readiness audit attempts to falsify hidden semantics, incomplete JSON, drift, omissions and nondeterminism."
+    ru: "Независимый аудит готовности должен искать потенциальные опровержения: скрытые host-смыслы, неполный JSON, дрейф входных данных, пропуски и недетерминизм. Его предмет — не повторить положительный CI, а проверить границы уже предъявленных свидетельств и уязвимости модели."
+    domain: "Принятая нормативная область V15-READY-02"
+    exclusions: ["Не заменять независимый audit вторым запуском того же теста"]
+  - id: v15-ready-03
+    accepted_id: V15-READY-03
+    source_quote: "Only explicit Author ACCEPT/REJECT can change accepted/current from v0.14 to v0.15."
+    ru: "Только явное авторское решение ACCEPT либо REJECT изменяет accepted/current с v0.14 на v0.15. Завершённый workflow, закрытый issue и сформированный релизный документ не предоставляют помощнику или инфраструктуре права самостоятельно принять математическую теорию."
+    domain: "Принятая нормативная область V15-READY-03"
+    exclusions: ["Не приравнивать успешный CI к решению Автора"]
+  - id: v15-author-json-01
+    accepted_id: V15-AUTHOR-JSON-01
+    source_quote: "Every new canonical logical/executable JSON artifact in v0.15 stops at AUTHOR_REVIEW_PENDING before completion. Proof/aprover artifacts are separately Author-gated in v0.16."
+    ru: "Новый канонический исполняемый JSON в v0.15 останавливается в AUTHOR_REVIEW_PENDING до авторского решения. Артефакты aprover и доказательств имеют самостоятельную область авторского контроля будущей v0.16; это не повод считать уже принятый в v0.15 JSON автоматически одобренным."
+    domain: "Принятая нормативная область V15-AUTHOR-JSON-01"
+    exclusions: ["Не переносить JSON approval на будущие доказательства или наоборот"]
+  - id: v15-author-json-02
+    accepted_id: V15-AUTHOR-JSON-02
+    source_quote: "v0.15 Author review shows exact FORMAL, exact JSON, source/semantic mapping, external/backend boundary, round-trip, fresh executable replay and falsifiers."
+    ru: "Автору предоставляются точные FORMAL и JSON, соответствие исходной и семантической моделей, границы внешнего и backend-кода, round-trip, воспроизведение исполнения в новой Memory и применимые фальсификаторы. Без полного предъявления невозможно установить предмет решения."
+    domain: "Принятая нормативная область V15-AUTHOR-JSON-02"
+    exclusions: ["Не сокращать пакет приёмки до одного удачного скриншота"]
+  - id: v15-author-json-03
+    accepted_id: V15-AUTHOR-JSON-03
+    source_quote: "Author decision is recorded per exact artifact revision/digest; material changes invalidate prior approval."
+    ru: "Авторское одобрение привязывается к точной ревизии или дайджесту JSON-артефакта. Семантически существенная правка отменяет применимость ранее вынесенного решения; сохранение имени файла или номера issue не обеспечивает тождество нового содержимого утверждённому."
+    domain: "Принятая нормативная область V15-AUTHOR-JSON-03"
+    exclusions: ["Не сохранять approval после изменения канонического JSON"]
+  - id: v15-author-json-04
+    accepted_id: V15-AUTHOR-JSON-04
+    source_quote: "Author JSON review applies throughout v0.15; batch approval only for an explicitly shown exact batch."
+    ru: "Рассмотрение JSON продолжается на протяжении всей v0.15. Пакетное решение разрешено только для явно предъявленной точной группы артефактов; такое согласие не является бессрочной санкцией на любую будущую генерацию или изменение семантического источника."
+    domain: "Принятая нормативная область V15-AUTHOR-JSON-04"
+    exclusions: ["Не распространять batch approval на неизвестные будущие артефакты"]
+  - id: v15-reg-01
+    accepted_id: V15-REG-01
+    source_quote: "Every Author-approved JSON enters the permanent executable regression corpus."
+    ru: "Каждый утверждённый Автором JSON включается в постоянный исполняемый регрессионный корпус с привязкой к точной ревизии. Без этого свидетельства будущая правка может незаметно изменить уже принятое поведение; регрессия должна стать обязательной частью общего контроля."
+    domain: "Принятая нормативная область V15-REG-01"
+    exclusions: ["Не оставлять авторски одобренный источник вне полного корпуса"]
+  - id: v15-reg-02
+    accepted_id: V15-REG-02
+    source_quote: "Every FORMAL/model/JSON/metacompiler/recursive/execution change that can affect v0.15 executable semantics replays the complete Author-approved executable JSON corpus."
+    ru: "Любая правка FORMAL, модели, JSON, метакомпилятора, рекурсивного представления или исполняющей системы, способная повлиять на семантику v0.15, запускает полный корпус утверждённых JSON. Выборочная проверка изменённой программы не свидетельствует о сохранении прочих программ."
+    domain: "Принятая нормативная область V15-REG-02"
+    exclusions: ["Не заменять полный semantic replay локальными unit-тестами"]
+  - id: v15-reg-03
+    accepted_id: V15-REG-03
+    source_quote: "Approved JSON/evidence is never silently regenerated; incompatible changes use explicit migration and renewed Author approval."
+    ru: "Ранее утверждённые JSON и их свидетельства нельзя незаметно регенерировать даже при совпадающем внешнем имени. Несовместимое изменение требует явного протокола миграции и повторного авторского одобрения уже новой точной ревизии и её наблюдаемых результатов."
+    domain: "Принятая нормативная область V15-REG-03"
+    exclusions: ["Не переписывать принятый JSON без миграции и нового решения"]

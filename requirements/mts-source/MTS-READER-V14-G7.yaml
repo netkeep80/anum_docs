@@ -1,0 +1,151 @@
+# G7 proposed scientific Russian prose; accepted v0.14 contract remains immutable.
+schema: mts-reader-atomic-v14/v0.1
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+publication: blocked
+proof_check: declarations-only
+accepted_scope: [V14-L5, V14-L6, V14-L13, V14-L12]
+atoms:
+  - id: link-identity
+    accepted_id: V14-L5
+    role: accepted-contract
+    source_quote: "Semantic Link identity is immutable"
+    ru: "Тождество конкретной Связи Link сохраняется при операциях над асетью. Под неизменностью понимается отсутствие изменения полюсных позиций уже существующей Связи на месте; это не утверждение, что вся асеть остаётся неизменной."
+    domain: "Связь и её структурное тождество"
+    exclusions: ["Не переносить неизменность Link на состав или актуальность асети"]
+    requires: []
+  - id: link-rewrite
+    accepted_id: V14-L5
+    role: accepted-contract
+    source_quote: "rewrite changes membership/structure rather than poles in place"
+    ru: "Операция переписывания изменяет принадлежность Связей асети либо строит другую структуру посредством новых Связей. Она не присваивает новые полюса уже существующему Link. Замена принадлежности и структурная подстановка различаются как действия."
+    domain: "Изменение асети"
+    exclusions: ["Не считать rewrite мутацией полюсов существующего Link"]
+    requires: [link-identity]
+  - id: link-deletion-boundary
+    accepted_id: V14-L5
+    role: scope-boundary
+    source_quote: "rewrite changes membership/structure rather than poles in place"
+    ru: "Исключение Связи из текущей асети не тождественно физическому удалению её из хранилища. Этот вывод уточняет принятую границу membership replacement и physical deletion, но сам по себе не устанавливает политику сборки мусора или удаления всех ссылок."
+    domain: "ANet membership и физическое хранилище"
+    exclusions: ["Не отождествлять неактуальность со стиранием физических данных"]
+    requires: [link-rewrite]
+  - id: nat-zero
+    accepted_id: V14-L6
+    role: accepted-contract
+    source_quote: "Nat starts at U and uses uniform successor N⟼L"
+    ru: "Производная шкала натуральных чисел МТС Nat имеет нулевую точку N₀=U. Здесь U — обозначение из принятой модели Nat, а не автоматически корень R любой последовательности; связь этих носителей должна задаваться явно."
+    domain: "Производная Nat, а не примитив Foundation"
+    exclusions: ["Не отождествлять U с R только по роли начала"]
+    requires: [link-identity]
+  - id: nat-successor
+    accepted_id: V14-L6
+    role: accepted-contract
+    source_quote: "uses uniform successor N⟼L"
+    ru: "Для уже введённого N из шкалы Nat операция следующего задаётся единым конструктором Succ(N)=N⟼L. В частности N₁=U⟼L. Запись использует принятую внешнюю нотацию образования Связи, а не отдельный арифметический машинный opcode."
+    domain: "Производная Nat"
+    exclusions: ["Не объявлять successor примитивом Link или доказательством бесконечности Nat"]
+    requires: [nat-zero]
+  - id: degree-one
+    accepted_id: V14-L6
+    role: accepted-contract
+    source_quote: "Degree remains a separate scale starting at L"
+    ru: "Шкала степени связности Degree сохраняется отдельно от Nat: её единица обозначается D₁=L, а последующие степени образуются по NextDegree(D)=D⟼L. Числовые индексы двух шкал не устанавливают тождество структур."
+    domain: "Производная Degree"
+    exclusions: ["Не смешивать область степени связности с Nat"]
+    requires: [nat-successor]
+  - id: nat-degree-nonidentity
+    accepted_id: V14-L6
+    role: scope-boundary
+    source_quote: "Degree remains a separate scale starting at L"
+    ru: "Из N₁=U⟼L и D₁=L нельзя заключать, что соответствующие Связи совпадают: принятая модель специально различает единицу Nat и первую степень связности. Любое отображение между шкалами требует отдельного определения и свидетельства его свойств."
+    domain: "Сопоставление Nat и Degree"
+    exclusions: ["Не постулировать равенство N₁=D₁"]
+    requires: [degree-one]
+  - id: anum-carrier
+    accepted_id: V14-L13
+    role: accepted-contract
+    source_quote: "Anum is a rooted compact representation/coding of a sequence of Links"
+    ru: "Anum — корневое компактное представление или кодировка последовательности Связей. Это способ представления данных, а не дополнительный сорт онтологических Link. Из самого слова «кодировка» ещё не следует идентичность значения и байтовой формы."
+    domain: "Представление последовательности"
+    exclusions: ["Не переносить свойства конкретного кодека на онтологию Link"]
+    requires: [link-identity]
+  - id: exact-sequence
+    accepted_id: V14-L13
+    role: accepted-contract
+    source_quote: "ExactSequence preserves exact positional sequence identity distinct from fold denotation"
+    ru: "ExactSequence предназначена для сохранения точного порядка, количества и кратности позиций последовательности. Её позиционное тождество отличают от денотации свёртки к Связи: совпадение результата некоторой свёртки само по себе не удостоверяет тождество исходных последовательностей."
+    domain: "Позиционная последовательность"
+    exclusions: ["Не использовать rooted fold как единственный носитель позиции и кратности"]
+    requires: [anum-carrier]
+  - id: recursive-codec
+    accepted_id: V14-L13
+    role: scope-boundary
+    source_quote: "the recursive Link codec is not Anum"
+    ru: "Рекурсивный кодек представления одной структуры Link — не то же самое, что Anum как кодировка последовательности Связей. Поэтому рекурсивный структурный алфавит и алфавит Anum/Q нельзя объявлять синонимами без явного преобразования."
+    domain: "Представление Link и последовательности"
+    exclusions: ["Не отождествлять рекурсивный Link codec с Anum"]
+    requires: [exact-sequence]
+  - id: q-codec
+    accepted_id: V14-L13
+    role: accepted-contract
+    source_quote: "Q is a versioned sequence codec/interpreter"
+    ru: "Q — версионируемый кодек и интерпретатор последовательностей. Правила Q следует указывать для конкретного профиля или версии, а не переносить их без проверки на любой поток рекурсивных Связей или на формальную нотацию FORMAL."
+    domain: "Профиль Q и сериализация"
+    exclusions: ["Не считать Q вневременным фундаментальным оператором Link"]
+    requires: [recursive-codec]
+  - id: sequence-origin
+    accepted_id: V14-L13
+    role: accepted-contract
+    source_quote: "every local sequence origin is R"
+    ru: "Локальное начало последовательности в данной принятой модели обозначается R. Это соглашение относится к носителю последовательности; его нельзя незаметно подменять нулём Nat, который в отдельной производной шкале обозначается U."
+    domain: "Локальная последовательность"
+    exclusions: ["Не приравнивать R и U по сходству функций начала"]
+    requires: [exact-sequence]
+  - id: objective-orbit-qualified
+    accepted_id: V14-L12
+    role: conditional-theorem
+    source_quote: "objective chirality Ω={W,J(W)} exists before any observer and J²=Id"
+    ru: "Принятый закон A4′ говорит об объективной хиральной паре ещё до выбора наблюдателя. Внешняя теорема CTX_03_objective_chiral_orbit_before_context доказывает существование взаимно инвертируемых различных односторонних Связей лишь при A1, нормализации Grounded, одностороннем существовании и RecursiveInversionDomain. Это не глобальный выбор W и не безусловная функция J для каждой Связи."
+    domain: "Foundation при A1, N, E, D"
+    exclusions: ["Не выдавать условную экзистенциальную теорему за глобальное J²=Id"]
+    requires: [link-identity]
+    g4_science_step: chiral-orbit
+    proof_symbol: CTX_03_objective_chiral_orbit_before_context
+    proof_premises: [A1RecursiveSeparation, F2F3GroundedNormalization, F2F3OneSidedExistence, RecursiveInversionDomain]
+  - id: context-marker-qualified
+    accepted_id: V14-L12
+    role: conditional-theorem
+    source_quote: "an oriented Context K carries one of two Link-native one-sided self-incidence markers"
+    ru: "Ориентация выбранного контекста описывается допустимым односторонним маркером Link. Теорема CTX_03_context_selection_induces_local_roles устанавливает два различимых относительных локальных маркера при A1, одностороннем существовании, RecursiveInversionDomain и уже предъявленном ContextOrientationMarker для body и selected. Наличие такого выбора у произвольного контекста без дополнительных условий не доказано."
+    domain: "body, selected и допустимый маркер при A1,E,D"
+    exclusions: ["Не утверждать автоматически ориентированность произвольного Context"]
+    requires: [objective-orbit-qualified]
+    g4_science_step: context-roles
+    proof_symbol: CTX_03_context_selection_induces_local_roles
+    proof_premises: [A1RecursiveSeparation, F2F3OneSidedExistence, RecursiveInversionDomain]
+  - id: context-local-names
+    accepted_id: V14-L12
+    role: accepted-contract
+    source_quote: "deriving χ(K) and local START_K/END_K roles"
+    ru: "Обозначения χ(K), START_K и END_K имеют смысл только относительно уже ориентированного контекста K. Две односторонние позиции не превращаются от этих имён в два дополнительных вида Связей; переход к именам происходит после выбора допустимого ориентационного маркера."
+    domain: "Ориентированный Context K"
+    exclusions: ["Не вводить безусловные глобальные START/END вместо START_K/END_K"]
+    requires: [context-marker-qualified]
+  - id: relative-z2
+    accepted_id: V14-L12
+    role: accepted-contract
+    source_quote: "Relative frame transport g_AB lies in {Id,J}, composes as Z2, and semantic laws are covariant"
+    ru: "Принятый контракт A4′ задаёт относительный перенос между ориентированными контекстами элементами множества {Id,J} с композицией типа Z₂ и ковариантностью семантических законов. Наличие такой контрактной формулировки не заменяет отдельное доказательство всех свойств переноса для произвольной модели и произвольных контекстов."
+    domain: "Относительно ориентированных контекстов A и B"
+    exclusions: ["Не заявлять полной теоремы о транспорте только из наличия RelativeZ2Law как определения"]
+    requires: [context-local-names]
+  - id: orientation-authority-boundary
+    accepted_id: V14-L12
+    role: scope-boundary
+    source_quote: "no Foundation-global selected W, ExactSequence, host boolean, or four primitive opcodes are orientation authority"
+    ru: "Источником ориентации служит выбранный односторонний Link-маркер контекста. Ни глобально фиксированная W в Foundation, ни ExactSequence, ни host Boolean, ни четыре отдельные команды не являются источником этой ориентационной семантики. Последнее выражение перечисляет отвергнутые конкурирующие механизмы, а не четыре команды как базис МТС."
+    domain: "Контекстная ориентация Link"
+    exclusions: ["Не объявлять четыре opcode или булеву метку онтологическими примитивами"]
+    requires: [relative-z2]

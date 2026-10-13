@@ -1,0 +1,82 @@
+# G11/W1: Russian first-pass proposed text, no acceptance or theorem assurance.
+schema: mts-reader-v15-wave/v0.1
+wave: W1
+status: proposed
+author_approval: not-recorded
+publication: blocked
+argument_completeness: unverified
+scientific_review: pending-individual-exp
+proof_check: accepted-contract-only
+atoms:
+  - id: v15-term-01
+    accepted_id: V15-TERM-01
+    source_quote: "Normative English term for «асеть / асеть связей» is ANet. Aset is not an MTS English term; legacy Aset/aset code identifiers have no terminology or semantic authority."
+    ru: "Нормативное английское наименование асети Связей — ANet. Встречающееся в исторических именах кода обозначение Aset не определяет альтернативный математический объект и не должно менять смысл принятой терминологии или классификацию Link."
+    domain: "Принятая нормативная область V15-TERM-01"
+    exclusions: ["Не повышать legacy Aset до нормативного термина МТС"]
+  - id: v15-auth-01
+    accepted_id: V15-AUTH-01
+    source_quote: "One v0.15 execution-core semantic authority path: universal FORMAL and canonical JSON converge to the same native source ANet, then shared resolution/denotation/compiler/Γ execution/projection; no consumer-specific host semantic path is authoritative."
+    ru: "В версии v0.15 авторитетный исполнительный путь един: FORMAL и канонический JSON сходятся в общую исходную ANet, далее используются общий резолвер, денотация, метакомпиляция, Γ-исполнение и проекция. Специальный путь конкретной программы не имеет собственного семантического статуса."
+    domain: "Принятая нормативная область V15-AUTH-01"
+    exclusions: ["Не вводить индивидуальный host-интерпретатор смыслов программ"]
+  - id: v15-auth-02
+    accepted_id: V15-AUTH-02
+    source_quote: "FORMAL_MIGRATED or VERTICAL_GREEN requires tracked canonical FORMAL artifact, entry, digest, profile and evidence."
+    ru: "Состояния FORMAL_MIGRATED и VERTICAL_GREEN присваиваются лишь при прослеживаемой записи точного FORMAL-источника, точки входа, дайджеста, профиля и комплекса свидетельств. Успех одного теста или имя ветки недостаточны для формальной аттестации результата."
+    domain: "Принятая нормативная область V15-AUTH-02"
+    exclusions: ["Не выводить статус миграции из имени PR или одиночного теста"]
+  - id: v15-onto-01
+    accepted_id: V15-ONTO-01
+    source_quote: "One-Link ontology: host kinds do not acquire MTS semantic authority."
+    ru: "Онтология МТС продолжает содержать единственный базовый объект Link. Виды данных, создаваемые средой выполнения, кодеками или инструментами проверки, могут обслуживать вычисление, но не получают права определять законы МТС или создавать новые онтологические сущности."
+    domain: "Принятая нормативная область V15-ONTO-01"
+    exclusions: ["Не приписывать host-типам самостоятельную семантическую власть"]
+  - id: v15-onto-02
+    accepted_id: V15-ONTO-02
+    source_quote: "Prefer ordinary Link + ExactSequence + self-reference topology before extending Grammar."
+    ru: "Прежде чем вводить новый элемент Grammar, следует проверить выражение требуемой структуры посредством обычных Связей, ExactSequence и топологии самоссылок. Это дисциплина минимальности источника, а не доказательство того, что любая будущая конструкция заранее выразима."
+    domain: "Принятая нормативная область V15-ONTO-02"
+    exclusions: ["Не расширять грамматику без проверки существующей Link-топологии"]
+  - id: v15-onto-03
+    accepted_id: V15-ONTO-03
+    source_quote: "Presentation names carry no semantic authority; topology-preserving rename preserves behavior."
+    ru: "Символические имена представляют и разрешают Связи, но не участвуют самостоятельно в их семантике. Если переименование сохраняет топологию, поведение должно остаться прежним; обнаруженная зависимость результата от имени указывает на ошибочную внешнюю власть."
+    domain: "Принятая нормативная область V15-ONTO-03"
+    exclusions: ["Не назначать семантику по строковому идентификатору"]
+  - id: v15-struct-01
+    accepted_id: V15-STRUCT-01
+    source_quote: "The v0.15 direct FORMAL/JSON source path preserves the already accepted ROOT/START/END/PAIR structural aspect constructors and lowers them to native Link topology / recursive 8/9/6/1 without enabling arbitrary cyclic bindings."
+    ru: "Общий прямой исходный путь FORMAL и JSON сохраняет структурные формы ROOT, START, END, PAIR, принятые ранее, и строит их как нативную Link-топологию с рекурсивным представлением 8/9/6/1. Наличие этой конструкции не снимает ограничений на произвольное циклическое связывание имён."
+    domain: "Принятая нормативная область V15-STRUCT-01"
+    exclusions: ["Не считать произвольный cyclic binding допустимым из-за self-reference"]
+  - id: v15-close-01
+    accepted_id: V15-CLOSE-01
+    source_quote: "VERTICAL_GREEN requires transitive semantic dependency closure for the declared artifact scope."
+    ru: "Вердикт VERTICAL_GREEN допустим только при подтверждённом транзитивном замыкании семантических зависимостей заявленного артефакта. Неявная зависимость за пределами области исследования является пробелом свидетельства, даже если локальный исполнимый пример выдаёт верный результат."
+    domain: "Принятая нормативная область V15-CLOSE-01"
+    exclusions: ["Не принимать готовность без транзитивного dependency closure"]
+  - id: v15-close-02
+    accepted_id: V15-CLOSE-02
+    source_quote: "Every dependency outside the artifact is explicitly classified and versioned."
+    ru: "Зависимости, выходящие за границу конкретного артефакта, должны быть явно классифицированы и иметь версию. Это позволяет отличить существенную семантическую предпосылку от допустимого технического средства исполнения и исключает скрытую смену источника авторитета."
+    domain: "Принятая нормативная область V15-CLOSE-02"
+    exclusions: ["Не скрывать неверсированные внешние семантические зависимости"]
+  - id: v15-close-03
+    accepted_id: V15-CLOSE-03
+    source_quote: "Program-specific host semantic injection budget is exactly zero. Generic orchestration and backend compatibility/optimization lowerings may exist but have no MTS semantic authority."
+    ru: "Бюджет внедрения программно-специфической host-семантики установлен равным нулю. Общие технические средства оркестрации и совместимого backend-понижения допустимы лишь без создания новых правил смысла; речь не о запрете host-кода вообще."
+    domain: "Принятая нормативная область V15-CLOSE-03"
+    exclusions: ["Не трактовать нулевой semantic injection как запрет оркестрации"]
+  - id: v15-fresh-01
+    accepted_id: V15-FRESH-01
+    source_quote: "A canonical FORMAL executable artifact reconstructs its executable package in fresh Memory using only fixed generic authorities."
+    ru: "Канонический исполняемый артефакт FORMAL обязан восстановить свой исполнительный пакет в свежей Memory, пользуясь только фиксированными общими авторитетами. Предварительно созданные частные Связи, данные старой сессии или ручное восстановление пакета не входят в свидетельство."
+    domain: "Принятая нормативная область V15-FRESH-01"
+    exclusions: ["Не требовать прогретого состояния или ручных исправлений Memory"]
+  - id: v15-fresh-02
+    accepted_id: V15-FRESH-02
+    source_quote: "Canonical JSON alone reconstructs the same package in fresh Memory without source-specific repair."
+    ru: "Канонический JSON без дополнительного FORMAL-исходника должен сам восстановить тот же исполнительный пакет в новой Memory, без ремонта под конкретную программу. Успешное чтение и повторная запись JSON недостаточны: требуется сопоставимый исполнимый результат."
+    domain: "Принятая нормативная область V15-FRESH-02"
+    exclusions: ["Не подменять fresh replay простым JSON round-trip"]

@@ -1,0 +1,82 @@
+# G11/W3: 12 proposed Russian source-owned first-pass claims.
+schema: mts-reader-v15-wave/v0.1
+wave: W3
+status: proposed
+author_approval: not-recorded
+publication: blocked
+argument_completeness: unverified
+scientific_review: pending-individual-exp
+proof_check: accepted-contract-only
+atoms:
+  - id: v15-ctx-02
+    accepted_id: V15-CTX-02
+    source_quote: "The same Link may have different execution roles under different selected ANet contexts only because the corresponding contextual Link memberships differ; host names, manifests or pointers cannot create those roles."
+    ru: "Одна и та же Link может играть разные исполнительные роли при выборе различных контекстов ANet лишь потому, что различается её контекстная принадлежность. Смена строкового имени или host-указателя без структурного изменения членства не должна менять эту семантическую роль."
+    domain: "Принятая нормативная область V15-CTX-02"
+    exclusions: ["Не создавать роли переименованием manifest без изменения membership"]
+  - id: v15-gamma-01
+    accepted_id: V15-GAMMA-01
+    source_quote: "One repeated universal Γ is the shared v0.15 semantic execution operation for ordinary executable ANets and self-hosted meta/interpreter ANets: reaction-start snapshot; J0 structural-unary applicability over one explicit current endpoint; S1 read-only structural match/bind; S2 substitution/canonical Link construction during synthesis; 0/1/N ordered image contribution; complete staged successor and atomic publication. Exact grounded MP is the zero-role refinement. J1 cross-current-member join, external semantic grounder commands, consumer-specific opcodes and a second semantic runtime are not required/permitted by the selected profile."
+    ru: "Единая операция Γ выполняет реакцию над снимком исходного состояния: J0 устанавливает структурную применимость к явно выбранному текущему концу, S1 лишь читает и связывает, S2 строит канонические Связи, затем публикуются упорядоченные образы 0/1/N и новое состояние атомарно. J1 и отдельный runtime не являются необходимыми."
+    domain: "Принятая нормативная область V15-GAMMA-01"
+    exclusions: ["Не подменять универсальную Γ межтекущим join или host-командами"]
+  - id: v15-formal-proof-01
+    accepted_id: V15-FORMAL-PROOF-01
+    source_quote: "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence."
+    ru: "Lean 4 и Rocq независимо формализуют поддерживаемую часть математического ядра FORMAL: контекстные имена, денотацию, DAS и ExactSequence. Для каждой теоремы фиксируются точные предпосылки и область действия; утверждение о поддерживаемом фрагменте не означает доказанность языка целиком."
+    domain: "Принятая нормативная область V15-FORMAL-PROOF-01"
+    exclusions: ["Не выдавать покрытие фрагмента FORMAL за полноту всех его форм"]
+  - id: v15-formal-proof-02
+    accepted_id: V15-FORMAL-PROOF-02
+    source_quote: "Paired external assurance proves/cross-checks semantic preservation of FORMAL/JSON convergence and canonical recursive 8/9/6/1 metacompilation for the declared fragment; corpus GREEN alone is not proof of soundness."
+    ru: "Парное внешнее свидетельство проверяет сохранение семантики при объединении FORMAL и JSON и канонической компиляции в рекурсивный алфавит 8/9/6/1 для указанного фрагмента. Исполняемый зелёный корпус остаётся эмпирической проверкой и не заменяет формальное утверждение о сохранении смысла."
+    domain: "Принятая нормативная область V15-FORMAL-PROOF-02"
+    exclusions: ["Не выводить теорему soundness из одного corpus GREEN"]
+  - id: v15-json-04
+    accepted_id: V15-JSON-04
+    source_quote: "JSON arrays lower canonically to ExactSequence of already-denoted element Links; []=R. R-rooted fold F_R is a separate derived projection, not the positional/execution carrier."
+    ru: "Массив JSON означает каноническую ExactSequence из уже денотированных элементов Link; пустой массив соответствует R. Отдельно вычисляемая корневая свёртка F_R не обладает тождественной позиционной семантикой массива и не вправе подменять носитель последовательного исполнения."
+    domain: "Принятая нормативная область V15-JSON-04"
+    exclusions: ["Не отождествлять ExactSequence с результатом rooted fold"]
+  - id: v15-stage-01
+    accepted_id: V15-STAGE-01
+    source_quote: "Source bytes, native source ANet, resolution/denotation, semantic ANet, recursive metacompilation, backend compatibility lowering, execution/replay and projection remain separately observable."
+    ru: "Стадии обработки исходных байтов, source ANet, разрешения и денотации, семантической ANet, рекурсивной метакомпиляции, backend lowering, воспроизведения и проекции должны быть независимо наблюдаемы. Это позволяет локализовать расхождение, не назначая технической промежуточной форме новую семантику."
+    domain: "Принятая нормативная область V15-STAGE-01"
+    exclusions: ["Не сливать стадии в единственный непрозрачный признак успешности"]
+  - id: v15-stage-02
+    accepted_id: V15-STAGE-02
+    source_quote: "Read/find/validation are read-only; materialization/publication is explicit and failure-safe."
+    ru: "Операции чтения, поиска и проверки выполняются без изменения структуры. Материализация и публикация допускаются только явными шагами с безопасным поведением при ошибке; скрытое создание объекта во время read-only обхода нарушало бы модель наблюдения."
+    domain: "Принятая нормативная область V15-STAGE-02"
+    exclusions: ["Не создавать Связи как побочный эффект простого чтения"]
+  - id: v15-fals-01
+    accepted_id: V15-FALS-01
+    source_quote: "Every semantic capability has positive, structural mutation, missing authority, context, identity, JSON mutation and fresh-memory falsifiers as applicable."
+    ru: "Каждую семантическую возможность сопровождает применимый набор фальсификаторов: положительные примеры, мутации структуры, отсутствие authority, смена контекста, тест тождества, мутация JSON и запуск в новой Memory. Их назначение — искать контрпример к заявленному свойству, а не украшать успешный отчёт."
+    domain: "Принятая нормативная область V15-FALS-01"
+    exclusions: ["Не считать один положительный тест достаточной фальсификацией"]
+  - id: v15-gov-01
+    accepted_id: V15-GOV-01
+    source_quote: "Machine-readable candidate v0.15 requirements/traceability registry governs completion state."
+    ru: "За статусы требований v0.15 отвечает машинный реестр требований и трассируемости. Человекочитаемые страницы и задачи должны проецироваться из него, не создавая отдельный ручной источник решения о выполнении или обязательности требований."
+    domain: "Принятая нормативная область V15-GOV-01"
+    exclusions: ["Не поддерживать независимые статусы готовности в Markdown"]
+  - id: v15-gov-02
+    accepted_id: V15-GOV-02
+    source_quote: "Acceptance corpus audits direct semantic construction and rejects hidden program-specific host injection or backend-specific semantic authority."
+    ru: "Аудит приёмочного корпуса обязан выявлять прямое встраивание программной семантики в host или backend. Совпадение результата таблицы истинности не компенсирует неверного пути его получения, если путь обходит каноническую модель и универсальный исполнитель."
+    domain: "Принятая нормативная область V15-GOV-02"
+    exclusions: ["Не принимать правильный ответ при скрытой backend-семантике"]
+  - id: v15-gov-03
+    accepted_id: V15-GOV-03
+    source_quote: "Roadmap/status projections derive completion from registry/evidence rather than hand-maintained prose."
+    ru: "Дорожная карта и сводка исполнения вычисляются из реестра и свидетельств, а не корректируются вручную в документах. Изменение реального источника должно отражаться в производной проекции, причём статус без свидетельства не вправе возникнуть самопроизвольно."
+    domain: "Принятая нормативная область V15-GOV-03"
+    exclusions: ["Не считать ручную метку GREEN формальным доказательством"]
+  - id: v15-corpus-01
+    accepted_id: V15-CORPUS-01
+    source_quote: "Every Author-approved v0.15 executable artifact is pinned and replayed through FORMAL/JSON -> native source ANet -> semantic ANet -> recursive 8/9/6/1 -> generic compatibility lowering where required -> frozen A-memory 0.175.0, with zero semantic backend patches."
+    ru: "Каждый принятый Автором исполняемый JSON-артефакт проходит закреплённый путь от FORMAL/JSON через source и semantic ANet, рекурсивный 8/9/6/1, общее понижение и замороженную A-memory 0.175.0. Конкретные исправления backend под одну программу нарушают требование неизменной исполнительной базы."
+    domain: "Принятая нормативная область V15-CORPUS-01"
+    exclusions: ["Не заменять frozen A-memory 0.175.0 произвольным runtime"]

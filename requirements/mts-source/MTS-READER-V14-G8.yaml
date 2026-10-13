@@ -1,0 +1,130 @@
+# G8 proposed scientific Russian prose; no semantic or publication authority.
+schema: mts-reader-atomic-v14/v0.2
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+publication: blocked
+proof_check: contract-trace-only
+accepted_scope: [V14-L2, V14-L14]
+atoms:
+  - id: glyph-map
+    accepted_id: V14-L2
+    section: formal-notation
+    role: accepted-contract
+    source_quote: "Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR"
+    accepted_detail_pointer: /ostensiveFormalNotation/synonyms
+    ru: "Знаки ∞, ♂, ♀ и ⟼ являются элементами остенсивной записи структурных форм ROOT, START, END и PAIR. По принятому соответствию символов им отвечают 8, 9, 6 и 1. Это четыре обозначения случаев одной структуры Link, а не четыре независимые операции образования Связей."
+    domain: "Символический слой записи Link"
+    exclusions: ["Не объявлять четыре глифа четырьмя онтологическими командами"]
+    requires: []
+  - id: positional-forms
+    accepted_id: V14-L2
+    section: formal-notation
+    role: accepted-contract
+    source_quote: "Ostensive ∞/♂/♀/⟼ denote ROOT/START/END/PAIR"
+    accepted_detail_pointer: /ostensiveFormalNotation/positionalForms
+    ru: "Принятая остенсивная грамматика различает формы ∞, ♂S, S♀ и A ⟼ B. Буквы S, A, B здесь служат обозначениями соответствующих подвыражений, а не новыми онтологическими сущностями. Полярная ориентация START_K или END_K требует отдельно выбранного контекста."
+    domain: "Формы остенсивной записи"
+    exclusions: ["Не выводить глобальную ориентацию из очертания символа"]
+    requires: [glyph-map]
+  - id: grammar-explicit
+    accepted_id: V14-L2
+    section: formal-notation
+    role: accepted-contract
+    source_quote: "through an explicit grammar"
+    accepted_detail_pointer: /ostensiveFormalNotation/finalSurfaceGrammar
+    ru: "Правила интерпретации остенсивных форм определяются явной грамматикой. Грамматика относится к уровню записи и разбору источника: сам факт существования грамматического правила не создаёт ещё один примитив построения Link и не определяет семантику отдельным host-opcode."
+    domain: "Грамматика остенсивных форм"
+    exclusions: ["Не превращать правила парсера в независимую онтологию"]
+    requires: [positional-forms]
+  - id: reject-ambiguity
+    accepted_id: V14-L2
+    section: formal-notation
+    role: accepted-contract
+    source_quote: "through an explicit grammar"
+    accepted_detail_pointer: /ostensiveFormalNotation/ambiguousUngroupedFormsRejected
+    ru: "В принятом профиле v0.14 неоднозначную запись, в которой не указано необходимое группирование, требуется отклонять. Наличие формы A ⟼ B не предоставляет само по себе права выбирать произвольное дерево разбора более длинной записи и тем самым менять структурное значение."
+    domain: "Остенсивная грамматика v0.14"
+    exclusions: ["Не скрывать неоднозначность неявным выбором дерева"]
+    requires: [grammar-explicit]
+  - id: no-implicit-associativity
+    accepted_id: V14-L2
+    section: formal-notation
+    role: scope-boundary
+    source_quote: "through an explicit grammar"
+    accepted_detail_pointer: /ostensiveFormalNotation/implicitPairAssociativity
+    ru: "Для принятой остенсивной грамматики v0.14 значение implicitPairAssociativity равно NONE. Это отсутствие неявного правила группирования выражений PAIR; оно не утверждает и не опровергает отдельного алгебраического закона ассоциативности для операции построения Link."
+    domain: "Остенсивный синтаксис v0.14"
+    exclusions: ["Не смешивать ассоциативность операции и соглашение о скобках"]
+    requires: [reject-ambiguity]
+  - id: v015-das-version-boundary
+    accepted_id: V14-L2
+    section: formal-notation
+    role: version-boundary
+    source_quote: "through an explicit grammar"
+    accepted_detail_pointer: /ostensiveFormalNotation/implicitPairAssociativity
+    ru: "Версионная граница обязательна: запрет неявного группирования здесь относится к принятому остенсивному профилю v0.14. Принятая v0.15 отдельно фиксирует общий путь FORMAL и JSON через денотацию DAS; из этого не следует ретроактивное изменение грамматики v0.14 или тождество (A⟼B)⟼C и A⟼(B⟼C)."
+    domain: "Различие профилей v0.14 и v0.15"
+    exclusions: ["Не выдавать политику разбора за уравнение алгебры Link"]
+    requires: [no-implicit-associativity]
+    related_accepted_id: V15-JSON-02
+  - id: ontology-level
+    accepted_id: V14-L14
+    section: architecture
+    role: accepted-contract
+    source_quote: "MTS representation layers are explicit and non-ontological above Link"
+    accepted_detail_pointer: /representationLayers/ontology
+    ru: "Нулевой уровень модели МТС — онтология Link. Только он вводит онтологическую сущность Связь. Вышележащие уровни служат способами структурного описания, представления, записи и метаобозначения, поэтому их элементы не становятся новыми видами сущностей МТС."
+    domain: "Уровни представления МТС"
+    exclusions: ["Не считать текст, кодек или имя вторым видом Link"]
+    requires: []
+  - id: recursive-level
+    accepted_id: V14-L14
+    section: architecture
+    role: accepted-contract
+    source_quote: "recursive structure, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity"
+    accepted_detail_pointer: /representationLayers/recursiveStructure
+    ru: "Первый уровень — рекурсивное структурное описание одной онтологии Link. Алфавит 8/9/6/1 различает четыре структурных случая самоинцидентности; его знаки не являются самостоятельными полюсными сущностями или четырьмя командами конструирования Link."
+    domain: "Рекурсивная структура над Link"
+    exclusions: ["Не смешивать описывающий алфавит с базовой онтологией"]
+    requires: [ontology-level]
+  - id: codecs-level
+    accepted_id: V14-L14
+    section: architecture
+    role: accepted-contract
+    source_quote: "recursive structure, representations/codecs, byte-text and symbolic metanotation introduce no second ontology entity"
+    accepted_detail_pointer: /representationLayers/representationsAndCodecs
+    ru: "Второй уровень объединяет способы представления и кодеки: рекурсивный Link codec, Anum, ExactSequence и Q. Они выполняют различные функции представления Связей и последовательностей и не становятся отдельными онтологическими объектами только потому, что имеют собственный формат."
+    domain: "Представления и кодеки"
+    exclusions: ["Не отождествлять Anum, Q, ExactSequence и рекурсивный Link codec"]
+    requires: [recursive-level]
+  - id: byte-text-level
+    accepted_id: V14-L14
+    section: architecture
+    role: accepted-contract
+    source_quote: "byte-text and symbolic metanotation introduce no second ontology entity"
+    accepted_detail_pointer: /representationLayers/byteText
+    ru: "Третий уровень — байтовая и текстовая запись, в том числе STRING и UTF-8. Она позволяет переносить или отображать представление, но сама кодировка байтов не назначает структуре Link новых полюсов и не является источником МТС-семантики."
+    domain: "Текстовый и байтовый слой"
+    exclusions: ["Не приписывать байтовой последовательности самостоятельную онтологическую роль"]
+    requires: [codecs-level]
+  - id: symbolic-meta-level
+    accepted_id: V14-L14
+    section: architecture
+    role: accepted-contract
+    source_quote: "symbolic metanotation introduce no second ontology entity"
+    accepted_detail_pointer: /representationLayers/symbolicMetanotation
+    ru: "Четвёртый уровень содержит символическую метанотацию: имена, Dictionary, Grammar, Theory и FORMAL. Эти конструкции организуют обозначение, описание и чтение модели, но без дополнительных оснований не могут менять онтологию Link или становиться независимыми источниками семантики."
+    domain: "Символическая метанотация"
+    exclusions: ["Не превращать имена и элементы Grammar в физические сущности"]
+    requires: [byte-text-level]
+  - id: no-second-ontology
+    accepted_id: V14-L14
+    section: architecture
+    role: scope-boundary
+    source_quote: "introduce no second ontology entity"
+    accepted_detail_pointer: /representationLayers/symbolicMetanotation
+    ru: "Перечисленные уровни — классификация форм описания и представления, а не лестница новых онтологических примитивов. Высказывание о пяти уровнях не является утверждением, что каждый из них может независимо образовывать Связи; образование Link остаётся исходным структурным основанием."
+    domain: "Граница между онтологией и представлениями"
+    exclusions: ["Не выводить самостоятельную власть над Link из иерархии уровней"]
+    requires: [symbolic-meta-level]

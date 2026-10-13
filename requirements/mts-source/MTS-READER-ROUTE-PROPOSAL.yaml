@@ -1,0 +1,57 @@
+# G5 editorial proposal, not an accepted semantic or publication authority.
+schema: mts-reader-route-proposal/v0.1
+status: proposed
+semantic_change: false
+author_approval: not-recorded
+reader_edges: scientific-review-pending
+chapters:
+  foundations: Первичная онтология и структурные формы Связей
+  inversion-and-context: Реляционная инверсия, хиральность и контекст
+  representation: Ачисла, сериализация и последовательности
+  arithmetic: Выводимые арифметические конструкции и границы
+  formal-notation: FORMAL, имена и JSON-представление
+  execution: Обобщённые правила исполнения и реакция
+  architecture: Разделение семантики, представления и исполнения
+  worked-examples: Проверяемые логические примеры
+  proofs: Математические доказательства Lean 4 и Rocq
+  assurance: Проверяемость, регрессия и технические свидетельства
+  governance: Авторская приёмка и управление выпуском
+  documentation: Построение документации из моделей
+  terminology: Нормативные термины и словарь
+v014:
+  V14-L1: foundations
+  V14-L2: formal-notation
+  V14-L3: representation
+  V14-L4: execution
+  V14-L5: foundations
+  V14-L6: arithmetic
+  V14-L7: representation
+  V14-L8: arithmetic
+  V14-L9: arithmetic
+  V14-L10: arithmetic
+  V14-L11: execution
+  V14-L12: inversion-and-context
+  V14-L13: representation
+  V14-L14: architecture
+v015_groups:
+  TERM: terminology
+  AUTH: architecture
+  ONTO: foundations
+  STRUCT: foundations
+  CLOSE: architecture
+  FRESH: assurance
+  NAME: formal-notation
+  JSON: formal-notation
+  VERT: assurance
+  AND: worked-examples
+  CTX: execution
+  GAMMA: execution
+  FORMAL_PROOF: proofs
+  STAGE: architecture
+  FALS: assurance
+  GOV: governance
+  CORPUS: assurance
+  DOCS: documentation
+  READY: governance
+  AUTHOR_JSON: governance
+  REG: assurance
