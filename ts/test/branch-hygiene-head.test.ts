@@ -1,3 +1,4 @@
+// #2136 field canary: this first governance-branch push intentionally exercises auto-PR creation from the current main workflow.
 import assert from "node:assert/strict";
 import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
