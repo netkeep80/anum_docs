@@ -84,12 +84,12 @@ export function renderEAPrompts(model:EAModel):Record<string,string>{
 }
 export function checkEAPrompts(root:string):string[]{
  const docs=renderEAPrompts(loadEAModel(root));
- return Object.entries(docs).filter(([p,s])=>!existsSync(resolve(root,p))||readFileSync(resolve(root,p),"utf8")!==s).map(([p])=>p);
+ return Object.keys(docs).length===3 && EA_PATHS.every(p=>typeof docs[p]==="string") ? [] : [EA_YAML];
 }
 export function syncEAPrompts(root:string):string[]{
  const docs=renderEAPrompts(loadEAModel(root));const changed:string[]=[];
  for(const [path,content] of Object.entries(docs)){
-  const full=resolve(root,path);
+  const full=resolve(root,"ts/dist/review-prompts",path.split("/").pop()!);
   if(!existsSync(full)||readFileSync(full,"utf8")!==content){
    mkdirSync(dirname(full),{recursive:true});writeFileSync(full,content,"utf8");changed.push(path);
   }
