@@ -18,6 +18,9 @@ jobs:
     name: Ensure draft PR for side branch
     if: github.event_name == 'push' && github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch
     runs-on: ubuntu-latest
+    concurrency:
+      group: branch-hygiene-${{ github.repository }}-${{ github.ref_name }}
+      cancel-in-progress: false
     steps:
       - name: Ensure open draft PR
         env:
@@ -26,14 +29,48 @@ jobs:
           OWNER: ${{ github.repository_owner }}
           BRANCH: ${{ github.ref_name }}
           BASE: ${{ github.event.repository.default_branch }}
+          HEAD_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
 
-          existing="$(gh api --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f base="$BASE" --jq 'length')"
+          workflow_path=".github/workflows/branch-hygiene.yml"
+
+          workflow_blob_sha() {
+            local ref="$1"
+            gh api --method GET "repos/$REPO/contents/$workflow_path" \
+              -f ref="$ref" \
+              --jq 'if type == "object" and .type == "file" and (.sha | type == "string") then .sha else error("unexpected workflow metadata response") end'
+          }
+
+          branch_workflow_sha="$(workflow_blob_sha "$BRANCH")"
+          base_workflow_sha="$(workflow_blob_sha "$BASE")"
+          if [ "$branch_workflow_sha" != "$base_workflow_sha" ]; then
+            echo "::warning::Stale branch-hygiene workflow on $BRANCH ($branch_workflow_sha != $base_workflow_sha on $BASE); PR mutation suppressed."
+            exit 0
+          fi
+
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
 
           if [ "$existing" -gt 0 ]; then
             echo "Open PR already exists for $BRANCH."
+            exit 0
+          fi
+
+          # A one-file policy synchronization is operational maintenance, not
+          # a feature branch needing a placeholder PR. This bypass is allowed
+          # only after proving that the branch workflow blob already equals main.
+          sync_only="$(gh api --method GET "repos/$REPO/commits/$HEAD_SHA" --jq '
+            if type == "object" and (.parents | type == "array") and (.files | type == "array") then
+              if (.parents | length) == 1 and
+                 (.files | length) == 1 and
+                 .files[0].filename == ".github/workflows/branch-hygiene.yml" and
+                 .files[0].status == "modified"
+              then "yes" else "no" end
+            else error("unexpected commit metadata response") end
+          ')"
+          if [ "$sync_only" = "yes" ]; then
+            echo "::notice::Workflow-only synchronization to the trusted main blob; placeholder PR creation suppressed."
             exit 0
           fi
 
@@ -50,6 +87,13 @@ jobs:
             exit 0
           fi
 
+          # A stacked PR can be opened/retargeted while compare is running.
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
+          if [ "$existing" -gt 0 ]; then
+            echo "An open exact-head PR now exists, including stacked bases; no new PR."
+            exit 0
+          fi
+
           title="draft: ${BRANCH//\// }"
           body="$(printf '%s\n' \
             "Automatically opened by repository branch-hygiene policy." \
@@ -59,6 +103,16 @@ jobs:
             "- policy issue: #1637" \
             "" \
             "Please replace this placeholder title/body with the task-specific PR description before marking the PR ready.")"
+
+          # Re-check the trusted workflow blob immediately before the write.
+          # If main changed while this run was evaluating the branch, fail closed
+          # and let a later run use the new policy instead of writing from stale code.
+          branch_workflow_sha="$(workflow_blob_sha "$BRANCH")"
+          base_workflow_sha="$(workflow_blob_sha "$BASE")"
+          if [ "$branch_workflow_sha" != "$base_workflow_sha" ]; then
+            echo "::warning::Branch-hygiene became stale during this run; PR mutation suppressed."
+            exit 0
+          fi
 
           error_file="$(mktemp)"
           if gh api --method POST "repos/$REPO/pulls" \
@@ -93,6 +147,14 @@ jobs:
 
           if grep -Fq "No commits between" <<< "$error_text"; then
             echo "::notice::GitHub reports no PR-eligible commits between $BASE and $BRANCH; creation deferred."
+            exit 0
+          fi
+
+          # If another actor won the race, the existing exact-head PR
+          # is the authoritative outcome; do not treat it as a second create.
+          existing="$(gh api --paginate --method GET "repos/$REPO/pulls" -f state=open -f head="$OWNER:$BRANCH" -f per_page=100 --jq 'if type == "array" then .[].number else error("unexpected PR list response") end' | wc -l | tr -d ' ')"
+          if [ "$existing" -gt 0 ]; then
+            echo "::notice::Exact-head PR already exists after concurrent create attempt."
             exit 0
           fi
 
