@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # repo-guard exact consumer pin: state-replacement + linked-issue + large-diff fixes (#640/#650/#653)
+      # RepoGuard exact consumer pin: include trusted SHA-bound size-rule growth grants (#685).
       - name: Run repo-guard
         id: repo_guard
         uses: netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2
