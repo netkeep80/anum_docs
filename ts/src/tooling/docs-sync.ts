@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {checkEAPrompts, syncEAPrompts} from "./external-audit-methodology.js";
 import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mts-compiler.js";
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
@@ -614,14 +615,14 @@ function main(): void {
   const root = findRepositoryRoot();
   const mode = process.argv[2] ?? "--check";
   if (mode === "--write") {
-    const changed = syncRepositoryDocs(root);
+    const changed = [...syncRepositoryDocs(root), ...syncEAPrompts(root)];
     console.log(changed.length ? `Синхронизированы: ${changed.join(", ")}` : "Документация уже синхронизирована.");
     return;
   }
   if (mode !== "--check") fail(`unknown mode ${mode}; expected --check or --write`);
   const policyIssues = checkCurrentReleasePolicy(root);
   if (policyIssues.length) fail(`current release policy mismatch: ${policyIssues.join("; ")}`);
-  const stale = checkRepositoryDocs(root);
+  const stale = [...checkRepositoryDocs(root), ...checkEAPrompts(root)];
   if (stale.length) fail(`устарела автоматическая проекция: ${stale.join(", ")}; запустите npm --prefix ts run docs:sync`);
   const lawIssues = checkRepositorySemanticLawDocumentation(root);
   if (lawIssues.length) fail(`нарушена документационная канонизация законов: ${lawIssues.map((issue) => issue.message).join("; ")}`);
