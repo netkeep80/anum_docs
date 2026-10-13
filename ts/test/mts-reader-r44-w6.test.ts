@@ -54,6 +54,15 @@ assert.equal(actualModel.headings.flat().length,102);
 assert.equal(new Set(actualModel.headings.flat()).size,102);
 assert.equal((document.mainText.match(/^\*\*\d+\.\d+\. /gm)??[]).length,102);
 assert.ok(document.mainText.includes("**1.1. Внешний математический интерфейс Foundation.**"));
+const basisPrelude=document.mainText.indexOf("**Предпосылка корневого базиса.**");
+assert.ok(basisPrelude>document.mainText.indexOf("**1.4.")&&
+ basisPrelude<document.mainText.indexOf("**1.5.")&&
+ document.mainText.indexOf("**1.5.")<document.mainText.indexOf("**1.6."),
+ "the conditional basis premise must precede the first named root/basis equations");
+assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("F2F3OneSidedExistence(F)")&&
+ document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("O≠R")&&
+ document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("C≠R"),
+ "reader must explicitly disclose conditional nontrivial basis witnesses before use");
 const foundationStart=document.mainText.indexOf("**1.1. ");
 const foundationLast=document.mainText.indexOf("**1.9. ");
 const foundationReview=document.mainText.indexOf("### F01. ");
