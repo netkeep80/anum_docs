@@ -7,7 +7,11 @@ import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderC
   loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
   loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
   loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
-  projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS }
+  projectReaderAllFirstPassCensus, renderReaderAllFirstPassCensus, READER_V15_G11_PATHS,
+  loadReaderDraftPreview, projectReaderDraftPreview,
+  loadReaderScienceClosure, parseReaderScienceClosure, renderReaderScienceClosure,
+  loadReaderBootstrapNames, parseReaderBootstrapNames, loadReaderDraftWithBootstrapPrelude,
+  loadReaderFoundationOpening, parseReaderFoundationOpening, loadReaderDraftWithFoundationOpening }
   from "../src/tooling/mts-reader-coverage.js";
 
 const root = resolve("..");
@@ -286,8 +290,12 @@ assert.throws(()=>p10(g10Source.replace("  - id: v14-l3","  - id: v14-l3\n    id
 console.log("G10: 7 v0.14 Russian first-pass laws proposed, unverified and blocked.");
 
 const g11=loadReaderV15G11(root);
+assert.ok(g10.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Принятый контракт")&&x.domain!=="Link"));
 const c11=projectReaderAllFirstPassCensus(g9,g10,g11);
 assert.equal(g11.atoms.length,48);
+assert.ok(g11.atoms.every(x=>x.domain.length>=30&&!x.domain.includes("Принятая нормативная область")));
+assert.equal(new Set([...g10.atoms,...g11.atoms].map(x=>x.domain)).size,55);
+assert.ok([...g10.atoms,...g11.atoms].every(x=>!x.domain.includes(x.acceptedId)));
 assert.equal(new Set(g11.atoms.map(x=>x.acceptedId)).size,48);
 assert.ok(g11.atoms.every(x=>v15.find(y=>y.id===x.acceptedId)?.statement===x.sourceQuote));
 assert.equal(g11.publication,"blocked");
@@ -323,3 +331,127 @@ assert.throws(()=>projectReaderAllFirstPassCensus(g9,g10,{
   ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!,acceptedId:"V14-L2"}]
 }),/duplicate\/foreign cross-source ID/);
 console.log("G11: 48 first-pass v0.15 source-owned Russian texts; 62/62 accepted ID owner presence, ZERO scientific completion.");
+
+const draft=loadReaderDraftPreview(root);
+assert.equal(draft.schema,"mts-reader-draft-preview/v0.1");
+assert.equal(draft.publication,"blocked");
+assert.equal(draft.authorApproval,"not-recorded");
+assert.equal(draft.readerOrder,"registry-order-not-reviewed");
+assert.equal(draft.sectionCount,13);
+assert.equal(draft.acceptedLawCount,62);
+assert.equal(draft.proposedParagraphCount,104);
+assert.ok(draft.markdown.startsWith("# Метатеория Связей — научное изложение (редакционный черновик)"));
+assert.ok(draft.markdown.includes("ПУБЛИКАЦИЯ ЗАПРЕЩЕНА"));
+assert.ok(draft.markdown.includes("НЕ является доказанным reader DAG"));
+assert.equal((draft.markdown.match(/^## /gm)??[]).length,13);
+assert.equal((draft.markdown.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((draft.markdown.match(/^#### /gm)??[]).length,104);
+assert.equal(loadReaderDraftPreview(root).markdown,draft.markdown);
+assert.throws(()=>projectReaderDraftPreview(plan,routes,g4,g7,g8,g10,g11,{
+  ...c11,authorApprovedIds:1 as 0,
+}),/cannot present incomplete or approved/);
+assert.throws(()=>projectReaderDraftPreview(plan,routes,g4,g7,g8,g10,{
+ ...g11,atoms:[...g11.atoms,{...g11.atoms[0]!}],
+},c11),/duplicate source text ownership/);
+console.log("G12: 13-section 62-law 104-atom deterministic unapproved Russian draft preview.");
+
+const g13Text=readFileSync(resolve(root,"requirements/mts-source/MTS-READER-SCIENCE-GATES-G13.yaml"),"utf8");
+const g13=loadReaderScienceClosure(root);
+assert.equal(g13.gates.length,12);
+assert.equal(new Set(g13.gates.map(x=>x.id)).size,12);
+assert.ok(g13.gates.every(x=>x.status==="pending"));
+assert.equal(g13.authorApproval,"not-recorded");
+assert.equal(g13.publication,"blocked");
+assert.ok(renderReaderScienceClosure(g13).includes("публикация запрещена"));
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("publication: blocked",
+ "publication: ready"),draft),/cannot approve/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("  - id: reader-dag",
+ "  - id: science-atomicity"),draft),/missing, duplicated or falsely resolved/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("    status: pending",
+ "    status: approved"),draft),/missing, duplicated or falsely resolved/);
+assert.throws(()=>parseReaderScienceClosure(g13Text.replace("  - id: reader-dag",
+ "  - id: reader-dag\n    id: reader-dag"),draft),/G13 invalid gate YAML/);
+assert.throws(()=>p10(g10Source.replace(/    domain: "[^"]+"/,
+  '    domain: "Принятый контракт V14-L3"')),/incomplete scientific text/);
+assert.throws(()=>parse11(w11.map((x,i)=>i===0?x.replace(/    domain: "[^"]+"/,
+  '    domain: "Принятая нормативная область V15-TERM-01"'):x)),
+  /incomplete Russian science text/);
+console.log("G13: 12 unresolved science/publication blockers remain explicit and source-owned.");
+
+
+const v13Contract=JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.13.json"),"utf8"));
+const v14Contract=JSON.parse(readFileSync(resolve(root,"contracts/mts-contract-v0.14.json"),"utf8"));
+const g15Yaml=readFileSync(resolve(root,"requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml"),"utf8");
+const g15=loadReaderBootstrapNames(root);
+assert.deepEqual(g15.symbols.map(x=>x.symbol),["R","O","C","L","U"]);
+assert.ok(g15.symbols.every(x=>x.exactEquation===v13Contract.bootstrapBasis.definitions[x.symbol]));
+assert.equal(g15.authorApproval,"not-recorded");
+assert.equal(g15.publication,"blocked");
+const namedDraft=loadReaderDraftWithBootstrapPrelude(root);
+assert.ok(namedDraft.indexOf("### Исходные обозначения корневого базиса")<
+  namedDraft.indexOf("## Первичная онтология"));
+assert.ok(namedDraft.includes("N₀=U, D₁=L"));
+assert.equal((namedDraft.match(/^## /gm)??[]).length,13);
+assert.equal((namedDraft.match(/^### V1[45]-/gm)??[]).length,62);
+const p15=(txt:string,v13=v13Contract,v14=v14Contract)=>
+  parseReaderBootstrapNames(txt,v13,v14);
+assert.throws(()=>p15(g15Yaml.replace("status: proposed","status: accepted")),
+  /cannot forge inherited basis/);
+assert.throws(()=>p15(g15Yaml.replace('exact_equation: "R = R ⟼ R"',
+  'exact_equation: "R = O ⟼ R"')),/missing, forged or incomplete basis definition/);
+assert.throws(()=>p15(g15Yaml,{
+  ...v13Contract,
+  bootstrapBasis:{...v13Contract.bootstrapBasis,definitions:{
+    ...v13Contract.bootstrapBasis.definitions,U:"U = R ⟼ R"}}
+}),/missing, forged or incomplete basis definition/);
+assert.throws(()=>p15(g15Yaml,v13Contract,{
+  ...v14Contract,natTheory:{...v14Contract.natTheory,zero:"N0 = R"}
+}),/inconsistent inherited U\/L\/R/);
+console.log("G15: R O C L U inherited basis and model-derived Russian reader prelude.");
+
+
+const g16Yaml = readFileSync(resolve(root,
+  "requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml"),"utf8");
+const g16 = loadReaderFoundationOpening(root);
+assert.equal(g16.acceptedId,"V14-L1");
+assert.equal(g16.historicalSha256,g4.statement.sha256);
+assert.ok(g4.statement.ru.startsWith(g16.historicalOpening));
+assert.ok(!g16.candidateRu.includes(g16.historicalOpening));
+assert.ok(g16.candidateRu.includes("11") && g16.candidateRu.includes("01"));
+assert.ok(g16.candidateRu.includes("START_K") && g16.candidateRu.includes("END_K"));
+assert.ok(g16.candidateRu.includes("R представляет случай 11"));
+assert.equal(g16.exclusions.length,3);
+assert.equal(g16.authorApproval,"not-recorded");
+assert.equal(g16.publication,"blocked");
+const introduced = loadReaderDraftWithFoundationOpening(root);
+const firstDefinition=introduced.indexOf("### Предмет МТС и четыре локальных случая");
+const basisDefinition=introduced.indexOf("### Исходные обозначения корневого базиса");
+const firstChapter=introduced.search(/^## /m);
+assert.ok(firstDefinition>=0 && firstDefinition<basisDefinition && basisDefinition<firstChapter);
+assert.equal((introduced.match(/^## /gm)??[]).length,13);
+assert.equal((introduced.match(/^### V1[45]-/gm)??[]).length,62);
+assert.equal((introduced.match(/^#### /gm)??[]).length,104);
+const g16Parse=(text:string,model=g4,v13=v13Contract)=>
+  parseReaderFoundationOpening(text,model,v13);
+assert.throws(()=>g16Parse(g16Yaml.replace("status: proposed","status: accepted")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("publication: blocked","publication: ready")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("historical_sha256: b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5",
+  "historical_sha256: altered")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("accepted_id: V14-L1","accepted_id: V14-L2")),
+ /G16 historical provenance or unapproved state drift/);
+assert.throws(()=>g16Parse(g16Yaml.replace("  - ","  - ")
+  .replace("exclusions:\n","exclusions:\n  - \"\" \n")),
+ /G16 needs three separate scientific noninference boundaries/);
+assert.throws(()=>g16Parse(g16Yaml,g4,{
+  ...v13Contract,aspectFoundationTheorem:{
+    ...v13Contract.aspectFoundationTheorem,necessity:{
+      ...v13Contract.aspectFoundationTheorem.necessity,witnesses:{
+        ...v13Contract.aspectFoundationTheorem.necessity.witnesses,PAIR:"U"
+      }
+    }
+  }
+}),/accepted v0.13 structural witnesses drift/);
+console.log("G16: original historic source unchanged; standalone blocked scientific prelude candidate.");

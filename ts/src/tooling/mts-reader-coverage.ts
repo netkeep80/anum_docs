@@ -698,7 +698,8 @@ export function parseReaderV14G10(text:string, coverage:ReaderCoveragePlan,
       fail("G10 duplicate, unknown or already-owned accepted ID");
     if(typeof x.source_quote!=="string"||acceptedLaws.get(x.accepted_id)!==x.source_quote)
       fail("G10 exact accepted law quote mismatch");
-    if(typeof x.ru!=="string"||x.ru.length<140||typeof x.domain!=="string"||!x.domain.trim()||
+    if(typeof x.ru!=="string"||x.ru.length<140||typeof x.domain!=="string"||
+       x.domain.trim().length<30||x.domain==="Link"||x.domain.startsWith("Принятый контракт")||
        !Array.isArray(x.exclusions)||x.exclusions.length!==1||
        typeof x.exclusions[0]!=="string"||x.exclusions[0].length<25)
       fail("G10 incomplete scientific text and exclusions");
@@ -770,7 +771,8 @@ export function parseReaderV15G11(waves:readonly string[],
       if(typeof a.source_quote!=="string"||a.source_quote!==acceptedLaws.get(a.accepted_id))
         fail("G11 source quote differs from accepted registry");
       if(typeof a.ru!=="string"||a.ru.length<145||
-        typeof a.domain!=="string"||!a.domain.trim()||
+        typeof a.domain!=="string"||a.domain.trim().length<30||
+        a.domain.startsWith("Принятая нормативная область")||a.domain==="Link"||
         !Array.isArray(a.exclusions)||a.exclusions.length!==1||
         typeof a.exclusions[0]!=="string"||a.exclusions[0].length<27)
         fail("G11 incomplete Russian science text / exclusion");
@@ -836,4 +838,346 @@ export function renderReaderAllFirstPassCensus(c:ReaderAllFirstPassCensus):strin
     "author_approved_ids="+c.authorApprovedIds,
     "publication_ready_ids="+c.publicationReadyIds,
   ].join("\n");
+}
+
+
+/** G12 deterministic PREVIEW renderer: no generated markdown is authoritative or published. */
+export interface ReaderDraftParagraph {
+  readonly id:string; readonly acceptedId:string; readonly source:string;
+  readonly textRu:string; readonly role:string; readonly exclusionRu:readonly string[];
+}
+export interface ReaderDraftPreview {
+  readonly schema:"mts-reader-draft-preview/v0.1";
+  readonly publication:"blocked";
+  readonly authorApproval:"not-recorded";
+  readonly readerOrder:"registry-order-not-reviewed";
+  readonly sectionCount:13;
+  readonly acceptedLawCount:62;
+  readonly proposedParagraphCount:104;
+  readonly markdown:string;
+}
+export function projectReaderDraftPreview(
+  coverage:ReaderCoveragePlan,routes:ReaderRoutes,
+  g4:ReturnType<typeof loadMtsSourceRequirement>,g7:ReaderG7Plan,g8:ReaderG8Plan,
+  g10:ReaderV14G10,g11:ReaderV15G11,full:ReaderAllFirstPassCensus
+):ReaderDraftPreview{
+  if(full.acceptedIds!==62||full.idsWithProposedRussianText!==62||
+     full.totalProposedRussianAtoms!==104||full.scientificallyCompleteIds!==0||
+     full.authorApprovedIds!==0||full.publicationReadyIds!==0||
+     g4.readerScience?.publication!=="blocked"||
+     g7.publication!=="blocked"||g8.publication!=="blocked"||
+     g10.publication!=="blocked"||g11.publication!=="blocked")
+    fail("G12 cannot present incomplete or approved scientific corpus as draft");
+  if(coverage.rows.length!==62||Object.keys(routes.chapters).length!==13)
+    fail("G12 reader coverage or chapters changed");
+  const blocks=new Map<string,ReaderDraftParagraph[]>();
+  const uniqueKeys=new Set<string>();
+  const add=(id:string,source:string,atom:string,text:string,role:string,exclusions:readonly string[])=>{
+    if(!coverage.rows.some(x=>x.id===id)||!atom||!text.trim())fail("G12 invalid source atom");
+    const key=source+"/"+atom;
+    if(uniqueKeys.has(key))fail("G12 duplicate source text ownership");
+    uniqueKeys.add(key);
+    const arr=blocks.get(id)??[];
+    arr.push(Object.freeze({
+      id:atom,acceptedId:id,source,textRu:text,role,
+      exclusionRu:Object.freeze([...exclusions]),
+    }));
+    blocks.set(id,arr);
+  };
+  if(!g4.readerScience)fail("G12 missing G4 science owner");
+  for(const x of g4.readerScience.steps)
+    add("V14-L1","G4",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g7.atoms)
+    add(x.acceptedId,"G7",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g8.atoms)
+    add(x.acceptedId,"G8",x.id,x.ru,x.role,x.exclusions);
+  for(const x of g10.atoms)
+    add(x.acceptedId,"G10",x.id,x.ru,"accepted-contract-exposition",x.exclusions);
+  for(const x of g11.atoms)
+    add(x.acceptedId,"G11-"+x.wave,x.id,x.ru,"accepted-contract-exposition",x.exclusions);
+  if(uniqueKeys.size!==104||blocks.size!==62)
+    fail("G12 duplicate/missing source texts");
+  const out=[
+    "# Метатеория Связей — научное изложение (редакционный черновик)",
+    "",
+    "**СТАТУС: ПРЕДЛОЖЕНИЕ; АВТОР НЕ УТВЕРЖДАЛ; ПУБЛИКАЦИЯ ЗАПРЕЩЕНА.**",
+    "",
+    "Материал построен из моделей и дословно привязан к принятым нормативным идентификаторам.",
+    "Порядок ниже пока повторяет порядок реестров внутри разделов и НЕ является доказанным reader DAG.",
+    "Наличие текста не гарантирует полноту объяснения, доказательств или корректность межпонятийных переходов.",
+    "",
+  ];
+  const chapters=Object.entries(routes.chapters) as [ReaderSection,string][];
+  for(const [section,title] of chapters){
+    out.push("## "+title,"");
+    for(const row of coverage.rows.filter(x=>x.proposedSection===section)){
+      out.push("### "+row.id+" — редакционный кандидат","","Нормативный источник: "+
+        row.acceptedAuthority.path+"#"+row.acceptedAuthority.pointer+".","");
+      for(const atom of blocks.get(row.id)??[]){
+        out.push("#### "+atom.id,"",atom.textRu,"");
+        if(atom.exclusionRu.length)
+          out.push("Граница утверждения: "+atom.exclusionRu.join("; ")+".","");
+      }
+      out.push("*Статус: научная полнота не подтверждена; авторское одобрение отсутствует.*","");
+    }
+  }
+  out.push("---","",
+    "Этот черновик не заменяет принятые нормативные реестры и внешние доказательства.",
+    "Пока не выполнен полный индивидуальный научный аудит, публикация недопустима.","");
+  return Object.freeze({
+    schema:"mts-reader-draft-preview/v0.1" as const,publication:"blocked" as const,
+    authorApproval:"not-recorded" as const,
+    readerOrder:"registry-order-not-reviewed" as const,
+    sectionCount:13 as const,acceptedLawCount:62 as const,
+    proposedParagraphCount:104 as const,markdown:out.join("\n"),
+  });
+}
+export function loadReaderDraftPreview(root:string):ReaderDraftPreview{
+  const census=loadReaderScienceCensus(root);
+  const g10=loadReaderV14G10(root),g11=loadReaderV15G11(root);
+  return projectReaderDraftPreview(loadReaderCoverage(root),loadReaderRoutes(root),
+    loadMtsSourceRequirement(root,"requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    loadReaderG7(root),loadReaderG8(root),g10,g11,
+    projectReaderAllFirstPassCensus(census,g10,g11));
+}
+
+
+/** G13 closure is always pending until independently reviewed and explicitly Author accepted. */
+export const READER_SCIENCE_G13_PATH="requirements/mts-source/MTS-READER-SCIENCE-GATES-G13.yaml";
+export interface ReaderScienceClosureGate {
+  readonly id:string; readonly status:"pending";
+  readonly purposeRu:string; readonly evidenceRu:string; readonly trackedIn:string;
+}
+export interface ReaderScienceClosure {
+  readonly schema:"mts-reader-scientific-closure/v0.1";
+  readonly publication:"blocked"; readonly authorApproval:"not-recorded";
+  readonly gates:readonly ReaderScienceClosureGate[];
+}
+export function parseReaderScienceClosure(text:string,preview:ReaderDraftPreview):ReaderScienceClosure{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G13 invalid gate YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G13 science gates");
+  exactFields(raw,["schema","status","semantic_change","author_approval","publication","gates"],"G13");
+  if(raw.schema!=="mts-reader-scientific-closure/v0.1"||raw.status!=="proposed"||
+    raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+    raw.publication!=="blocked"||preview.publication!=="blocked"||
+    preview.acceptedLawCount!==62||preview.proposedParagraphCount!==104)
+    fail("G13 cannot approve scientific completeness or publication");
+  if(!Array.isArray(raw.gates)||raw.gates.length!==12)fail("G13 requires 12 independent blockers");
+  const names=new Set<string>();
+  const gates=raw.gates.map((entry,i)=>{
+    const x=object(entry,"G13.gates["+i+"]");
+    exactFields(x,["id","status","purpose_ru","evidence_ru","tracked_in"],"G13.gate");
+    if(typeof x.id!=="string"||!/^[a-z][a-z0-9-]+$/.test(x.id)||
+       names.has(x.id)||x.status!=="pending"||
+       typeof x.purpose_ru!=="string"||x.purpose_ru.length<95||
+       typeof x.evidence_ru!=="string"||x.evidence_ru.length<90||
+       typeof x.tracked_in!=="string"||!/^#[0-9]+$/.test(x.tracked_in))
+      fail("G13 missing, duplicated or falsely resolved scientific gate");
+    names.add(x.id);
+    return Object.freeze({id:x.id,status:"pending" as const,
+      purposeRu:x.purpose_ru,evidenceRu:x.evidence_ru,trackedIn:x.tracked_in});
+  });
+  return Object.freeze({schema:"mts-reader-scientific-closure/v0.1" as const,
+    publication:"blocked" as const,authorApproval:"not-recorded" as const,
+    gates:Object.freeze(gates)});
+}
+export function loadReaderScienceClosure(root:string):ReaderScienceClosure{
+  return parseReaderScienceClosure(
+    readFileSync(resolve(root,READER_SCIENCE_G13_PATH),"utf8"),
+    loadReaderDraftPreview(root));
+}
+export function renderReaderScienceClosure(x:ReaderScienceClosure):string{
+  return [
+    "# Научные блокировки изложения МТС",
+    "",
+    "**Статус: публикация запрещена; решения Автора отсутствуют.**",
+    "",
+    ...x.gates.flatMap(g=>[
+      "## "+g.id,"",g.purposeRu,"",
+      "Требуемое свидетельство: "+g.evidenceRu,"",
+      "Учет: "+g.trackedIn+". Статус: ожидает научного завершения.","",
+    ]),
+  ].join("\n");
+}
+
+
+/** G15: five accepted v0.13 basis Links named explicitly before later Nat/ExactSequence explanations. */
+export const READER_BOOTSTRAP_G15_PATH="requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml";
+export interface ReaderBootstrapSymbol {
+  readonly symbol:"R"|"O"|"C"|"L"|"U";
+  readonly exactEquation:string;readonly explanationRu:string;
+  readonly exclusions:readonly string[];
+}
+export interface ReaderBootstrapNames {
+  readonly schema:"mts-reader-bootstrap-symbols/v0.1";
+  readonly authorApproval:"not-recorded";readonly publication:"blocked";
+  readonly symbols:readonly ReaderBootstrapSymbol[];
+}
+export function parseReaderBootstrapNames(text:string,source13:Record<string,unknown>,
+  source14:Record<string,unknown>):ReaderBootstrapNames{
+  const doc=parseDocument(text,{strict:true,uniqueKeys:true});
+  if(doc.errors.length||doc.warnings.length)fail("G15 invalid basis YAML");
+  const raw=object(doc.toJS({maxAliasCount:0}),"G15 basis");
+  exactFields(raw,["schema","status","semantic_change","author_approval",
+    "publication","source_contract","symbols"],"G15 basis");
+  if(raw.schema!=="mts-reader-bootstrap-symbols/v0.1"||raw.status!=="proposed"||
+     raw.semantic_change!==false||raw.author_approval!=="not-recorded"||
+     raw.publication!=="blocked"||raw.source_contract!=="contracts/mts-contract-v0.13.json"||
+     source13.schema!=="mts-contract/v0.13"||source13.accepted!==true||
+     source14.schema!=="mts-contract/v0.14"||source14.accepted!==true)
+    fail("G15 cannot forge inherited basis or approval");
+  const basis=object(object(source13.bootstrapBasis,"v0.13 basis").definitions,"v0.13 definitions");
+  if(object(source14.inheritedFoundation,"v0.14 inherited foundation").rootBasis!=="R/O/C/L/U")
+    fail("G15 inherited basis drift");
+  if(!Array.isArray(raw.symbols)||raw.symbols.length!==5)fail("G15 requires five basis symbols");
+  const names=["R","O","C","L","U"];
+  const symbols:ReaderBootstrapSymbol[]=raw.symbols.map((entry,i)=>{
+    const x=object(entry,"G15 symbol");
+    exactFields(x,["symbol","exact_equation","explanation_ru","exclusions"],"G15 symbol");
+    if(x.symbol!==names[i]||typeof x.exact_equation!=="string"||
+       x.exact_equation!==basis[names[i]!]||
+       typeof x.explanation_ru!=="string"||x.explanation_ru.length<145||
+       !Array.isArray(x.exclusions)||x.exclusions.length!==1||
+       typeof x.exclusions[0]!=="string"||x.exclusions[0].length<30)
+      fail("G15 missing, forged or incomplete basis definition");
+    return Object.freeze({symbol:x.symbol as ReaderBootstrapSymbol["symbol"],
+      exactEquation:x.exact_equation,explanationRu:x.explanation_ru,
+      exclusions:Object.freeze([...x.exclusions])});
+  });
+  const nat=object(source14.natTheory,"v0.14 Nat");
+  const degree=object(source14.connectivityDegreeTheory,"v0.14 Degree");
+  const sequence=object(source14.sequenceSemantics,"v0.14 sequence");
+  if(nat.zero!=="N0 = U"||degree.one!=="D1 = L"||sequence.rootOrigin!=="R")
+    fail("G15 inconsistent inherited U/L/R scopes");
+  return Object.freeze({schema:"mts-reader-bootstrap-symbols/v0.1" as const,
+    authorApproval:"not-recorded" as const,publication:"blocked" as const,
+    symbols:Object.freeze(symbols)});
+}
+export function loadReaderBootstrapNames(root:string):ReaderBootstrapNames{
+  const v13=object(JSON.parse(readFileSync(resolve(root,
+    "contracts/mts-contract-v0.13.json"),"utf8")),"v0.13 source");
+  const v14=object(JSON.parse(readFileSync(resolve(root,
+    "contracts/mts-contract-v0.14.json"),"utf8")),"v0.14 source");
+  return parseReaderBootstrapNames(
+    readFileSync(resolve(root,READER_BOOTSTRAP_G15_PATH),"utf8"),v13,v14);
+}
+export function loadReaderDraftWithBootstrapPrelude(root:string):string{
+  const preview=loadReaderDraftPreview(root),basis=loadReaderBootstrapNames(root);
+  if(preview.publication!=="blocked"||basis.publication!=="blocked")
+    fail("G15 draft may not be published");
+  const firstChapter=preview.markdown.indexOf("## ");
+  if(firstChapter<0)fail("G15 missing draft chapter");
+  const prelude=[
+    "### Исходные обозначения корневого базиса","",
+    "Имена базиса восходят к принятому контракту v0.13:",
+    ...basis.symbols.map(x=>"- **"+x.symbol+"** — "+x.exactEquation+". "+
+      x.explanationRu+" Ограничение: "+x.exclusions.join("; ")+"."),
+    "","В v0.14: N₀=U, D₁=L; локальное начало последовательности — R.","",
+  ].join("\n");
+  return preview.markdown.slice(0,firstChapter)+prelude+preview.markdown.slice(firstChapter);
+}
+
+
+/** G16 editorial candidate: replace orphan introductory narrative, preserve accepted history. */
+export const READER_FOUNDATION_G16_PATH =
+  "requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml";
+export interface ReaderFoundationOpening {
+  readonly schema: "mts-reader-foundation-opening/v0.1";
+  readonly acceptedId: "V14-L1";
+  readonly candidateRu: string;
+  readonly historicalOpening: string;
+  readonly historicalSha256: string;
+  readonly exclusions: readonly string[];
+  readonly publication: "blocked";
+  readonly authorApproval: "not-recorded";
+}
+export function parseReaderFoundationOpening(
+  text: string, g4: ReturnType<typeof loadMtsSourceRequirement>,
+  acceptedV13: Record<string, unknown>,
+): ReaderFoundationOpening {
+  const doc = parseDocument(text, {strict:true, uniqueKeys:true});
+  if (doc.errors.length || doc.warnings.length) fail("G16 invalid editorial YAML");
+  const raw = object(doc.toJS({maxAliasCount:0}), "G16 opening");
+  exactFields(raw, [
+    "schema","status","semantic_change","author_approval","publication",
+    "historical_source","historical_sha256","historical_opening","accepted_id",
+    "candidate_ru","exclusions"
+  ], "G16 opening");
+  const historicalOpening = "Первичен **" + "\u0060Link\u0060" + "**, а не четыре команды.";
+  const historicalSha256 =
+    "b4ed8bc68c3a45a7eb26526027d39ac2de2ed72085c34e6de33eb8e8019017f5";
+  if (raw.schema !== "mts-reader-foundation-opening/v0.1" ||
+      raw.status !== "proposed" || raw.semantic_change !== false ||
+      raw.author_approval !== "not-recorded" || raw.publication !== "blocked" ||
+      raw.historical_source !== "requirements/mts-source/MTS-FND-V14-L1.yaml" ||
+      raw.accepted_id !== "V14-L1" ||
+      raw.historical_opening !== historicalOpening ||
+      raw.historical_sha256 !== historicalSha256 ||
+      g4.statement.sha256 !== historicalSha256 ||
+      g4.statement.sourceRole !== "current-published-explanation" ||
+      !g4.statement.ru.startsWith(historicalOpening)) {
+    fail("G16 historical provenance or unapproved state drift");
+  }
+  if (acceptedV13.schema !== "mts-contract/v0.13" || acceptedV13.accepted !== true) {
+    fail("G16 witness provenance requires accepted v0.13");
+  }
+  const aspect = object(acceptedV13.aspectFoundationTheorem, "accepted v0.13 theorem scope");
+  const necessity = object(aspect.necessity, "accepted v0.13 witness necessity");
+  const witnesses = object(necessity.witnesses, "accepted v0.13 ROOT/START/END/PAIR witnesses");
+  const expected: Readonly<Record<string,string>> = {ROOT:"R",START:"O",END:"C",PAIR:"L"};
+  if (aspect.domain !== "admissible semantic Links with finite R-grounding" ||
+      Object.keys(witnesses).length !== 4 ||
+      Object.entries(expected).some(([role, value]) => witnesses[role] !== value)) {
+    fail("G16 accepted v0.13 structural witnesses drift");
+  }
+    if (typeof raw.candidate_ru !== "string" ||
+      raw.candidate_ru.trim().length < 1000 ||
+      !raw.candidate_ru.includes("Link") ||
+      !raw.candidate_ru.includes("11") ||
+      !raw.candidate_ru.includes("10") ||
+      !raw.candidate_ru.includes("01") ||
+      !raw.candidate_ru.includes("00") ||
+      !raw.candidate_ru.includes("R представляет случай 11") ||
+      !raw.candidate_ru.includes("L — случай 00") ||
+      !raw.candidate_ru.includes("START_K") ||
+      !raw.candidate_ru.includes("END_K") ||
+      raw.candidate_ru.includes(historicalOpening)) {
+    fail("G16 incomplete or orphaned replacement candidate");
+  }
+  if (!Array.isArray(raw.exclusions) || raw.exclusions.length !== 3 ||
+      raw.exclusions.some(x => typeof x !== "string" || x.length < 60)) {
+    fail("G16 needs three separate scientific noninference boundaries");
+  }
+  return Object.freeze({
+    schema: "mts-reader-foundation-opening/v0.1" as const,
+    acceptedId: "V14-L1" as const,
+    candidateRu: raw.candidate_ru,
+    historicalOpening, historicalSha256,
+    exclusions: Object.freeze([...raw.exclusions]) as readonly string[],
+    publication: "blocked" as const, authorApproval: "not-recorded" as const,
+  });
+}
+export function loadReaderFoundationOpening(root: string): ReaderFoundationOpening {
+  return parseReaderFoundationOpening(
+    readFileSync(resolve(root, READER_FOUNDATION_G16_PATH), "utf8"),
+    loadMtsSourceRequirement(root, "requirements/mts-source/MTS-FND-V14-L1.yaml"),
+    object(JSON.parse(readFileSync(resolve(root, "contracts/mts-contract-v0.13.json"), "utf8")),
+      "accepted v0.13 contract"),
+  );
+}
+export function loadReaderDraftWithFoundationOpening(root: string): string {
+  const manuscript = loadReaderDraftWithBootstrapPrelude(root);
+  const intro = loadReaderFoundationOpening(root);
+  if (intro.publication !== "blocked" || intro.authorApproval !== "not-recorded") {
+    fail("G16 may not promote editorial candidate to published content");
+  }
+  const beforeBasis = manuscript.indexOf("### Исходные обозначения корневого базиса");
+  if (beforeBasis < 0) fail("G16 reader prelude missing");
+  const inserted = [
+    "### Предмет МТС и четыре локальных случая самоинцидентности", "",
+    intro.candidateRu, "",
+    "Этот вводный текст предложен для авторского и научного рассмотрения; публикация заблокирована.", "",
+  ].join("\n");
+  return manuscript.slice(0, beforeBasis) + inserted + manuscript.slice(beforeBasis);
 }

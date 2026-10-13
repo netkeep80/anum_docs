@@ -12,71 +12,71 @@ atoms:
     accepted_id: V15-FRESH-03
     source_quote: "Two fresh Memories with unrelated allocation noise preserve canonical recursive representation and behavior."
     ru: "Две заново созданные Memory с различными сторонними аллокациями должны давать одинаковое каноническое рекурсивное представление и поведение артефакта. Адреса размещения или случайный порядок создания объектов не могут выступать скрытым источником семантики Связей."
-    domain: "Принятая нормативная область V15-FRESH-03"
+    domain: "Инвариантность рекурсивного представления и поведения к шуму аллокаций Memory"
     exclusions: ["Не опираться на совпадение внутренних адресов двух Memory"]
   - id: v15-name-01
     accepted_id: V15-NAME-01
     source_quote: "Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction."
     ru: "Имя FORMAL всегда определяется относительно контекста; запись :A означает сокращённый абсолютный путь R:A. Концы структурных выражений разрешаются общим контекстным резолвером до образования Link, а не посредством неявного host-глобального словаря атомов."
-    domain: "Принятая нормативная область V15-NAME-01"
+    domain: "Контекстные имена FORMAL и единый резолвер endpoint перед образованием Link"
     exclusions: ["Не допускать глобальный host namespace как источник Link"]
   - id: v15-json-01
     accepted_id: V15-JSON-01
     source_quote: "JSON losslessly projects the complete supported canonical source ANet/model, not only passive carriers."
     ru: "Канонический JSON должен сохранять всю поддерживаемую исходную модель ANet, включая исполняемые роли, а не только пассивные носители. Проверка без потерь касается структурного и семантического восстановления, поэтому текстовый round-trip является лишь частью необходимого свидетельства."
-    domain: "Принятая нормативная область V15-JSON-01"
+    domain: "Полная каноническая JSON-проекция поддерживаемой исходной модели ANet"
     exclusions: ["Не принимать неполный JSON лишь по равенству сериализованных строк"]
   - id: v15-json-02
     accepted_id: V15-JSON-02
     source_quote: "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics."
     ru: "Исходный текст FORMAL и непосредственно введённый JSON обязаны дать одну нативную исходную ANet, одинаковые разрешение ролей и DAS-денотацию до начала семантического исполнения. Наличие двух независимых путей задания смысла нарушает единый канонический маршрут."
-    domain: "Принятая нормативная область V15-JSON-02"
+    domain: "Схождение FORMAL и JSON в общий source ANet и DAS-денотацию"
     exclusions: ["Не вводить отдельную денотацию для JSON и FORMAL"]
   - id: v15-json-03
     accepted_id: V15-JSON-03
     source_quote: "Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority."
     ru: "Мутация JSON, затрагивающая модель, должна предсказуемо изменить или отклонить исходную структуру, денотацию либо исполнение. Изменение только транспортного оформления не может приобретать семантическую власть: оба случая проверяются отдельно."
-    domain: "Принятая нормативная область V15-JSON-03"
+    domain: "Семантические и транспортные мутации канонического JSON"
     exclusions: ["Не считать транспортную перестановку новым смысловым оператором"]
   - id: v15-vert-01
     accepted_id: V15-VERT-01
     source_quote: "VERTICAL_GREEN requires the complete mandatory evidence bundle and zero semantic injection."
     ru: "VERTICAL_GREEN требует полный комплект обязательных свидетельств и нулевое внедрение host-семантики. Частично прошедшие тесты и формально заполненные имена полей не образуют доказанной вертикали без проверенного происхождения всей цепочки."
-    domain: "Принятая нормативная область V15-VERT-01"
+    domain: "Полнота evidence bundle и нулевая host-инъекция для VERTICAL_GREEN"
     exclusions: ["Не повышать GREEN по частичному комплексу проверок"]
   - id: v15-vert-02
     accepted_id: V15-VERT-02
     source_quote: "Completion state may only come from registered evidence, never PR/issue/test naming or partial round-trip."
     ru: "Итоговый статус должен вычисляться только из зарегистрированных свидетельств. Заголовки PR, имена задач и обещания в комментариях не могут повышать состояние даже при удачной сериализации части артефакта, если необходимые элементы доказательного пакета отсутствуют."
-    domain: "Принятая нормативная область V15-VERT-02"
+    domain: "Машинная аттестация статуса завершения по зарегистрированным свидетельствам"
     exclusions: ["Не принимать статус по имени issue или одного теста"]
   - id: v15-and-01
     accepted_id: V15-AND-01
     source_quote: "A compact Author-gated Boolean AND source ANet contains only the exact local T/F truth-table semantics expressed as zero-role Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source."
     ru: "Канонический Boolean AND задаёт ровно локальную таблицу T/F как правила zero-role Rule в исходной ANet. Унаследованный RoleDictionary, индексная таблица, Scope и особый интерпретатор не входят в каноническую семантику оператора, а конкретная версия проходит авторское рассмотрение."
-    domain: "Принятая нормативная область V15-AND-01"
+    domain: "Строгая локальная таблица Boolean AND в zero-role Rule ANet"
     exclusions: ["Не распространять AND на значения вне строгого локального T/F"]
   - id: v15-and-02
     accepted_id: V15-AND-02
     source_quote: "Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through."
     ru: "Boolean AND исполняется общим matcher/Γ-совместимым маршрутом через замороженный адаптер совместимости, без выделенного host-dispatch AND. Вход за пределами T/F должен давать NO_MATCH, а не pass-through или скрытое приведение к булевым значениям."
-    domain: "Принятая нормативная область V15-AND-02"
+    domain: "Выполнение Boolean AND через общий matcher и Γ с границей NO_MATCH"
     exclusions: ["Не заменять NO_MATCH автоматической пересылкой непонятного входа"]
   - id: v15-and-03
     accepted_id: V15-AND-03
     source_quote: "MTS has one canonical semantic Boolean AND source/model. Frozen or future A-memory backends may use generated compatibility or optimized AND lowerings only when they are semantics-preserving with respect to the exact T/F-domain truth table and NO_MATCH boundary, remain generic/backend-owned, and stay outside canonical AND semantic authority."
     ru: "Для Boolean AND допускается одна каноническая исходная семантическая модель. Оптимизации backend имеют смысл лишь при сохранении таблицы T/F и границы NO_MATCH; поэтому они не могут становиться альтернативным источником операторной семантики."
-    domain: "Принятая нормативная область V15-AND-03"
+    domain: "Единая каноническая семантика AND и допустимые понижения backend"
     exclusions: ["Не допускать backend-specific значение логического AND"]
   - id: v15-and-04
     accepted_id: V15-AND-04
     source_quote: "Author-gated strict Boolean NOT/OR/XOR reuse the exact same FORMAL/JSON source model, semantic Theory->Rule discovery, zero-role Rule topology, generic Γ-compatible execution path and generic frozen-backend lowering as approved AND; no operator-specific semantic/runtime path is permitted."
     ru: "Строгие NOT, OR и XOR обязаны повторно использовать ту же FORMAL/JSON-модель, zero-role Rule, общую Γ-цепочку и универсальное совместимое понижение, что и AND. Специальный runtime или семантический host-opcode для каждой операции нарушал бы принцип единого источника."
-    domain: "Принятая нормативная область V15-AND-04"
+    domain: "Общий семантический путь строгих NOT, OR и XOR вместе с AND"
     exclusions: ["Не создавать отдельный исполняющий механизм для каждого Boolean"]
   - id: v15-ctx-01
     accepted_id: V15-CTX-01
     source_quote: "Theory, Context/currentness, interpreter/meta-program, entry and result execution roles are represented by Links and semantic ANet membership. Host package/launch code may perform only generic selection/orchestration allowed by the machine contract and cannot supply semantic role authority."
     ru: "Исполнительные роли Theory, выбранного Context, интерпретатора, точки входа и результата определяются Link и членством в семантической ANet. Код пакета или запуска может выполнять общий технический выбор, но не подменять структуру членства внешним именем роли."
-    domain: "Принятая нормативная область V15-CTX-01"
+    domain: "Исполнительные роли Theory и Context/currentness по членству в ANet"
     exclusions: ["Не приписывать manifest или host-переменным семантические роли"]
