@@ -30,6 +30,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      # Temporary #2282 diagnostics: remove after the exact failed rule is identified.
+      - name: Diagnose blocking RepoGuard refusal
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git clone --quiet --filter=blob:none https://github.com/netkeep80/repo-guard.git /tmp/rg-exact
+          git -C /tmp/rg-exact checkout --quiet --detach c19f29da366c985e2cf162ef7e75f5594f60c3a2
+          npm ci --prefix /tmp/rg-exact --omit=dev --ignore-scripts --no-audit --no-fund --silent
+          node /tmp/rg-exact/dist/repo-guard.mjs --repo-root "$GITHUB_WORKSPACE" --enforcement blocking check-pr --format json > /tmp/rg-exact-report.json || true
+          jq '{result,reasonCode,message,violations,checks:([.checks[]? | select(.ok == false or .check.ok == false)]),keys:(keys)}' /tmp/rg-exact-report.json
       - name: Publish repo-guard summary
         if: always()
         run: |
