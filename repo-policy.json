@@ -143,6 +143,16 @@
         "value": "read"
       },
       {
+        "id": "repo-guard-workflow-action-pin",
+        "kind": "scalar_equals_literal",
+        "source": {
+          "document": "repo-guard-workflow",
+          "pointer": "/jobs/policy-check/steps/1/uses",
+          "type": "string"
+        },
+        "value": "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2"
+      },
+      {
         "id": "branch-hygiene-permission-contents-write",
         "kind": "scalar_equals_literal",
         "source": {
