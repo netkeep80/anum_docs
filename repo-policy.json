@@ -150,7 +150,7 @@
           "pointer": "/jobs/policy-check/steps/1/uses",
           "type": "string"
         },
-        "value": "netkeep80/repo-guard@10f04af309fcb512dff3d690f595926472c52f40"
+        "value": "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2"
       },
       {
         "id": "branch-hygiene-permission-contents-write",
@@ -528,6 +528,24 @@
     }
   ],
   "surfaces": {
+    "science-corpus-pr2153-files": [
+      "requirements/mts-source/MTS-READER-INTRO-PROPOSAL.yaml",
+      "requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml",
+      "requirements/mts-source/MTS-READER-V14-G10.yaml",
+      "requirements/mts-source/MTS-READER-V14-G7.yaml",
+      "requirements/mts-source/MTS-READER-V14-G8.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W1.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W2.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W3.yaml",
+      "requirements/mts-source/MTS-READER-V15-G11-W4.yaml"
+    ],
+    "science-foundation-pr2138-files": [
+      "requirements/mts-source/MTS-FND-V14-L1.yaml",
+      "ts/package.json",
+      "ts/package-lock.json",
+      "ts/src/tooling/mts-source-requirement.ts",
+      "ts/test/mts-source-requirement.test.ts"
+    ],
     "theorem-catalog-generated-doc": [
       "docs/theory/Теоремы МТС.md"
     ],
@@ -546,6 +564,124 @@
     ],
     "historical-pics-test": [
       "ts/test/historical-images-protection.test.ts"
+    ],
+    "science-shared-research-classification-test": [
+      "ts/test/research-v013-semantic-dependency-projection-a9.test.ts"
+    ],
+    "science-shared-reader-coverage-files": [
+      "ts/src/tooling/mts-reader-coverage.ts",
+      "ts/test/mts-reader-coverage.test.ts"
+    ],
+    "science-corpus-pr2173-exact-files": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/reader-preview.yml",
+      "proofs/coq/MtsBasisFiveDistinct.v",
+      "proofs/coq/MtsM06W2External.v",
+      "proofs/lean4/MtsBasisFiveDistinct.lean",
+      "proofs/lean4/MtsM06W2External.lean",
+      "requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml",
+      "requirements/mts-source/MTS-READER-ANET-EXACTSEQUENCE-R01-R02.yaml",
+      "requirements/mts-source/MTS-READER-BASIS-GROUNDED-IDENTITY-F03-F04-F05.yaml",
+      "requirements/mts-source/MTS-READER-CHAPTER-CYCLES-G18.yaml",
+      "requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W1.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R35-W2.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W3.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W4.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R36-W5.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W1.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W2.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W3.yaml",
+      "requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W4.yaml",
+      "requirements/mts-source/MTS-READER-EPISTEMIC-CLAIMS-M04.yaml",
+      "requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml",
+      "requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml",
+      "requirements/mts-source/MTS-READER-FORMAL-DAS-GAMMA-L01-L02-L03.yaml",
+      "requirements/mts-source/MTS-READER-FOUNDATION-MODEL-PROOF-F01-F02-P01.yaml",
+      "requirements/mts-source/MTS-READER-GAMMA-AND-G01-G02-G03.yaml",
+      "requirements/mts-source/MTS-READER-HISTORICAL-IMAGES-M05.yaml",
+      "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml",
+      "requirements/mts-source/MTS-READER-INDEPENDENT-MATH-AUDIT-R44-W1.yaml",
+      "requirements/mts-source/MTS-READER-INDIVIDUAL-MATH-REVIEW-R44-W2.yaml",
+      "requirements/mts-source/MTS-READER-INVERSION-G17.yaml",
+      "requirements/mts-source/MTS-READER-INVERSION-ORIENTATION-F06-F07.yaml",
+      "requirements/mts-source/MTS-READER-MATHEMATICAL-POSITION-M01.yaml",
+      "requirements/mts-source/MTS-READER-NOTATION-SEMANTICS-M03.yaml",
+      "requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W1.yaml",
+      "requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W2.yaml",
+      "requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W3.yaml",
+      "requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W1.yaml",
+      "requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W2.yaml",
+      "requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W3.yaml",
+      "requirements/mts-source/MTS-READER-QUESTIONS-M06-INDEX.yaml",
+      "requirements/mts-source/MTS-READER-REFINEMENT-REPRODUCIBILITY-P02-P03.yaml",
+      "requirements/mts-source/MTS-READER-REPRESENTATION-ARITHMETIC-R03-R04.yaml",
+      "requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml",
+      "requirements/mts-source/MTS-READER-SCIENTIFIC-FINAL-REVIEW-R44-W5.yaml",
+      "requirements/mts-source/MTS-READER-SCIENTIFIC-SECOND-PASS-R42.yaml",
+      "requirements/mts-source/MTS-READER-SOURCE-ATTRIBUTION-R43.yaml",
+      "requirements/mts-source/MTS-READER-V015-INDIVIDUAL-AUDIT-R44-W3.yaml",
+      "requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml",
+      "reviews/m06/reviewer-b-97-indexed-extraction.txt",
+      "reviews/m06/reviewer-c-43-indexed-extraction.txt",
+      "tools/reader-preview/render.mjs",
+      "tools/reader-preview/style.css",
+      "ts/src/tooling/mts-reader-g20.ts",
+      "ts/src/tooling/mts-reader-g42.ts",
+      "ts/src/tooling/mts-reader-r42.ts",
+      "ts/src/tooling/mts-reader-r43.ts",
+      "ts/src/tooling/mts-reader-r44-w2.ts",
+      "ts/src/tooling/mts-reader-r44-w3.ts",
+      "ts/src/tooling/mts-reader-r44-w4.ts",
+      "ts/src/tooling/mts-reader-r44-w5.ts",
+      "ts/src/tooling/mts-reader-r44-w6-cli.ts",
+      "ts/src/tooling/mts-reader-r44-w6.ts",
+      "ts/src/tooling/mts-reader-r44.ts",
+      "ts/src/tooling/mts-reader-review-f01-f02-p01.ts",
+      "ts/src/tooling/mts-reader-review-f03-f04-f05.ts",
+      "ts/src/tooling/mts-reader-review-f06-f07.ts",
+      "ts/src/tooling/mts-reader-review-g01-g02-g03.ts",
+      "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
+      "ts/src/tooling/mts-reader-review-m01.ts",
+      "ts/src/tooling/mts-reader-review-m02.ts",
+      "ts/src/tooling/mts-reader-review-m03.ts",
+      "ts/src/tooling/mts-reader-review-m04.ts",
+      "ts/src/tooling/mts-reader-review-m05.ts",
+      "ts/src/tooling/mts-reader-review-m06-w1.ts",
+      "ts/src/tooling/mts-reader-review-m06-w2.ts",
+      "ts/src/tooling/mts-reader-review-m06-w3.ts",
+      "ts/src/tooling/mts-reader-review-m06.ts",
+      "ts/src/tooling/mts-reader-review-p02-p03.ts",
+      "ts/src/tooling/mts-reader-review-r01-r02.ts",
+      "ts/src/tooling/mts-reader-review-r03-r04.ts",
+      "ts/test/mts-reader-f03-kernel-candidate.test.ts",
+      "ts/test/mts-reader-g20.test.ts",
+      "ts/test/mts-reader-g42.test.ts",
+      "ts/test/mts-reader-r42.test.ts",
+      "ts/test/mts-reader-r43.test.ts",
+      "ts/test/mts-reader-r44-w2.test.ts",
+      "ts/test/mts-reader-r44-w3.test.ts",
+      "ts/test/mts-reader-r44-w4.test.ts",
+      "ts/test/mts-reader-r44-w5.test.ts",
+      "ts/test/mts-reader-r44-w6.test.ts",
+      "ts/test/mts-reader-r44.test.ts",
+      "ts/test/mts-reader-review-f01-f02-p01.test.ts",
+      "ts/test/mts-reader-review-f03-f04-f05.test.ts",
+      "ts/test/mts-reader-review-f06-f07.test.ts",
+      "ts/test/mts-reader-review-g01-g02-g03.test.ts",
+      "ts/test/mts-reader-review-l01-l02-l03.test.ts",
+      "ts/test/mts-reader-review-m01.test.ts",
+      "ts/test/mts-reader-review-m02.test.ts",
+      "ts/test/mts-reader-review-m03.test.ts",
+      "ts/test/mts-reader-review-m04.test.ts",
+      "ts/test/mts-reader-review-m05.test.ts",
+      "ts/test/mts-reader-review-m06-w1.test.ts",
+      "ts/test/mts-reader-review-m06-w2.test.ts",
+      "ts/test/mts-reader-review-m06-w3.test.ts",
+      "ts/test/mts-reader-review-m06.test.ts",
+      "ts/test/mts-reader-review-p02-p03.test.ts",
+      "ts/test/mts-reader-review-r01-r02.test.ts",
+      "ts/test/mts-reader-review-r03-r04.test.ts"
     ]
   },
   "new_file_classes": {
@@ -569,6 +705,40 @@
     ]
   },
   "change_profiles": {
+    "post-v015-science-source-corpus-technical-merge": {
+      "allow_surfaces": [
+        "science-corpus-pr2153-files",
+        "science-shared-research-classification-test",
+        "science-shared-reader-coverage-files"
+      ],
+      "require_surfaces": [
+        "science-corpus-pr2153-files",
+        "science-shared-research-classification-test",
+        "science-shared-reader-coverage-files"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 11,
+        "max_net_added_lines": 2050
+      }
+    },
+    "post-v015-science-source-foundation-technical-merge": {
+      "allow_surfaces": [
+        "science-foundation-pr2138-files",
+        "science-shared-research-classification-test"
+      ],
+      "require_surfaces": [
+        "science-foundation-pr2138-files",
+        "science-shared-research-classification-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 3,
+        "max_net_added_lines": 1800
+      }
+    },
     "generated-theorem-catalog": {
       "allow_surfaces": [
         "theorem-catalog-generated-doc",
@@ -627,6 +797,24 @@
         "max_new_docs": 1,
         "max_new_files": 3,
         "max_net_added_lines": 300
+      }
+    },
+    "post-v015-science-source-reader-evidence-technical-merge": {
+      "allow_surfaces": [
+        "science-corpus-pr2173-exact-files",
+        "science-shared-reader-coverage-files",
+        "science-shared-research-classification-test"
+      ],
+      "require_surfaces": [
+        "science-corpus-pr2173-exact-files",
+        "science-shared-reader-coverage-files",
+        "science-shared-research-classification-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 108,
+        "max_net_added_lines": 17118
       }
     }
   }
