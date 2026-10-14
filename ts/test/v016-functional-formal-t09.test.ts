@@ -13,6 +13,10 @@ import {
   type NativeSyntaxGrammarRuleSpec,
 } from "../src/native-syntax-grammar.js";
 import {
+  materializeV013HierarchicalCarrierFromSemanticLink,
+  serializeV013HierarchicalCarrier,
+} from "../src/v013-hierarchical-carrier.js";
+import {
   V016FunctionalError,
   applyV016FunctionalPlan,
   classifyV016Observation,
@@ -180,6 +184,20 @@ const encode = (source: string): Uint8Array => new TextEncoder().encode(source);
     encode("h(a):a{}\nh(a)(b):a->c"));
   reject("unbound-name", () => denoteV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot,
     bad.sourceAset, theory, context), "undefined body reference");
+}
+
+{
+  const run = (noise: number): string => {
+    const f = fixture(noise), theory = f.fresh(), context = f.fresh();
+    const source = compileV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot, encode("form(a):a{}\nform(a)(b):a->b"));
+    const defs = denoteV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot, source.sourceAset, theory, context);
+    const callSource = compileV016FunctionalCall(f.memory, f.basis, f.grammarRoot, f.profileRoot, encode("form(L)(U)"));
+    const call = denoteV016FunctionalCall(f.memory, f.basis, f.grammarRoot, f.profileRoot, callSource.sourceAset, defs.definitions);
+    const output = applyV016FunctionalPlan(f.memory, planV016FunctionalCall(f.memory, call, defs.members, theory, context))[0];
+    assert(output !== undefined, "allocation-noise run produces one result");
+    return new TextDecoder().decode(serializeV013HierarchicalCarrier(f.memory, f.basis, materializeV013HierarchicalCarrierFromSemanticLink(f.memory, f.basis, output)));
+  };
+  same(run(0), run(31), "allocation noise preserves structural result wire");
 }
 
 console.log([
