@@ -212,8 +212,39 @@ function parse(input: unknown): V015SemanticSnapshot {
 
 export interface V015StructureVerified {
   readonly status: "STRUCTURE_VERIFIED";
+  /** Mutable working data, never proof of semantic authority. */
   readonly memory: Memory;
   readonly members: ReadonlySet<LinkHandle>;
+}
+
+/** Portable, deeply frozen source-backed evidence; no mutable Memory or Set. */
+export interface V015SourceReplayVerified {
+  readonly status: "SOURCE_REPLAY_VERIFIED";
+  /** Positive semantic membership in canonical structural coordinates. */
+  readonly members: readonly number[];
+  /** Dependency-closed physical topology; its Links are not all semantic members. */
+  readonly topology: StorageTopologyImage;
+  readonly source: V015SourceReceipt;
+  readonly contentSha256: string;
+}
+
+/** Detach every nested array/object from caller-owned transport data. */
+function freezeSourceReplayEvidence(snapshot: V015SemanticSnapshot): V015SourceReplayVerified {
+  const links = Object.freeze(snapshot.topology.links.map(
+    (pair) => Object.freeze([pair[0], pair[1]] as const),
+  ));
+  const topology: StorageTopologyImage = Object.freeze({
+    schema: snapshot.topology.schema,
+    root: snapshot.topology.root,
+    links,
+  });
+  return Object.freeze({
+    status: "SOURCE_REPLAY_VERIFIED" as const,
+    members: Object.freeze([...snapshot.members]),
+    topology,
+    source: Object.freeze({ ...snapshot.source }),
+    contentSha256: snapshot.contentSha256,
+  });
 }
 
 /** Structural validation does NOT validate provenance or semantic authority. */
@@ -259,7 +290,7 @@ export interface V015TrustedReplay {
 export function verifyV015SemanticSnapshot(
   input: unknown,
   trusted: V015TrustedReplay,
-): Omit<V015StructureVerified, "status"> & { readonly status: "SOURCE_REPLAY_VERIFIED" } {
+): V015SourceReplayVerified {
   const snapshot = parse(input);
   restoreV015SemanticSnapshot(snapshot);
   if (hash(trusted.source.bytes) !== trusted.expectedSourceSha256 ||
@@ -282,6 +313,6 @@ export function verifyV015SemanticSnapshot(
   if (JSON.stringify(replayed) !== JSON.stringify(snapshot)) {
     fail("source replay topology, source identity or positive membership mismatch");
   }
-  const restored = restoreV015SemanticSnapshot(snapshot);
-  return Object.freeze({ ...restored, status: "SOURCE_REPLAY_VERIFIED" as const });
+  // The restored Memory/Set is deliberately not returned as trusted evidence.
+  return freezeSourceReplayEvidence(snapshot);
 }
