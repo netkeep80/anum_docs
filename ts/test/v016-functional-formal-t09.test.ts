@@ -184,6 +184,8 @@ const encode = (source: string): Uint8Array => new TextEncoder().encode(source);
     "same parameter spelling in different scopes does not capture");
   reject("duplicate-parameter", () => compileV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot,
     encode("f(a):a{}\nf(a)(a):a->a")), "duplicate parameter");
+  const duplicate = compileV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot, encode("f(a):a{}\nf(a)(b):a->b\nf(x)(y):x->y"));
+  reject("duplicate-definition", () => denoteV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot, duplicate.sourceAset, theory, context), "duplicate definition");
   const bad = compileV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot,
     encode("h(a):a{}\nh(a)(b):a->c"));
   reject("unbound-name", () => denoteV016FunctionalDefinitions(f.memory, f.basis, f.grammarRoot, f.profileRoot,
