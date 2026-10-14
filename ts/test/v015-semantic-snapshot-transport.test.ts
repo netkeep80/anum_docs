@@ -1,7 +1,7 @@
 // mts-version-evidence: A1-1a-U, transport-only (no accepted MTS change)
 // Uses existing Author-approved compact AND FORMAL/JSON; never changes corpus.
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import {
@@ -225,4 +225,17 @@ assert(e1.snapshot.source.nativeSourceSha256 !== e2.snapshot.source.nativeSource
 assert(e1.snapshot.source.bytesSha256 !== e2.snapshot.source.bytesSha256,
   "distinct source bytes when denotation equal");
 console.log("N9 MISSING_MEMBERSHIP=REJECT N10 DISTINCT_SOURCE_IDENTITY=PASS");
+// Optional generated transport evidence (not a maintained canonical source).
+// The input check recompiles independent accepted source bytes, not the fixture.
+if (process.env.MTS_V015_SNAPSHOT_OUTPUT) {
+  writeFileSync(process.env.MTS_V015_SNAPSHOT_OUTPUT,
+    JSON.stringify(formal.snapshot) + "\n", "utf8");
+}
+if (process.env.MTS_V015_SNAPSHOT_INPUT) {
+  const received = JSON.parse(readFileSync(process.env.MTS_V015_SNAPSHOT_INPUT, "utf8")) as unknown;
+  const verification = verifyV015SemanticSnapshot(
+    received, trusted(fixture(), source("formal"), FORMAL_SHA));
+  assert(verification.status === "SOURCE_REPLAY_VERIFIED", "independent file replay");
+  console.log("EXTERNAL_TRANSPORT_FILE_SOURCE_REPLAY=PASS");
+}
 console.log("A1_UPSTREAM_SNAPSHOT_EXPORT_VERIFIED=PASS SOURCE_REPLAY_VERIFIED=PASS");
