@@ -62,10 +62,10 @@ assert.ok(basisPrelude>document.mainText.indexOf("**1.4.")&&
 assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("F2F3OneSidedExistence(F)")&&
  document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("O≠R")&&
  document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("C≠R"),
- assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("не оператором = исполняемой МТС, возвращающим L/U.")&&
+ "reader must explicitly disclose conditional nontrivial basis witnesses before use");
+assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("не оператором = исполняемой МТС, возвращающим L/U.")&&
  document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("одноэлементная внешняя модель"),
  "external equality and singleton Foundation countermodel must be explicit before O/C");
- "reader must explicitly disclose conditional nontrivial basis witnesses before use");
 const foundationStart=document.mainText.indexOf("**1.1. ");
 const foundationLast=document.mainText.indexOf("**1.9. ");
 const foundationReview=document.mainText.indexOf("### F01. ");
