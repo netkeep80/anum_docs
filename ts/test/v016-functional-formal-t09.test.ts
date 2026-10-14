@@ -108,6 +108,10 @@ const encode = (source: string): Uint8Array => new TextEncoder().encode(source);
     "alpha-renaming and presentation bytes preserve semantic Definition");
   assert(alpha.sourceAset !== literal.sourceAset, "source occurrence/provenance remains distinct from denotation");
 
+  const ambientRoleBundle = f.memory.poles(denotation.definitions[0]!.branchRules[8]!).start;
+  const ambientPhysicalRole = f.memory.ensure(ambientRoleBundle, f.fresh());
+  assert(!denotation.members.has(ambientPhysicalRole), "physical outgoing role without membership is not a semantic role");
+
   const x = f.fresh(), pair = f.memory.ensure(f.basis.R, x), start = f.memory.ensureStartSelfClosed(pair);
   const values = [f.basis.R, f.basis.O, f.basis.C, f.basis.L, f.basis.U, x, f.fresh(), pair, start,
     f.memory.ensureEndSelfClosed(f.basis.O), f.memory.ensureEndSelfClosed(f.memory.ensureStartSelfClosed(f.basis.C)),
