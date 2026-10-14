@@ -1,8 +1,10 @@
 // mts-version-evidence: A1-1a-U, transport-only (no accepted MTS change)
 // Uses existing Author-approved compact AND FORMAL/JSON; never changes corpus.
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { Memory, ensureRootBasis, type LinkHandle } from "../src/memory.js";
 import {
   materializeNativeSyntaxGrammar,
@@ -148,6 +150,57 @@ const independentlyCompiled = fixture();
 const verified = verifyV015SemanticSnapshot(
   formal.snapshot, trusted(independentlyCompiled, source("formal"), FORMAL_SHA));
 assert(verified.status === "SOURCE_REPLAY_VERIFIED", "independent source-backed replay");
+
+assert(!("memory" in verified), "mutable Memory is absent from trusted replay result");
+assert(!("add" in verified.members) && !("delete" in verified.members),
+  "trusted coordinates are not a mutable Set");
+same(verified.members, formal.snapshot.members, "confirmed membership coordinates");
+same(verified.topology, formal.snapshot.topology, "confirmed structural topology");
+same(verified.source, formal.snapshot.source, "confirmed pinned source provenance");
+same(verified.contentSha256, formal.snapshot.contentSha256, "confirmed structural digest");
+assert(Object.isFrozen(verified) && Object.isFrozen(verified.members) &&
+  Object.isFrozen(verified.topology) && Object.isFrozen(verified.topology.links) &&
+  verified.topology.links.every((pair) => Object.isFrozen(pair)) &&
+  Object.isFrozen(verified.source), "trusted evidence is deeply frozen");
+function mutationRejected(operation: () => unknown, label: string): void {
+  let error: unknown;
+  try { operation(); } catch (caught) { error = caught; }
+  assert(error instanceof TypeError, label + ": mutation must throw TypeError");
+}
+const evidenceBefore = JSON.stringify(verified);
+mutationRejected(() => (verified.members as number[]).push(123456),
+  "N11 post-replay membership insertion");
+mutationRejected(() => { (verified.members as number[])[0] = 9999; },
+  "N12 post-replay membership replacement");
+mutationRejected(() => {
+  (verified.topology.links[1] as [number, number])[0] = 9999;
+}, "N13 post-replay physical pole mutation");
+mutationRejected(() => {
+  (verified.topology.links as Array<[number, number]>).push([2, 2]);
+}, "N14 post-replay physical link insertion");
+mutationRejected(() => {
+  (verified.source as { path: string }).path = "forged-after-replay.formal";
+}, "N15 post-replay provenance mutation");
+same(JSON.stringify(verified), evidenceBefore, "trusted evidence unchanged after mutation attempts");
+
+// The untrusted input and structurally restored working Memory remain mutable,
+// but cannot alter a previously verified immutable membership/topology receipt.
+const callerOwned = JSON.parse(JSON.stringify(formal.snapshot)) as Record<string, any>;
+const detached = verifyV015SemanticSnapshot(
+  callerOwned, trusted(fixture(), source("formal"), FORMAL_SHA));
+const detachedBefore = JSON.stringify(detached);
+callerOwned.members.splice(0, 1);
+callerOwned.topology.links[1][0] = 999999;
+callerOwned.source.path = "attacker-after-replay";
+same(JSON.stringify(detached), detachedBefore, "N16 input alias mutation cannot poison receipt");
+const working = restoreV015SemanticSnapshot(formal.snapshot);
+(working.members as Set<LinkHandle>).clear();
+working.memory.ensureStartSelfClosed(working.memory.root);
+assert(working.memory.linkCount > verified.topology.links.length ||
+  working.members.size === 0, "mutable structural restore really changed");
+same(JSON.stringify(verified), evidenceBefore, "N17 working Memory/Set cannot poison receipt");
+console.log("N11-N17 POST_REPLAY_MUTATION=REJECT_OR_ISOLATED");
+
 const independentJson = fixture();
 verifyV015SemanticSnapshot(json.snapshot, trusted(independentJson, source("json"), JSON_SHA));
 console.log("P3 RESTORE_AND_SOURCE_REPLAY=PASS");
@@ -238,4 +291,51 @@ if (process.env.MTS_V015_SNAPSHOT_INPUT) {
   assert(verification.status === "SOURCE_REPLAY_VERIFIED", "independent file replay");
   console.log("EXTERNAL_TRANSPORT_FILE_SOURCE_REPLAY=PASS");
 }
-console.log("A1_UPSTREAM_SNAPSHOT_EXPORT_VERIFIED=PASS SOURCE_REPLAY_VERIFIED=PASS");
+// This marker belongs to the component test only; the planner owns global approval.
+if (!process.env.MTS_V015_SNAPSHOT_CHILD &&
+    !process.env.MTS_V015_SNAPSHOT_OUTPUT && !process.env.MTS_V015_SNAPSHOT_INPUT) {
+  // Truly different Node processes exchange only an on-disk transport image.
+  const directory = mkdtempSync(join(tmpdir(), "mts-a1-semantic-"));
+  const artifact = join(directory, "compact-and.semantic-snapshot.json");
+  const child = (environment: Record<string, string>) =>
+    spawnSync(process.execPath, [resolve(process.argv[1]!)], {
+      cwd: process.cwd(),
+      env: { ...process.env, ...environment, MTS_V015_SNAPSHOT_CHILD: "1" },
+      encoding: "utf8",
+      timeout: 120000,
+      maxBuffer: 8 * 1024 * 1024,
+    });
+  try {
+    const producer = child({ MTS_V015_SNAPSHOT_OUTPUT: artifact });
+    assert(producer.status === 0 && existsSync(artifact),
+      "separate-process snapshot export failed: " + producer.stderr + producer.stdout);
+    const saved = JSON.parse(readFileSync(artifact, "utf8")) as V015SemanticSnapshot;
+    same(saved, formal.snapshot, "persisted exact export");
+    const consumer = child({ MTS_V015_SNAPSHOT_INPUT: artifact });
+    assert(consumer.status === 0 &&
+      consumer.stdout.includes("EXTERNAL_TRANSPORT_FILE_SOURCE_REPLAY=PASS"),
+      "independent process snapshot verify failed: " + consumer.stderr + consumer.stdout);
+    console.log("A1_COMPONENT_FILE_EXPORT_REPLAY_TWO_PROCESSES=PASS");
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+}
+// The exact PR diff command is run in the GitHub checkout (full fetch) on this
+// branch, never on immutable accepted main or inside spawned replay processes.
+if (process.env.GITHUB_HEAD_REF === "issue-2006-a1-semantic-snapshot-transport" &&
+    !process.env.MTS_V015_SNAPSHOT_CHILD) {
+  const refs = spawnSync("git", ["show-ref", "--verify", "--quiet", "refs/heads/main"],
+    { cwd: repository });
+  if (refs.status !== 0) {
+    const create = spawnSync("git", ["branch", "main", "origin/main"], {
+      cwd: repository, encoding: "utf8",
+    });
+    assert(create.status === 0, "prepare CI-local main for exact git diff: " + create.stderr);
+  }
+  const diff = spawnSync("git", ["diff", "--check", "main...HEAD"], {
+    cwd: repository, encoding: "utf8",
+  });
+  assert(diff.status === 0, "git diff --check main...HEAD: " + diff.stderr + diff.stdout);
+  console.log("A1_COMPONENT_GIT_DIFF_CHECK_MAIN_HEAD=PASS command=git diff --check main...HEAD");
+}
+console.log("A1_COMPONENT_SNAPSHOT_EXPORT_REPLAY=PASS");
