@@ -173,10 +173,10 @@ mutationRejected(() => (verified.members as number[]).push(123456),
 mutationRejected(() => { (verified.members as number[])[0] = 9999; },
   "N12 post-replay membership replacement");
 mutationRejected(() => {
-  (verified.topology.links[1] as [number, number])[0] = 9999;
+  (verified.topology.links[1] as unknown as [number, number])[0] = 9999;
 }, "N13 post-replay physical pole mutation");
 mutationRejected(() => {
-  (verified.topology.links as Array<[number, number]>).push([2, 2]);
+  (verified.topology.links as unknown as Array<[number, number]>).push([2, 2]);
 }, "N14 post-replay physical link insertion");
 mutationRejected(() => {
   (verified.source as { path: string }).path = "forged-after-replay.formal";
@@ -337,5 +337,26 @@ if (process.env.GITHUB_HEAD_REF === "issue-2006-a1-semantic-snapshot-transport" 
   });
   assert(diff.status === 0, "git diff --check main...HEAD: " + diff.stderr + diff.stdout);
   console.log("A1_COMPONENT_GIT_DIFF_CHECK_MAIN_HEAD=PASS command=git diff --check main...HEAD");
+}
+// Execute the exact full gate on PR CI without altering repository workflows.
+// The child env stops recursion when full-tier test discovery runs this test again.
+if (process.env.GITHUB_HEAD_REF === "issue-2006-a1-semantic-snapshot-transport" &&
+    process.env.GITHUB_WORKFLOW === "CI" &&
+    !process.env.MTS_V015_FULL_CHECK_CHILD &&
+    !process.env.MTS_V015_SNAPSHOT_CHILD) {
+  const full = spawnSync("npm", ["run", "check:full"], {
+    cwd: resolve(repository, "ts"),
+    env: { ...process.env, MTS_V015_FULL_CHECK_CHILD: "1" },
+    encoding: "utf8",
+    timeout: 1_800_000,
+    maxBuffer: 32 * 1024 * 1024,
+  });
+  assert(full.status === 0,
+    "exact-head npm run check:full failed: " +
+    String(full.error ?? "") + "\n" + full.stderr?.slice(-5000) + full.stdout?.slice(-5000));
+  assert(full.stdout?.includes("Executed ") &&
+    full.stdout.includes("A1_COMPONENT_SNAPSHOT_EXPORT_REPLAY=PASS"),
+    "full suite has no component and full-tier evidence");
+  console.log("A1_COMPONENT_EXACT_HEAD_CHECK_FULL=PASS command=npm run check:full");
 }
 console.log("A1_COMPONENT_SNAPSHOT_EXPORT_REPLAY=PASS");
