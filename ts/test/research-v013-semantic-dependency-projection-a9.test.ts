@@ -209,6 +209,8 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-direct-json-source.ts",
   "ts/src/v015-direct-formal-source.ts",
   "ts/src/v015-direct-source.ts",
+  // A1-1a-U: transport-only v0.15 snapshot, independently audited by its own tests.
+  "ts/src/v015-semantic-snapshot.ts",
   // Post-v0.13 documentation verifier builds an isolated, temporary B20 Memory.
   // Its writes are not part of immutable historical v0.13 package evidence.
   "ts/src/tooling/v015-native-evidence-verifier.ts",
