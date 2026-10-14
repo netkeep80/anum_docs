@@ -54,6 +54,49 @@ assert.equal(actualModel.headings.flat().length,102);
 assert.equal(new Set(actualModel.headings.flat()).size,102);
 assert.equal((document.mainText.match(/^\*\*\d+\.\d+\. /gm)??[]).length,102);
 assert.ok(document.mainText.includes("**1.1. Внешний математический интерфейс Foundation.**"));
+const basisPrelude=document.mainText.indexOf("**Предпосылка корневого базиса.**");
+assert.ok(basisPrelude>document.mainText.indexOf("**1.4.")&&
+ basisPrelude<document.mainText.indexOf("**1.5.")&&
+ document.mainText.indexOf("**1.5.")<document.mainText.indexOf("**1.6."),
+ "the conditional basis premise must precede the first named root/basis equations");
+assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("F2F3OneSidedExistence(F)")&&
+ document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("O≠R")&&
+ document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("C≠R"),
+ "reader must explicitly disclose conditional nontrivial basis witnesses before use");
+assert.ok(document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("не оператором = исполняемой МТС, возвращающим L/U.")&&
+ document.mainText.slice(basisPrelude,document.mainText.indexOf("**1.5.")).includes("одноэлементная внешняя модель"),
+ "external equality and singleton Foundation countermodel must be explicit before O/C");
+const foundationStart=document.mainText.indexOf("**1.1. ");
+const foundationLast=document.mainText.indexOf("**1.9. ");
+const foundationReview=document.mainText.indexOf("### F01. ");
+const modelReview=document.mainText.indexOf("### F02. ");
+const nextChapter=document.mainText.indexOf("## 2. ");
+assert.ok(foundationStart>=0&&foundationStart<foundationLast&&
+ foundationLast<foundationReview&&foundationReview<modelReview&&modelReview<nextChapter,
+ "the nine source-owned Foundation definitions must precede F01/F02 reviews in the rendered manuscript");
+assert.ok(document.mainText.indexOf("LocalSelfDecision")>=foundationStart&&
+ document.mainText.indexOf("LocalSelfDecision")<foundationReview,
+ "LocalSelfDecision must be introduced before its extended F01 analysis");
+const representation=document.mainText.indexOf("## 3. ");
+const representationSourceStart=document.mainText.indexOf("**3.1. ");
+const representationSourceLast=document.mainText.indexOf("**3.12. ");
+const anetIntro=document.mainText.indexOf("**3.4. ");
+const exactSequenceIntro=document.mainText.indexOf("**3.5. ");
+const anetReview=document.mainText.indexOf("### R01. ");
+const sequenceReview=document.mainText.indexOf("### R02. ");
+const codeReview=document.mainText.indexOf("### R03. ");
+const formalReview=document.mainText.indexOf("### L01. ");
+const dasReview=document.mainText.indexOf("### L02. ");
+const nextRepresentation=document.mainText.indexOf("## 4. ");
+assert.ok(nextChapter<representation&&representation<representationSourceStart&&
+ representationSourceStart<anetIntro&&anetIntro<exactSequenceIntro&&
+ exactSequenceIntro<representationSourceLast&&representationSourceLast<anetReview&&
+ anetReview<sequenceReview&&sequenceReview<codeReview&&
+ codeReview<formalReview&&formalReview<dasReview&&
+ dasReview<nextRepresentation,
+ "chapter-3 scientific reviews must follow their source-owned definitions in R01/R02/R03/L01/L02 order");
+assert.ok(document.mainText.slice(0,representation).indexOf("### R01. ")===-1,
+ "ANet scientific review must not be emitted in Foundation");
 assert.ok(document.mainText.includes("**2.14. Объективная хиральная пара без выбора контекста.**"));
 assert.ok(!document.mainText.includes("**1.1. Определение и математическое положение.**"));
 assert.ok(!document.mainText.includes("**7.1. Нормативное положение.**"));

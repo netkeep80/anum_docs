@@ -78,7 +78,7 @@ export function parseReaderW6Model(source:string){
  caveat.includes("девять")&&assurance.includes("48"),"scientific source count or status drift");
  const repair=map(doc.scholarly_repairs,"direct-render scientific repair");
  shape(repair,["status","author_approval","publication","observation","reason_ru",
-  "chapter_labels","chapter_title_overrides","historic_acceptance",
+  "basis_boundary_ru","chapter_labels","chapter_title_overrides","historic_acceptance",
   "no_match_duplicate_policy","q_display_normalization"],"scholarly repair");
  check(repair.status==="proposed"&&repair.author_approval==="not-recorded"&&
   repair.publication==="blocked"&&
@@ -87,6 +87,8 @@ export function parseReaderW6Model(source:string){
   repair.q_display_normalization==="display-trim-leading-space-while-source-fragments-remain-identical",
   "direct scholarly repair cannot change accepted text");
  str(repair.reason_ru,"actual rendered-text critique",180);
+ const basisBoundary=str(repair.basis_boundary_ru,"conditional Foundation basis",240);
+ check(basisBoundary.includes("F2F3OneSidedExistence(F)")&&basisBoundary.includes("O≠R")&&basisBoundary.includes("C≠R")&&basisBoundary.includes("form(R,R)=R"),"basis premise not explicitly bounded");
  check(Array.isArray(repair.chapter_labels),"nine chapter-specific heading lists missing");
  const chapterIds=["foundational-forms","grounded-inverse-context","representation-first-use",
   "derived-and-context","grammar-and-historical-mp","v015-ontology",
@@ -122,7 +124,7 @@ export function parseReaderW6Model(source:string){
   meaningRu:str(h.meaning_ru,"scope of ACCEPT",220),
   sourceRu:str(h.source_ru,"V15-READY-03 historical contrast",210),
   provenanceRu:str(h.provenance_ru,"merge SHA distinction",170)};
- return {introduction,caveat,archive,assurance,headings,renamed,history,publication:"blocked" as const};
+ return {introduction,caveat,archive,assurance,basisBoundary,headings,renamed,history,publication:"blocked" as const};
 }
 export function renderReaderW6(root:string):ReaderW6Document{
  const model=parseReaderW6Model(read(root,READER_W6_PATH));
@@ -178,14 +180,6 @@ export function renderReaderW6(root:string):ReaderW6Document{
   const titleOverride=model.renamed.find(x=>x.id===chapter.id)?.title;
   main.push("## "+(ci+1)+". "+(titleOverride??chapter.titleRu),"",transition.reading,"",
     "**Граница применимости.** "+transition.limit,"");
-  if(chapter.id==="foundational-forms"){
-   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"",
-    relationalReview.anetMd,"");
-  }
-  if(chapter.id==="representation-first-use"){
-   main.push(relationalReview.sequenceMd,"",representationReview.representationMd,"",
-    languageReview.formalMd,"",languageReview.dasMd,"");
-  }
   if(chapter.id==="derived-and-context"){
    main.push(representationReview.arithmeticMd,"");
   }
@@ -210,6 +204,7 @@ export function renderReaderW6(root:string):ReaderW6Document{
     main.push("**Предварительное определение Q.** "+g41.earlyQ.exactSourceOpeningRu,"");
     emit("g7:q-codec",g41.earlyQ.exactSourceOpeningRu);
    }
+   if(id==="basis:R")main.push("**Предпосылка корневого базиса.** "+model.basisBoundary,"");
    const humanHeading=model.headings[ci]?.[paragraph-1];
    check(humanHeading!==undefined,"unreviewed or reordered paragraph "+chapter.id+"/"+paragraph);
    main.push("**"+(ci+1)+"."+(paragraph)+". "+humanHeading+".**","");
@@ -227,6 +222,17 @@ export function renderReaderW6(root:string):ReaderW6Document{
   }
   check(ci===9||paragraph===model.headings[ci]?.length,
    "chapter paragraph count invalid after editorial repair");
+  // Reader-owned definitions precede their extended mathematical analysis.
+  // Do not edit or duplicate source atoms: only move the existing supplement.
+  if(chapter.id==="foundational-forms"){
+   main.push(scientificReview.foundationMd,"",scientificReview.modelMd,"",structuralReview.basisMd,"");
+  }
+  // Explain ANet and ExactSequence only after their chapter-3 source definitions.
+  // Do not duplicate R01 in Foundation or move source-owned text itself.
+  if(chapter.id==="representation-first-use"){
+   main.push(relationalReview.anetMd,"",relationalReview.sequenceMd,"",
+    representationReview.representationMd,"",languageReview.formalMd,"",languageReview.dasMd,"");
+  }
   if(chapter.id==="governance-and-history"){
    check(paragraph===0&&chapter.atomIds.every(id=>toAnnex.has(id)),
     "historical chapter must be filled with attributed narrative, not duplicated governance axioms");

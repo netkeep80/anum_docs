@@ -28,7 +28,8 @@ assert.equal(book.publication,"blocked");
 assert.ok(book.mainText.includes("### F01. Математический паспорт Foundation"));
 assert.ok(book.mainText.includes("### F02. Совместная нетривиальная модель"));
 assert.ok(book.mainText.includes("### P01. Какую именно математическую силу"));
-assert.ok(book.mainText.indexOf("### F01.")<book.mainText.indexOf("**1.1."));
+assert.ok(book.mainText.indexOf("**1.9.")<book.mainText.indexOf("### F01.")&&
+ book.mainText.indexOf("### F01.")<book.mainText.indexOf("## 2. "));
 assert.ok(book.mainText.indexOf("### P01.")>book.mainText.indexOf("## 8. "));
 assert.ok(book.mainText.indexOf("### P01.")<book.mainText.indexOf("**8.1."));
 assert.equal((book.mainText.match(/^## \d+\. /gm)??[]).length,10);

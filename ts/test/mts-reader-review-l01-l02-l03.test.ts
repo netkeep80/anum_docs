@@ -28,9 +28,9 @@ assert.equal(doc.publication,"blocked");
 for(const id of ["L01","L02","L03"])
  assert.equal(doc.mainText.split("### "+id+".").length-1,1,"one first-use scientific section "+id);
 assert.ok(doc.mainText.indexOf("### L01.")>doc.mainText.indexOf("### R03."));
-assert.ok(doc.mainText.indexOf("### L01.")<doc.mainText.indexOf("**3.1."));
+assert.ok(doc.mainText.indexOf("### L01.")>doc.mainText.indexOf("**3.12."));
 assert.ok(doc.mainText.indexOf("### L02.")>doc.mainText.indexOf("### L01."));
-assert.ok(doc.mainText.indexOf("### L02.")<doc.mainText.indexOf("**3.1."));
+assert.ok(doc.mainText.indexOf("### L02.")<doc.mainText.indexOf("## 4. "));
 assert.ok(doc.mainText.indexOf("### L03.")>doc.mainText.indexOf("### R04."));
 assert.ok(doc.mainText.indexOf("### L03.")<doc.mainText.indexOf("**7.1."));
 assert.equal(doc.mainIds.length,102);assert.equal(doc.annexIds.length,17);
