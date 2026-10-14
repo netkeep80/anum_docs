@@ -259,7 +259,7 @@ export interface V015TrustedReplay {
 export function verifyV015SemanticSnapshot(
   input: unknown,
   trusted: V015TrustedReplay,
-): V015StructureVerified & { readonly status: "SOURCE_REPLAY_VERIFIED" } {
+): Omit<V015StructureVerified, "status"> & { readonly status: "SOURCE_REPLAY_VERIFIED" } {
   const snapshot = parse(input);
   restoreV015SemanticSnapshot(snapshot);
   if (hash(trusted.source.bytes) !== trusted.expectedSourceSha256 ||
