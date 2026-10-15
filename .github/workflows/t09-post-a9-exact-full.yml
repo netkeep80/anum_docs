@@ -1,0 +1,78 @@
+name: T09 Post-A9 Exact Full Tier
+on:
+  push:
+    branches:
+      - probe/t09-post-a9-full-20261015
+    paths:
+      - .github/workflows/t09-post-a9-exact-full.yml
+permissions:
+  contents: read
+jobs:
+  t09-post-a9-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact-head T09 full-tier
+        env:
+          TARGET_SHA: fd73c7adcfd912b471f1ea258ee256f7bc472adf
+          MAIN_SHA: 6b6e0875a5793acdacaa448f7f9199c78e1b8d67
+          T09_SOURCE_BLOB: 4259027a2d8c61c5d03b4966b11642991cb47f5e
+          T09_TEST_BLOB: 8cefc610cbf0e283d134102e8d56554a824a24bf
+          A9_BLOB: 0652579cdbbcf0bdd7a75a7ed89f766bc1cd0bb1
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          out="$RUNNER_TEMP/t09-exact-full"
+          mkdir -p "$out"
+          git checkout --detach "$TARGET_SHA"
+          git rev-parse HEAD > "$out/tested-head.txt"
+          git rev-parse HEAD^{tree} > "$out/tested-tree.txt"
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$(git rev-parse "$TARGET_SHA:ts/src/v016-functional-formal.ts")" = "$T09_SOURCE_BLOB"
+          test "$(git rev-parse "$TARGET_SHA:ts/test/v016-functional-formal-t09.test.ts")" = "$T09_TEST_BLOB"
+          test "$(git rev-parse "$TARGET_SHA:ts/test/research-v013-semantic-dependency-projection-a9.test.ts")" = "$A9_BLOB"
+          git diff --check "$MAIN_SHA"..HEAD > "$out/diff-check.log" 2>&1
+          git diff --numstat "$MAIN_SHA"..HEAD > "$out/diff.numstat"
+          node --version > "$out/node-version.txt"
+          npm --version > "$out/npm-version.txt"
+          test "$(node -p 'process.versions.node.split(".")[0]')" = 24
+          git status --porcelain=v1 > "$out/clean-checkout.txt"
+          test ! -s "$out/clean-checkout.txt"
+          set +e
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund > "$out/npm-ci.stdout.log" 2> "$out/npm-ci.stderr.log"
+          ci_rc=$?
+          set -e
+          printf '%s\n' "$ci_rc" > "$out/npm-ci.exit-code"
+          echo "NPM_CI_EXIT=$ci_rc"
+          if [ "$ci_rc" -ne 0 ]; then exit "$ci_rc"; fi
+          set +e
+          npm --prefix ts run check:full > "$out/full.stdout.log" 2> "$out/full.stderr.log"
+          full_rc=$?
+          set -e
+          printf '%s\n' "$full_rc" > "$out/full.exit-code"
+          echo "T09_FULL_EXIT=$full_rc"
+          grep -E 'A9_T09_DELTA=|MTS_T09_V016_FUNCTIONAL_FORMAL|569/569|test files' "$out/full.stdout.log" | tail -n 30 > "$out/key-receipts.txt" || true
+          cat "$out/key-receipts.txt"
+          test "$full_rc" -eq 0
+      - name: Evidence SHA256
+        if: always()
+        shell: bash
+        run: |
+          out="$RUNNER_TEMP/t09-exact-full"
+          mkdir -p "$out"
+          (cd "$out" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS)
+      - name: Upload exact-head receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: t09-post-a9-exact-full-node24
+          path: ${{ runner.temp }}/t09-exact-full/
+          if-no-files-found: error
+          retention-days: 30
