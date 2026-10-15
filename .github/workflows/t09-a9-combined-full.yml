@@ -57,7 +57,7 @@ jobs:
           test "$(node -p 'process.versions.node.split(".")[0]')" = 24
           git diff --check "$A9_HEAD"..HEAD >"$out/git-diff-check.log" 2>&1
           git diff --numstat "$A9_HEAD"..HEAD >"$out/diff-a9-to-probe.numstat"
-          git diff --numstat "$(git merge-base main HEAD)"..HEAD >"$out/diff-main-to-probe.numstat"
+          git diff --numstat 63bd6624e0e030b26ca5a79bc676892ed1408594..HEAD >"$out/diff-main-to-probe.numstat"
           gate npm-ci npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           gate current npm --prefix ts run check:current
           gate A9-focused node ts/dist/test/research-v013-semantic-dependency-projection-a9.test.js
