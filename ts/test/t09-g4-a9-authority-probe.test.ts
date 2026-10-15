@@ -60,7 +60,8 @@ assert(historical.packageDirectSemanticWriteAudit.physicalMutationBoundaryProven
   "global physical mutation completeness remains false");
 assert(historical.metrics.unclassifiedDirectSemanticWriteOwnerCount === 0,
   "historical classified count remains frozen");
-assert(expected.every((e) => e.category !== "tooling"), "semantic/compiler candidates never declared tooling");
+const declaredCategories: readonly string[] = expected.map((e) => e.category);
+assert(!declaredCategories.includes("tooling"), "semantic/compiler candidates never declared tooling");
 const original = readFileSync(path, "utf8");
 const sites = inspect();
 const owners = sites.map((s) => s.owner);
