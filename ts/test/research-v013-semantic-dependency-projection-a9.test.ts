@@ -211,6 +211,8 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-direct-source.ts",
   // A1-1a-U: transport-only v0.15 snapshot, independently audited by its own tests.
   "ts/src/v015-semantic-snapshot.ts",
+  // Separate post-v0.13 candidate; independent closed writer inventory below.
+  "ts/src/v016-functional-formal.ts",
   // Post-v0.13 documentation verifier builds an isolated, temporary B20 Memory.
   // Its writes are not part of immutable historical v0.13 package evidence.
   "ts/src/tooling/v015-native-evidence-verifier.ts",
@@ -741,6 +743,42 @@ const currentDirectWriteOwners = [...new Set(
     .flatMap((sourcePath) => discoverDirectWriteSinks(sourcePath))
     .map((sink) => `${sink.file}#${sink.owner}`),
 )].sort();
+
+const t09SourcePath = "ts/src/v016-functional-formal.ts";
+const t09Present = tsSourceFiles("ts/src").includes(t09SourcePath);
+// Research delta: no retroactive changes to the 53 historical v0.13 writer owners.
+const t09WriteLedger = [
+  { owner: "denoteV016FunctionalDefinitions", sites: 12, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.definition",
+    reason: "Definition, binders and selected Context evidence from source ANet." },
+  { owner: "materializeBranches", sites: 40, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.bounded-elaboration",
+    reason: "Nine bounded ordinary Rule templates, not runtime opcodes." },
+  { owner: "emit", sites: 6, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.selected-admission",
+    reason: "Positive Theory-to-Rule and role membership, not ambient incidence." },
+  { owner: "denoteV016FunctionalCall", sites: 1, phase: "pre-S1",
+    category: "representation-materialization", capability: "candidate.v016.physical-query",
+    reason: "Physical query creation alone does not grant semantic admission." },
+] as const;
+const t09ExpectedOwnerIds = t09WriteLedger.map(({ owner }) => t09SourcePath + "#" + owner);
+if (t09Present) {
+  const sinks = discoverDirectWriteSinks(t09SourcePath);
+  setEqual([...new Set(sinks.map(({ owner }) => t09SourcePath + "#" + owner))],
+    t09ExpectedOwnerIds, "T09 direct writer owners exact");
+  setEqual([...new Set(sinks.map(({ method }) => method))],
+    ["ensure", "ensureStartSelfClosed", "ensureEndSelfClosed"], "T09 exact write methods");
+  same(sinks.length, 59, "T09 direct write sites exact");
+  for (const entry of t09WriteLedger) {
+    same(sinks.filter(({ owner }) => owner === entry.owner).length, entry.sites,
+      "T09 " + entry.owner + " syntactic write sites");
+    const category: string = entry.category;
+    assert(category !== "tooling" && entry.capability.length > 0 && entry.reason.length > 0,
+      "T09 " + entry.owner + " has a semantic classification and reason");
+  }
+} else {
+  console.log("A9_T09_DELTA=NOT_PRESENT (frozen historical 53 enforced)");
+}
 setEqual(
   currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
   [
@@ -770,6 +808,7 @@ setEqual(
     "ts/src/v015-proof-source.ts#materializeV015ProofDenotation",
     "ts/src/v015-proof-source.ts#morphism",
     "ts/src/v015-proof-source.ts#primitive",
+    ...(t09Present ? t09ExpectedOwnerIds : []),
   ],
   "explicit post-v0.13 direct write owner delta is exact",
 );
