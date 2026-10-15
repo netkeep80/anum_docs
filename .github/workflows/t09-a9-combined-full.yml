@@ -1,0 +1,88 @@
+name: T09 A9 Temporary Combined Full Tier
+on:
+  push:
+    branches:
+      - "probe/t09-a9-combined-full-20261015"
+    paths:
+      - ".github/workflows/t09-a9-combined-full.yml"
+permissions:
+  contents: read
+jobs:
+  combined-tier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Exact source attestations and full-tier execution
+        shell: bash
+        env:
+          A9_HEAD: e13aefd07c4e5681c1a20cb96049b316629dded1
+          T09_HEAD: 0dd62e6ee6c6a6b568d6fddbf6c6265ee43c18ab
+          SOURCE_BLOB: 4259027a2d8c61c5d03b4966b11642991cb47f5e
+          TEST_BLOB: 8cefc610cbf0e283d134102e8d56554a824a24bf
+          A9_BLOB: 0652579cdbbcf0bdd7a75a7ed89f766bc1cd0bb1
+        run: |
+          set -Eeuo pipefail
+          out="$RUNNER_TEMP/t09-a9-combined"
+          mkdir -p "$out"
+          function gate() {
+            local name="$1"; shift
+            set +e
+            "$@" >"$out/$name.stdout.log" 2>"$out/$name.stderr.log"
+            local rc=$?
+            set -e
+            echo "$rc" >"$out/$name.exit-code"
+            echo "GATE $name = $rc"
+            return 0
+          }
+          git rev-parse HEAD >"$out/combined-head.txt"
+          git rev-parse "$A9_HEAD" >"$out/A9-base-head.txt"
+          git merge-base --is-ancestor "$A9_HEAD" HEAD
+          test "$(git rev-parse HEAD:ts/src/v016-functional-formal.ts)" = "$SOURCE_BLOB"
+          test "$(git rev-parse HEAD:ts/test/v016-functional-formal-t09.test.ts)" = "$TEST_BLOB"
+          test "$(git rev-parse HEAD:ts/test/research-v013-semantic-dependency-projection-a9.test.ts)" = "$A9_BLOB"
+          test "$(git rev-parse "$T09_HEAD:ts/src/v016-functional-formal.ts")" = "$SOURCE_BLOB"
+          test "$(git rev-parse "$T09_HEAD:ts/test/v016-functional-formal-t09.test.ts")" = "$TEST_BLOB"
+          test "$(git rev-parse "$A9_HEAD:ts/test/research-v013-semantic-dependency-projection-a9.test.ts")" = "$A9_BLOB"
+          git status --porcelain=v1 >"$out/clean-checkout.txt"
+          test ! -s "$out/clean-checkout.txt"
+          node -v >"$out/node-version.txt"
+          npm -v >"$out/npm-version.txt"
+          test "$(node -p 'process.versions.node.split(".")[0]')" = 24
+          git diff --check "$A9_HEAD"..HEAD >"$out/git-diff-check.log" 2>&1
+          git diff --numstat "$A9_HEAD"..HEAD >"$out/diff-a9-to-probe.numstat"
+          git diff --numstat "$(git merge-base main HEAD)"..HEAD >"$out/diff-main-to-probe.numstat"
+          gate npm-ci npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          gate current npm --prefix ts run check:current
+          gate A9-focused node ts/dist/test/research-v013-semantic-dependency-projection-a9.test.js
+          gate full npm --prefix ts run check:full
+          cat "$out/current.exit-code" "$out/A9-focused.exit-code" "$out/full.exit-code" > "$out/exit-codes.txt"
+          grep -E 'A9_T09_DELTA|MTS v0.13 A9 P1f' "$out/A9-focused.stdout.log" > "$out/A9-focused.receipt" || true
+          echo "T09_A9_COMBINED_HEAD=$(cat "$out/combined-head.txt")"
+          echo "T09_A9_FULL_EXIT=$(cat "$out/full.exit-code")"
+          cat "$out/A9-focused.receipt" || true
+          test "$(cat "$out/npm-ci.exit-code")" = 0
+          test "$(cat "$out/current.exit-code")" = 0
+          test "$(cat "$out/A9-focused.exit-code")" = 0
+          test "$(cat "$out/full.exit-code")" = 0
+      - name: Manifest
+        if: always()
+        shell: bash
+        run: |
+          out="$RUNNER_TEMP/t09-a9-combined"
+          mkdir -p "$out"
+          (cd "$out" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS)
+      - name: Preserve full stdout stderr
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: t09-a9-combined-node24-exact-head
+          path: ${{ runner.temp }}/t09-a9-combined/
+          if-no-files-found: error
+          retention-days: 30
