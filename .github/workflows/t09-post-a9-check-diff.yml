@@ -1,0 +1,85 @@
+name: T09 Post-A9 Exact RepoGuard Check-Diff
+on:
+  push:
+    branches:
+      - probe/t09-post-a9-full-20261015
+    paths:
+      - .github/workflows/t09-post-a9-check-diff.yml
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+jobs:
+  exact-t09-repoguard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check exact T09 snapshot and ChangeIntent
+        shell: bash
+        env:
+          TARGET_SHA: fd73c7adcfd912b471f1ea258ee256f7bc472adf
+          MAIN_SHA: 6b6e0875a5793acdacaa448f7f9199c78e1b8d67
+        run: |
+          set -Eeuo pipefail
+          git checkout --detach "$TARGET_SHA"
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$(git rev-parse "$TARGET_SHA:ts/src/v016-functional-formal.ts")" = "4259027a2d8c61c5d03b4966b11642991cb47f5e"
+          test "$(git rev-parse "$TARGET_SHA:ts/test/v016-functional-formal-t09.test.ts")" = "8cefc610cbf0e283d134102e8d56554a824a24bf"
+          test "$(git rev-parse "$TARGET_SHA:ts/test/research-v013-semantic-dependency-projection-a9.test.ts")" = "0652579cdbbcf0bdd7a75a7ed89f766bc1cd0bb1"
+          git diff --check "$MAIN_SHA"..HEAD
+          git diff --numstat "$MAIN_SHA"..HEAD
+          cat > t09-pr-change-intent.json <<'JSON'
+          {
+            "change_type": "mts-v016-functional-formal-t09-research",
+            "scope": [
+              "ts/src/v016-functional-formal.ts",
+              "ts/test/v016-functional-formal-t09.test.ts"
+            ],
+            "must_touch": [
+              "ts/test/v016-functional-formal-t09.test.ts"
+            ],
+            "budgets": {
+              "max_new_docs": 0,
+              "max_new_files": 2,
+              "max_net_added_lines": 800
+            },
+            "must_not_touch": [
+              "contracts/**",
+              "requirements/**",
+              "formal/v0.15/**",
+              ".github/**",
+              "repo-policy.json",
+              "ts/src/v015-semantic-snapshot.ts",
+              "ts/test/v015-semantic-snapshot-transport.test.ts"
+            ],
+            "expected_effects": [
+              "introduce a bounded experimental v0.16 functional source grammar without changing v0.15",
+              "lower two author definition surfaces to one native source ANet and ordinary Rule topology",
+              "add positive and negative source-to-semantic differential evidence",
+              "preserve semantic admission from positive membership; do not add an independent execution engine"
+            ]
+          }
+          JSON
+          node -e 'const fs=require("fs"),j=JSON.parse(fs.readFileSync("t09-pr-change-intent.json"));if(j.budgets.max_net_added_lines!==800||j.scope.length!==2)process.exit(3)'
+      - name: Pinned RepoGuard exact-head check-diff (not check-pr)
+        id: repo_guard
+        uses: netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2
+        with:
+          mode: check-diff
+          enforcement: blocking
+          repo-root: ${{ github.workspace }}
+          base: 6b6e0875a5793acdacaa448f7f9199c78e1b8d67
+          head: fd73c7adcfd912b471f1ea258ee256f7bc472adf
+          change-intent: t09-pr-change-intent.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Report exact-head RepoGuard result
+        if: always()
+        run: |
+          echo "T09_EXACT_HEAD=fd73c7adcfd912b471f1ea258ee256f7bc472adf"
+          echo "T09_REPOGUARD_RESULT=${{ steps.repo_guard.outputs.result }}"
+          echo "T09_REPOGUARD_SUMMARY=${{ steps.repo_guard.outputs.summary }}"
