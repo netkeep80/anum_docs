@@ -5,6 +5,7 @@ on:
       - "probe/t09-g4-a9-authority-20261015"
     paths:
       - ".github/workflows/t09-g4-typed-authority.yml"
+      - "ts/test/t09-g4-a9-authority-probe.test.ts"
 permissions:
   contents: read
 jobs:
