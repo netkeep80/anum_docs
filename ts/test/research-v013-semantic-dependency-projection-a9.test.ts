@@ -211,6 +211,8 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-direct-source.ts",
   // A1-1a-U: transport-only v0.15 snapshot, independently audited by its own tests.
   "ts/src/v015-semantic-snapshot.ts",
+  // Separate post-v0.13 candidate; independent closed writer inventory below.
+  "ts/src/v016-functional-formal.ts",
   // Post-v0.13 documentation verifier builds an isolated, temporary B20 Memory.
   // Its writes are not part of immutable historical v0.13 package evidence.
   "ts/src/tooling/v015-native-evidence-verifier.ts",
@@ -741,6 +743,42 @@ const currentDirectWriteOwners = [...new Set(
     .flatMap((sourcePath) => discoverDirectWriteSinks(sourcePath))
     .map((sink) => `${sink.file}#${sink.owner}`),
 )].sort();
+
+const t09SourcePath = "ts/src/v016-functional-formal.ts";
+const t09Present = tsSourceFiles("ts/src").includes(t09SourcePath);
+// Research delta: no retroactive changes to the 53 historical v0.13 writer owners.
+const t09WriteLedger = [
+  { owner: "denoteV016FunctionalDefinitions", sites: 12, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.definition",
+    reason: "Definition, binders and selected Context evidence from source ANet." },
+  { owner: "materializeBranches", sites: 40, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.bounded-elaboration",
+    reason: "Nine bounded ordinary Rule templates, not runtime opcodes." },
+  { owner: "emit", sites: 6, phase: "S0",
+    category: "authority-evidence-producer", capability: "candidate.v016.selected-admission",
+    reason: "Positive Theory-to-Rule and role membership, not ambient incidence." },
+  { owner: "denoteV016FunctionalCall", sites: 1, phase: "pre-S1",
+    category: "representation-materialization", capability: "candidate.v016.physical-query",
+    reason: "Physical query creation alone does not grant semantic admission." },
+] as const;
+const t09ExpectedOwnerIds = t09WriteLedger.map(({ owner }) => t09SourcePath + "#" + owner);
+if (t09Present) {
+  const sinks = discoverDirectWriteSinks(t09SourcePath);
+  setEqual([...new Set(sinks.map(({ owner }) => t09SourcePath + "#" + owner))],
+    t09ExpectedOwnerIds, "T09 direct writer owners exact");
+  setEqual([...new Set(sinks.map(({ method }) => method))],
+    ["ensure", "ensureStartSelfClosed", "ensureEndSelfClosed"], "T09 exact write methods");
+  same(sinks.length, 59, "T09 direct write sites exact");
+  for (const entry of t09WriteLedger) {
+    same(sinks.filter(({ owner }) => owner === entry.owner).length, entry.sites,
+      "T09 " + entry.owner + " syntactic write sites");
+    const category: string = entry.category;
+    assert(category !== "tooling" && entry.capability.length > 0 && entry.reason.length > 0,
+      "T09 " + entry.owner + " has a semantic classification and reason");
+  }
+} else {
+  console.log("A9_T09_DELTA=NOT_PRESENT (frozen historical 53 enforced)");
+}
 setEqual(
   currentDirectWriteOwners.filter((owner) => !observedDirectWriteOwners.includes(owner)),
   [
@@ -770,6 +808,7 @@ setEqual(
     "ts/src/v015-proof-source.ts#materializeV015ProofDenotation",
     "ts/src/v015-proof-source.ts#morphism",
     "ts/src/v015-proof-source.ts#primitive",
+    ...(t09Present ? t09ExpectedOwnerIds : []),
   ],
   "explicit post-v0.13 direct write owner delta is exact",
 );
@@ -1186,6 +1225,74 @@ const typedReadOwners = [...new Set(
 const typedWriteOwners = [...new Set(
   typedWriteSites.map((site) => `${site.file}#${site.owner}`),
 )].sort();
+
+
+if (t09Present) {
+  // P1f independently resolves the real WriteMemory receiver for each new site.
+  type T09Write = Readonly<{ owner: string; method: string; typed: boolean; receiver: string }>;
+  const inspectT09 = (program: ts.Program): readonly T09Write[] => {
+    const checker = program.getTypeChecker();
+    const source = program.getSourceFile(join(repoRoot, t09SourcePath));
+    assert(source !== undefined, "T09 participates in the typed program");
+    const sites: T09Write[] = [];
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) &&
+          writeMethods.has(node.expression.name.text)) {
+        const member = node.expression.name;
+        sites.push({
+          owner: nodeOwner(node), method: member.text,
+          typed: declarationIsMemoryMemberFrom(
+            checker.getSymbolAtLocation(member), member.text, writeMemoryMembers),
+          receiver: checker.typeToString(checker.getTypeAtLocation(node.expression.expression)),
+        });
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    return sites;
+  };
+  const requireExactT09 = (sites: readonly T09Write[]): void =>
+    setEqual([...new Set(sites.map(({ owner }) => t09SourcePath + "#" + owner))],
+      t09ExpectedOwnerIds, "T09 P1f typed owner set exact");
+  const sites = inspectT09(typedProgram);
+  requireExactT09(sites);
+  same(sites.length, 59, "T09 independently typed 59 write sites");
+  assert(sites.every((site) => site.typed && ["Memory", "WriteMemory"].includes(site.receiver)),
+    "all T09 writers resolve to typed Memory/WriteMemory declarations");
+  setEqual([...new Set(sites.map(({ method }) => method))],
+    ["ensure", "ensureStartSelfClosed", "ensureEndSelfClosed"], "T09 P1f methods exact");
+  for (const entry of t09WriteLedger) {
+    same(sites.filter(({ owner }) => owner === entry.owner).length, entry.sites,
+      "T09 " + entry.owner + " typed sites exact");
+  }
+  // True typed fifth-writer mutation in a disposable virtual source (no file edits).
+  const host = ts.createCompilerHost(typedProgram.getCompilerOptions());
+  const originalGetSourceFile = host.getSourceFile.bind(host);
+  host.getSourceFile = (fileName, languageVersion, onError, fresh) =>
+    fileName.replaceAll("\\", "/") === join(repoRoot, t09SourcePath).replaceAll("\\", "/")
+      ? ts.createSourceFile(fileName, read(t09SourcePath) +
+        "\nfunction t09FifthUnknownWriter(memory: WriteMemory, basis: RootBasis): void {" +
+        " memory.ensure(basis.R, basis.C); }\n", languageVersion, true, ts.ScriptKind.TS)
+      : originalGetSourceFile(fileName, languageVersion, onError, fresh);
+  const injected = ts.createProgram({
+    rootNames: [join(repoRoot, t09SourcePath)],
+    options: typedProgram.getCompilerOptions(), host,
+  });
+  const mutant = inspectT09(injected);
+  same(mutant.length, 60, "fifth typed Memory writer adds one direct write site");
+  assert(mutant.some((site) => site.owner === "t09FifthUnknownWriter" &&
+    site.method === "ensure" && site.typed && site.receiver === "WriteMemory"),
+    "fifth writer must resolve to real typed WriteMemory.ensure");
+  let rejected = false;
+  try { requireExactT09(mutant); }
+  catch (error) {
+    if (error instanceof Error && error.message.includes("T09 P1f typed owner set exact"))
+      rejected = true;
+    else throw error;
+  }
+  assert(rejected, "same positive owner gate rejects unknown fifth typed writer");
+  console.log("A9_T09_DELTA=PASS OWNERS=4 SITES=59 FIFTH=REJECTED");
+}
 
 const typedReadMemberCounts = Object.fromEntries(
   [...readMemoryMembers].sort().map((member) => [
