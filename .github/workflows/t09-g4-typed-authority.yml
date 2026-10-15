@@ -1,0 +1,71 @@
+name: T09 G4 Temporary Typed Authority Probe
+on:
+  push:
+    branches:
+      - "probe/t09-g4-a9-authority-20261015"
+    paths:
+      - ".github/workflows/t09-g4-typed-authority.yml"
+permissions:
+  contents: read
+jobs:
+  typed-authority:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Independent typed authority audit and fifth owner negative
+        shell: bash
+        env:
+          T09_EXPECT_HEAD: 0dd62e6ee6c6a6b568d6fddbf6c6265ee43c18ab
+        run: |
+          set -Eeuo pipefail
+          OUT="$RUNNER_TEMP/t09-g4-typed"
+          mkdir -p "$OUT"
+          attempt() {
+            local name="$1"; shift
+            set +e
+            "$@" > "$OUT/$name.stdout.log" 2> "$OUT/$name.stderr.log"
+            local rc=$?
+            set -e
+            echo "$rc" > "$OUT/$name.exit-code"
+            echo "$name=$rc"
+            return "$rc"
+          }
+          echo "$T09_EXPECT_HEAD" > "$OUT/original-head.txt"
+          git rev-parse HEAD > "$OUT/probe-head.txt"
+          node -v > "$OUT/node-version.txt"
+          npm -v > "$OUT/npm-version.txt"
+          git rev-parse "$T09_EXPECT_HEAD:ts/src/v016-functional-formal.ts" > "$OUT/original-source-blob.txt"
+          git rev-parse "HEAD:ts/src/v016-functional-formal.ts" > "$OUT/probe-source-blob.txt"
+          test "$(cat "$OUT/original-source-blob.txt")" = "$(cat "$OUT/probe-source-blob.txt")"
+          test "$(cat "$OUT/original-source-blob.txt")" = "4259027a2d8c61c5d03b4966b11642991cb47f5e"
+          git rev-parse "$T09_EXPECT_HEAD:traceability/mts-v0.13-semantic-dependency-projection.json" > "$OUT/original-a9-blob.txt"
+          git rev-parse "HEAD:traceability/mts-v0.13-semantic-dependency-projection.json" > "$OUT/probe-a9-blob.txt"
+          test "$(cat "$OUT/original-a9-blob.txt")" = "$(cat "$OUT/probe-a9-blob.txt")"
+          attempt npm-ci npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          attempt npm-build npm --prefix ts run build
+          (cd ts && attempt typed-negative node dist/test/t09-g4-a9-authority-probe.test.js)
+          git status --porcelain=v1 > "$OUT/working-tree-after.txt"
+          cat "$OUT/typed-negative.stdout.log"
+          echo "G4_TYPED_PROBE=PASS_NOT_PR_FULL_TIER" > "$OUT/verdict.txt"
+      - name: Write manifest
+        if: always()
+        shell: bash
+        run: |
+          OUT="$RUNNER_TEMP/t09-g4-typed"
+          mkdir -p "$OUT"
+          (cd "$OUT" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS)
+      - name: Upload provenance and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: t09-g4-typed-authority-and-negative
+          path: ${{ runner.temp }}/t09-g4-typed/
+          if-no-files-found: error
+          retention-days: 30
