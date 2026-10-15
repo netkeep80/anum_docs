@@ -528,6 +528,12 @@
     }
   ],
   "surfaces": {
+    "mts-v016-t09-functional-source": [
+      "ts/src/v016-functional-formal.ts"
+    ],
+    "mts-v016-t09-functional-test": [
+      "ts/test/v016-functional-formal-t09.test.ts"
+    ],
     "science-corpus-pr2153-files": [
       "requirements/mts-source/MTS-READER-INTRO-PROPOSAL.yaml",
       "requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml",
@@ -705,6 +711,24 @@
     ]
   },
   "change_profiles": {
+    "mts-v016-t09-a9-typed-closure": {
+      "allow_surfaces": [
+        "mts-v016-t09-functional-source",
+        "mts-v016-t09-functional-test",
+        "science-shared-research-classification-test"
+      ],
+      "require_surfaces": [
+        "mts-v016-t09-functional-source",
+        "mts-v016-t09-functional-test",
+        "science-shared-research-classification-test"
+      ],
+      "allow_unclassified_surfaces": false,
+      "budgets": {
+        "max_new_docs": 0,
+        "max_new_files": 2,
+        "max_net_added_lines": 898
+      }
+    },
     "post-v015-science-source-corpus-technical-merge": {
       "allow_surfaces": [
         "science-corpus-pr2153-files",
