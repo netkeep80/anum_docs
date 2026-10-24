@@ -21,7 +21,7 @@ jobs:
       # Immutable RepoGuard 4.0.0 compiler-only consumer.
       - name: Run repo-guard
         id: repo_guard
-        uses: netkeep80/repo-guard@5d189594d4486e14aec269e80d53a8173b4abd1a
+        uses: netkeep80/repo-guard@6490ddc499ce01fa35b854dd4afbe0996d444165
         with:
           mode: check
           base: ${{ github.event.pull_request.base.sha }}
