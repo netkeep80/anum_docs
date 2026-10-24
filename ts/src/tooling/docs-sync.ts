@@ -473,7 +473,7 @@ export function currentDocumentationSizeWithinBudget(
 }
 
 function validatedTheoremCatalog(root: string): string {
-  // The generic v4.0.0 model is normalized in production, not only in tests.
+  // The generic v4.1.0 model is normalized in production, not only in tests.
   // MTS-specific theorem interpretation and rendering stay in anum_docs.
   const sources = loadRepositoryTheoremProjectionSources(root);
   normalizeProjectionModel(buildTheoremCatalogProjectionDeclaration(sources.currentIndex));
