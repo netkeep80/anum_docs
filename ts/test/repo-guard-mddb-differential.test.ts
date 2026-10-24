@@ -5,19 +5,11 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import {
-  listMarkdownAnchorIds as localListMarkdownAnchorIds,
-  listOwnedMarkdownBlockIds as localListOwnedMarkdownBlockIds,
-  listRepositoryMarkdownSurface,
-  listMarkdownChildren as localListMarkdownChildren,
-  listMarkdownSections as localListMarkdownSections,
-  readMarkdownNode as localReadMarkdownNode,
-  readOwnedMarkdownBlock as localReadOwnedMarkdownBlock,
-  replaceOwnedMarkdownSection as localReplaceOwnedMarkdownSection,
-  resolveMarkdownAnchor as localResolveMarkdownAnchor,
-} from "../src/tooling/markdown-section-adapter.js";
+import ts from "typescript";
+import * as production from "../src/tooling/markdown-section-adapter.js";
+const { listRepositoryMarkdownSurface } = production;
 
-const REPO_GUARD_SHA = "10f04af309fcb512dff3d690f595926472c52f40";
+const REPO_GUARD_SHA = "5d189594d4486e14aec269e80d53a8173b4abd1a";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -136,6 +128,37 @@ const tempRoot = mkdtempSync(resolve(tmpdir(), "anum-docs-repo-guard-diff-"));
 const cloneRoot = resolve(tempRoot, "repo-guard");
 
 try {
+  // Immutable old consumer behavior is the independent migration oracle.
+  // Read the accepted original adapter straight from Git history instead of
+  // retaining a second production or checked-in test implementation.
+  const observedRepo = [process.cwd(), resolve(process.cwd(), "..")].find(
+    candidate => existsSync(resolve(candidate, "repo-policy.json")),
+  );
+  assert.ok(observedRepo !== undefined, "the legacy oracle requires checked-out anum_docs");
+  const oldSource = spawnSync("git", [
+    "show",
+    "862e1b84347773c6c091cc33ce7499cd4900c855:ts/src/tooling/markdown-section-adapter.ts",
+  ], { cwd: observedRepo, encoding: "utf8", timeout: 20_000 });
+  assert.equal(oldSource.status, 0, `cannot read legacy accepted adapter: ${oldSource.stderr}`);
+  const oldModulePath = resolve(tempRoot, "accepted-v015-markdown-adapter.mjs");
+  writeFileSync(oldModulePath, ts.transpileModule(oldSource.stdout, {
+    compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+  }).outputText);
+  const legacy: typeof import("../src/tooling/markdown-section-adapter.js") =
+    await import(pathToFileURL(oldModulePath).href);
+  const {
+    listMarkdownAnchorIds: localListMarkdownAnchorIds,
+    listOwnedMarkdownBlockIds: localListOwnedMarkdownBlockIds,
+    listMarkdownChildren: localListMarkdownChildren,
+    listMarkdownSections: localListMarkdownSections,
+    readMarkdownNode: localReadMarkdownNode,
+    readOwnedMarkdownBlock: localReadOwnedMarkdownBlock,
+    replaceOwnedMarkdownSection: localReplaceOwnedMarkdownSection,
+    resolveMarkdownAnchor: localResolveMarkdownAnchor,
+  } = legacy;
+  assert.equal(production.REPO_GUARD_SHA, REPO_GUARD_SHA);
+  assert.equal(production.REPO_GUARD_VERSION, "4.0.0");
+
   run("git", ["clone", "--quiet", "--filter=blob:none", REPO_GUARD_URL, cloneRoot]);
   run("git", ["checkout", "--quiet", "--detach", REPO_GUARD_SHA], cloneRoot);
   const checked = spawnSync("git", ["rev-parse", "HEAD"], {
@@ -159,6 +182,8 @@ try {
     localListMarkdownAnchorIds(source),
     "stable anchor inventory must match",
   );
+  assert.deepEqual(production.listMarkdownAnchorIds(source), localListMarkdownAnchorIds(source),
+    "production RepoGuard v4 adapter must preserve accepted stable anchors");
 
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(
@@ -324,6 +349,10 @@ try {
     generatedContent: "> generated metadata v2",
   });
   assert.equal(updatedUpstream, updatedLocal, "owned-block replacement must be byte-identical");
+  assert.equal(production.replaceOwnedMarkdownSection({
+    source, mode: "hybrid", anchorId: "node-a",
+    blockId, generatedContent: "> generated metadata v2",
+  }), updatedLocal, "production docs:sync HYBRID replacement must be byte-equivalent");
 
   const child = { anchorId: "node-c", title: "Node C", payload: "Authored C." };
   assert.equal(upstream.insertMarkdownChild({
@@ -363,7 +392,7 @@ try {
   assert.equal(localListMarkdownAnchorIds(source).includes("fake"), false);
   assert.equal(upstream.listMarkdownAnchorIds(source).includes("fake"), false);
 
-  // Compare the public v3.2.3 API against the actual tracked Markdown
+  // Compare the public v4.0.0 API against the actual tracked Markdown
   // corpus, not just the synthetic canonical-tree fixture above. No writes.
   const repositoryRoot = [process.cwd(), resolve(process.cwd(), "..")].find(
     (candidate) => existsSync(resolve(candidate, "repo-policy.json")),
@@ -387,11 +416,20 @@ try {
     const localAnchors = localListMarkdownAnchorIds(actualSource);
     assert.deepEqual(upstream.listMarkdownAnchorIds(actualSource), localAnchors,
       `${path}: real stable anchor inventory differs`);
+    assert.deepEqual(production.listMarkdownAnchorIds(actualSource), localAnchors,
+      `${path}: production anchor inventory differs from accepted behavior`);
+    assert.deepEqual(production.listOwnedMarkdownBlockIds(actualSource), ownedIds,
+      `${path}: production owned-block inventory differs`);
     for (const id of localAnchors) {
       assert.deepEqual(
         normalizeAddress(upstream.resolveMarkdownAnchor(actualSource, id)),
         normalizeAddress(localResolveMarkdownAnchor(actualSource, id)),
         `${path}/${id}: real anchor address differs`,
+      );
+      assert.deepEqual(
+        normalizeAddress(production.resolveMarkdownAnchor(actualSource, id)),
+        normalizeAddress(localResolveMarkdownAnchor(actualSource, id)),
+        `${path}/${id}: production anchor address differs`,
       );
       checkedAnchors += 1;
     }
@@ -399,6 +437,8 @@ try {
     const publicSections = upstream.listMarkdownSections(actualSource, actualOptions).map(normalizeSection);
     assert.deepEqual(publicSections, localSections,
       `${path}: real sections, heading paths and byte ranges differ`);
+    assert.deepEqual(production.listMarkdownSections(actualSource).map(normalizeSection), localSections,
+      `${path}: production section byte ranges differ`);
     for (const section of publicSections) {
       assert.equal(actualSource.slice(section.start, section.end), section.content,
         `${path}: reported section content differs from exact source bytes`);
@@ -410,12 +450,18 @@ try {
         localReadOwnedMarkdownBlock(actualSource, block.blockId),
         `${path}/${block.blockId}: real MTS owned-block byte identity differs`,
       );
+      assert.deepEqual(
+        production.readOwnedMarkdownBlock(actualSource, block.blockId),
+        localReadOwnedMarkdownBlock(actualSource, block.blockId),
+        `${path}/${block.blockId}: production owned block differs`,
+      );
       checkedBlocks += 1;
     }
   }
   console.log(
     `MDDB_REAL_DOCS_DIFFERENTIAL=PASS files=${realSurfaces.length} anchors=${checkedAnchors} sections=${checkedSections} ownedBlocks=${checkedBlocks}`,
   );
+  console.log("PRODUCTION_RG4_V015_LEGACY_ORACLE=PASS");
 
   console.log(
     `repo-guard MDDB differential passed against exact SHA ${REPO_GUARD_SHA}`,

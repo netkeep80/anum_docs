@@ -100,7 +100,7 @@
           "pointer": "/jobs/policy-check/steps/1/with/mode",
           "type": "string"
         },
-        "value": "check-pr"
+        "value": "check"
       },
       {
         "id": "repo-guard-workflow-enforcement",
@@ -123,26 +123,6 @@
         "value": "read"
       },
       {
-        "id": "repo-guard-workflow-permission-issues",
-        "kind": "scalar_equals_literal",
-        "source": {
-          "document": "repo-guard-workflow",
-          "pointer": "/permissions/issues",
-          "type": "string"
-        },
-        "value": "read"
-      },
-      {
-        "id": "repo-guard-workflow-permission-pull-requests",
-        "kind": "scalar_equals_literal",
-        "source": {
-          "document": "repo-guard-workflow",
-          "pointer": "/permissions/pull-requests",
-          "type": "string"
-        },
-        "value": "read"
-      },
-      {
         "id": "repo-guard-workflow-action-pin",
         "kind": "scalar_equals_literal",
         "source": {
@@ -150,7 +130,7 @@
           "pointer": "/jobs/policy-check/steps/1/uses",
           "type": "string"
         },
-        "value": "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2"
+        "value": "netkeep80/repo-guard@5d189594d4486e14aec269e80d53a8173b4abd1a"
       },
       {
         "id": "branch-hygiene-permission-contents-write",
