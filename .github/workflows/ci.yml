@@ -56,7 +56,7 @@ jobs:
 
       - name: Install pinned RepoGuard 4.0.0 runtime
         run: |
-          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "5d189594d4486e14aec269e80d53a8173b4abd1a"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "6490ddc499ce01fa35b854dd4afbe0996d444165"
           npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
 
       - name: Install TypeScript toolchain
