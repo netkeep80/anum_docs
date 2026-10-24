@@ -9,7 +9,7 @@ import ts from "typescript";
 import * as production from "../src/tooling/markdown-section-adapter.js";
 const { listRepositoryMarkdownSurface } = production;
 
-const REPO_GUARD_SHA = "5d189594d4486e14aec269e80d53a8173b4abd1a";
+const REPO_GUARD_SHA = "6490ddc499ce01fa35b854dd4afbe0996d444165";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -392,7 +392,7 @@ try {
   assert.equal(localListMarkdownAnchorIds(source).includes("fake"), false);
   assert.equal(upstream.listMarkdownAnchorIds(source).includes("fake"), false);
 
-  // Compare the public v4.0.0 API against the actual tracked Markdown
+  // Compare the public v4.1.0 API against the actual tracked Markdown
   // corpus, not just the synthetic canonical-tree fixture above. No writes.
   const repositoryRoot = [process.cwd(), resolve(process.cwd(), "..")].find(
     (candidate) => existsSync(resolve(candidate, "repo-policy.json")),
