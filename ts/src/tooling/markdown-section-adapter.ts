@@ -4,9 +4,9 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MarkdownStructureOptions } from "../../../vendor/repo-guard/dist/projection-api.mjs";
 
-// Generic Markdown structure and projection belong to immutable RepoGuard 4.0.0.
+// Generic Markdown structure and projection belong to immutable RepoGuard 4.1.0.
 // Only MTS-owned marker configuration and repository surface selection stay here.
-export const REPO_GUARD_VERSION = "4.0.0";
+export const REPO_GUARD_VERSION = "4.1.0";
 export const REPO_GUARD_SHA = "6490ddc499ce01fa35b854dd4afbe0996d444165";
 
 export type MarkdownDocumentMode = "source" | "hybrid" | "generated";

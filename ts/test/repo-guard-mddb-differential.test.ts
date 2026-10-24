@@ -157,7 +157,7 @@ try {
     resolveMarkdownAnchor: localResolveMarkdownAnchor,
   } = legacy;
   assert.equal(production.REPO_GUARD_SHA, REPO_GUARD_SHA);
-  assert.equal(production.REPO_GUARD_VERSION, "4.0.0");
+  assert.equal(production.REPO_GUARD_VERSION, "4.1.0");
 
   run("git", ["clone", "--quiet", "--filter=blob:none", REPO_GUARD_URL, cloneRoot]);
   run("git", ["checkout", "--quiet", "--detach", REPO_GUARD_SHA], cloneRoot);
