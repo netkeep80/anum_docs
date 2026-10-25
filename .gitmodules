@@ -1,0 +1,3 @@
+[submodule "vendor/repo-guard"]
+	path = vendor/repo-guard
+	url = https://github.com/netkeep80/repo-guard.git

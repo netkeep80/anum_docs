@@ -8,7 +8,9 @@ import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
 import { buildMarkdownCoverageAudit } from "./markdown-coverage-audit.js";
 import { THEOREM_CATALOG_PATH, renderTheoremCatalogMarkdown } from "./theorem-catalog-markdown.js";
-import { loadRepositoryTheoremProjectionModel } from "./theorem-projection-model.js";
+import { buildTheoremProjectionModel, loadRepositoryTheoremProjectionSources } from "./theorem-projection-model.js";
+import { buildTheoremCatalogProjectionDeclaration } from "./theorem-projection-contract.js";
+import { normalizeProjectionModel } from "./markdown-section-adapter.js";
 import { FORMAL_NOTATION_V015_TARGET_PATH, renderFormalNotationV015Markdown } from "./formal-notation-v015-markdown.js";
 
 export const PROJECTION_START = "<!-- мтс-текущая-проекция:начало -->";
@@ -470,9 +472,17 @@ export function currentDocumentationSizeWithinBudget(
   return measurement.codePoints <= CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints;
 }
 
+function validatedTheoremCatalog(root: string): string {
+  // The generic v4.1.0 model is normalized in production, not only in tests.
+  // MTS-specific theorem interpretation and rendering stay in anum_docs.
+  const sources = loadRepositoryTheoremProjectionSources(root);
+  normalizeProjectionModel(buildTheoremCatalogProjectionDeclaration(sources.currentIndex));
+  return renderTheoremCatalogMarkdown(buildTheoremProjectionModel(sources));
+}
+
 export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
+  const theoremCatalog = validatedTheoremCatalog(root);
   const formalNotationV015 = renderFormalNotationV015Markdown(root);
   const stale = CANONICAL_DOCS.filter((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
@@ -498,7 +508,7 @@ export function checkRepositoryDocs(root = findRepositoryRoot()): string[] {
 
 export function syncRepositoryDocs(root = findRepositoryRoot()): string[] {
   const projection = renderCurrentProjection(loadCurrentProjection(root));
-  const theoremCatalog = renderTheoremCatalogMarkdown(loadRepositoryTheoremProjectionModel(root));
+  const theoremCatalog = validatedTheoremCatalog(root);
   const formalNotationV015 = renderFormalNotationV015Markdown(root);
   const changed: string[] = [];
   for (const path of CANONICAL_DOCS) {

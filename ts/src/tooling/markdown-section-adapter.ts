@@ -1,382 +1,171 @@
-import { readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import type { MarkdownStructureOptions } from "../../../vendor/repo-guard/dist/projection-api.mjs";
+
+// Generic Markdown structure and projection belong to immutable RepoGuard 4.1.0.
+// Only MTS-owned marker configuration and repository surface selection stay here.
+export const REPO_GUARD_VERSION = "4.1.0";
+export const REPO_GUARD_SHA = "6490ddc499ce01fa35b854dd4afbe0996d444165";
 
 export type MarkdownDocumentMode = "source" | "hybrid" | "generated";
-
-export interface MarkdownHeading {
-  readonly level: number;
-  readonly title: string;
-}
-
+export interface MarkdownHeading { readonly level: number; readonly title: string; }
 export interface MarkdownAddress {
-  readonly anchorId: string;
-  readonly line: number;
-  readonly offset: number;
+  readonly anchorId: string; readonly line: number; readonly offset: number;
   readonly headingPath: readonly MarkdownHeading[];
 }
-
 export interface MarkdownOwnedBlock {
-  readonly blockId: string;
-  readonly start: number;
-  readonly end: number;
+  readonly blockId: string; readonly start: number; readonly end: number;
   readonly content: string;
 }
-
 export interface MarkdownNode {
-  readonly anchorId: string;
-  readonly anchorLine: number;
-  readonly headingLine: number;
-  readonly heading: MarkdownHeading;
-  readonly headingPath: readonly MarkdownHeading[];
-  readonly start: number;
-  readonly end: number;
-  readonly subtree: string;
+  readonly anchorId: string; readonly anchorLine: number; readonly headingLine: number;
+  readonly heading: MarkdownHeading; readonly headingPath: readonly MarkdownHeading[];
+  readonly start: number; readonly end: number; readonly subtree: string;
 }
-
 export interface MarkdownSection {
-  readonly diagnosticLine: number;
-  readonly heading: MarkdownHeading;
-  readonly headingPath: readonly MarkdownHeading[];
-  readonly anchorId: string | null;
-  readonly start: number;
-  readonly end: number;
-  readonly content: string;
+  readonly diagnosticLine: number; readonly heading: MarkdownHeading;
+  readonly headingPath: readonly MarkdownHeading[]; readonly anchorId: string | null;
+  readonly start: number; readonly end: number; readonly content: string;
 }
 
 function fail(message: string): never {
   throw new Error(`markdown-section-adapter: ${message}`);
 }
+function assertSafeId(id: string, label: string): void {
+  if (!/^[A-Za-z][A-Za-z0-9._-]*$/.test(id)) fail(`${label} must be a stable ASCII identifier: ${id}`);
+}
+function beginMarker(id: string): string { return `<!-- мтс:требование:${id}:начало -->`; }
+function endMarker(id: string): string { return `<!-- мтс:требование:${id}:конец -->`; }
+function blockSpec(id: string) {
+  assertSafeId(id, "blockId");
+  return { blockId: id, beginMarker: beginMarker(id), endMarker: endMarker(id) };
+}
 
-function assertSafeId(value: string, name: string): void {
-  if (!/^[A-Za-z][A-Za-z0-9._-]*$/.test(value)) {
-    fail(`${name} must be a stable ASCII identifier: ${value}`);
+function findRepositoryRoot(): string {
+  let at = dirname(fileURLToPath(import.meta.url));
+  for (let i = 0; i < 9; i++) {
+    if (existsSync(resolve(at, "repo-policy.json")) &&
+        existsSync(resolve(at, ".gitmodules"))) return at;
+    const next = dirname(at);
+    if (next === at) break;
+    at = next;
   }
+  return fail("cannot locate pinned repository root");
 }
 
-function beginMarker(blockId: string): string {
-  return `<!-- мтс:требование:${blockId}:начало -->`;
+const repositoryRoot = findRepositoryRoot();
+const upstreamRoot = resolve(repositoryRoot, "vendor/repo-guard");
+const upstreamEntrypoint = resolve(upstreamRoot, "dist/projection-api.mjs");
+if (!existsSync(upstreamEntrypoint)) {
+  fail("RepoGuard v4.1.0 gitlink is not checked out; run git submodule update --init");
 }
-
-function endMarker(blockId: string): string {
-  return `<!-- мтс:требование:${blockId}:конец -->`;
+const git = spawnSync("git", ["-C", upstreamRoot, "rev-parse", "HEAD"], {
+  encoding: "utf8", timeout: 10000,
+});
+if (git.status !== 0 || git.stdout.trim() !== REPO_GUARD_SHA) {
+  fail(`RepoGuard pin mismatch: expected ${REPO_GUARD_SHA}, observed ${git.stdout?.trim() ?? "unknown"}`);
 }
-
-interface VisibleLine {
-  readonly line: number;
-  readonly start: number;
-  readonly end: number;
-  readonly text: string;
-  readonly visible: boolean;
+const upstreamManifest = JSON.parse(readFileSync(resolve(upstreamRoot, "package.json"), "utf8")) as { version?: string };
+if (upstreamManifest.version !== REPO_GUARD_VERSION) {
+  fail(`RepoGuard package version must be ${REPO_GUARD_VERSION}`);
 }
+const upstream: typeof import("../../../vendor/repo-guard/dist/projection-api.mjs") =
+  await import(pathToFileURL(upstreamEntrypoint).href);
 
-function linesOf(source: string): readonly VisibleLine[] {
-  const result: VisibleLine[] = [];
-  let line = 1;
-  let offset = 0;
-  let inFence = false;
-
-  while (offset <= source.length) {
-    const newline = source.indexOf("\n", offset);
-    const end = newline < 0 ? source.length : newline;
-    const text = source.slice(offset, end).replace(/\r$/, "");
-    const trimmed = text.trim();
-    const fence = /^(?:```|~~~)/.test(trimmed);
-    const visible = !inFence && !fence;
-
-    result.push(Object.freeze({ line, start: offset, end, text, visible }));
-
-    if (fence) inFence = !inFence;
-    if (newline < 0) break;
-    offset = newline + 1;
-    line += 1;
-  }
-
-  return Object.freeze(result);
+function heading(value: { level: number; text: string }): MarkdownHeading {
+  return Object.freeze({ level: value.level, title: value.text });
 }
-
-function headingPathAt(lines: readonly VisibleLine[], targetLine: number): readonly MarkdownHeading[] {
-  const stack: MarkdownHeading[] = [];
-  for (const line of lines) {
-    if (line.line > targetLine) break;
-    if (!line.visible) continue;
-    const match = /^(#{1,6})\s+(.+?)\s*$/.exec(line.text);
-    if (match === null) continue;
-    const level = match[1]!.length;
-    const title = match[2]!.trim();
-    while (stack.length > 0 && stack[stack.length - 1]!.level >= level) stack.pop();
-    stack.push(Object.freeze({ level, title }));
-  }
-  return Object.freeze([...stack]);
+function headingPath(values: readonly { level: number; text: string }[]): readonly MarkdownHeading[] {
+  return Object.freeze(values.map(heading));
 }
-
-export function resolveMarkdownAnchor(source: string, anchorId: string): MarkdownAddress {
-  assertSafeId(anchorId, "anchorId");
-  const pattern = new RegExp(`<a\\s+id=["']${anchorId.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\$&")}["']\\s*><\\/a>`);
-  const lines = linesOf(source);
-  const matches = lines.filter((line) => line.visible && pattern.test(line.text));
-
-  if (matches.length === 0) fail(`anchor not found: ${anchorId}`);
-  if (matches.length > 1) fail(`anchor is duplicated: ${anchorId}`);
-
-  const match = matches[0]!;
-  return Object.freeze({
-    anchorId,
-    line: match.line,
-    offset: match.start,
-    headingPath: headingPathAt(lines, match.line),
-  });
-}
-
-function headingOf(line: VisibleLine): MarkdownHeading | null {
-  if (!line.visible) return null;
-  const match = /^(#{1,6})\s+(.+?)\s*$/.exec(line.text);
-  return match === null ? null : Object.freeze({ level: match[1]!.length, title: match[2]!.trim() });
-}
-
-function stableAnchorId(line: VisibleLine): string | null {
-  if (!line.visible) return null;
-  const match = /<a\s+id=["']([A-Za-z][A-Za-z0-9._-]*)["']\s*><\/a>/.exec(line.text);
-  return match?.[1] ?? null;
+function options(source: string): MarkdownStructureOptions {
+  return { transparentOwnedBlocks: listOwnedMarkdownBlockIds(source).map(blockSpec) };
 }
 
 export function listMarkdownAnchorIds(source: string): readonly string[] {
-  const ids = linesOf(source).map(stableAnchorId).filter((id): id is string => id !== null);
-  if (new Set(ids).size !== ids.length) fail("document contains duplicate stable anchors");
-  return Object.freeze(ids);
+  return Object.freeze(upstream.listMarkdownAnchorIds(source));
 }
-
-function associatedHeadingLine(lines: readonly VisibleLine[], anchorLine: number): VisibleLine | null {
-  let ownedBlockDepth = 0;
-  for (const line of lines) {
-    if (line.line <= anchorLine || !line.visible) continue;
-    const trimmed = line.text.trim();
-    if (trimmed.startsWith("<!-- мтс:требование:") && trimmed.endsWith(":начало -->")) {
-      ownedBlockDepth += 1;
-      continue;
-    }
-    if (trimmed.startsWith("<!-- мтс:требование:") && trimmed.endsWith(":конец -->")) {
-      ownedBlockDepth -= 1;
-      if (ownedBlockDepth < 0) fail("orphan compiler-owned block end marker");
-      continue;
-    }
-    if (ownedBlockDepth > 0 || trimmed.length === 0 || /^<!--.*-->$/.test(trimmed)) continue;
-    return headingOf(line) === null ? null : line;
-  }
-  if (ownedBlockDepth !== 0) fail("unclosed compiler-owned block before node heading");
-  return null;
+export function resolveMarkdownAnchor(source: string, anchorId: string): MarkdownAddress {
+  const address = upstream.resolveMarkdownAnchor(source, anchorId);
+  return Object.freeze({ ...address, headingPath: headingPath(address.headingPath) });
 }
-
-function nodeOrNull(source: string, anchorId: string): MarkdownNode | null {
-  const anchor = resolveMarkdownAnchor(source, anchorId);
-  const lines = linesOf(source);
-  const headingLine = associatedHeadingLine(lines, anchor.line);
-  if (headingLine === null) return null;
-  const heading = headingOf(headingLine)!;
-  const endLine = lines.find((line) => {
-    if (line.line <= headingLine.line) return false;
-    const candidate = headingOf(line);
-    return candidate !== null && candidate.level <= heading.level;
-  });
-  let end = source.length;
-  if (endLine !== undefined) {
-    const owningAnchors = lines.filter((line) => {
-      if (line.line >= endLine.line || stableAnchorId(line) === null) return false;
-      return associatedHeadingLine(lines, line.line)?.line === endLine.line;
-    });
-    if (owningAnchors.length > 1) fail(`heading at line ${endLine.line} has multiple node anchors`);
-    end = owningAnchors[0]?.start ?? endLine.start;
-  }
+function node(value: ReturnType<typeof upstream.readMarkdownNode>): MarkdownNode {
   return Object.freeze({
-    anchorId,
-    anchorLine: anchor.line,
-    headingLine: headingLine.line,
-    heading,
-    headingPath: headingPathAt(lines, headingLine.line),
-    start: anchor.offset,
-    end,
-    subtree: source.slice(anchor.offset, end),
+    ...value, heading: heading(value.heading), headingPath: headingPath(value.headingPath),
   });
 }
-
 export function readMarkdownNode(source: string, anchorId: string): MarkdownNode {
-  const node = nodeOrNull(source, anchorId);
-  if (node === null) fail(`${anchorId}: anchor is not a canonical tree node`);
-  return node;
+  return node(upstream.readMarkdownNode(source, anchorId, options(source)));
 }
-
 export function listMarkdownChildren(source: string, parentAnchorId: string): readonly MarkdownNode[] {
-  const parent = readMarkdownNode(source, parentAnchorId);
-  const ids = listMarkdownAnchorIds(source);
-  return Object.freeze(ids
-    .map((id) => nodeOrNull(source, id))
-    .filter((node): node is MarkdownNode =>
-      node !== null &&
-      node.anchorId !== parent.anchorId &&
-      node.start > parent.start &&
-      node.start < parent.end &&
-      node.heading.level === parent.heading.level + 1
-    )
-    .sort((left, right) => left.start - right.start));
+  return Object.freeze(upstream.listMarkdownChildren(source, parentAnchorId, options(source)).map(node));
 }
-
 export function listMarkdownSections(source: string): readonly MarkdownSection[] {
-  const lines = linesOf(source);
-  const nodesByHeadingLine = new Map<number, MarkdownNode>();
-  for (const anchorId of listMarkdownAnchorIds(source)) {
-    const node = nodeOrNull(source, anchorId);
-    if (node === null) continue;
-    if (nodesByHeadingLine.has(node.headingLine)) {
-      fail(`heading at line ${node.headingLine} has multiple canonical node anchors`);
-    }
-    nodesByHeadingLine.set(node.headingLine, node);
-  }
-
-  const headingLines = lines.filter((line) => headingOf(line) !== null);
-  return Object.freeze(headingLines.map((line, index) => {
-    const heading = headingOf(line)!;
-    const node = nodesByHeadingLine.get(line.line);
-    const next = headingLines.slice(index + 1).find((candidate) => {
-      const candidateHeading = headingOf(candidate)!;
-      return candidateHeading.level <= heading.level;
-    });
-    let end = source.length;
-    if (next !== undefined) {
-      end = nodesByHeadingLine.get(next.line)?.start ?? next.start;
-    }
-    const start = node?.start ?? line.start;
-    return Object.freeze({
-      diagnosticLine: line.line,
-      heading,
-      headingPath: headingPathAt(lines, line.line),
-      anchorId: node?.anchorId ?? null,
-      start,
-      end,
-      content: source.slice(start, end),
-    });
-  }));
+  return Object.freeze(upstream.listMarkdownSections(source, options(source)).map(value => Object.freeze({
+    ...value, heading: heading(value.heading), headingPath: headingPath(value.headingPath),
+  })));
 }
 
-export function readOwnedMarkdownBlock(source: string, blockId: string): MarkdownOwnedBlock | null {
-  assertSafeId(blockId, "blockId");
-  const startToken = beginMarker(blockId);
-  const endToken = endMarker(blockId);
-  const lines = linesOf(source);
-  const starts = lines.filter((line) => line.visible && line.text.includes(startToken));
-  const ends = lines.filter((line) => line.visible && line.text.includes(endToken));
-
-  if (starts.length === 0 && ends.length === 0) return null;
-  if (starts.length !== 1 || ends.length !== 1) {
-    fail(`${blockId}: malformed owned block start=${starts.length} end=${ends.length}`);
-  }
-
-  const startLine = starts[0]!;
-  const endLine = ends[0]!;
-  if (endLine.line <= startLine.line) fail(`${blockId}: end marker must follow begin marker`);
-
-  const blockStart = startLine.start;
-  const blockEnd = endLine.end;
-  return Object.freeze({
-    blockId,
-    start: blockStart,
-    end: blockEnd,
-    content: source.slice(blockStart, blockEnd),
-  });
-}
-
+// MTS names of owned blocks are domain-owned, not a generic RepoGuard concept.
+// Enumerate only our explicit marker vocabulary; all structure/byte operations
+// below delegate to RepoGuard's generic public API.
 export function listOwnedMarkdownBlockIds(source: string): readonly string[] {
   const marker = /^<!--\s*мтс:требование:([^:]+):(начало|конец)\s*-->$/;
   const ids = new Set<string>();
-  for (const line of linesOf(source)) {
-    if (!line.visible) continue;
-    const match = marker.exec(line.text.trim());
-    if (match === null) continue;
-    const id = match[1]!;
-    assertSafeId(id, "owned block id");
-    ids.add(id);
+  let fenced = false;
+  for (const line of source.split("\n")) {
+    const text = line.replace(/\r$/, "").trim();
+    const fence = /^(?:```|~~~)/.test(text);
+    if (!fenced && !fence) {
+      const match = marker.exec(text);
+      if (match !== null) { assertSafeId(match[1]!, "owned block id"); ids.add(match[1]!); }
+    }
+    if (fence) fenced = !fenced;
   }
-  const result = [...ids].sort((left, right) => left.localeCompare(right));
-  for (const id of result) readOwnedMarkdownBlock(source, id);
-  return Object.freeze(result);
+  const sorted = [...ids].sort((a, b) => a.localeCompare(b));
+  for (const id of sorted) readOwnedMarkdownBlock(source, id);
+  return Object.freeze(sorted);
 }
-
-function insertAfterAnchorLine(source: string, anchor: MarkdownAddress, block: string): string {
-  const lines = linesOf(source);
-  const line = lines.find((candidate) => candidate.line === anchor.line);
-  if (line === undefined) fail(`${anchor.anchorId}: anchor line vanished`);
-  const newline = source.slice(line.end, line.end + 2) === "\r\n" ? "\r\n" : "\n";
-  const insertAt = line.end;
-  return `${source.slice(0, insertAt)}${newline}${block}${source.slice(insertAt)}`;
+export function readOwnedMarkdownBlock(source: string, blockId: string): MarkdownOwnedBlock | null {
+  const result = upstream.readOwnedMarkdownBlock(source, blockSpec(blockId));
+  return result === null ? null : Object.freeze(result);
 }
-
-export function assertOutsideOwnedBlockUnchanged(
-  before: string,
-  after: string,
-  blockId: string,
-): void {
-  const previous = readOwnedMarkdownBlock(before, blockId);
+export function assertOutsideOwnedBlockUnchanged(before: string, after: string, blockId: string): void {
+  const prev = readOwnedMarkdownBlock(before, blockId);
   const next = readOwnedMarkdownBlock(after, blockId);
-  if (previous === null || next === null) {
-    fail(`${blockId}: outside-change comparison requires block in both versions`);
-  }
-  const beforeOutside = before.slice(0, previous.start) + before.slice(previous.end);
-  const afterOutside = after.slice(0, next.start) + after.slice(next.end);
-  if (beforeOutside !== afterOutside) {
+  if (prev === null || next === null) fail(`${blockId}: outside-change comparison requires block in both versions`);
+  if (before.slice(0, prev.start) + before.slice(prev.end) !==
+      after.slice(0, next.start) + after.slice(next.end)) {
     fail(`${blockId}: bytes outside owned block changed`);
   }
 }
-
 export function replaceOwnedMarkdownSection(args: {
-  readonly source: string;
-  readonly mode: MarkdownDocumentMode;
-  readonly anchorId: string;
-  readonly blockId: string;
-  readonly generatedContent: string;
+  readonly source: string; readonly mode: MarkdownDocumentMode;
+  readonly anchorId: string; readonly blockId: string; readonly generatedContent: string;
 }): string {
   const { source, mode, anchorId, blockId, generatedContent } = args;
   assertSafeId(anchorId, "anchorId");
-  assertSafeId(blockId, "blockId");
-
-  if (mode === "source") fail(`${anchorId}: SOURCE document is read-only`);
-  if (mode === "generated") {
-    fail(`${anchorId}: whole-file GENERATED mode is not supported by the section adapter`);
+  const result = upstream.replaceOwnedMarkdownBlock({
+    source, mode, anchorId, block: blockSpec(blockId), generatedContent,
+  });
+  if (mode === "hybrid" && readOwnedMarkdownBlock(source, blockId) !== null) {
+    assertOutsideOwnedBlockUnchanged(source, result, blockId);
   }
-
-  const anchor = resolveMarkdownAnchor(source, anchorId);
-  const wrapped = [
-    beginMarker(blockId),
-    generatedContent,
-    endMarker(blockId),
-  ].join("\n");
-
-  const existing = readOwnedMarkdownBlock(source, blockId);
-  if (existing === null) {
-    return insertAfterAnchorLine(source, anchor, wrapped);
-  }
-
-  if (existing.start < anchor.offset) {
-    fail(`${blockId}: owned block precedes its anchor ${anchorId}`);
-  }
-
-  const updated = source.slice(0, existing.start) + wrapped + source.slice(existing.end);
-  assertOutsideOwnedBlockUnchanged(source, updated, blockId);
-  return updated;
+  return result;
 }
+export const normalizeProjectionModel = upstream.normalizeProjectionModel;
 
 function walkMarkdown(directory: string, prefix: string): string[] {
   const result: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      result.push(...walkMarkdown(resolve(directory, entry.name), path));
-    } else if (entry.isFile() && entry.name.endsWith(".md")) {
-      result.push(path);
-    }
+    if (entry.isDirectory()) result.push(...walkMarkdown(resolve(directory, entry.name), path));
+    else if (entry.isFile() && entry.name.endsWith(".md")) result.push(path);
   }
   return result;
 }
-
 export function listRepositoryMarkdownSurface(root: string): readonly string[] {
-  const result = ["README.md", "PORTFOLIO.md"];
-  result.push(...walkMarkdown(resolve(root, "docs"), "docs"));
-  return Object.freeze(result.sort());
+  return Object.freeze(["README.md", "PORTFOLIO.md", ...walkMarkdown(resolve(root, "docs"), "docs")].sort());
 }

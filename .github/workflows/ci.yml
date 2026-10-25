@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: Detect external proof diff
         id: external-proof-diff
@@ -53,6 +54,11 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Install pinned RepoGuard 4.1.0 runtime
+        run: |
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "6490ddc499ce01fa35b854dd4afbe0996d444165"
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+
       - name: Install TypeScript toolchain
         run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
 
@@ -63,6 +69,14 @@ jobs:
           else
             npm --prefix ts run check:full
           fi
+
+      - name: Verify deterministic documentation sync and coverage
+        run: |
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
 
       - name: Compile pinned Lean external foundation
         if: steps.external-proof-diff.outputs.run == 'true'
@@ -536,7 +550,7 @@ jobs:
         shell: bash
         run: |
           echo "Checking root directory..."
-          allowed='README.md|LICENSE|PORTFOLIO.md|repo-policy.json|.gitignore|.gitkeep'
+          allowed='README.md|LICENSE|PORTFOLIO.md|repo-policy.json|.gitignore|.gitkeep|.gitmodules'
           unexpected=0
           while IFS= read -r file; do
             if ! grep -Eq "^(${allowed})$" <<< "$file"; then
