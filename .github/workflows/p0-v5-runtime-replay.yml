@@ -1,0 +1,200 @@
+name: P0 RepoGuard v5 real-consumer replay (#2301)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/p0-v5-runtime-replay.yml
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    if: github.event.pull_request.draft == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ANUM_SHA: b53ade4bc6091f7811bcd73cce05257ee00662fa
+      ANUM_TREE: 5a903d178146db5bfd63ba89701428ad63e87205
+      RG_SHA: 98670b6f8638ceb4495fa77474efee468a4ebb81
+      RG_TREE: eedb205af5d5461d62bcfbb239a8ef17a5f395b5
+      OLD_RG_SHA: 6490ddc499ce01fa35b854dd4afbe0996d444165
+    steps:
+      - name: Checkout exact anum_docs
+        uses: actions/checkout@v6
+        with:
+          ref: b53ade4bc6091f7811bcd73cce05257ee00662fa
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+
+      - name: Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Verify exact snapshots and overlay only v5 submodule in runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$ANUM_SHA"
+          test "$(git rev-parse HEAD^{tree})" = "$ANUM_TREE"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "$OLD_RG_SHA"
+          git -C vendor/repo-guard fetch --quiet --no-tags origin main
+          git -C vendor/repo-guard checkout --quiet --detach "$RG_SHA"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "$RG_SHA"
+          test "$(git -C vendor/repo-guard rev-parse HEAD^{tree})" = "$RG_TREE"
+          test "$(node -p "require('./vendor/repo-guard/package.json').version")" = "5.0.0"
+          echo "EXACT_SNAPSHOTS=PASS"
+
+      - name: Install immutable dependency locks
+        run: |
+          set -euo pipefail
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+
+      - name: Ephemeral SHA and version guards only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          old_sha = "6490ddc499ce01fa35b854dd4afbe0996d444165"
+          new_sha = "98670b6f8638ceb4495fa77474efee468a4ebb81"
+          paths = (
+              "ts/src/tooling/markdown-section-adapter.ts",
+              "ts/src/tooling/theorem-projection-contract.ts",
+              "ts/test/repo-guard-mddb-differential.test.ts",
+              "ts/test/theorem-projection-contract.test.ts",
+          )
+          for name in paths:
+              f = Path(name)
+              old = subprocess.check_output(["git", "show", "HEAD:" + name], text=True)
+              if old_sha not in old and "4.1.0" not in old:
+                  raise SystemExit("MISSING_STALE_GUARD=" + name)
+              expected = old.replace(old_sha, new_sha).replace("4.1.0", "5.0.0")
+              f.write_text(expected, encoding="utf-8")
+              print("EPHEMERAL_GUARD=" + name)
+          changed = set(subprocess.check_output(["git", "diff", "--name-only", "HEAD"], text=True).splitlines())
+          if changed != set(paths) | {"vendor/repo-guard"}:
+              raise SystemExit("UNAUTHORIZED_OVERLAY_DIFF=" + str(sorted(changed)))
+          print("EPHEMERAL_IDENTITY_ONLY=PASS")
+          PY
+
+      - name: RepoGuard v5 clean compiler, expected J1 RED
+        id: compiler
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          node vendor/repo-guard/dist/repo-guard.mjs --repo-root "$PWD" check \
+            --base "$ANUM_SHA" --head "$ANUM_SHA" --format json \
+            > /tmp/p0-compiler.json 2> /tmp/p0-compiler.stderr
+          rc=$?
+          set -e
+          cat /tmp/p0-compiler.stderr
+          P0_RC="$rc" node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          const r = JSON.parse(readFileSync('/tmp/p0-compiler.json', 'utf8'));
+          const classes = {};
+          for (const d of r.diagnostics ?? []) classes[d.code] = (classes[d.code] ?? 0) + 1;
+          console.log("V5_COMPILER_EXIT=" + process.env.P0_RC);
+          console.log("J1=" + JSON.stringify(r.j1));
+          console.log("J2=" + JSON.stringify(r.j2));
+          console.log("J3=" + JSON.stringify(r.j3));
+          console.log("DIAGNOSTIC_COUNT=" + (r.diagnostics?.length ?? -1));
+          console.log("DIAGNOSTIC_CLASSES=" + JSON.stringify(classes));
+          console.log("DIAGNOSTIC_SAMPLE=" + JSON.stringify((r.diagnostics ?? []).slice(0,10)));
+          if (r.format !== 'repo-guard/local-compiler-v1' || r.base !== process.env.ANUM_SHA ||
+              r.head !== process.env.ANUM_SHA || r.ok !== false || r.j1?.tracked !== 1038 ||
+              r.j1?.justified !== 0 || process.env.P0_RC !== "1")
+            throw new Error('UNEXPECTED_COMPILER_RESULT');
+          console.log("V5_CLEAN_COMPILER_EXECUTION=YES");
+          console.log("CURRENT_FULL_J1=EXPECTED_RED");
+          JS
+
+      - name: Build real anum_docs consumer
+        run: |
+          npm --prefix ts run build
+          npm --prefix ts run package:check
+
+      - name: MDDB HYBRID, strict NodeNext, real Markdown corpus, negatives
+        id: mddb
+        continue-on-error: true
+        run: cd ts && node dist/test/repo-guard-mddb-differential.test.js
+
+      - name: Theorem projection exact-v5 replay
+        id: theorem
+        continue-on-error: true
+        run: |
+          cd ts
+          node dist/test/theorem-projection-contract.test.js
+          node dist/test/theorem-projection-model.test.js
+
+      - name: Current domain CI, FORMAL, provenance
+        id: domain
+        continue-on-error: true
+        run: |
+          set -e
+          npm --prefix ts run check:current
+          cd ts
+          node dist/test/foundation-provenance-audit.test.js
+          node dist/test/portable-assumption-derivation-provenance.test.js
+          node dist/test/portable-derivation-provenance.test.js
+
+      - name: Docs sync twice, byte-preservation, coverage
+        id: docs
+        continue-on-error: true
+        run: |
+          set -e
+          npm --prefix ts run docs:check
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          echo "DOCS_SYNC_IDEMPOTENCE=PASS"
+
+      - name: Contract Observatory
+        id: observatory
+        continue-on-error: true
+        run: |
+          set -e
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+
+      - name: Final integrity and P0 verdict
+        if: always()
+        env:
+          COMPILER: ${{ steps.compiler.outcome }}
+          MDDB: ${{ steps.mddb.outcome }}
+          THEOREM: ${{ steps.theorem.outcome }}
+          DOMAIN: ${{ steps.domain.outcome }}
+          DOCS: ${{ steps.docs.outcome }}
+          OBSERVATORY: ${{ steps.observatory.outcome }}
+        run: |
+          set -euo pipefail
+          echo "P0_STEP_OUTCOMES compiler=$COMPILER mddb=$MDDB theorem=$THEOREM domain=$DOMAIN docs=$DOCS observatory=$OBSERVATORY"
+          test "$(git rev-parse HEAD)" = "$ANUM_SHA"
+          test "$(git rev-parse HEAD^{tree})" = "$ANUM_TREE"
+          python3 - <<'PY'
+          import subprocess
+          expected = {
+              "vendor/repo-guard",
+              "ts/src/tooling/markdown-section-adapter.ts",
+              "ts/src/tooling/theorem-projection-contract.ts",
+              "ts/test/repo-guard-mddb-differential.test.ts",
+              "ts/test/theorem-projection-contract.test.ts",
+          }
+          actual = set(subprocess.check_output(["git","diff","--name-only","HEAD"],text=True).splitlines())
+          if actual != expected:
+              raise SystemExit("UNEXPECTED_TRACKED_DIFF=" + repr(sorted(actual)))
+          print("P0_EPHEMERAL_IDENTITY_ONLY=PASS")
+          PY
+          for result in "$COMPILER" "$MDDB" "$THEOREM" "$DOMAIN" "$DOCS" "$OBSERVATORY"; do
+            test "$result" = success || { echo "P0_RUNTIME=FAIL_OR_INCOMPLETE"; exit 1; }
+          done
+          echo "P0_RUNTIME=PASS"
