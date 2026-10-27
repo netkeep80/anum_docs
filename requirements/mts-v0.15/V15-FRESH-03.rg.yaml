@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-FRESH-03
+normative: "Two fresh Memories with unrelated allocation noise preserve canonical recursive representation and behavior."
+lifecycle:
+  accepted: true
+  current: true

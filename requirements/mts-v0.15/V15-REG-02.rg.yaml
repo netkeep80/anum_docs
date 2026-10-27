@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-REG-02
+normative: "Every FORMAL/model/JSON/metacompiler/recursive/execution change that can affect v0.15 executable semantics replays the complete Author-approved executable JSON corpus."
+lifecycle:
+  accepted: true
+  current: true

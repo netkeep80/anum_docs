@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CLOSE-01
+normative: "VERTICAL_GREEN requires transitive semantic dependency closure for the declared artifact scope."
+lifecycle:
+  accepted: true
+  current: true

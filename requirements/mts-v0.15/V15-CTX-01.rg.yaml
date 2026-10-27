@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CTX-01
+normative: "Theory, Context/currentness, interpreter/meta-program, entry and result execution roles are represented by Links and semantic ANet membership. Host package/launch code may perform only generic selection/orchestration allowed by the machine contract and cannot supply semantic role authority."
+lifecycle:
+  accepted: true
+  current: true

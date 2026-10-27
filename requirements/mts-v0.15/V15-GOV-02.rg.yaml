@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-GOV-02
+normative: "Acceptance corpus audits direct semantic construction and rejects hidden program-specific host injection or backend-specific semantic authority."
+lifecycle:
+  accepted: true
+  current: true

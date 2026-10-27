@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-ONTO-02
+normative: "Prefer ordinary Link + ExactSequence + self-reference topology before extending Grammar."
+lifecycle:
+  accepted: true
+  current: true

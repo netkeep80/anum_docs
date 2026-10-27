@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-STRUCT-01
+normative: "The v0.15 direct FORMAL/JSON source path preserves the already accepted ROOT/START/END/PAIR structural aspect constructors and lowers them to native Link topology / recursive 8/9/6/1 without enabling arbitrary cyclic bindings."
+lifecycle:
+  accepted: true
+  current: true

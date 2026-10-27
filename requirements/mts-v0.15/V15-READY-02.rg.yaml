@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-READY-02
+normative: "Independent readiness audit attempts to falsify hidden semantics, incomplete JSON, drift, omissions and nondeterminism."
+lifecycle:
+  accepted: true
+  current: true

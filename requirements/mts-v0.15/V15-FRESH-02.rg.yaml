@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-FRESH-02
+normative: "Canonical JSON alone reconstructs the same package in fresh Memory without source-specific repair."
+lifecycle:
+  accepted: true
+  current: true

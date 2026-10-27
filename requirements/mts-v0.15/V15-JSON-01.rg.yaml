@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-JSON-01
+normative: "JSON losslessly projects the complete supported canonical source ANet/model, not only passive carriers."
+lifecycle:
+  accepted: true
+  current: true

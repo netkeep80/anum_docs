@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-GOV-01
+normative: "Machine-readable candidate v0.15 requirements/traceability registry governs completion state."
+lifecycle:
+  accepted: true
+  current: true

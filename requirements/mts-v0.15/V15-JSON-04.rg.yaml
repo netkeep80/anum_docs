@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-JSON-04
+normative: "JSON arrays lower canonically to ExactSequence of already-denoted element Links; []=R. R-rooted fold F_R is a separate derived projection, not the positional/execution carrier."
+lifecycle:
+  accepted: true
+  current: true

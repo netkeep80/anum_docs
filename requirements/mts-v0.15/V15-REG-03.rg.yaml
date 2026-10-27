@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-REG-03
+normative: "Approved JSON/evidence is never silently regenerated; incompatible changes use explicit migration and renewed Author approval."
+lifecycle:
+  accepted: true
+  current: true

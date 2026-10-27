@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTH-02
+normative: "FORMAL_MIGRATED or VERTICAL_GREEN requires tracked canonical FORMAL artifact, entry, digest, profile and evidence."
+lifecycle:
+  accepted: true
+  current: true

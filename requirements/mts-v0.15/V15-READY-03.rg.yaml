@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-READY-03
+normative: "Only explicit Author ACCEPT/REJECT can change accepted/current from v0.14 to v0.15."
+lifecycle:
+  accepted: true
+  current: true

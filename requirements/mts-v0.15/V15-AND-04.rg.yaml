@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AND-04
+normative: "Author-gated strict Boolean NOT/OR/XOR reuse the exact same FORMAL/JSON source model, semantic Theory->Rule discovery, zero-role Rule topology, generic Γ-compatible execution path and generic frozen-backend lowering as approved AND; no operator-specific semantic/runtime path is permitted."
+lifecycle:
+  accepted: true
+  current: true

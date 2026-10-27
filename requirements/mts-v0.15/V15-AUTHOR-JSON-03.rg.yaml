@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTHOR-JSON-03
+normative: "Author decision is recorded per exact artifact revision/digest; material changes invalidate prior approval."
+lifecycle:
+  accepted: true
+  current: true

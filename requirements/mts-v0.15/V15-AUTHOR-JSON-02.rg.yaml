@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTHOR-JSON-02
+normative: "v0.15 Author review shows exact FORMAL, exact JSON, source/semantic mapping, external/backend boundary, round-trip, fresh executable replay and falsifiers."
+lifecycle:
+  accepted: true
+  current: true
