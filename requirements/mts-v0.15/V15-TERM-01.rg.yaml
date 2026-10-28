@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-TERM-01
+normative: "Normative English term for «асеть / асеть связей» is ANet. Aset is not an MTS English term; legacy Aset/aset code identifiers have no terminology or semantic authority."
+lifecycle:
+  accepted: true
+  current: true

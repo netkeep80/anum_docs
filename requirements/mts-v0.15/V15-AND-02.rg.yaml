@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AND-02
+normative: "Boolean AND executes through the shared matcher/Γ-compatible path and frozen compatibility adapter with zero AND-specific host dispatch; operands outside the local T/F domain are NO_MATCH rather than pass-through."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CLOSE-03
+normative: "Program-specific host semantic injection budget is exactly zero. Generic orchestration and backend compatibility/optimization lowerings may exist but have no MTS semantic authority."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AND-01
+normative: "A compact Author-gated Boolean AND source ANet contains only the exact local T/F truth-table semantics expressed as zero-role Rules; legacy RoleDictionary/index/Scope/interpreter scaffolding is not canonical source."
+lifecycle:
+  accepted: true
+  current: true

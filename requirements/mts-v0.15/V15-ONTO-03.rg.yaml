@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-ONTO-03
+normative: "Presentation names carry no semantic authority; topology-preserving rename preserves behavior."
+lifecycle:
+  accepted: true
+  current: true

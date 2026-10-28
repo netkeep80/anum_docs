@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CORPUS-01
+normative: "Every Author-approved v0.15 executable artifact is pinned and replayed through FORMAL/JSON -> native source ANet -> semantic ANet -> recursive 8/9/6/1 -> generic compatibility lowering where required -> frozen A-memory 0.175.0, with zero semantic backend patches."
+lifecycle:
+  accepted: true
+  current: true

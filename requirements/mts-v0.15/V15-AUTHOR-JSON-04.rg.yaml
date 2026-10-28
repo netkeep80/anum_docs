@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTHOR-JSON-04
+normative: "Author JSON review applies throughout v0.15; batch approval only for an explicitly shown exact batch."
+lifecycle:
+  accepted: true
+  current: true

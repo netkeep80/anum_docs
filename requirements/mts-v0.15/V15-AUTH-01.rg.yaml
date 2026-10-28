@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTH-01
+normative: "One v0.15 execution-core semantic authority path: universal FORMAL and canonical JSON converge to the same native source ANet, then shared resolution/denotation/compiler/Γ execution/projection; no consumer-specific host semantic path is authoritative."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-NAME-01
+normative: "Every FORMAL name is contextual. Absolute name :A is shorthand for R:A; no host-global atom namespace is semantic authority. Structured expressions resolve their endpoint names through the same contextual-name resolver before Link construction."
+lifecycle:
+  accepted: true
+  current: true

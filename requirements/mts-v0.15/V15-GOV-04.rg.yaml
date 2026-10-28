@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-GOV-04
+normative: "Normal MTS merge paths cannot bypass required CI/repo-guard enforcement: broad always-bypass repository roles are removed or contained to an explicitly audited emergency actor/process, and an intentional RED repo-guard pull request is mechanically blocked from merging until restored GREEN."
+lifecycle:
+  accepted: true
+  current: true

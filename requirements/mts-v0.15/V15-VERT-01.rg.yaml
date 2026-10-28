@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-VERT-01
+normative: "VERTICAL_GREEN requires the complete mandatory evidence bundle and zero semantic injection."
+lifecycle:
+  accepted: true
+  current: true

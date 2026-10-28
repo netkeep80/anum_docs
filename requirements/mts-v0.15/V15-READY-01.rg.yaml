@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-READY-01
+normative: "RELEASE_READY is impossible while any mandatory requirement is below VERTICAL_GREEN or explicitly resolved release state."
+lifecycle:
+  accepted: true
+  current: true

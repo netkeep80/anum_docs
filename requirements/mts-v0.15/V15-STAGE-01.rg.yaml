@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-STAGE-01
+normative: "Source bytes, native source ANet, resolution/denotation, semantic ANet, recursive metacompilation, backend compatibility lowering, execution/replay and projection remain separately observable."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-ONTO-01
+normative: "One-Link ontology: host kinds do not acquire MTS semantic authority."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-DOCS-01
+normative: "The canonical «Формальная нотация МТС.md» is a deterministic generated projection of the current v0.15 execution-core FORMAL/JSON model, machine registries, selected Gamma/context profiles and Author-approved executable corpus; hand-maintained semantic prose and stale v0.14-only projection are forbidden."
+lifecycle:
+  accepted: true
+  current: true

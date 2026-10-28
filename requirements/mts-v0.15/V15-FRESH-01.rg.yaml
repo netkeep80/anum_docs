@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-FRESH-01
+normative: "A canonical FORMAL executable artifact reconstructs its executable package in fresh Memory using only fixed generic authorities."
+lifecycle:
+  accepted: true
+  current: true

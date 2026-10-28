@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-JSON-03
+normative: "Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority."
+lifecycle:
+  accepted: true
+  current: true

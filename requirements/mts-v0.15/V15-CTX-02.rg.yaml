@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CTX-02
+normative: "The same Link may have different execution roles under different selected ANet contexts only because the corresponding contextual Link memberships differ; host names, manifests or pointers cannot create those roles."
+lifecycle:
+  accepted: true
+  current: true

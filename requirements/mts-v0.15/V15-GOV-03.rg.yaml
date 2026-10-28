@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-GOV-03
+normative: "Roadmap/status projections derive completion from registry/evidence rather than hand-maintained prose."
+lifecycle:
+  accepted: true
+  current: true

@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-VERT-02
+normative: "Completion state may only come from registered evidence, never PR/issue/test naming or partial round-trip."
+lifecycle:
+  accepted: true
+  current: true

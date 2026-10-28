@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-STAGE-02
+normative: "Read/find/validation are read-only; materialization/publication is explicit and failure-safe."
+lifecycle:
+  accepted: true
+  current: true

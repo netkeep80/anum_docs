@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-REG-01
+normative: "Every Author-approved JSON enters the permanent executable regression corpus."
+lifecycle:
+  accepted: true
+  current: true

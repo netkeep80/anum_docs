@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-JSON-02
+normative: "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics."
+lifecycle:
+  accepted: true
+  current: true

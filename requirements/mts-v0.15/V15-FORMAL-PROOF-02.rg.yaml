@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-FORMAL-PROOF-02
+normative: "Paired external assurance proves/cross-checks semantic preservation of FORMAL/JSON convergence and canonical recursive 8/9/6/1 metacompilation for the declared fragment; corpus GREEN alone is not proof of soundness."
+lifecycle:
+  accepted: true
+  current: true

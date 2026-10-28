@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-AUTHOR-JSON-01
+normative: "Every new canonical logical/executable JSON artifact in v0.15 stops at AUTHOR_REVIEW_PENDING before completion. Proof/aprover artifacts are separately Author-gated in v0.16."
+lifecycle:
+  accepted: true
+  current: true

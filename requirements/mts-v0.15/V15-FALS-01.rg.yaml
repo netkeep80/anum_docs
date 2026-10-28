@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-FALS-01
+normative: "Every semantic capability has positive, structural mutation, missing authority, context, identity, JSON mutation and fresh-memory falsifiers as applicable."
+lifecycle:
+  accepted: true
+  current: true

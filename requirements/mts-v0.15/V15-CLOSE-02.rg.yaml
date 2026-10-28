@@ -1,0 +1,6 @@
+format: repo-guard/requirement-v1
+id: V15-CLOSE-02
+normative: "Every dependency outside the artifact is explicitly classified and versioned."
+lifecycle:
+  accepted: true
+  current: true
