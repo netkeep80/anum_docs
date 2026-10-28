@@ -682,56 +682,6 @@
       "ts/test/mts-reader-review-p02-p03.test.ts",
       "ts/test/mts-reader-review-r01-r02.test.ts",
       "ts/test/mts-reader-review-r03-r04.test.ts"
-    ],
-    "p1-native-v015-requirements-exact": [
-      "requirements/mts-v0.15/V15-TERM-01.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTH-01.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTH-02.rg.yaml",
-      "requirements/mts-v0.15/V15-ONTO-01.rg.yaml",
-      "requirements/mts-v0.15/V15-ONTO-02.rg.yaml",
-      "requirements/mts-v0.15/V15-ONTO-03.rg.yaml",
-      "requirements/mts-v0.15/V15-STRUCT-01.rg.yaml",
-      "requirements/mts-v0.15/V15-CLOSE-01.rg.yaml",
-      "requirements/mts-v0.15/V15-CLOSE-02.rg.yaml",
-      "requirements/mts-v0.15/V15-CLOSE-03.rg.yaml",
-      "requirements/mts-v0.15/V15-FRESH-01.rg.yaml",
-      "requirements/mts-v0.15/V15-FRESH-02.rg.yaml",
-      "requirements/mts-v0.15/V15-FRESH-03.rg.yaml",
-      "requirements/mts-v0.15/V15-NAME-01.rg.yaml",
-      "requirements/mts-v0.15/V15-JSON-01.rg.yaml",
-      "requirements/mts-v0.15/V15-JSON-02.rg.yaml",
-      "requirements/mts-v0.15/V15-JSON-03.rg.yaml",
-      "requirements/mts-v0.15/V15-VERT-01.rg.yaml",
-      "requirements/mts-v0.15/V15-VERT-02.rg.yaml",
-      "requirements/mts-v0.15/V15-AND-01.rg.yaml",
-      "requirements/mts-v0.15/V15-AND-02.rg.yaml",
-      "requirements/mts-v0.15/V15-AND-03.rg.yaml",
-      "requirements/mts-v0.15/V15-AND-04.rg.yaml",
-      "requirements/mts-v0.15/V15-CTX-01.rg.yaml",
-      "requirements/mts-v0.15/V15-CTX-02.rg.yaml",
-      "requirements/mts-v0.15/V15-GAMMA-01.rg.yaml",
-      "requirements/mts-v0.15/V15-FORMAL-PROOF-01.rg.yaml",
-      "requirements/mts-v0.15/V15-FORMAL-PROOF-02.rg.yaml",
-      "requirements/mts-v0.15/V15-JSON-04.rg.yaml",
-      "requirements/mts-v0.15/V15-STAGE-01.rg.yaml",
-      "requirements/mts-v0.15/V15-STAGE-02.rg.yaml",
-      "requirements/mts-v0.15/V15-FALS-01.rg.yaml",
-      "requirements/mts-v0.15/V15-GOV-01.rg.yaml",
-      "requirements/mts-v0.15/V15-GOV-02.rg.yaml",
-      "requirements/mts-v0.15/V15-GOV-03.rg.yaml",
-      "requirements/mts-v0.15/V15-CORPUS-01.rg.yaml",
-      "requirements/mts-v0.15/V15-GOV-04.rg.yaml",
-      "requirements/mts-v0.15/V15-DOCS-01.rg.yaml",
-      "requirements/mts-v0.15/V15-READY-01.rg.yaml",
-      "requirements/mts-v0.15/V15-READY-02.rg.yaml",
-      "requirements/mts-v0.15/V15-READY-03.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTHOR-JSON-01.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTHOR-JSON-02.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTHOR-JSON-03.rg.yaml",
-      "requirements/mts-v0.15/V15-AUTHOR-JSON-04.rg.yaml",
-      "requirements/mts-v0.15/V15-REG-01.rg.yaml",
-      "requirements/mts-v0.15/V15-REG-02.rg.yaml",
-      "requirements/mts-v0.15/V15-REG-03.rg.yaml"
     ]
   },
   "new_file_classes": {
@@ -865,18 +815,6 @@
         "max_new_docs": 0,
         "max_new_files": 108,
         "max_net_added_lines": 17118
-      }
-    },
-    "p1-native-v015-requirements": {
-      "allow_surfaces": [
-        "p1-native-v015-requirements-exact"
-      ],
-      "require_surfaces": [
-        "p1-native-v015-requirements-exact"
-      ],
-      "allow_unclassified_surfaces": false,
-      "budgets": {
-        "max_new_files": 48
       }
     }
   }
