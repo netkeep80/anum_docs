@@ -17,3 +17,15 @@ relations:
     target:
       kind: artifact
       path: ts/test/docs-size-budget.test.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/formal-notation-v015-markdown.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/docs-sync.ts
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/specs/Формальная нотация МТС.md
