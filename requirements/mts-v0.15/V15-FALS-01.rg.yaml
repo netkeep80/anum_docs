@@ -4,3 +4,16 @@ normative: "Every semantic capability has positive, structural mutation, missing
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-context-authority-closure-c1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-json-j1-b9.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts

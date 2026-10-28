@@ -4,3 +4,16 @@ normative: "The canonical «Формальная нотация МТС.md» is a
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/docs-sync.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/docs-current-surface.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/docs-size-budget.test.ts

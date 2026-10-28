@@ -4,3 +4,12 @@ normative: "Program-specific host semantic injection budget is exactly zero. Gen
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-context-authority-closure-c1.test.ts

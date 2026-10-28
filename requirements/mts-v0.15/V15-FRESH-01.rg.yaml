@@ -4,3 +4,16 @@ normative: "A canonical FORMAL executable artifact reconstructs its executable p
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-boolean-package-replay-a2.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-frozen-replay-artifact-integrity.test.ts

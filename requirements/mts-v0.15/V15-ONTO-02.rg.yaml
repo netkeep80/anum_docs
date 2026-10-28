@@ -4,3 +4,12 @@ normative: "Prefer ordinary Link + ExactSequence + self-reference topology befor
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-exact-sequence-b7.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-direct-structural-aspects-s1.test.ts

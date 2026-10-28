@@ -4,3 +4,20 @@ normative: "VERTICAL_GREEN requires the complete mandatory evidence bundle and z
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-requirements-traceability-r0.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-frozen-replay-artifact-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-boolean-package-replay-a2.test.ts

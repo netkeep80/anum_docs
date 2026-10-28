@@ -4,3 +4,32 @@ normative: "Theory, Context/currentness, interpreter/meta-program, entry and res
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-self-contained-context-freeze-resume-a5.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-context-theory-self-contained-a6.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-positive-aset-currentness-a8.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-gamma-core-a9a.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-role-bundle-a9b.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-context-authority-closure-c1.test.ts

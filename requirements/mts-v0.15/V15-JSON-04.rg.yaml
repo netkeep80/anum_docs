@@ -4,3 +4,12 @@ normative: "JSON arrays lower canonically to ExactSequence of already-denoted el
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-exact-sequence-b7.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts

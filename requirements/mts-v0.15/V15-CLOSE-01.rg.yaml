@@ -4,3 +4,12 @@ normative: "VERTICAL_GREEN requires transitive semantic dependency closure for t
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-context-authority-closure-c1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts

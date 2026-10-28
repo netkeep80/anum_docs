@@ -4,3 +4,12 @@ normative: "MTS has one canonical semantic Boolean AND source/model. Frozen or f
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-and-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-boolean-package-replay-a2.test.ts

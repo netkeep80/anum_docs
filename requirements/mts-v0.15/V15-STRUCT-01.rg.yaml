@@ -4,3 +4,12 @@ normative: "The v0.15 direct FORMAL/JSON source path preserves the already accep
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-direct-structural-aspects-s1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-source-anet-denotation-core-das-a2a.test.ts

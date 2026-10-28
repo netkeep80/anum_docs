@@ -4,3 +4,12 @@ normative: "Paired external assurance proves/cross-checks semantic preservation 
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-frozen-replay-artifact-integrity.test.ts

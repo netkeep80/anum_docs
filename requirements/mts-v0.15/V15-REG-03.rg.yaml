@@ -4,3 +4,12 @@ normative: "Approved JSON/evidence is never silently regenerated; incompatible c
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-requirements-traceability-r0.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-frozen-replay-artifact-integrity.test.ts

@@ -4,3 +4,12 @@ normative: "Independent readiness audit attempts to falsify hidden semantics, in
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-final-readiness-r3.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-independent-readiness-r2.test.ts
