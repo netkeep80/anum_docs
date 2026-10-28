@@ -4,3 +4,12 @@ normative: "Every FORMAL/model/JSON/metacompiler/recursive/execution change that
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-frozen-replay-artifact-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: .github/workflows/amemory-v015-regression.yml

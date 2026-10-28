@@ -4,3 +4,28 @@ normative: "One repeated universal Γ is the shared v0.15 semantic execution ope
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-gamma-core-a9a.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-role-bundle-a9b.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-exact-finite-support-necessity-a10.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-parallel-reaction-reduction-a11.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-finite-materialized-reaction-a12.test.ts

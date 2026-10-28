@@ -4,3 +4,16 @@ normative: "JSON losslessly projects the complete supported canonical source ANe
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-direct-json-denotation-das-a2b.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-boolean-package-replay-a2.test.ts

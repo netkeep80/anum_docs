@@ -4,3 +4,12 @@ normative: "Lean4 and Rocq independently formalize the supported v0.15 FORMAL ma
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-proof-assurance-f0.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-direct-structural-aspects-s1.test.ts

@@ -4,3 +4,32 @@ normative: "Every new canonical logical/executable JSON artifact in v0.15 stops 
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-requirements-traceability-r0.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-grounded-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-two-role-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-and-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-not-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-or-approved-source-integrity.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-xor-approved-source-integrity.test.ts

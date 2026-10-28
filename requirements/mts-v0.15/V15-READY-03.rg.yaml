@@ -4,3 +4,12 @@ normative: "Only explicit Author ACCEPT/REJECT can change accepted/current from 
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-final-readiness-r3.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/release-cutover.test.ts

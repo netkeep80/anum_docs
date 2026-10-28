@@ -4,3 +4,8 @@ normative: "Normative English term for «асеть / асеть связей» 
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-requirements-traceability-r0.test.ts

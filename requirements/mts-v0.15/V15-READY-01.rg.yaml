@@ -4,3 +4,12 @@ normative: "RELEASE_READY is impossible while any mandatory requirement is below
 lifecycle:
   accepted: true
   current: true
+relations:
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-final-readiness-r3.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-requirements-traceability-r0.test.ts
