@@ -21,3 +21,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-rule-bundle-denotation-das-a2c.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-CTX-01
