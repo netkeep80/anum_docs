@@ -230,6 +230,7 @@ try {
     "contracts/mts-conformance-v0.15.json",
     "requirements/mts-v0.15.json",
     "traceability/mts-v0.15.json",
+    "cutover/typescript-c1-acceptance-v0.8.json",
     "contracts/mts-contract-v0.14.json",
     "contracts/mts-conformance-v0.14.json",
     "traceability/mts-v0.14.json",
@@ -238,8 +239,49 @@ try {
   ]) copy(path);
 
   const tempIr = loadMtsSemanticIr(tempRoot);
+  assert.deepEqual(tempIr, ir, "isolated accepted fixture must preserve the real repository semantic IR");
   assert.equal(tempIr.requirements.length, 48);
   assert.equal(tempIr.contract, "mts-contract/v0.15");
+
+  const policyPath = resolve(tempRoot, "repo-policy.json");
+  const policySource = readFileSync(policyPath, "utf8");
+  const policy = JSON.parse(policySource) as any;
+  policy.packs["contract-conformance"].current.contract.path = "contracts/mts-contract-v0.14.json";
+  writeFileSync(policyPath, JSON.stringify(policy), "utf8");
+  assert.deepEqual(
+    loadMtsSemanticIr(tempRoot),
+    ir,
+    "repo-policy current contract mutation must not influence accepted v0.15 semantic IR",
+  );
+  writeFileSync(policyPath, policySource, "utf8");
+
+  const nativeAuthorityCases: Array<[string, (value: any) => void, RegExp]> = [
+    [
+      "requirements/mts-v0.15.json",
+      (value) => { value.contract = "contracts/mts-contract-v0.14.json"; },
+      /registry current accepted contract path mismatch/,
+    ],
+    [
+      "traceability/mts-v0.15.json",
+      (value) => { value.currentAccepted.contract = "contracts/mts-contract-v0.14.json"; },
+      /traceability current accepted contract path mismatch/,
+    ],
+    [
+      "cutover/typescript-c1-acceptance-v0.8.json",
+      (value) => { value.current.contract = "contracts/mts-contract-v0.14.json"; },
+      /acceptance current contract path mismatch/,
+    ],
+  ];
+  for (const [path, mutate, pattern] of nativeAuthorityCases) {
+    const target = resolve(tempRoot, path);
+    const source = readFileSync(target, "utf8");
+    const value = JSON.parse(source);
+    mutate(value);
+    writeFileSync(target, JSON.stringify(value), "utf8");
+    expect(() => loadMtsSemanticIr(tempRoot), pattern, path);
+    writeFileSync(target, source, "utf8");
+  }
+
   const tempLegacyIr = loadMtsSemanticIr(tempRoot, registryPath);
   assert.equal(tempLegacyIr.requirements.length, 14);
   assert.equal(tempLegacyIr.repositoryRequirements.length, 2);
