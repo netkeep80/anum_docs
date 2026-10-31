@@ -21,3 +21,27 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-boolean-package-replay-a2.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-AUTH-02
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-CLOSE-03
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-FRESH-02
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-FRESH-03
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-JSON-03
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-FALS-01
