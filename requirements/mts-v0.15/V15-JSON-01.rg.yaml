@@ -17,3 +17,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-boolean-package-replay-a2.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-NAME-01

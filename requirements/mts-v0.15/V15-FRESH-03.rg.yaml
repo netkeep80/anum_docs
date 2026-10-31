@@ -17,3 +17,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-frozen-replay-artifact-integrity.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-FRESH-01

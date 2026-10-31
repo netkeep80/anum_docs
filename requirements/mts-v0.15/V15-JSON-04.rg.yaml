@@ -13,3 +13,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-JSON-02

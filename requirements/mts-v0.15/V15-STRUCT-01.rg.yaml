@@ -13,3 +13,11 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-source-anet-denotation-core-das-a2a.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-ONTO-02
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-JSON-02
