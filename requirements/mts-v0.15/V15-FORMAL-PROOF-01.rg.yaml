@@ -13,3 +13,19 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-direct-structural-aspects-s1.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-AUTH-01
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-JSON-04
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-STRUCT-01
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-NAME-01
