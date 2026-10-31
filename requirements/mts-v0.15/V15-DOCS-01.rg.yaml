@@ -29,3 +29,7 @@ relations:
     target:
       kind: artifact
       path: docs/specs/Формальная нотация МТС.md
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: profiles/mts-v015-formal-notation-projection.json
