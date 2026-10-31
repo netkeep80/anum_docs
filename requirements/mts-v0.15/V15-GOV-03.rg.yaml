@@ -9,3 +9,11 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-requirements-traceability-r0.test.ts
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-GOV-01
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-VERT-02
