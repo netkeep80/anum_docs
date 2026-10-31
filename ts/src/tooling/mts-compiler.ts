@@ -293,7 +293,6 @@ function loadAcceptedV015SemanticIr(
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, contractPath + ".schema");
   if (contractId !== "mts-contract/v0.15") fail("accepted v0.15 registry requires current v0.15 contract");
-  if (string(registry.contract, registryPath + ".contract") !== contractPath) fail("v0.15 registry contract path mismatch");
   const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
   const traces = object(traceability.requirements, traceabilityPath + ".requirements");
   if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
@@ -359,17 +358,13 @@ export function loadMtsSemanticIr(
   }
 
   const source = object(registry.semanticSource, `${registryPath}.semanticSource`);
-  const declaredContractPath = string(source.path, `${registryPath}.semanticSource.path`);
-  const contractPath = declaredContractPath;
+  const contractPath = string(source.path, `${registryPath}.semanticSource.path`);
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, `${contractPath}.schema`);
   if (string(registry.contract, `${registryPath}.contract`) !== contractId) {
     fail(`${registryPath} does not target contract ${contractId}`);
   }
 
-  if (declaredContractPath !== contractPath) {
-    fail(`semantic source must be current contract ${contractPath}`);
-  }
   if (string(source.pointer, `${registryPath}.semanticSource.pointer`) !== "/requiredSemanticLaws") {
     fail("semantic source pointer must be /requiredSemanticLaws");
   }
