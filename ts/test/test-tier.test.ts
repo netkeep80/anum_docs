@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { resolve } from "node:path";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import {
   buildTestTierPlan,
   classifyTestPaths,
@@ -97,6 +99,72 @@ assert.throws(
   /machine-readable authority references missing test/,
 );
 
+const fixtureRoot = mkdtempSync(join(tmpdir(), "mts-test-tier-"));
+try {
+  const copy = (path: string): void => {
+    const target = resolve(fixtureRoot, path);
+    mkdirSync(dirname(target), { recursive: true });
+    copyFileSync(resolve(repositoryRoot, path), target);
+  };
+
+  for (const path of [
+    "repo-policy.json",
+    "requirements/mts-v0.15.json",
+    "requirements/mts-v0.14.json",
+    "traceability/mts-v0.15.json",
+    "contracts/mts-contract-v0.15.json",
+    "contracts/mts-conformance-v0.15.json",
+    "cutover/typescript-c1-acceptance-v0.8.json",
+    "proofs/provers.json",
+    "theorems/current-v0.14.json",
+    "README.md",
+  ]) {
+    copy(path);
+  }
+
+  for (const path of plan.allSourceTests) {
+    const target = resolve(fixtureRoot, path);
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, "", "utf8");
+  }
+
+  const fixturePlan = buildTestTierPlan(fixtureRoot);
+  assert.deepEqual(
+    fixturePlan,
+    plan,
+    "isolated accepted fixture must reproduce the real repository test-tier plan",
+  );
+
+  const policyPath = resolve(fixtureRoot, "repo-policy.json");
+  const policySource = readFileSync(policyPath, "utf8");
+  const policy = JSON.parse(policySource) as any;
+  policy.packs["contract-conformance"].current.contract.path = "contracts/mts-contract-v0.14.json";
+  policy.packs["contract-conformance"].current.conformance.path = "contracts/mts-conformance-v0.14.json";
+  policy.packs["contract-conformance"].acceptance.document.path =
+    "cutover/typescript-c1-acceptance-v0.7.json";
+  writeFileSync(policyPath, JSON.stringify(policy), "utf8");
+  assert.deepEqual(
+    buildTestTierPlan(fixtureRoot),
+    fixturePlan,
+    "repo-policy current/acceptance mutations must not influence test-tier selection",
+  );
+  writeFileSync(policyPath, policySource, "utf8");
+
+  const registryPath = resolve(fixtureRoot, "requirements/mts-v0.15.json");
+  const registrySource = readFileSync(registryPath, "utf8");
+  const registry = JSON.parse(registrySource) as any;
+  registry.currentAccepted.contract = "contracts/mts-contract-v0.14.json";
+  writeFileSync(registryPath, JSON.stringify(registry), "utf8");
+  assert.throws(
+    () => buildTestTierPlan(fixtureRoot),
+    /v0\.15 registry current accepted contract path mismatch/,
+    "native accepted-authority inconsistency must fail closed",
+  );
+  writeFileSync(registryPath, registrySource, "utf8");
+} finally {
+  rmSync(fixtureRoot, { recursive: true, force: true });
+}
+
 console.log(
   [
     "R2 test tiers: GREEN",
@@ -104,5 +172,7 @@ console.log(
     `current=${plan.currentSourceTests.length}`,
     `machine-referenced=${plan.machineReferencedSourceTests.length}`,
     `historical-research=${plan.historicalResearchSourceTests.length}`,
+    "policy-pointer=IGNORED",
+    "native-authority-mismatch=RED",
   ].join(" "),
 );
