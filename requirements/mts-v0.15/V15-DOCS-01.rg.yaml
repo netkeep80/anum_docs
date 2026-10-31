@@ -33,3 +33,15 @@ relations:
     target:
       kind: artifact
       path: profiles/mts-v015-formal-notation-projection.json
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-STAGE-01
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-JSON-04
+  - predicates: [depends_on]
+    target:
+      kind: requirement
+      id: V15-FORMAL-PROOF-02
