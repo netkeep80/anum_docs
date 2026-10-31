@@ -84,13 +84,81 @@ function readJson(root: string, path: string): JsonObject {
   }
 }
 
-function currentContractPath(root: string): string {
-  const policy = readJson(root, "repo-policy.json");
-  const packs = object(policy.packs, "repo-policy.json.packs");
-  const pack = object(packs["contract-conformance"], "repo-policy.json.packs.contract-conformance");
-  const current = object(pack.current, "repo-policy.json.packs.contract-conformance.current");
-  const contract = object(current.contract, "repo-policy.json.packs.contract-conformance.current.contract");
-  return string(contract.path, "current.contract.path");
+function loadAcceptedV015Authority(
+  root: string,
+  registryPath: string,
+  registry: JsonObject,
+): {
+  readonly contractPath: string;
+  readonly traceabilityPath: string;
+  readonly traceability: JsonObject;
+} {
+  const current = object(registry.currentAccepted, registryPath + ".currentAccepted");
+  if (string(current.mtsVersion, registryPath + ".currentAccepted.mtsVersion") !== "v0.15") {
+    fail("v0.15 registry current accepted version mismatch");
+  }
+  if (string(current.requirements, registryPath + ".currentAccepted.requirements") !== registryPath) {
+    fail("v0.15 registry current accepted requirements path mismatch");
+  }
+
+  const contractPath = string(registry.contract, registryPath + ".contract");
+  if (string(current.contract, registryPath + ".currentAccepted.contract") !== contractPath) {
+    fail("v0.15 registry current accepted contract path mismatch");
+  }
+
+  const traceabilityPath = string(registry.traceability, registryPath + ".traceability");
+  if (string(current.traceability, registryPath + ".currentAccepted.traceability") !== traceabilityPath) {
+    fail("v0.15 registry current accepted traceability path mismatch");
+  }
+  const conformancePath = string(current.conformance, registryPath + ".currentAccepted.conformance");
+
+  const traceability = readJson(root, traceabilityPath);
+  if (
+    string(traceability.schema, traceabilityPath + ".schema") !== "mts-traceability/v0.3" ||
+    traceability.status !== "accepted" ||
+    traceability.accepted !== true ||
+    traceability.releaseState !== "ACCEPTED"
+  ) {
+    fail("v0.15 traceability must be accepted");
+  }
+  if (string(traceability.contract, traceabilityPath + ".contract") !== contractPath) {
+    fail("v0.15 traceability contract path mismatch");
+  }
+  if (string(traceability.conformance, traceabilityPath + ".conformance") !== conformancePath) {
+    fail("v0.15 traceability conformance path mismatch");
+  }
+
+  const traceCurrent = object(traceability.currentAccepted, traceabilityPath + ".currentAccepted");
+  if (string(traceCurrent.mtsVersion, traceabilityPath + ".currentAccepted.mtsVersion") !== "v0.15") {
+    fail("v0.15 traceability current accepted version mismatch");
+  }
+  if (string(traceCurrent.requirements, traceabilityPath + ".currentAccepted.requirements") !== registryPath) {
+    fail("v0.15 traceability current accepted requirements path mismatch");
+  }
+  if (string(traceCurrent.traceability, traceabilityPath + ".currentAccepted.traceability") !== traceabilityPath) {
+    fail("v0.15 traceability current accepted traceability path mismatch");
+  }
+  if (string(traceCurrent.contract, traceabilityPath + ".currentAccepted.contract") !== contractPath) {
+    fail("v0.15 traceability current accepted contract path mismatch");
+  }
+  if (string(traceCurrent.conformance, traceabilityPath + ".currentAccepted.conformance") !== conformancePath) {
+    fail("v0.15 traceability current accepted conformance path mismatch");
+  }
+
+  const acceptancePath = string(traceability.acceptance, traceabilityPath + ".acceptance");
+  const acceptance = readJson(root, acceptancePath);
+  if (string(acceptance.decision, acceptancePath + ".decision") !== "ACCEPT_MTS_V0_15") {
+    fail("v0.15 acceptance decision mismatch");
+  }
+  const acceptanceCurrent = object(acceptance.current, acceptancePath + ".current");
+  if (string(acceptanceCurrent.contract, acceptancePath + ".current.contract") !== contractPath) {
+    fail("v0.15 acceptance current contract path mismatch");
+  }
+  if (string(acceptanceCurrent.conformance, acceptancePath + ".current.conformance") !== conformancePath) {
+    fail("v0.15 acceptance current conformance path mismatch");
+  }
+
+  return Object.freeze({ contractPath, traceabilityPath, traceability });
 }
 
 function exactSet(name: string, left: readonly string[], right: readonly string[]): void {
@@ -221,14 +289,11 @@ function loadAcceptedV015SemanticIr(
   registry: JsonObject,
 ): MtsSemanticIr {
   if (registry.status !== "accepted" || registry.accepted !== true) fail("v0.15 registry must be accepted after S22");
-  const contractPath = currentContractPath(root);
+  const { contractPath, traceabilityPath, traceability } = loadAcceptedV015Authority(root, registryPath, registry);
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, contractPath + ".schema");
   if (contractId !== "mts-contract/v0.15") fail("accepted v0.15 registry requires current v0.15 contract");
-  if (string(registry.contract, registryPath + ".contract") !== contractPath) fail("v0.15 registry contract path mismatch");
   const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
-  const traceabilityPath = string(registry.traceability, registryPath + ".traceability");
-  const traceability = readJson(root, traceabilityPath);
   const traces = object(traceability.requirements, traceabilityPath + ".requirements");
   if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
 
@@ -293,19 +358,13 @@ export function loadMtsSemanticIr(
   }
 
   const source = object(registry.semanticSource, `${registryPath}.semanticSource`);
-  const declaredContractPath = string(source.path, `${registryPath}.semanticSource.path`);
-  const contractPath = registryPath === MTS_REQUIREMENT_REGISTRY_PATH
-    ? currentContractPath(root)
-    : declaredContractPath;
+  const contractPath = string(source.path, `${registryPath}.semanticSource.path`);
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, `${contractPath}.schema`);
   if (string(registry.contract, `${registryPath}.contract`) !== contractId) {
     fail(`${registryPath} does not target contract ${contractId}`);
   }
 
-  if (declaredContractPath !== contractPath) {
-    fail(`semantic source must be current contract ${contractPath}`);
-  }
   if (string(source.pointer, `${registryPath}.semanticSource.pointer`) !== "/requiredSemanticLaws") {
     fail("semantic source pointer must be /requiredSemanticLaws");
   }
