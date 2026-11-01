@@ -1,14 +1,16 @@
 import {
   existsSync,
   readFileSync,
-  readdirSync,
 } from "node:fs";
 import {
   basename,
   join,
   resolve,
 } from "node:path";
-import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
+import {
+  CURRENT_DOC_SIZE_SURFACE,
+  loadCurrentProjection,
+} from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`current docs: ${message}`);
@@ -36,32 +38,19 @@ assert(
   "post-acceptance FORMAL formula migration is governed by #1951",
 );
 
-function listMarkdownFiles(directory: string, relativePrefix: string): string[] {
-  const result: string[] = [];
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const relativePath = `${relativePrefix}/${entry.name}`;
-    const absolutePath = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      result.push(...listMarkdownFiles(absolutePath, relativePath));
-    } else if (entry.isFile() && entry.name.endsWith(".md")) {
-      result.push(relativePath);
-    }
-  }
-  return result;
-}
-
 const current = Object.freeze([
-  "README.md",
+  ...CURRENT_DOC_SIZE_SURFACE,
   "PORTFOLIO.md",
-  ...listMarkdownFiles(join(root, "docs"), "docs"),
-].filter((relativePath) =>
-  readFileSync(join(root, relativePath), "utf8").includes("mts-doc-version: v0.15"),
-));
+]);
 
-assert(current.length > 0, "current documentation surface is discovered from v0.15 markers");
+same(current.length, 10, "current reader-facing documentation surface cardinality");
+same(new Set(current).size, current.length, "current documentation paths are unique");
+assert(
+  current.includes("docs/theory/Основания МТС.md"),
+  "required current document is selected independently of its version marker",
+);
 assert(current.includes("PORTFOLIO.md"), "portfolio remains current reader-facing documentation");
 assert(current.includes("docs/CONTRIBUTING.md"), "contributing guide remains current reader-facing documentation");
-same(new Set(current).size, current.length, "current documentation paths are unique");
 
 const obsoleteCurrentMarkerPattern = /mts-doc-version:\s*v0\.(?:9|10|11|12|13)\b/gi;
 const versionedNamePattern = /(?:^|[\s._-])v?\d+\.\d+(?:$|[\s._-])/i;
