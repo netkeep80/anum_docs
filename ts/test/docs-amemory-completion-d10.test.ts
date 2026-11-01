@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   existsSync,
   readFileSync,
+  readdirSync,
 } from "node:fs";
 import {
   join,
@@ -19,6 +20,27 @@ function same<T>(actual: T, expected: T, message: string): void {
   );
 }
 
+function listMarkdownFiles(directory: string, relativePrefix: string): string[] {
+  const result: string[] = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const relativePath = `${relativePrefix}/${entry.name}`;
+    const absolutePath = join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...listMarkdownFiles(absolutePath, relativePath));
+    else if (entry.isFile() && entry.name.endsWith(".md")) result.push(relativePath);
+  }
+  return result;
+}
+
+function currentMarkdownFiles(root: string): readonly string[] {
+  return Object.freeze([
+    "README.md",
+    "PORTFOLIO.md",
+    ...listMarkdownFiles(join(root, "docs"), "docs"),
+  ].filter((relativePath) =>
+    readFileSync(join(root, relativePath), "utf8").includes("mts-doc-version: v0.15"),
+  ));
+}
+
 function gitBlobSha(source: string): string {
   const body = Buffer.from(source, "utf8");
   const header = Buffer.from(`blob ${body.length}\0`, "utf8");
@@ -28,7 +50,6 @@ function gitBlobSha(source: string): string {
 const root = resolve(process.cwd(), "..");
 const docPath = join(root, "docs/specs/Апамять и управление сетью связей.md");
 const profilePath = join(root, "profiles/amemory-execution-profile.json");
-const policyPath = join(root, "repo-policy.json");
 
 const requiredConvergenceGates = Object.freeze([
   "ts/test/docs-current-surface.test.ts",
@@ -130,32 +151,19 @@ same(
   "normalized schedule independence",
 );
 
-const policy = JSON.parse(readFileSync(policyPath, "utf8")) as {
-  paths?: { canonical_docs?: string[] };
-};
-const canonicalDocs = policy.paths?.canonical_docs;
-assert(Array.isArray(canonicalDocs), "canonical current docs are declared");
-
+const currentDocs = currentMarkdownFiles(root);
 const ownerMarker = "<!-- смысловой-владелец-апамяти -->";
 let ownerCount = 0;
 let ownerPath = "";
-for (const relativePath of canonicalDocs) {
+for (const relativePath of currentDocs) {
   const source = readFileSync(join(root, relativePath), "utf8");
   const count = source.split(ownerMarker).length - 1;
   if (count > 0) ownerPath = relativePath;
   ownerCount += count;
 }
 same(ownerCount, 1, "competing A-memory semantic owner count must remain zero");
-same(
-  ownerPath,
-  "docs/specs/Апамять и управление сетью связей.md",
-  "canonical A-memory semantic owner path",
-);
-same(
-  profile.authority.canonicalSemanticOwner,
-  ownerPath,
-  "machine profile must point to the same semantic owner",
-);
+same(ownerPath, "docs/specs/Апамять и управление сетью связей.md", "current A-memory semantic owner path");
+same(profile.authority.canonicalSemanticOwner, ownerPath, "machine profile must point to the same semantic owner");
 
 const doc = readFileSync(docPath, "utf8");
 const d10Marker = '<a id="d10-completion"></a>';
