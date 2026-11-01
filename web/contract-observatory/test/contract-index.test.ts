@@ -104,7 +104,7 @@ same(
   "every observed contract/conformance pair is accounted for exactly once",
 );
 
-const nativeFixtureRoot = mkdtempSync(join(tmpdir(), "mts-contract-index-native-"));
+const nativeFixtureRoot = mkdtempSync(join(repositoryRoot, ".mts-contract-index-native-"));
 try {
   for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
     cpSync(join(repositoryRoot, directory), join(nativeFixtureRoot, directory), { recursive: true });
