@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { loadMtsSemanticIr } from "./mts-compiler.js";
 
 export type TestTier = "current" | "full";
 
@@ -98,54 +99,14 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     .map((name) => `ts/test/${name}`)
     .sort();
 
-  const policy = object(readJson(repositoryRoot, "repo-policy.json"), "repo-policy.json");
-  const packs = object(policy.packs, "repo-policy.json.packs");
-  const contractConformance = object(
-    packs["contract-conformance"],
-    "repo-policy.json.packs.contract-conformance",
-  );
-  const current = object(
-    contractConformance.current,
-    "repo-policy.json.packs.contract-conformance.current",
-  );
-  const acceptanceConfig = object(
-    contractConformance.acceptance,
-    "repo-policy.json.packs.contract-conformance.acceptance",
-  );
-  const contractConfig = object(current.contract, "contract-conformance.current.contract");
-  const conformanceConfig = object(current.conformance, "contract-conformance.current.conformance");
-  const acceptanceDocument = object(
-    acceptanceConfig.document,
-    "contract-conformance.acceptance.document",
-  );
-
-  const contractPath = string(contractConfig.path, "current.contract.path");
-  const conformancePath = string(conformanceConfig.path, "current.conformance.path");
-  const acceptancePath = string(acceptanceDocument.path, "acceptance.document.path");
-
-  const acceptance = object(readJson(repositoryRoot, acceptancePath), acceptancePath);
-  const acceptanceCurrent = object(acceptance.current, `${acceptancePath}.current`);
-  if (string(acceptanceCurrent.contract, `${acceptancePath}.current.contract`) !== contractPath) {
-    fail("repo-policy current contract differs from acceptance current contract");
-  }
-  if (
-    string(acceptanceCurrent.conformance, `${acceptancePath}.current.conformance`) !==
-    conformancePath
-  ) {
-    fail("repo-policy current conformance differs from acceptance current conformance");
-  }
-
+  const semanticIr = loadMtsSemanticIr(repositoryRoot);
+  const contractPath = semanticIr.contractPath;
+  const traceabilityPath = semanticIr.traceabilityPath;
+  const conformancePath = semanticIr.conformancePath;
   const contract = object(readJson(repositoryRoot, contractPath), contractPath);
+  const traceability = object(readJson(repositoryRoot, traceabilityPath), traceabilityPath);
+  const acceptancePath = string(traceability.acceptance, `${traceabilityPath}.acceptance`);
   const conformance = object(readJson(repositoryRoot, conformancePath), conformancePath);
-  if (string(contract.conformanceCorpus, `${contractPath}.conformanceCorpus`) !== conformancePath) {
-    fail("current contract conformanceCorpus differs from current conformance path");
-  }
-
-  const traceabilityPath = string(
-    contract.traceabilityManifest,
-    `${contractPath}.traceabilityManifest`,
-  );
-  const traceability = readJson(repositoryRoot, traceabilityPath);
 
   const proofInfrastructurePath = "proofs/provers.json";
   const proofInfrastructure = object(
