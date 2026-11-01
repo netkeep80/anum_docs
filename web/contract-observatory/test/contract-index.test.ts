@@ -1,12 +1,14 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   ContractIndexError,
   buildContractObservatoryIndex,
+  buildContractObservatoryIndexFromReleasePointers,
   serializeContractObservatoryIndex,
   type ContractIndexErrorCode,
+  type ReleasePointers,
 } from "../src/contract-index.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -28,7 +30,24 @@ function expectCode(effect: () => unknown, code: ContractIndexErrorCode, message
   throw new Error(`Contract Observatory V3a: ${message}: expected rejection`);
 }
 
+function expectThrow(effect: () => unknown, message: string): void {
+  let rejected = false;
+  try {
+    effect();
+  } catch {
+    rejected = true;
+  }
+  assert(rejected, `${message}: expected rejection`);
+}
+
 const repositoryRoot = process.cwd();
+const acceptedReleasePointers: ReleasePointers = Object.freeze({
+  currentContractPath: "contracts/mts-contract-v0.15.json",
+  currentConformancePath: "contracts/mts-conformance-v0.15.json",
+  previousContractPath: "contracts/mts-contract-v0.14.json",
+  previousConformancePath: "contracts/mts-conformance-v0.14.json",
+  acceptancePath: "cutover/typescript-c1-acceptance-v0.8.json",
+});
 const realIndex = buildContractObservatoryIndex(repositoryRoot);
 same(realIndex.schema, "mts-contract-observatory-index/v0.1", "index schema");
 assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted pairs");
@@ -45,11 +64,11 @@ assert(historicalV011 !== undefined, "historical v0.11 remains observable");
 same(historicalV011.accepted, true, "historical v0.11 remains accepted evidence");
 same(historicalV011.isCurrent, false, "historical v0.11 is not current");
 same(historicalV011.isPrevious, false, "historical v0.11 is not previous");
-same(realIndex.currentContractPath, "contracts/mts-contract-v0.15.json", "policy current contract");
-same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.15.json", "policy current conformance");
-same(realIndex.previousContractPath, "contracts/mts-contract-v0.14.json", "policy previous contract");
-same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.14.json", "policy previous conformance");
-same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json", "acceptance path comes from policy");
+same(realIndex.currentContractPath, "contracts/mts-contract-v0.15.json", "accepted current contract");
+same(realIndex.currentConformancePath, "contracts/mts-conformance-v0.15.json", "accepted current conformance");
+same(realIndex.previousContractPath, "contracts/mts-contract-v0.14.json", "accepted previous contract");
+same(realIndex.previousConformancePath, "contracts/mts-conformance-v0.14.json", "accepted previous conformance");
+same(realIndex.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json", "acceptance path comes from accepted native projection");
 
 const current = realIndex.versions.find((version) => version.isCurrent);
 const previous = realIndex.versions.find((version) => version.isPrevious);
@@ -67,6 +86,15 @@ same(previous.accepted, true, "previous accepted flag projected");
 
 const serialized = serializeContractObservatoryIndex(realIndex);
 same(serialized, serializeContractObservatoryIndex(buildContractObservatoryIndex(repositoryRoot)), "serialization is deterministic");
+const explicitAcceptedIndex = buildContractObservatoryIndexFromReleasePointers(
+  repositoryRoot,
+  acceptedReleasePointers,
+);
+same(
+  serializeContractObservatoryIndex(explicitAcceptedIndex),
+  serialized,
+  "native authority acquisition preserves the exact accepted baseline index",
+);
 assert(!serialized.includes("rootBasisTarget"), "index does not copy raw contract bodies");
 assert(!serialized.includes("TopBind(R,S)"), "index does not copy semantic equations");
 const livePaths = new Set(realIndex.versions.flatMap((version) => [version.contractPath, version.conformancePath]));
@@ -76,15 +104,73 @@ same(
   "every observed contract/conformance pair is accounted for exactly once",
 );
 
+const nativeFixtureRoot = mkdtempSync(join(tmpdir(), "mts-contract-index-native-"));
+try {
+  for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
+    cpSync(join(repositoryRoot, directory), join(nativeFixtureRoot, directory), { recursive: true });
+  }
+  mkdirSync(join(nativeFixtureRoot, "ts"), { recursive: true });
+  cpSync(join(repositoryRoot, "ts", "dist"), join(nativeFixtureRoot, "ts", "dist"), { recursive: true });
+  cpSync(join(repositoryRoot, "README.md"), join(nativeFixtureRoot, "README.md"));
+  cpSync(join(repositoryRoot, "repo-policy.json"), join(nativeFixtureRoot, "repo-policy.json"));
+
+  const nativeBaseline = buildContractObservatoryIndex(nativeFixtureRoot);
+  same(
+    serializeContractObservatoryIndex(nativeBaseline),
+    serialized,
+    "isolated native-authority fixture preserves real repository index",
+  );
+
+  const policyPath = join(nativeFixtureRoot, "repo-policy.json");
+  const policySource = readFileSync(policyPath, "utf8");
+  const policy = JSON.parse(policySource) as any;
+  policy.packs["contract-conformance"].current.contract.path = "contracts/does-not-exist-current.json";
+  policy.packs["contract-conformance"].current.conformance.path = "contracts/does-not-exist-current-conformance.json";
+  policy.packs["contract-conformance"].previous.contract.path = "contracts/does-not-exist-previous.json";
+  policy.packs["contract-conformance"].previous.conformance.path = "contracts/does-not-exist-previous-conformance.json";
+  policy.packs["contract-conformance"].acceptance.document.path = "cutover/does-not-exist.json";
+  writeFileSync(policyPath, JSON.stringify(policy), "utf8");
+
+  const policyMutated = buildContractObservatoryIndex(nativeFixtureRoot);
+  same(
+    serializeContractObservatoryIndex(policyMutated),
+    serializeContractObservatoryIndex(nativeBaseline),
+    "legacy policy pointer mutation must not influence Observatory index",
+  );
+
+  const registryPath = join(nativeFixtureRoot, "requirements", "mts-v0.15.json");
+  const registrySource = readFileSync(registryPath, "utf8");
+  const registry = JSON.parse(registrySource) as any;
+  registry.currentAccepted.contract = "contracts/mts-contract-v0.14.json";
+  writeFileSync(registryPath, JSON.stringify(registry), "utf8");
+  expectThrow(
+    () => buildContractObservatoryIndex(nativeFixtureRoot),
+    "native current-authority mismatch must fail closed",
+  );
+  writeFileSync(registryPath, registrySource, "utf8");
+
+  const acceptancePath = join(nativeFixtureRoot, "cutover", "typescript-c1-acceptance-v0.8.json");
+  const acceptanceSource = readFileSync(acceptancePath, "utf8");
+  const acceptance = JSON.parse(acceptanceSource) as any;
+  acceptance.previousReleaseEvidence.conformance = "contracts/mts-conformance-v0.15.json";
+  writeFileSync(acceptancePath, JSON.stringify(acceptance), "utf8");
+  expectThrow(
+    () => buildContractObservatoryIndex(nativeFixtureRoot),
+    "native previous-release evidence mismatch must fail closed",
+  );
+  writeFileSync(acceptancePath, acceptanceSource, "utf8");
+} finally {
+  rmSync(nativeFixtureRoot, { recursive: true, force: true });
+}
+
 interface Fixture {
   readonly root: string;
-  readonly acceptancePath: string;
+  readonly pointers: ReleasePointers;
 }
 
 function createFixture(versions = ["0.9", "0.10", "1.2", "1.10"]): Fixture {
   const root = mkdtempSync(join(tmpdir(), "mts-contract-index-"));
   mkdirSync(join(root, "contracts"));
-  mkdirSync(join(root, "cutover"));
   for (const version of versions) {
     writeJson(root, `contracts/mts-contract-v${version}.json`, {
       schema: `mts-contract/v${version}`,
@@ -109,29 +195,14 @@ function createFixture(versions = ["0.9", "0.10", "1.2", "1.10"]): Fixture {
   }
   const current = versions.at(-1)!;
   const previous = versions.at(-2)!;
-  const acceptancePath = "cutover/acceptance.json";
-  writeJson(root, "repo-policy.json", {
-    packs: {
-      "contract-conformance": {
-        current: {
-          contract: { path: `contracts/mts-contract-v${current}.json` },
-          conformance: { path: `contracts/mts-conformance-v${current}.json` },
-        },
-        previous: {
-          contract: { path: `contracts/mts-contract-v${previous}.json` },
-          conformance: { path: `contracts/mts-conformance-v${previous}.json` },
-        },
-        acceptance: { document: { path: acceptancePath } },
-      },
-    },
+  const pointers: ReleasePointers = Object.freeze({
+    currentContractPath: `contracts/mts-contract-v${current}.json`,
+    currentConformancePath: `contracts/mts-conformance-v${current}.json`,
+    previousContractPath: `contracts/mts-contract-v${previous}.json`,
+    previousConformancePath: `contracts/mts-conformance-v${previous}.json`,
+    acceptancePath: "cutover/acceptance.json",
   });
-  writeJson(root, acceptancePath, {
-    current: {
-      contract: `contracts/mts-contract-v${current}.json`,
-      conformance: `contracts/mts-conformance-v${current}.json`,
-    },
-  });
-  return { root, acceptancePath };
+  return { root, pointers };
 }
 
 function writeJson(root: string, path: string, value: unknown): void {
@@ -154,7 +225,7 @@ function fixtureCase(effect: (fixture: Fixture) => void): void {
 const natural = createFixture();
 try {
   same(
-    buildContractObservatoryIndex(natural.root).versions.map((version) => version.contractId).join(","),
+    buildContractObservatoryIndexFromReleasePointers(natural.root, natural.pointers).versions.map((version) => version.contractId).join(","),
     "mts-contract/v0.9,mts-contract/v0.10,mts-contract/v1.2,mts-contract/v1.10",
     "numeric version ordering is not lexical ordering",
   );
@@ -187,29 +258,18 @@ try {
     requiredExecutableGates: ["candidate-gate"],
     requiredNegativeVectors: ["candidate-negative"],
   });
-  overwrite(withCandidate.root, "repo-policy.json", {
-    packs: {
-      "contract-conformance": {
-        current: {
-          contract: { path: "contracts/mts-contract-v0.12.json" },
-          conformance: { path: "contracts/mts-conformance-v0.12.json" },
-        },
-        previous: {
-          contract: { path: "contracts/mts-contract-v0.11.json" },
-          conformance: { path: "contracts/mts-conformance-v0.11.json" },
-        },
-        acceptance: { document: { path: withCandidate.acceptancePath } },
-      },
-    },
-  });
-  overwrite(withCandidate.root, withCandidate.acceptancePath, {
-    current: {
-      contract: "contracts/mts-contract-v0.12.json",
-      conformance: "contracts/mts-conformance-v0.12.json",
-    },
+  const candidatePointers: ReleasePointers = Object.freeze({
+    currentContractPath: "contracts/mts-contract-v0.12.json",
+    currentConformancePath: "contracts/mts-conformance-v0.12.json",
+    previousContractPath: "contracts/mts-contract-v0.11.json",
+    previousConformancePath: "contracts/mts-conformance-v0.11.json",
+    acceptancePath: withCandidate.pointers.acceptancePath,
   });
 
-  const candidateIndex = buildContractObservatoryIndex(withCandidate.root);
+  const candidateIndex = buildContractObservatoryIndexFromReleasePointers(
+    withCandidate.root,
+    candidatePointers,
+  );
   same(candidateIndex.versions.length, 3, "candidate pair is visible alongside accepted pair history");
   const candidate = candidateIndex.versions.find((version) => version.contractId === "mts-contract/v0.13");
   assert(candidate !== undefined, "candidate summary exists");
@@ -224,81 +284,70 @@ try {
   rmSync(withCandidate.root, { recursive: true, force: true });
 }
 
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   writeFileSync(join(root, "contracts/mts-contract-v0.9.json"), "{broken", "utf8");
-  expectCode(() => buildContractObservatoryIndex(root), "malformed-json", "malformed contract JSON");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "malformed-json", "malformed contract JSON");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   overwrite(root, "contracts/mts-contract-v0.9.json", {
     status: "accepted", accepted: true, acceptanceReady: true,
     semanticBase: "mts-contract/v0.1", observableSemanticDelta: true,
     conformanceCorpus: "contracts/mts-conformance-v0.9.json",
   });
-  expectCode(() => buildContractObservatoryIndex(root), "invalid-document", "missing contract schema");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "invalid-document", "missing contract schema");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   overwrite(root, "contracts/mts-contract-v0.9.json", {
     schema: "mts-contract/v0.9", status: "accepted", accepted: true, acceptanceReady: true,
     semanticBase: "mts-contract/v0.1", observableSemanticDelta: true,
     conformanceCorpus: "contracts/not-present.json",
   });
-  expectCode(() => buildContractObservatoryIndex(root), "missing-conformance", "missing declared conformance");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "missing-conformance", "missing declared conformance");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   writeJson(root, "contracts/mts-conformance-v9.9.json", {
     schema: "mts-conformance/v9.9", status: "accepted", accepted: true,
     contract: "mts-contract/v9.9", coverageState: "complete",
     requiredExecutableGates: [], requiredNegativeVectors: [],
   });
-  expectCode(() => buildContractObservatoryIndex(root), "orphan-conformance", "orphan conformance");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "orphan-conformance", "orphan conformance");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   writeJson(root, "contracts/mts-contract-v9.9.json", {
     schema: "mts-contract/v0.9", status: "accepted", accepted: true, acceptanceReady: true,
     semanticBase: "mts-contract/v0.1", observableSemanticDelta: true,
     conformanceCorpus: "contracts/mts-conformance-v0.9.json",
   });
-  expectCode(() => buildContractObservatoryIndex(root), "duplicate-contract-id", "duplicate contract ID");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "duplicate-contract-id", "duplicate contract ID");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   writeJson(root, "contracts/mts-conformance-v9.9.json", {
     schema: "mts-conformance/v0.9", status: "accepted", accepted: true,
     contract: "mts-contract/v0.9", coverageState: "complete",
     requiredExecutableGates: [], requiredNegativeVectors: [],
   });
-  expectCode(() => buildContractObservatoryIndex(root), "duplicate-conformance-id", "duplicate conformance ID");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "duplicate-conformance-id", "duplicate conformance ID");
 });
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   overwrite(root, "contracts/mts-conformance-v0.9.json", {
     schema: "mts-conformance/v0.9", status: "accepted", accepted: true,
     contract: "mts-contract/v0.10", coverageState: "complete",
     requiredExecutableGates: [], requiredNegativeVectors: [],
   });
-  expectCode(() => buildContractObservatoryIndex(root), "pair-mismatch", "declared pair mismatch");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "pair-mismatch", "declared pair mismatch");
 });
-fixtureCase(({ root }) => {
-  overwrite(root, "repo-policy.json", {
-    packs: {
-      "contract-conformance": {
-        current: { contract: { path: "contracts/missing.json" }, conformance: { path: "contracts/mts-conformance-v1.10.json" } },
-        previous: { contract: { path: "contracts/mts-contract-v1.2.json" }, conformance: { path: "contracts/mts-conformance-v1.2.json" } },
-        acceptance: { document: { path: "cutover/acceptance.json" } },
-      },
-    },
+fixtureCase(({ root, pointers }) => {
+  const missingPointers: ReleasePointers = Object.freeze({
+    ...pointers,
+    currentContractPath: "contracts/missing.json",
   });
-  expectCode(() => buildContractObservatoryIndex(root), "policy-path-missing", "policy points outside discovered pairs");
+  expectCode(
+    () => buildContractObservatoryIndexFromReleasePointers(root, missingPointers),
+    "release-pair-missing",
+    "accepted release pointer outside discovered pairs",
+  );
 });
-fixtureCase(({ root, acceptancePath }) => {
-  rmSync(join(root, acceptancePath));
-  expectCode(() => buildContractObservatoryIndex(root), "acceptance-missing", "missing acceptance manifest");
-});
-fixtureCase(({ root, acceptancePath }) => {
-  overwrite(root, acceptancePath, {
-    current: { contract: "contracts/mts-contract-v1.2.json", conformance: "contracts/mts-conformance-v1.2.json" },
-  });
-  expectCode(() => buildContractObservatoryIndex(root), "acceptance-mismatch", "acceptance disagrees with policy");
-});
-fixtureCase(({ root }) => {
+fixtureCase(({ root, pointers }) => {
   writeJson(root, "contracts/mts-contract-v1.x.json", {
     schema: "mts-contract/v1.x", status: "accepted", accepted: true, acceptanceReady: true,
     semanticBase: "mts-contract/v0.1", observableSemanticDelta: true,
@@ -309,7 +358,7 @@ fixtureCase(({ root }) => {
     contract: "mts-contract/v1.x", coverageState: "complete",
     requiredExecutableGates: [], requiredNegativeVectors: [],
   });
-  expectCode(() => buildContractObservatoryIndex(root), "invalid-schema-version", "ambiguous schema version");
+  expectCode(() => buildContractObservatoryIndexFromReleasePointers(root, pointers), "invalid-schema-version", "ambiguous schema version");
 });
 
 const sourceTestDirectory = join(repositoryRoot, "web", "contract-observatory", "test");
