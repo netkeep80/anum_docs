@@ -50,9 +50,17 @@ const repositoryRoot = findRepositoryRoot();
 assert.deepEqual(checkCurrentReleasePolicy(repositoryRoot), [], "v0.15 current contribution policy must be internally consistent");
 
 const projection = loadCurrentProjection(repositoryRoot);
-assert.equal(projection.currentContract, "mts-contract/v0.15");
-assert.equal(projection.previousContract, "mts-contract/v0.14");
-assert.equal(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json");
+assert.deepEqual(projection, {
+  currentContract: "mts-contract/v0.15",
+  currentConformance: "mts-conformance/v0.15",
+  previousContract: "mts-contract/v0.14",
+  previousConformance: "mts-conformance/v0.14",
+  currentContractPath: "contracts/mts-contract-v0.15.json",
+  currentConformancePath: "contracts/mts-conformance-v0.15.json",
+  previousContractPath: "contracts/mts-contract-v0.14.json",
+  previousConformancePath: "contracts/mts-conformance-v0.14.json",
+  acceptancePath: "cutover/typescript-c1-acceptance-v0.8.json",
+}, "accepted current projection must remain byte-for-byte path equivalent to the pre-Slice-3 baseline");
 assert.deepEqual(CANONICAL_DOCS, ["README.md"], "generated current projection must have exactly one owner");
 assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
   "docs/CONTRIBUTING.md",
@@ -61,6 +69,15 @@ assert.deepEqual(PROJECTION_FORBIDDEN_DOCS, [
 ]);
 
 const rendered = renderCurrentProjection(projection);
+assert.equal(rendered, [
+  PROJECTION_START,
+  "> **Текущий принятый выпуск МТС: v0.15.** Этот блок строится из принятых указателей командой `npm --prefix ts run docs:sync`.",
+  ">",
+  "> - Контракт: `mts-contract/v0.15` — [файл контракта](contracts/mts-contract-v0.15.json).",
+  "> - Корпус соответствия: `mts-conformance/v0.15` — [файл корпуса](contracts/mts-conformance-v0.15.json).",
+  "> - Свидетельство принятия: [файл принятия](cutover/typescript-c1-acceptance-v0.8.json).",
+  PROJECTION_END,
+].join("\n"), "rendered current projection must remain exactly unchanged");
 assert.ok(rendered.includes("mts-contract/v0.15"));
 assert.ok(!rendered.includes("mts-contract/v0.14"), "current README projection must not expose previous MTS versions");
 assert.ok(!rendered.includes("Предыдущ"), "current README projection must not contain previous-release prose");
@@ -282,9 +299,100 @@ try {
   copy("traceability/mts-v0.14.json");
   copy("requirements/mts-v0.14.json");
   copy("cutover/typescript-c1-acceptance-v0.8.json");
+  copy("cutover/typescript-c1-acceptance-v0.7.json");
   for (const path of loadRepositoryTheoremProjectionSources(repositoryRoot).availablePaths) copy(path);
   for (const path of FORMAL_NOTATION_V015_SOURCE_PATHS) copy(path);
   for (const path of listRepositoryMarkdownSurface(repositoryRoot)) copy(path);
+
+  const fixtureProjection = loadCurrentProjection(tempRoot);
+  assert.deepEqual(fixtureProjection, projection, "isolated fixture must preserve real current projection");
+  assert.equal(
+    renderCurrentProjection(fixtureProjection),
+    rendered,
+    "isolated fixture must preserve rendered current projection",
+  );
+  assert.deepEqual(checkRepositorySemanticLawDocumentation(tempRoot), []);
+  assert.deepEqual(checkRepositoryDocs(tempRoot), []);
+  assert.deepEqual(syncRepositoryDocs(tempRoot), [], "clean fixture docs sync must remain a no-op");
+
+  const policyPath = resolve(tempRoot, "repo-policy.json");
+  const policySource = readFileSync(policyPath, "utf8");
+  const writePolicyMutation = (mutate: (policy: any) => void): void => {
+    const policy = JSON.parse(policySource) as any;
+    mutate(policy);
+    writeFileSync(policyPath, JSON.stringify(policy), "utf8");
+  };
+  const restorePolicy = (): void => writeFileSync(policyPath, policySource, "utf8");
+
+  writePolicyMutation((policy) => {
+    policy.packs["contract-conformance"].current.contract.path = "contracts/mts-contract-v0.14.json";
+    policy.packs["contract-conformance"].current.conformance.path = "contracts/mts-conformance-v0.14.json";
+  });
+  assert.deepEqual(loadCurrentProjection(tempRoot), fixtureProjection, "F1: policy current pointers must be ignored");
+  assert.deepEqual(
+    checkRepositorySemanticLawDocumentation(tempRoot),
+    [],
+    "F1: policy current pointers must not redirect semantic-law documentation checks",
+  );
+  restorePolicy();
+
+  writePolicyMutation((policy) => {
+    policy.packs["contract-conformance"].acceptance.document.path =
+      "cutover/typescript-c1-acceptance-v0.7.json";
+  });
+  assert.deepEqual(loadCurrentProjection(tempRoot), fixtureProjection, "F2: policy acceptance pointer must be ignored");
+  restorePolicy();
+
+  writePolicyMutation((policy) => {
+    policy.packs["contract-conformance"].previous.contract.path = "contracts/does-not-exist.json";
+    policy.packs["contract-conformance"].previous.conformance.path = "contracts/also-does-not-exist.json";
+  });
+  assert.deepEqual(loadCurrentProjection(tempRoot), fixtureProjection, "F3: policy previous pointers must be ignored");
+  restorePolicy();
+
+  writePolicyMutation((policy) => {
+    policy.paths.canonical_docs = ["docs/does-not-exist.md"];
+  });
+  assert.deepEqual(
+    checkRepositorySemanticLawDocumentation(tempRoot),
+    [],
+    "F4: policy canonical_docs must not influence semantic-law documentation checks",
+  );
+  assert.deepEqual(checkRepositoryDocs(tempRoot), [], "F4: policy canonical_docs must not alter generated docs checks");
+  restorePolicy();
+
+  const registryPathV15 = resolve(tempRoot, "requirements/mts-v0.15.json");
+  const registrySourceV15 = readFileSync(registryPathV15, "utf8");
+  const registryV15 = JSON.parse(registrySourceV15) as any;
+  registryV15.currentAccepted.contract = "contracts/mts-contract-v0.14.json";
+  writeFileSync(registryPathV15, JSON.stringify(registryV15), "utf8");
+  expectThrow(
+    () => loadCurrentProjection(tempRoot),
+    /v0\.15 registry current accepted contract path mismatch/,
+  );
+  writeFileSync(registryPathV15, registrySourceV15, "utf8");
+
+  const currentContractPath = resolve(tempRoot, "contracts/mts-contract-v0.15.json");
+  const currentContractSource = readFileSync(currentContractPath, "utf8");
+  const currentContract = JSON.parse(currentContractSource) as any;
+  currentContract.conformanceCorpus = "contracts/mts-conformance-v0.14.json";
+  writeFileSync(currentContractPath, JSON.stringify(currentContract), "utf8");
+  expectThrow(
+    () => loadCurrentProjection(tempRoot),
+    /v0\.15 contract conformanceCorpus differs from accepted conformance path/,
+  );
+  writeFileSync(currentContractPath, currentContractSource, "utf8");
+
+  const acceptancePathV15 = resolve(tempRoot, "cutover/typescript-c1-acceptance-v0.8.json");
+  const acceptanceSourceV15 = readFileSync(acceptancePathV15, "utf8");
+  const acceptanceV15 = JSON.parse(acceptanceSourceV15) as any;
+  acceptanceV15.previousReleaseEvidence.conformance = "contracts/mts-conformance-v0.15.json";
+  writeFileSync(acceptancePathV15, JSON.stringify(acceptanceV15), "utf8");
+  expectThrow(
+    () => loadCurrentProjection(tempRoot),
+    /previous contract conformanceCorpus differs from accepted previous conformance path/,
+  );
+  writeFileSync(acceptancePathV15, acceptanceSourceV15, "utf8");
 
   const contributingPath = resolve(tempRoot, "docs/CONTRIBUTING.md");
   const currentPolicy = readFileSync(contributingPath, "utf8");
