@@ -101,15 +101,9 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
 
   const semanticIr = loadMtsSemanticIr(repositoryRoot);
   const contractPath = semanticIr.contractPath;
+  const traceabilityPath = semanticIr.traceabilityPath;
+  const conformancePath = semanticIr.conformancePath;
   const contract = object(readJson(repositoryRoot, contractPath), contractPath);
-  const conformancePath = string(
-    contract.conformanceCorpus,
-    `${contractPath}.conformanceCorpus`,
-  );
-  const traceabilityPath = string(
-    contract.traceabilityManifest,
-    `${contractPath}.traceabilityManifest`,
-  );
   const traceability = object(readJson(repositoryRoot, traceabilityPath), traceabilityPath);
   const acceptancePath = string(traceability.acceptance, `${traceabilityPath}.acceptance`);
   const conformance = object(readJson(repositoryRoot, conformancePath), conformancePath);
