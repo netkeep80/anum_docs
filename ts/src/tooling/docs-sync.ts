@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {checkEAPrompts, syncEAPrompts} from "./external-audit-methodology.js";
-import { compileRequirementDocuments, MTS_REQUIREMENT_REGISTRY_PATH } from "./mts-compiler.js";
+import { compileRequirementDocuments, loadMtsSemanticIr, MTS_REQUIREMENT_REGISTRY_PATH } from "./mts-compiler.js";
 import { auditRepositoryMarkdownLinks } from "./markdown-link-audit.js";
 import { auditRepositoryStableAnchors } from "./markdown-anchor-baseline.js";
 import { auditHistoricalV013FoundationProvenance } from "./foundation-provenance-audit.js";
@@ -47,6 +47,17 @@ export interface DocumentationSizeMeasurement {
  * текущего выпуска. Теория и процессные документы не получают копию release manifest.
  */
 export const CANONICAL_DOCS = ["README.md"] as const;
+
+const SEMANTIC_LAW_DOCUMENT_SURFACE = [
+  "README.md",
+  "docs/theory/Основания МТС.md",
+  "docs/theory/Система аксиом МТС.md",
+  "docs/specs/Формальная нотация МТС.md",
+  "docs/specs/Ачисла и сериализация.md",
+  "docs/specs/Апамять и управление сетью связей.md",
+  "docs/specs/Пучки связей.md",
+  "docs/Словарь терминов МТС.md",
+] as const;
 
 export const PROJECTION_FORBIDDEN_DOCS = [
   "docs/CONTRIBUTING.md",
@@ -111,40 +122,108 @@ export function findRepositoryRoot(start = process.cwd()): string {
 }
 
 export function loadCurrentProjection(root = findRepositoryRoot()): CurrentProjection {
-  const policy = readJson(root, "repo-policy.json");
-  const packs = nested(policy, "packs", "repo-policy.json");
-  const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
-  const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
-  const previous = nested(topology, "previous", "repo-policy.json.packs.contract-conformance");
-  const acceptance = nested(topology, "acceptance", "repo-policy.json.packs.contract-conformance");
+  const semanticIr = loadMtsSemanticIr(root);
+  const currentContractPath = semanticIr.contractPath;
+  const currentConformancePath = semanticIr.conformancePath;
+  const traceabilityPath = semanticIr.traceabilityPath;
 
-  const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
-  const currentConformancePath = string(nested(current, "conformance", "current").path, "current.conformance.path");
-  const previousContractPath = string(nested(previous, "contract", "previous").path, "previous.contract.path");
-  const previousConformancePath = string(nested(previous, "conformance", "previous").path, "previous.conformance.path");
-  const acceptancePath = string(nested(acceptance, "document", "acceptance").path, "acceptance.document.path");
+  const traceability = readJson(root, traceabilityPath);
+  const acceptancePath = string(traceability.acceptance, `${traceabilityPath}.acceptance`);
+  const acceptance = readJson(root, acceptancePath);
+  const previousEvidence = nested(acceptance, "previousReleaseEvidence", acceptancePath);
+
+  if (previousEvidence.immutable !== true) {
+    fail("accepted previous-release evidence must be immutable");
+  }
+  if (previousEvidence.liveRuntimeSelectable !== false) {
+    fail("accepted previous-release evidence must not be live-runtime selectable");
+  }
+
+  const previousContractPath = string(
+    previousEvidence.contract,
+    `${acceptancePath}.previousReleaseEvidence.contract`,
+  );
+  const previousConformancePath = string(
+    previousEvidence.conformance,
+    `${acceptancePath}.previousReleaseEvidence.conformance`,
+  );
+  const previousAcceptancePath = string(
+    previousEvidence.acceptance,
+    `${acceptancePath}.previousReleaseEvidence.acceptance`,
+  );
 
   const contract = readJson(root, currentContractPath);
   const conformance = readJson(root, currentConformancePath);
   const previousContract = readJson(root, previousContractPath);
   const previousConformance = readJson(root, previousConformancePath);
+  const previousAcceptance = readJson(root, previousAcceptancePath);
 
   const contractSchema = string(contract.schema, `${currentContractPath}.schema`);
   const conformanceSchema = string(conformance.schema, `${currentConformancePath}.schema`);
-  const declaredConformance = string(contract.conformanceCorpus, `${currentContractPath}.conformanceCorpus`);
-  if (declaredConformance !== currentConformancePath) {
-    fail(`current contract points to ${declaredConformance}, policy points to ${currentConformancePath}`);
-  }
   const conformanceContract = string(conformance.contract, `${currentConformancePath}.contract`);
   if (conformanceContract !== contractSchema) {
     fail(`current conformance targets ${conformanceContract}, current contract is ${contractSchema}`);
   }
 
+  const previousContractSchema = string(previousContract.schema, `${previousContractPath}.schema`);
+  const previousConformanceSchema = string(
+    previousConformance.schema,
+    `${previousConformancePath}.schema`,
+  );
+  if (
+    string(previousContract.conformanceCorpus, `${previousContractPath}.conformanceCorpus`) !==
+    previousConformancePath
+  ) {
+    fail("previous contract conformanceCorpus differs from accepted previous conformance path");
+  }
+  if (
+    string(previousConformance.contract, `${previousConformancePath}.contract`) !==
+    previousContractSchema
+  ) {
+    fail("previous conformance does not target accepted previous contract");
+  }
+
+  const previousAcceptanceCurrent = nested(previousAcceptance, "current", previousAcceptancePath);
+  if (
+    string(previousAcceptanceCurrent.contract, `${previousAcceptancePath}.current.contract`) !==
+    previousContractPath
+  ) {
+    fail("previous acceptance current contract differs from accepted previous contract path");
+  }
+  if (
+    string(
+      previousAcceptanceCurrent.conformance,
+      `${previousAcceptancePath}.current.conformance`,
+    ) !== previousConformancePath
+  ) {
+    fail("previous acceptance current conformance differs from accepted previous conformance path");
+  }
+  const previousVersionDecision = nested(
+    previousAcceptance,
+    "versionDecision",
+    previousAcceptancePath,
+  );
+  if (
+    string(
+      previousVersionDecision.acceptedVersion,
+      `${previousAcceptancePath}.versionDecision.acceptedVersion`,
+    ) !== previousContractSchema
+  ) {
+    fail("previous acceptance acceptedVersion differs from accepted previous contract");
+  }
+  const previousAcceptanceFlags = nested(previousAcceptance, "acceptance", previousAcceptancePath);
+  if (
+    previousAcceptanceFlags.typeScriptAccepted !== true ||
+    previousAcceptanceFlags.cutoverPerformed !== true
+  ) {
+    fail("previous acceptance artifact is not an accepted cutover");
+  }
+
   return {
     currentContract: contractSchema,
     currentConformance: conformanceSchema,
-    previousContract: string(previousContract.schema, `${previousContractPath}.schema`),
-    previousConformance: string(previousConformance.schema, `${previousConformancePath}.schema`),
+    previousContract: previousContractSchema,
+    previousConformance: previousConformanceSchema,
     currentContractPath,
     currentConformancePath,
     previousContractPath,
@@ -325,21 +404,21 @@ export function validateSemanticLawDocumentation(
 }
 
 export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoot()): SemanticLawDocumentationIssue[] {
-  const policy = readJson(root, "repo-policy.json");
-  const packs = nested(policy, "packs", "repo-policy.json");
-  const topology = nested(packs, "contract-conformance", "repo-policy.json.packs");
-  const current = nested(topology, "current", "repo-policy.json.packs.contract-conformance");
-  const currentContractPath = string(nested(current, "contract", "current").path, "current.contract.path");
+  const semanticIr = loadMtsSemanticIr(root);
+  const currentContractPath = semanticIr.contractPath;
   const contract = readJson(root, currentContractPath);
   const laws = nested(contract, "requiredSemanticLaws", currentContractPath);
   const requiredLawIds = Object.keys(laws);
 
-  const registryPath = typeof contract.documentationProjectionRegistry === "string"
-    ? contract.documentationProjectionRegistry
-    : MTS_REQUIREMENT_REGISTRY_PATH;
+  const contractSchema = string(contract.schema, `${currentContractPath}.schema`);
+  const registryPath = contractSchema === "mts-contract/v0.15"
+    ? MTS_REQUIREMENT_REGISTRY_PATH
+    : typeof contract.documentationProjectionRegistry === "string"
+      ? contract.documentationProjectionRegistry
+      : MTS_REQUIREMENT_REGISTRY_PATH;
   const registry = readJson(root, registryPath);
   if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
-  if (string(contract.schema, `${currentContractPath}.schema`) === "mts-contract/v0.15") {
+  if (contractSchema === "mts-contract/v0.15") {
     if (string(registry.schema, `${registryPath}.schema`) !== "mts-requirement-registry/v0.3") fail("accepted v0.15 requires registry v0.3");
     if (registry.accepted !== true) fail("accepted v0.15 registry must be accepted");
     const ids = (registry.requirements as unknown[]).map((raw, index) => string(object(raw, `${registryPath}.requirements[${index}]`).id, "v0.15 requirement id")).sort();
@@ -378,8 +457,7 @@ export function checkRepositorySemanticLawDocumentation(root = findRepositoryRoo
 
   const paths = new Set<string>([
     ...Object.values(ownerById),
-    ...((nested(policy, "paths", "repo-policy.json").canonical_docs as unknown[]) ?? [])
-      .filter((value): value is string => typeof value === "string"),
+    ...SEMANTIC_LAW_DOCUMENT_SURFACE,
   ]);
   const documents: Record<string, string> = {};
   for (const path of paths) {
@@ -662,7 +740,7 @@ function main(): void {
     fail(`current documentation size ${size.codePoints} exceeds hard ceiling ${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints} code points`);
   }
   console.log(
-    `MTS Compiler: docs synchronized; historical v0.13 foundation provenance baseline=${historicalV013Provenance.directEvidenceClauseCount}/${historicalV013Provenance.clauseCount}, gaps=${historicalV013Provenance.gapClauseIds.join(",")}; current release authority remains repo-policy/current acceptance; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
+    `MTS Compiler: docs synchronized; historical v0.13 foundation provenance baseline=${historicalV013Provenance.directEvidenceClauseCount}/${historicalV013Provenance.clauseCount}, gaps=${historicalV013Provenance.gapClauseIds.join(",")}; current release authority = accepted native v0.15 chain; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
   );
 }
 
