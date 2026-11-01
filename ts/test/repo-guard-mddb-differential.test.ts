@@ -13,6 +13,17 @@ const REPO_GUARD_SHA = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
+function findCheckedOutRepositoryRoot(): string {
+  const candidates = [process.cwd(), resolve(process.cwd(), "..")];
+  const root = candidates.find((candidate) =>
+    existsSync(resolve(candidate, ".gitmodules")) &&
+    existsSync(resolve(candidate, "ts", "package.json"))
+  );
+  assert.ok(root !== undefined, "differential requires the checked-out anum_docs repository");
+  return root;
+}
+const checkedOutRepositoryRoot = findCheckedOutRepositoryRoot();
+
 function run(command: string, args: readonly string[], cwd?: string): void {
   const result = spawnSync(command, args, {
     cwd,
@@ -131,10 +142,7 @@ try {
   // Immutable old consumer behavior is the independent migration oracle.
   // Read the accepted original adapter straight from Git history instead of
   // retaining a second production or checked-in test implementation.
-  const observedRepo = [process.cwd(), resolve(process.cwd(), "..")].find(
-    candidate => existsSync(resolve(candidate, "repo-policy.json")),
-  );
-  assert.ok(observedRepo !== undefined, "the legacy oracle requires checked-out anum_docs");
+  const observedRepo = checkedOutRepositoryRoot;
   const oldSource = spawnSync("git", [
     "show",
     "862e1b84347773c6c091cc33ce7499cd4900c855:ts/src/tooling/markdown-section-adapter.ts",
@@ -394,10 +402,7 @@ try {
 
   // Compare the public v6.0.0 API against the actual tracked Markdown
   // corpus, not just the synthetic canonical-tree fixture above. No writes.
-  const repositoryRoot = [process.cwd(), resolve(process.cwd(), "..")].find(
-    (candidate) => existsSync(resolve(candidate, "repo-policy.json")),
-  );
-  assert.ok(repositoryRoot !== undefined, "real-document parity requires the checked-out repository");
+  const repositoryRoot = checkedOutRepositoryRoot;
   const realSurfaces = listRepositoryMarkdownSurface(repositoryRoot);
   assert.ok(realSurfaces.length >= 10, "real-document parity corpus must contain current reader surfaces");
   let checkedAnchors = 0;

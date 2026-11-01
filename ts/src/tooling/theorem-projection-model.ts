@@ -180,7 +180,10 @@ function sameStrings(left: readonly string[], right: readonly string[]): boolean
 function findRepositoryRoot(start = process.cwd()): string {
   let current = resolve(start);
   while (true) {
-    if (existsSync(resolve(current, "theorems", "current-v0.14.json"))) return current;
+    if (
+      existsSync(resolve(current, ".gitmodules")) &&
+      existsSync(resolve(current, "ts", "package.json"))
+    ) return current;
     const parent = dirname(current);
     if (parent === current) return fail(`cannot locate repository root from ${start}`);
     current = parent;

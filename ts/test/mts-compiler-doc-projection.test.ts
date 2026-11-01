@@ -225,7 +225,6 @@ const writeRegistry = (value: unknown): void =>
 
 try {
   for (const path of [
-    "repo-policy.json",
     "contracts/mts-contract-v0.15.json",
     "contracts/mts-conformance-v0.15.json",
     "requirements/mts-v0.15.json",
@@ -244,7 +243,14 @@ try {
   assert.equal(tempIr.contract, "mts-contract/v0.15");
 
   const policyPath = resolve(tempRoot, "repo-policy.json");
-  const policySource = readFileSync(policyPath, "utf8");
+  const policySource = JSON.stringify({
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "decoy-current-contract" } },
+      },
+    },
+  });
+  writeFileSync(policyPath, policySource, "utf8");
   const policy = JSON.parse(policySource) as any;
   policy.packs["contract-conformance"].current.contract.path = "contracts/mts-contract-v0.14.json";
   writeFileSync(policyPath, JSON.stringify(policy), "utf8");

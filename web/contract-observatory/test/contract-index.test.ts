@@ -112,7 +112,6 @@ try {
   mkdirSync(join(nativeFixtureRoot, "ts"), { recursive: true });
   cpSync(join(repositoryRoot, "ts", "dist"), join(nativeFixtureRoot, "ts", "dist"), { recursive: true });
   cpSync(join(repositoryRoot, "README.md"), join(nativeFixtureRoot, "README.md"));
-  cpSync(join(repositoryRoot, "repo-policy.json"), join(nativeFixtureRoot, "repo-policy.json"));
 
   const nativeBaseline = buildContractObservatoryIndex(nativeFixtureRoot);
   same(
@@ -122,7 +121,16 @@ try {
   );
 
   const policyPath = join(nativeFixtureRoot, "repo-policy.json");
-  const policySource = readFileSync(policyPath, "utf8");
+  const policySource = JSON.stringify({
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "decoy-current-contract" }, conformance: { path: "decoy-current-conformance" } },
+        previous: { contract: { path: "decoy-previous-contract" }, conformance: { path: "decoy-previous-conformance" } },
+        acceptance: { document: { path: "decoy-acceptance" } },
+      },
+    },
+  });
+  writeFileSync(policyPath, policySource, "utf8");
   const policy = JSON.parse(policySource) as any;
   policy.packs["contract-conformance"].current.contract.path = "contracts/does-not-exist-current.json";
   policy.packs["contract-conformance"].current.conformance.path = "contracts/does-not-exist-current-conformance.json";

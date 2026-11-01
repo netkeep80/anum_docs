@@ -114,9 +114,12 @@ function nested(parent: JsonObject, key: string, name: string): JsonObject {
 export function findRepositoryRoot(start = process.cwd()): string {
   let current = resolve(start);
   while (true) {
-    if (existsSync(resolve(current, "repo-policy.json"))) return current;
+    if (
+      existsSync(resolve(current, ".gitmodules")) &&
+      existsSync(resolve(current, "ts", "package.json"))
+    ) return current;
     const parent = dirname(current);
-    if (parent === current) fail(`cannot locate repo-policy.json from ${start}`);
+    if (parent === current) fail(`cannot locate repository root from ${start}`);
     current = parent;
   }
 }

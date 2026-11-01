@@ -108,7 +108,6 @@ try {
   };
 
   for (const path of [
-    "repo-policy.json",
     "requirements/mts-v0.15.json",
     "requirements/mts-v0.14.json",
     "traceability/mts-v0.15.json",
@@ -136,7 +135,15 @@ try {
   );
 
   const policyPath = resolve(fixtureRoot, "repo-policy.json");
-  const policySource = readFileSync(policyPath, "utf8");
+  const policySource = JSON.stringify({
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "decoy-current-contract" }, conformance: { path: "decoy-current-conformance" } },
+        acceptance: { document: { path: "decoy-acceptance" } },
+      },
+    },
+  });
+  writeFileSync(policyPath, policySource, "utf8");
   const policy = JSON.parse(policySource) as any;
   policy.packs["contract-conformance"].current.contract.path = "contracts/mts-contract-v0.14.json";
   policy.packs["contract-conformance"].current.conformance.path = "contracts/mts-conformance-v0.14.json";
