@@ -1,17 +1,9 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join, relative, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 
 function fail(message) {
   throw new Error(`current-theorem-index: ${message}`);
-}
-
-function findRepositoryRoot() {
-  const candidates = [process.cwd(), resolve(process.cwd(), "..")];
-  const root = candidates.find((candidate) =>
-    existsSync(resolve(candidate, "theorems", "p0-v0.14.json")),
-  );
-  if (root === undefined) fail("repository root not found");
-  return root;
 }
 
 function readJson(root, path) {
@@ -139,7 +131,7 @@ function buildCurrentIndex(root) {
   };
 }
 
-const root = findRepositoryRoot();
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = resolve(root, "theorems", "current-v0.14.json");
 const serialized = JSON.stringify(buildCurrentIndex(root)) + "\n";
 const mode = process.argv[2] ?? "--check";

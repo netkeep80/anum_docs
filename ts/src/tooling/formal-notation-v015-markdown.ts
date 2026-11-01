@@ -28,7 +28,6 @@ export const FORMAL_NOTATION_V015_SOURCE_PATHS = Object.freeze([
   "contracts/mts-contract-v0.15.json",
   "contracts/mts-conformance-v0.15.json",
   "cutover/typescript-c1-acceptance-v0.8.json",
-  "repo-policy.json",
 ] as const);
 
 function fail(message: string): never {

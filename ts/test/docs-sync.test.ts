@@ -47,6 +47,26 @@ expectThrow(
 );
 
 const repositoryRoot = findRepositoryRoot();
+assert.equal(findRepositoryRoot(resolve(repositoryRoot, "ts", "src", "tooling")), repositoryRoot,
+  "nested tooling invocation resolves the same repository root");
+const structuralRoot = mkdtempSync(resolve(tmpdir(), "mts-root-structural-"));
+try {
+  mkdirSync(resolve(structuralRoot, "ts", "nested"), { recursive: true });
+  writeFileSync(resolve(structuralRoot, ".gitmodules"), "[submodule \"vendor/repo-guard\"]\n", "utf8");
+  writeFileSync(resolve(structuralRoot, "ts", "package.json"), "{\"private\":true}\n", "utf8");
+  assert.equal(findRepositoryRoot(resolve(structuralRoot, "ts", "nested")), structuralRoot,
+    "structural root discovery does not require repo-policy.json");
+} finally {
+  rmSync(structuralRoot, { recursive: true, force: true });
+}
+const policyOnlyRoot = mkdtempSync(resolve(tmpdir(), "mts-root-policy-only-"));
+try {
+  writeFileSync(resolve(policyOnlyRoot, "repo-policy.json"), "{}\n", "utf8");
+  assert.throws(() => findRepositoryRoot(policyOnlyRoot), /cannot locate repository root/,
+    "repo-policy.json alone must not establish repository root");
+} finally {
+  rmSync(policyOnlyRoot, { recursive: true, force: true });
+}
 assert.deepEqual(checkCurrentReleasePolicy(repositoryRoot), [], "v0.15 current contribution policy must be internally consistent");
 
 const projection = loadCurrentProjection(repositoryRoot);
@@ -289,7 +309,6 @@ try {
     writeFileSync(target, readFileSync(resolve(repositoryRoot, path), "utf8"), "utf8");
   };
   copy("docs/CONTRIBUTING.md");
-  copy("repo-policy.json");
   copy("contracts/mts-contract-v0.14.json");
   copy("contracts/mts-conformance-v0.14.json");
   copy("contracts/mts-contract-v0.15.json");
@@ -316,7 +335,17 @@ try {
   assert.deepEqual(syncRepositoryDocs(tempRoot), [], "clean fixture docs sync must remain a no-op");
 
   const policyPath = resolve(tempRoot, "repo-policy.json");
-  const policySource = readFileSync(policyPath, "utf8");
+  const policySource = JSON.stringify({
+    packs: {
+      "contract-conformance": {
+        current: { contract: { path: "decoy-current-contract" }, conformance: { path: "decoy-current-conformance" } },
+        previous: { contract: { path: "decoy-previous-contract" }, conformance: { path: "decoy-previous-conformance" } },
+        acceptance: { document: { path: "decoy-acceptance" } },
+      },
+    },
+    paths: { canonical_docs: ["decoy.md"] },
+  });
+  writeFileSync(policyPath, policySource, "utf8");
   const writePolicyMutation = (mutate: (policy: any) => void): void => {
     const policy = JSON.parse(policySource) as any;
     mutate(policy);

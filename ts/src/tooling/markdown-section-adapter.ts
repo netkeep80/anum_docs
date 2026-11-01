@@ -46,8 +46,10 @@ function blockSpec(id: string) {
 function findRepositoryRoot(): string {
   let at = dirname(fileURLToPath(import.meta.url));
   for (let i = 0; i < 9; i++) {
-    if (existsSync(resolve(at, "repo-policy.json")) &&
-        existsSync(resolve(at, ".gitmodules"))) return at;
+    if (
+      existsSync(resolve(at, ".gitmodules")) &&
+      existsSync(resolve(at, "ts", "package.json"))
+    ) return at;
     const next = dirname(at);
     if (next === at) break;
     at = next;
