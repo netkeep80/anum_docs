@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`v0.13 historical documentation ownership: ${message}`);
@@ -12,9 +13,7 @@ const repoRoot = resolve(process.cwd(), "..");
 const contract = JSON.parse(
   readFileSync(join(repoRoot, "contracts/mts-contract-v0.13.json"), "utf8"),
 ) as any;
-const policy = JSON.parse(
-  readFileSync(join(repoRoot, "repo-policy.json"), "utf8"),
-) as any;
+const currentProjection = loadCurrentProjection(repoRoot);
 const acceptance13 = JSON.parse(
   readFileSync(join(repoRoot, "cutover/typescript-c1-acceptance-v0.6.json"), "utf8"),
 ) as any;
@@ -26,18 +25,18 @@ same(contract.acceptedCurrent?.contract, "mts-contract/v0.13", "historical accep
 same(contract.acceptedCurrent?.conformance, "mts-conformance/v0.13", "historical acceptance current conformance");
 
 same(
-  policy.packs["contract-conformance"].current.contract.path,
+  currentProjection.currentContractPath,
   "contracts/mts-contract-v0.15.json",
   "v0.15 is current accepted release after S22",
 );
 same(
-  policy.packs["contract-conformance"].previous.contract.path,
+  currentProjection.previousContractPath,
   "contracts/mts-contract-v0.14.json",
   "v0.14 is previous accepted release after S22",
 );
 assert(
-  policy.packs["contract-conformance"].current.contract.path !== "contracts/mts-contract-v0.13.json"
-    && policy.packs["contract-conformance"].previous.contract.path !== "contracts/mts-contract-v0.13.json",
+  currentProjection.currentContractPath !== "contracts/mts-contract-v0.13.json"
+    && currentProjection.previousContractPath !== "contracts/mts-contract-v0.13.json",
   "v0.13 remains historical rather than current/previous selector authority",
 );
 same(
