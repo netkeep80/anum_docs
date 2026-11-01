@@ -44,6 +44,8 @@ export interface MtsSemanticIr {
   readonly schema: string;
   readonly contract: string;
   readonly contractPath: string;
+  readonly traceabilityPath: string;
+  readonly conformancePath: string;
   readonly requirements: readonly MtsRequirementProjection[];
   readonly repositoryRequirements: readonly RepositoryRequirementProjection[];
   readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
@@ -91,6 +93,7 @@ function loadAcceptedV015Authority(
 ): {
   readonly contractPath: string;
   readonly traceabilityPath: string;
+  readonly conformancePath: string;
   readonly traceability: JsonObject;
 } {
   const current = object(registry.currentAccepted, registryPath + ".currentAccepted");
@@ -158,7 +161,7 @@ function loadAcceptedV015Authority(
     fail("v0.15 acceptance current conformance path mismatch");
   }
 
-  return Object.freeze({ contractPath, traceabilityPath, traceability });
+  return Object.freeze({ contractPath, traceabilityPath, conformancePath, traceability });
 }
 
 function exactSet(name: string, left: readonly string[], right: readonly string[]): void {
@@ -289,10 +292,17 @@ function loadAcceptedV015SemanticIr(
   registry: JsonObject,
 ): MtsSemanticIr {
   if (registry.status !== "accepted" || registry.accepted !== true) fail("v0.15 registry must be accepted after S22");
-  const { contractPath, traceabilityPath, traceability } = loadAcceptedV015Authority(root, registryPath, registry);
+  const { contractPath, traceabilityPath, conformancePath, traceability } =
+    loadAcceptedV015Authority(root, registryPath, registry);
   const contract = readJson(root, contractPath);
   const contractId = string(contract.schema, contractPath + ".schema");
   if (contractId !== "mts-contract/v0.15") fail("accepted v0.15 registry requires current v0.15 contract");
+  if (string(contract.conformanceCorpus, contractPath + ".conformanceCorpus") !== conformancePath) {
+    fail("v0.15 contract conformanceCorpus differs from accepted conformance path");
+  }
+  if (string(contract.traceabilityManifest, contractPath + ".traceabilityManifest") !== traceabilityPath) {
+    fail("v0.15 contract traceabilityManifest differs from accepted traceability path");
+  }
   const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
   const traces = object(traceability.requirements, traceabilityPath + ".requirements");
   if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
@@ -339,6 +349,8 @@ function loadAcceptedV015SemanticIr(
     schema: string(registry.schema, registryPath + ".schema"),
     contract: contractId,
     contractPath,
+    traceabilityPath,
+    conformancePath,
     requirements: Object.freeze(requirements),
     repositoryRequirements,
     documentModes: Object.freeze(legacyModes),
@@ -376,7 +388,8 @@ export function loadMtsSemanticIr(
   if (string(traceability.contract, `${traceabilityPath}.contract`) !== contractPath) {
     fail(`${traceabilityPath} does not target current contract path ${contractPath}`);
   }
-  if (string(traceability.conformance, `${traceabilityPath}.conformance`) !== string(contract.conformanceCorpus, `${contractPath}.conformanceCorpus`)) {
+  const conformancePath = string(contract.conformanceCorpus, `${contractPath}.conformanceCorpus`);
+  if (string(traceability.conformance, `${traceabilityPath}.conformance`) !== conformancePath) {
     fail(`${traceabilityPath} conformance does not match current contract`);
   }
   const invariants = object(traceability.invariants, `${traceabilityPath}.invariants`);
@@ -509,6 +522,8 @@ export function loadMtsSemanticIr(
     schema,
     contract: contractId,
     contractPath,
+    traceabilityPath,
+    conformancePath,
     requirements: Object.freeze(requirements),
     repositoryRequirements,
     documentModes: Object.freeze(documentModes),
