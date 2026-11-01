@@ -7,6 +7,7 @@ import {
   join,
   resolve,
 } from "node:path";
+import { CURRENT_DOC_SIZE_SURFACE } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`A-memory D10 completion: ${message}`);
@@ -28,7 +29,6 @@ function gitBlobSha(source: string): string {
 const root = resolve(process.cwd(), "..");
 const docPath = join(root, "docs/specs/Апамять и управление сетью связей.md");
 const profilePath = join(root, "profiles/amemory-execution-profile.json");
-const policyPath = join(root, "repo-policy.json");
 
 const requiredConvergenceGates = Object.freeze([
   "ts/test/docs-current-surface.test.ts",
@@ -130,32 +130,22 @@ same(
   "normalized schedule independence",
 );
 
-const policy = JSON.parse(readFileSync(policyPath, "utf8")) as {
-  paths?: { canonical_docs?: string[] };
-};
-const canonicalDocs = policy.paths?.canonical_docs;
-assert(Array.isArray(canonicalDocs), "canonical current docs are declared");
-
+const currentDocs = Object.freeze([
+  ...CURRENT_DOC_SIZE_SURFACE,
+  "PORTFOLIO.md",
+]);
 const ownerMarker = "<!-- смысловой-владелец-апамяти -->";
 let ownerCount = 0;
 let ownerPath = "";
-for (const relativePath of canonicalDocs) {
+for (const relativePath of currentDocs) {
   const source = readFileSync(join(root, relativePath), "utf8");
   const count = source.split(ownerMarker).length - 1;
   if (count > 0) ownerPath = relativePath;
   ownerCount += count;
 }
 same(ownerCount, 1, "competing A-memory semantic owner count must remain zero");
-same(
-  ownerPath,
-  "docs/specs/Апамять и управление сетью связей.md",
-  "canonical A-memory semantic owner path",
-);
-same(
-  profile.authority.canonicalSemanticOwner,
-  ownerPath,
-  "machine profile must point to the same semantic owner",
-);
+same(ownerPath, "docs/specs/Апамять и управление сетью связей.md", "current A-memory semantic owner path");
+same(profile.authority.canonicalSemanticOwner, ownerPath, "machine profile must point to the same semantic owner");
 
 const doc = readFileSync(docPath, "utf8");
 const d10Marker = '<a id="d10-completion"></a>';

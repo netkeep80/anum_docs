@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { materializeExactSequence } from "../src/exact-sequence.js";
 import { Memory, ensureRootBasis } from "../src/memory.js";
+import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error("v0.14 N21 readiness audit: " + message);
@@ -29,7 +30,7 @@ const contract=readJson("contracts/mts-contract-v0.14.json");
 const conformance=readJson("contracts/mts-conformance-v0.14.json");
 const traceability=readJson("traceability/mts-v0.14.json");
 const requirements=readJson("requirements/mts-v0.14.json");
-const policy=readJson("repo-policy.json");
+const currentProjection=loadCurrentProjection(repoRoot);
 const acceptance14=readJson("cutover/typescript-c1-acceptance-v0.7.json");
 
 // Live-kernel anchor: this is not a JSON-only readiness declaration.
@@ -207,10 +208,10 @@ same(conformance.readinessAudit.accepted,true,"readiness consumed by accepted li
 same(traceability.readinessAudit.issue,1679,"traceability readiness issue");
 
 // v0.14 remains immutable as the immediately previous accepted release after S22.
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.15.json","live policy current contract");
-same(policy.packs["contract-conformance"].current.conformance.path,"contracts/mts-conformance-v0.15.json","live policy current conformance");
-same(policy.packs["contract-conformance"].previous.contract.path,"contracts/mts-contract-v0.14.json","live policy previous contract");
-same(policy.packs["contract-conformance"].previous.conformance.path,"contracts/mts-conformance-v0.14.json","live policy previous conformance");
+same(currentProjection.currentContractPath,"contracts/mts-contract-v0.15.json","native current contract");
+same(currentProjection.currentConformancePath,"contracts/mts-conformance-v0.15.json","native current conformance");
+same(currentProjection.previousContractPath,"contracts/mts-contract-v0.14.json","native previous contract");
+same(currentProjection.previousConformancePath,"contracts/mts-conformance-v0.14.json","native previous conformance");
 same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","historical v0.14 cutover contract");
 same(acceptance14.current.conformance,"contracts/mts-conformance-v0.14.json","historical v0.14 cutover conformance");
 

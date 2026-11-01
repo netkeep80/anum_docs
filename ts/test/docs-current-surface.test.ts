@@ -7,6 +7,10 @@ import {
   join,
   resolve,
 } from "node:path";
+import {
+  CURRENT_DOC_SIZE_SURFACE,
+  loadCurrentProjection,
+} from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`current docs: ${message}`);
@@ -17,46 +21,36 @@ function same<T>(actual: T, expected: T, message: string): void {
 }
 
 const root = resolve(process.cwd(), "..");
+const projection = loadCurrentProjection(root);
 const acceptance = JSON.parse(
   readFileSync(join(root, "cutover/typescript-c1-acceptance-v0.8.json"), "utf8"),
 ) as any;
-assert(
-  acceptance.current?.contract === "contracts/mts-contract-v0.15.json",
-  "accepted release pointer is v0.15",
+same(projection.currentContract, "mts-contract/v0.15", "accepted current contract");
+same(projection.previousContract, "mts-contract/v0.14", "accepted previous contract");
+same(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json", "accepted current acceptance");
+same(
+  acceptance.current?.contract,
+  projection.currentContractPath,
+  "accepted v0.8 artifact matches native current projection",
 );
 assert(
   Array.isArray(acceptance.postAcceptanceWork) && acceptance.postAcceptanceWork.some((item: unknown) => typeof item === "string" && item.includes("#1951")),
   "post-acceptance FORMAL formula migration is governed by #1951",
 );
 
-const policy = JSON.parse(
-  readFileSync(join(root, "repo-policy.json"), "utf8"),
-) as {
-  paths?: {
-    canonical_docs?: unknown;
-  };
-};
-
-const canonical = policy.paths?.canonical_docs;
-assert(Array.isArray(canonical), "repo-policy canonical_docs must be an array");
-assert(
-  canonical.every((value) => typeof value === "string"),
-  "every canonical_docs entry must be a string",
-);
-same(canonical.length, 8, "canonical current documentation cardinality");
-
-const support = Object.freeze([
-  "docs/CONTRIBUTING.md",
+const current = Object.freeze([
+  ...CURRENT_DOC_SIZE_SURFACE,
   "PORTFOLIO.md",
 ]);
 
-const current = Object.freeze([
-  ...canonical as string[],
-  ...support,
-]);
-
-same(new Set(current).size, current.length, "current documentation paths are unique");
 same(current.length, 10, "current reader-facing documentation surface cardinality");
+same(new Set(current).size, current.length, "current documentation paths are unique");
+assert(
+  current.includes("docs/theory/Основания МТС.md"),
+  "required current document is selected independently of its version marker",
+);
+assert(current.includes("PORTFOLIO.md"), "portfolio remains current reader-facing documentation");
+assert(current.includes("docs/CONTRIBUTING.md"), "contributing guide remains current reader-facing documentation");
 
 const obsoleteCurrentMarkerPattern = /mts-doc-version:\s*v0\.(?:9|10|11|12|13)\b/gi;
 const versionedNamePattern = /(?:^|[\s._-])v?\d+\.\d+(?:$|[\s._-])/i;
@@ -122,8 +116,8 @@ assert(
 
 const glossary = join(root, "docs/Словарь терминов МТС.md");
 assert(
-  (canonical as string[]).includes("docs/Словарь терминов МТС.md"),
-  "glossary must belong to canonical current documentation surface",
+  current.includes("docs/Словарь терминов МТС.md"),
+  "glossary must belong to the self-declared current documentation surface",
 );
 assert(existsSync(glossary), "glossary exists");
 

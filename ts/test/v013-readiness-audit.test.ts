@@ -19,7 +19,6 @@ const traceability13 = readJson("traceability/mts-v0.13.json");
 const contract12 = readJson("contracts/mts-contract-v0.12.json");
 const conformance12 = readJson("contracts/mts-conformance-v0.12.json");
 const acceptance13 = readJson("cutover/typescript-c1-acceptance-v0.6.json");
-const policy = readJson("repo-policy.json");
 
 // The earlier readiness audit remains historical evidence, but readiness has been rerun after A73s scoped reclassification.
 same(contract13.status, "accepted", "v0.13 status is accepted");
@@ -239,27 +238,24 @@ same(
   "author decision must reference exact ready artifacts",
 );
 
-// Governance preserves accepted v0.13 readiness either through the legacy scalar pins
-// or through the stronger accepted-snapshot PR immutability boundary.
-const rules = new Map<string, any>(
-  (policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]),
-);
-const legacyReadinessPins =
-  rules.get("v013-contract-ready")?.value === true
-  && rules.get("v013-conformance-ready")?.value === true
-  && rules.get("v013-conformance-complete")?.value === "complete";
-const immutablePaths = new Set<string>(policy.paths?.pr_immutable ?? []);
-const acceptedSnapshotFrozen = [
-  "contracts/mts-contract-v0.13.json",
-  "contracts/mts-conformance-v0.13.json",
-  "traceability/mts-v0.13.json",
-  "cutover/typescript-c1-acceptance-v0.6.json",
-].every((path) => immutablePaths.has(path));
-assert(
-  legacyReadinessPins || acceptedSnapshotFrozen,
-  "accepted v0.13 readiness evidence is protected by legacy pins or atomic PR immutability",
+// Immutable v0.6 cutover evidence preserves readiness and explicit acceptance
+// without depending on present-day policy pins.
+same(acceptance13.decision, "ACCEPT_MTS_V0_13", "v0.13 explicit acceptance decision");
+same(acceptance13.acceptance?.acceptanceReadyWasProvenBeforeCutover, true, "readiness preceded v0.13 cutover");
+same(acceptance13.acceptance?.explicitAuthorDecisionRecordedBeforeCutover, true, "Author decision preceded v0.13 cutover");
+same(acceptance13.evidence?.readinessIssue, 1335, "historical v0.13 readiness issue");
+same(acceptance13.evidence?.mandatoryExecutableGateCount, declaredGates.length, "v0.13 accepted gate count");
+same(acceptance13.previousReleaseEvidence?.contract, "contracts/mts-contract-v0.12.json", "v0.13 previous contract evidence");
+same(acceptance13.previousReleaseEvidence?.conformance, "contracts/mts-conformance-v0.12.json", "v0.13 previous conformance evidence");
+same(acceptance13.previousReleaseEvidence?.acceptance, "cutover/typescript-c1-acceptance-v0.5.json", "v0.13 previous acceptance evidence");
+same(acceptance13.previousReleaseEvidence?.immutable, true, "v0.12 previous release evidence is immutable");
+same(acceptance13.previousReleaseEvidence?.liveRuntimeSelectable, false, "v0.12 historical runtime is nonselectable");
+same(
+  acceptance13.evidence?.preAcceptanceReadyMainSha,
+  contract13.acceptanceAuthority?.acceptedCandidateMainSha,
+  "accepted v0.13 candidate SHA matches readiness/Author authority",
 );
 
 console.log(
-  `MTS v0.13 A73t/A74 lifecycle: readiness evidence remains GREEN across ${declaredGates.length} projected gates; explicit author acceptance is recorded, v0.13 is current, and stronger A9 research remains non-blocking.`,
+  `MTS v0.13 A73t/A74 lifecycle: readiness evidence remains GREEN across ${declaredGates.length} projected gates; explicit author acceptance is recorded, the historical v0.13 cutover remains immutable, and stronger A9 research remains non-blocking.`,
 );

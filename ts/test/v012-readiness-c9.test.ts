@@ -12,7 +12,7 @@ const conformance = JSON.parse(read("contracts/mts-conformance-v0.12.json")) as 
 const traceability = JSON.parse(read("traceability/mts-v0.12.json")) as any;
 const acceptedContract = JSON.parse(read("contracts/mts-contract-v0.11.json")) as any;
 const acceptedConformance = JSON.parse(read("contracts/mts-conformance-v0.11.json")) as any;
-const policy = JSON.parse(read("repo-policy.json")) as any;
+const acceptance12 = JSON.parse(read("cutover/typescript-c1-acceptance-v0.5.json")) as any;
 
 const candidateLifecycle =
   contract.status === "candidate"
@@ -99,37 +99,20 @@ assert(
   "traceability invariant identity exactly matches required semantic laws",
 );
 
-const rules = new Map<string, any>((policy.document_relations?.rules ?? []).map((rule: any) => [rule.id, rule]));
-const legacyReadinessPins =
-  rules.get("v012-contract-ready")?.value === true
-  && rules.get("v012-conformance-ready")?.value === true
-  && rules.get("v012-conformance-complete")?.value === "complete";
-const immutablePaths = new Set<string>(policy.paths?.pr_immutable ?? []);
-const acceptedSnapshotFrozen =
-  acceptedLifecycle
-  && [
-    "contracts/mts-contract-v0.12.json",
-    "contracts/mts-conformance-v0.12.json",
-    "traceability/mts-v0.12.json",
-    "cutover/typescript-c1-acceptance-v0.5.json",
-  ].every((path) => immutablePaths.has(path));
-assert(
-  legacyReadinessPins || acceptedSnapshotFrozen,
-  "accepted v0.12 readiness evidence is protected by legacy pins or atomic PR immutability",
-);
-const temporaryPreAcceptancePins = [
-  ["v012-contract-status-candidate", "candidate"],
-  ["v012-conformance-status-candidate", "candidate"],
-  ["v012-contract-not-accepted", false],
-  ["v012-conformance-not-accepted", false],
-] as const;
-const presentTemporaryPins = temporaryPreAcceptancePins.filter(([id]) => rules.has(id));
-assert(
-  presentTemporaryPins.length === 0 || presentTemporaryPins.length === temporaryPreAcceptancePins.length,
-  "temporary pre-acceptance policy pins are either fully present or fully detached",
-);
-for (const [id, expected] of presentTemporaryPins) {
-  assert(rules.get(id)?.value === expected, `temporary pre-acceptance policy pin is exact: ${id}`);
-}
+assert(traceability.acceptance === "cutover/typescript-c1-acceptance-v0.5.json", "v0.12 traceability binds immutable acceptance");
+assert(acceptance12.decision === "ACCEPT_MTS_V0_12", "v0.12 explicit acceptance decision");
+assert(acceptance12.current?.contract === "contracts/mts-contract-v0.12.json", "v0.12 accepted current contract");
+assert(acceptance12.current?.conformance === "contracts/mts-conformance-v0.12.json", "v0.12 accepted current conformance");
+assert(acceptance12.previousReleaseEvidence?.contract === "contracts/mts-contract-v0.11.json", "v0.12 historical previous contract");
+assert(acceptance12.previousReleaseEvidence?.conformance === "contracts/mts-conformance-v0.11.json", "v0.12 historical previous conformance");
+assert(acceptance12.previousReleaseEvidence?.immutable === true, "v0.11 previous evidence is immutable");
+assert(acceptance12.previousReleaseEvidence?.liveRuntimeSelectable === false, "v0.11 historical runtime is nonselectable");
+assert(acceptance12.acceptance?.acceptanceReadyWasProvenBeforeCutover === true, "C9 readiness was proven before C10 cutover");
+assert(acceptance12.acceptance?.explicitAuthorDecisionRecordedBeforeCutover === true, "explicit Author decision precedes cutover");
+assert(acceptance12.evidence?.readinessIssue === 1222, "historical C9 readiness issue");
+assert(acceptance12.evidence?.readinessPullRequest === 1226, "historical C9 readiness PR");
+assert(acceptance12.evidence?.mandatoryExecutableGateCount === declaredGates.length, "accepted v0.12 gate count matches readiness evidence");
+assert(conformance.implementationSlices?.readinessAudit?.status === "green-confirmed", "immutable v0.12 readiness audit remains green");
+assert(conformance.implementationSlices?.acceptedCutover?.status === "accepted", "immutable v0.12 C10 cutover remains accepted");
 
 console.log("MTS v0.12 C9 independent readiness audit: GREEN.");

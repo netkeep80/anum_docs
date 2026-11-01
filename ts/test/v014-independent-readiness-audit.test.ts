@@ -10,6 +10,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Memory, ensureRootBasis } from "../src/memory.js";
+import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error("v0.14 historical N18 readiness guard: " + message);
@@ -23,7 +24,7 @@ const readJson=(path:string):any=>JSON.parse(readFileSync(join(repoRoot,path),"u
 const contract=readJson("contracts/mts-contract-v0.14.json");
 const conformance=readJson("contracts/mts-conformance-v0.14.json");
 const traceability=readJson("traceability/mts-v0.14.json");
-const policy=readJson("repo-policy.json");
+const currentProjection=loadCurrentProjection(repoRoot);
 const acceptance14=readJson("cutover/typescript-c1-acceptance-v0.7.json");
 
 const memory=new Memory();
@@ -65,8 +66,8 @@ same(contract.acceptanceBoundary.documentationReconstructionUnblocked,true,"#158
 same(contract.implementation.acceptedRuntime,"mts-contract/v0.14","accepted runtime is v0.14");
 same(contract.implementation.candidateRuntimeSelectable,false,"candidate not selectable");
 same(contract.implementation.productionBehaviorChanged,false,"no production behavior delta");
-same(policy.packs["contract-conformance"].current.contract.path,"contracts/mts-contract-v0.15.json","live policy current is v0.15 after S22");
-same(policy.packs["contract-conformance"].previous.contract.path,"contracts/mts-contract-v0.14.json","live policy previous is v0.14 after S22");
+same(currentProjection.currentContractPath,"contracts/mts-contract-v0.15.json","native current is v0.15 after S22");
+same(currentProjection.previousContractPath,"contracts/mts-contract-v0.14.json","native previous is v0.14 after S22");
 same(acceptance14.current.contract,"contracts/mts-contract-v0.14.json","historical v0.14 cutover remains bound to v0.14");
 assert(existsSync(join(repoRoot,"cutover/typescript-c1-acceptance-v0.7.json")),"v0.14 cutover exists");
 

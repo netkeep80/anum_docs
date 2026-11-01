@@ -6,6 +6,7 @@ import {
   join,
   resolve,
 } from "node:path";
+import { CURRENT_DOC_SIZE_SURFACE } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`external reader: ${message}`);
@@ -18,7 +19,6 @@ function same<T>(actual: T, expected: T, message: string): void {
 const root = resolve(process.cwd(), "..");
 const docPath = join(root, "docs/specs/Апамять и управление сетью связей.md");
 const profilePath = join(root, "profiles/amemory-execution-profile.json");
-const policyPath = join(root, "repo-policy.json");
 const packagePath = join(root, "ts/package.json");
 
 const requiredGates = Object.freeze([
@@ -39,16 +39,14 @@ for (const script of ["docs:sync", "docs:check", "check"]) {
   assert(typeof pkg.scripts[script] === "string", `D8 script exists: ${script}`);
 }
 
-const policy = JSON.parse(readFileSync(policyPath, "utf8")) as {
-  paths?: { canonical_docs?: string[] };
-};
-const canonicalDocs = policy.paths?.canonical_docs;
-assert(Array.isArray(canonicalDocs), "canonical docs are declared");
-
+const currentDocs = Object.freeze([
+  ...CURRENT_DOC_SIZE_SURFACE,
+  "PORTFOLIO.md",
+]);
 const ownerMarker = "<!-- смысловой-владелец-апамяти -->";
 let ownerCount = 0;
 let ownerPath = "";
-for (const relativePath of canonicalDocs) {
+for (const relativePath of currentDocs) {
   const source = readFileSync(join(root, relativePath), "utf8");
   const count = source.split(ownerMarker).length - 1;
   if (count > 0) ownerPath = relativePath;

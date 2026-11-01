@@ -13,7 +13,6 @@ const root = resolve(process.cwd(), "..");
 const profilePath = join(root, "profiles/amemory-execution-profile.json");
 const docPath = join(root, "docs/specs/Апамять и управление сетью связей.md");
 const glossaryPath = join(root, "docs/Словарь терминов МТС.md");
-const policyPath = join(root, "repo-policy.json");
 
 const profile = JSON.parse(readFileSync(profilePath, "utf8")) as {
   schema: string;
@@ -56,10 +55,6 @@ const profile = JSON.parse(readFileSync(profilePath, "utf8")) as {
 
 const doc = readFileSync(docPath, "utf8");
 const glossary = readFileSync(glossaryPath, "utf8");
-const policy = JSON.parse(readFileSync(policyPath, "utf8")) as {
-  paths?: { canonical_docs?: string[] };
-};
-
 same(profile.schema, "mts-amemory-execution-profile/v0.1", "schema");
 same(profile.id, "minimal-portable-amemory-execution", "profile id");
 same(profile.profileVersion, "0.1.0", "profile version");
@@ -87,8 +82,12 @@ same(
 same(profile.authority.issue, 1558, "research issue");
 
 assert(
-  policy.paths?.canonical_docs?.includes(profile.authority.canonicalSemanticOwner) === true,
-  "canonical semantic owner must remain a canonical current document",
+  doc.includes("mts-doc-version: v0.15"),
+  "canonical semantic owner must remain a self-declared current v0.15 document",
+);
+assert(
+  doc.includes("<!-- смысловой-владелец-апамяти -->"),
+  "canonical semantic owner marker must remain present",
 );
 assert(
   !/v\d+\.\d+/i.test(basename(profilePath)),
