@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Memory, ensureRootBasis } from "../src/memory.js";
+import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -59,7 +60,7 @@ const conformance = json(join(repoRoot, "contracts/mts-conformance-v0.14.json"))
 const traceability = json(join(repoRoot, "traceability/mts-v0.14.json"));
 const traceabilityErrata = json(join(repoRoot, "traceability/mts-v0.14-errata.json"));
 const requirements = json(join(repoRoot, "requirements/mts-v0.14.json"));
-const policy = json(join(repoRoot, "repo-policy.json"));
+const currentProjection = loadCurrentProjection(repoRoot);
 const acceptance14 = json(join(repoRoot, "cutover/typescript-c1-acceptance-v0.7.json"));
 
 // Mandatory semantic audit remains attached to the real kernel.
@@ -141,13 +142,10 @@ const planned = strings(conformance.plannedExecutableGates, "planned gates");
 assert(planned.length === 0, "no planned executable gates remain after N21");
 assert(gateAuthority.has("ts/test/v014-post-n20c-independent-readiness-audit.test.ts"), "N21 readiness audit is mandatory");
 
-const current = record(record(policy.packs, "policy packs")["contract-conformance"], "contract pack");
-const currentPair = record(current.current, "current pair");
-assert(text(record(currentPair.contract, "current contract").path, "current contract path") === "contracts/mts-contract-v0.15.json", "repo-policy current is v0.15 after S22");
-assert(text(record(currentPair.conformance, "current conformance").path, "current conformance path") === "contracts/mts-conformance-v0.15.json", "repo-policy current conformance is v0.15 after S22");
-const previousPair = record(current.previous, "previous pair");
-assert(text(record(previousPair.contract, "previous contract").path, "previous contract path") === "contracts/mts-contract-v0.14.json", "repo-policy previous is v0.14 after S22");
-assert(text(record(previousPair.conformance, "previous conformance").path, "previous conformance path") === "contracts/mts-conformance-v0.14.json", "repo-policy previous conformance is v0.14 after S22");
+assert(currentProjection.currentContractPath === "contracts/mts-contract-v0.15.json", "native current is v0.15 after S22");
+assert(currentProjection.currentConformancePath === "contracts/mts-conformance-v0.15.json", "native current conformance is v0.15 after S22");
+assert(currentProjection.previousContractPath === "contracts/mts-contract-v0.14.json", "native previous is v0.14 after S22");
+assert(currentProjection.previousConformancePath === "contracts/mts-conformance-v0.14.json", "native previous conformance is v0.14 after S22");
 
 const acceptedCurrent = record(acceptance14.current, "accepted current");
 assert(text(acceptedCurrent.contract, "accepted contract") === "contracts/mts-contract-v0.14.json", "cutover current contract is v0.14");
@@ -167,7 +165,7 @@ const observed = record(correction.observed, "observed stale snapshot");
 const staleCurrentAccepted = record(traceability.currentAccepted, "traceability stale currentAccepted");
 assert(JSON.stringify(staleCurrentAccepted) === JSON.stringify(observed), "immutable traceability retains exactly the recorded stale snapshot");
 const authoritative = record(correction.authoritativeCurrent, "authoritative current selection");
-assert(text(authoritative.policy, "erratum policy") === "repo-policy.json", "repo-policy is current selection authority");
+assert(text(authoritative.policy, "erratum policy") === "repo-policy.json", "historical erratum records repo-policy as selection authority at correction time");
 assert(text(authoritative.acceptance, "erratum acceptance") === "cutover/typescript-c1-acceptance-v0.7.json", "acceptance manifest is v0.7");
 assert(text(authoritative.contract, "erratum contract") === text(acceptedCurrent.contract, "historical accepted contract"), "erratum remains bound to historical v0.14 cutover");
 assert(text(authoritative.conformance, "erratum conformance") === text(acceptedCurrent.conformance, "historical accepted conformance"), "erratum conformance remains bound to historical v0.14 cutover");
