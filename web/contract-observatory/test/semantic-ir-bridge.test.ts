@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { loadCompiledMtsSemanticIr, validateSemanticIr } from "../src/semantic-ir-bridge.js";
+import { loadCompiledCurrentProjection, loadCompiledMtsSemanticIr, validateCurrentProjection, validateSemanticIr } from "../src/semantic-ir-bridge.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Contract Observatory P3a: ${message}`);
@@ -12,6 +12,25 @@ function same<T>(actual: T, expected: T, message: string): void {
 }
 
 const repositoryRoot = process.cwd();
+const projection = loadCompiledCurrentProjection(repositoryRoot);
+same(projection.currentContract, "mts-contract/v0.15", "accepted current contract");
+same(projection.currentConformance, "mts-conformance/v0.15", "accepted current conformance");
+same(projection.previousContract, "mts-contract/v0.14", "accepted previous contract");
+same(projection.previousConformance, "mts-conformance/v0.14", "accepted previous conformance");
+same(projection.currentContractPath, "contracts/mts-contract-v0.15.json", "accepted current contract path");
+same(projection.currentConformancePath, "contracts/mts-conformance-v0.15.json", "accepted current conformance path");
+same(projection.previousContractPath, "contracts/mts-contract-v0.14.json", "accepted previous contract path");
+same(projection.previousConformancePath, "contracts/mts-conformance-v0.14.json", "accepted previous conformance path");
+same(projection.acceptancePath, "cutover/typescript-c1-acceptance-v0.8.json", "accepted acceptance path");
+
+let projectionRejected = false;
+try {
+  validateCurrentProjection({ ...projection, currentContractPath: "" });
+} catch {
+  projectionRejected = true;
+}
+assert(projectionRejected, "current projection bridge rejects empty required path");
+
 const ir = loadCompiledMtsSemanticIr(repositoryRoot);
 same(ir.contract, "mts-contract/v0.15", "current compiler contract");
 same(ir.contractPath, "contracts/mts-contract-v0.15.json", "current compiler contract path");
@@ -47,4 +66,4 @@ rejected = false;
 try { validateSemanticIr({ schema: ir.schema, contract: ir.contract, contractPath: ir.contractPath }); } catch { rejected = true; }
 assert(rejected, "missing requirement array fails closed");
 
-console.log("Contract Observatory P3a semantic IR bridge: GREEN requirements=48 source=MTS_COMPILER current=v0.15");
+console.log("Contract Observatory P3a semantic IR bridge: GREEN requirements=48 source=MTS_COMPILER current=v0.15 release_projection=NATIVE_ACCEPTED");
