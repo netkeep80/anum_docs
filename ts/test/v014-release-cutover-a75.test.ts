@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Memory, ensureRootBasis } from "../src/memory.js";
+import { loadCurrentProjection } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error("v0.14 A75 cutover: " + message);
@@ -18,7 +19,7 @@ const traceability = readJson("traceability/mts-v0.14.json");
 const requirements = readJson("requirements/mts-v0.14.json");
 const acceptance = readJson("cutover/typescript-c1-acceptance-v0.7.json");
 const previousAcceptance = readJson("cutover/typescript-c1-acceptance-v0.6.json");
-const policy = readJson("repo-policy.json");
+const currentProjection = loadCurrentProjection(root);
 
 const memory = new Memory();
 const basis = ensureRootBasis(memory);
@@ -35,9 +36,9 @@ assert(contract.implementation.acceptedRuntime === "mts-contract/v0.14", "accept
 assert(contract.implementation.singleLiveSemanticRuntime === true, "single live runtime");
 assert(contract.implementation.candidateRuntimeSelectable === false, "candidate runtime remains nonselectable");
 
-assert(policy.packs["contract-conformance"].current.contract.path === "contracts/mts-contract-v0.15.json", "live policy current v0.15 after S22");
-assert(policy.packs["contract-conformance"].previous.contract.path === "contracts/mts-contract-v0.14.json", "live policy previous v0.14 after S22");
-assert(policy.packs["contract-conformance"].acceptance.document.path === "cutover/typescript-c1-acceptance-v0.8.json", "live policy acceptance v0.8 after S22");
+assert(currentProjection.currentContractPath === "contracts/mts-contract-v0.15.json", "native current v0.15 after S22");
+assert(currentProjection.previousContractPath === "contracts/mts-contract-v0.14.json", "native previous v0.14 after S22");
+assert(currentProjection.acceptancePath === "cutover/typescript-c1-acceptance-v0.8.json", "native acceptance v0.8 after S22");
 assert(acceptance.schema === "typescript-c1-acceptance/v0.7", "acceptance schema");
 assert(acceptance.decision === "ACCEPT_MTS_V0_14", "explicit decision");
 assert(acceptance.current.contract === "contracts/mts-contract-v0.14.json", "manifest current contract");
