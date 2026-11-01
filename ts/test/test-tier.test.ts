@@ -161,6 +161,29 @@ try {
     "native accepted-authority inconsistency must fail closed",
   );
   writeFileSync(registryPath, registrySource, "utf8");
+
+  const contractPath = resolve(fixtureRoot, "contracts/mts-contract-v0.15.json");
+  const contractSource = readFileSync(contractPath, "utf8");
+
+  const conformanceMismatch = JSON.parse(contractSource) as any;
+  conformanceMismatch.conformanceCorpus = "contracts/mts-conformance-v0.14.json";
+  writeFileSync(contractPath, JSON.stringify(conformanceMismatch), "utf8");
+  assert.throws(
+    () => buildTestTierPlan(fixtureRoot),
+    /v0\.15 contract conformanceCorpus differs from accepted conformance path/,
+    "accepted contract conformance selector mismatch must fail closed",
+  );
+  writeFileSync(contractPath, contractSource, "utf8");
+
+  const traceabilityMismatch = JSON.parse(contractSource) as any;
+  traceabilityMismatch.traceabilityManifest = "traceability/mts-v0.14.json";
+  writeFileSync(contractPath, JSON.stringify(traceabilityMismatch), "utf8");
+  assert.throws(
+    () => buildTestTierPlan(fixtureRoot),
+    /v0\.15 contract traceabilityManifest differs from accepted traceability path/,
+    "accepted contract traceability selector mismatch must fail closed",
+  );
+  writeFileSync(contractPath, contractSource, "utf8");
 } finally {
   rmSync(fixtureRoot, { recursive: true, force: true });
 }
@@ -174,5 +197,7 @@ console.log(
     `historical-research=${plan.historicalResearchSourceTests.length}`,
     "policy-pointer=IGNORED",
     "native-authority-mismatch=RED",
+    "contract-conformance-selector-mismatch=RED",
+    "contract-traceability-selector-mismatch=RED",
   ].join(" "),
 );
