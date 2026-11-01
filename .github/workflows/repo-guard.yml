@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  issues: read
-  pull-requests: read
 
 jobs:
   policy-check:
@@ -20,15 +18,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      # RepoGuard exact consumer pin: include trusted SHA-bound size-rule growth grants (#685).
       - name: Run repo-guard
         id: repo_guard
-        uses: netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2
+        uses: netkeep80/repo-guard@682ac7d759873bec585d6096e4fa364ab6faef02
         with:
-          mode: check-pr
-          enforcement: blocking
-        env:
-          GH_TOKEN: ${{ github.token }}
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
 
       - name: Publish repo-guard summary
         if: always()

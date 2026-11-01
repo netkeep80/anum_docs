@@ -18,8 +18,8 @@ import {
 } from "../src/tooling/theorem-projection-contract.js";
 
 // T0 RED: this test intentionally lands before the MTS-specific contract module.
-const REPO_GUARD_SHA = "6490ddc499ce01fa35b854dd4afbe0996d444165";
-const REPO_GUARD_VERSION = "4.1.0";
+const REPO_GUARD_SHA = "682ac7d759873bec585d6096e4fa364ab6faef02";
+const REPO_GUARD_VERSION = "5.0.0";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 
 function repositoryRoot(): string {
