@@ -1,6 +1,7 @@
 import {
   existsSync,
   readFileSync,
+  readdirSync,
 } from "node:fs";
 import {
   join,
@@ -15,10 +16,30 @@ function same<T>(actual: T, expected: T, message: string): void {
   assert(Object.is(actual, expected), `${message}: expected ${String(expected)}, got ${String(actual)}`);
 }
 
+function listMarkdownFiles(directory: string, relativePrefix: string): string[] {
+  const result: string[] = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const relativePath = `${relativePrefix}/${entry.name}`;
+    const absolutePath = join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...listMarkdownFiles(absolutePath, relativePath));
+    else if (entry.isFile() && entry.name.endsWith(".md")) result.push(relativePath);
+  }
+  return result;
+}
+
+function currentMarkdownFiles(root: string): readonly string[] {
+  return Object.freeze([
+    "README.md",
+    "PORTFOLIO.md",
+    ...listMarkdownFiles(join(root, "docs"), "docs"),
+  ].filter((relativePath) =>
+    readFileSync(join(root, relativePath), "utf8").includes("mts-doc-version: v0.15"),
+  ));
+}
+
 const root = resolve(process.cwd(), "..");
 const docPath = join(root, "docs/specs/Апамять и управление сетью связей.md");
 const profilePath = join(root, "profiles/amemory-execution-profile.json");
-const policyPath = join(root, "repo-policy.json");
 const packagePath = join(root, "ts/package.json");
 
 const requiredGates = Object.freeze([
@@ -39,16 +60,11 @@ for (const script of ["docs:sync", "docs:check", "check"]) {
   assert(typeof pkg.scripts[script] === "string", `D8 script exists: ${script}`);
 }
 
-const policy = JSON.parse(readFileSync(policyPath, "utf8")) as {
-  paths?: { canonical_docs?: string[] };
-};
-const canonicalDocs = policy.paths?.canonical_docs;
-assert(Array.isArray(canonicalDocs), "canonical docs are declared");
-
+const currentDocs = currentMarkdownFiles(root);
 const ownerMarker = "<!-- смысловой-владелец-апамяти -->";
 let ownerCount = 0;
 let ownerPath = "";
-for (const relativePath of canonicalDocs) {
+for (const relativePath of currentDocs) {
   const source = readFileSync(join(root, relativePath), "utf8");
   const count = source.split(ownerMarker).length - 1;
   if (count > 0) ownerPath = relativePath;
