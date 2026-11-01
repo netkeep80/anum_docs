@@ -183,7 +183,7 @@ try {
     "stable anchor inventory must match",
   );
   assert.deepEqual(production.listMarkdownAnchorIds(source), localListMarkdownAnchorIds(source),
-    "production RepoGuard v4 adapter must preserve accepted stable anchors");
+    "production RepoGuard v5 adapter must preserve accepted stable anchors");
 
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(
