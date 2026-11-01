@@ -249,7 +249,7 @@ async function main(): Promise<void> {
   }
 
   console.log("THEOREM_CATALOG_T0_INTEGRATION_CONTRACT = FROZEN");
-  console.log("GENERIC_PROJECTION_RUNTIME = REPO_GUARD_V4_1_0");
+  console.log("GENERIC_PROJECTION_RUNTIME = REPO_GUARD_V5_0_0");
   console.log("MARKDOWN_PROOF_AUTHORITY = NONE");
   console.log("accepted semantic delta = NONE");
 }
