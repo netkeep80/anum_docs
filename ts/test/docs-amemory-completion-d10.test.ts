@@ -2,12 +2,12 @@ import { createHash } from "node:crypto";
 import {
   existsSync,
   readFileSync,
-  readdirSync,
 } from "node:fs";
 import {
   join,
   resolve,
 } from "node:path";
+import { CURRENT_DOC_SIZE_SURFACE } from "../src/tooling/docs-sync.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`A-memory D10 completion: ${message}`);
@@ -18,27 +18,6 @@ function same<T>(actual: T, expected: T, message: string): void {
     Object.is(actual, expected),
     `${message}: expected ${String(expected)}, got ${String(actual)}`,
   );
-}
-
-function listMarkdownFiles(directory: string, relativePrefix: string): string[] {
-  const result: string[] = [];
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const relativePath = `${relativePrefix}/${entry.name}`;
-    const absolutePath = join(directory, entry.name);
-    if (entry.isDirectory()) result.push(...listMarkdownFiles(absolutePath, relativePath));
-    else if (entry.isFile() && entry.name.endsWith(".md")) result.push(relativePath);
-  }
-  return result;
-}
-
-function currentMarkdownFiles(root: string): readonly string[] {
-  return Object.freeze([
-    "README.md",
-    "PORTFOLIO.md",
-    ...listMarkdownFiles(join(root, "docs"), "docs"),
-  ].filter((relativePath) =>
-    readFileSync(join(root, relativePath), "utf8").includes("mts-doc-version: v0.15"),
-  ));
 }
 
 function gitBlobSha(source: string): string {
@@ -151,7 +130,10 @@ same(
   "normalized schedule independence",
 );
 
-const currentDocs = currentMarkdownFiles(root);
+const currentDocs = Object.freeze([
+  ...CURRENT_DOC_SIZE_SURFACE,
+  "PORTFOLIO.md",
+]);
 const ownerMarker = "<!-- смысловой-владелец-апамяти -->";
 let ownerCount = 0;
 let ownerPath = "";
