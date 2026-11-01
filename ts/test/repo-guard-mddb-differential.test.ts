@@ -9,7 +9,7 @@ import ts from "typescript";
 import * as production from "../src/tooling/markdown-section-adapter.js";
 const { listRepositoryMarkdownSurface } = production;
 
-const REPO_GUARD_SHA = "682ac7d759873bec585d6096e4fa364ab6faef02";
+const REPO_GUARD_SHA = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 assert.match(REPO_GUARD_SHA, /^[0-9a-f]{40}$/, "repo-guard differential pin must be an exact commit SHA");
 
@@ -157,7 +157,7 @@ try {
     resolveMarkdownAnchor: localResolveMarkdownAnchor,
   } = legacy;
   assert.equal(production.REPO_GUARD_SHA, REPO_GUARD_SHA);
-  assert.equal(production.REPO_GUARD_VERSION, "5.0.0");
+  assert.equal(production.REPO_GUARD_VERSION, "6.0.0");
 
   run("git", ["clone", "--quiet", "--filter=blob:none", REPO_GUARD_URL, cloneRoot]);
   run("git", ["checkout", "--quiet", "--detach", REPO_GUARD_SHA], cloneRoot);
@@ -183,7 +183,7 @@ try {
     "stable anchor inventory must match",
   );
   assert.deepEqual(production.listMarkdownAnchorIds(source), localListMarkdownAnchorIds(source),
-    "production RepoGuard v5 adapter must preserve accepted stable anchors");
+    "production RepoGuard v6 adapter must preserve accepted stable anchors");
 
   for (const id of ["root", "node-a", "node-a1", "node-b"]) {
     assert.deepEqual(
@@ -392,7 +392,7 @@ try {
   assert.equal(localListMarkdownAnchorIds(source).includes("fake"), false);
   assert.equal(upstream.listMarkdownAnchorIds(source).includes("fake"), false);
 
-  // Compare the public v5.0.0 API against the actual tracked Markdown
+  // Compare the public v6.0.0 API against the actual tracked Markdown
   // corpus, not just the synthetic canonical-tree fixture above. No writes.
   const repositoryRoot = [process.cwd(), resolve(process.cwd(), "..")].find(
     (candidate) => existsSync(resolve(candidate, "repo-policy.json")),

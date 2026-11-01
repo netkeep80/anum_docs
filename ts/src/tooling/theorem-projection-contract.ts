@@ -1,8 +1,8 @@
 export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
   schema: "mts-theorem-catalog-integration/v0.5" as const,
   repoGuard: Object.freeze({
-    version: "5.0.0",
-    commitSha: "682ac7d759873bec585d6096e4fa364ab6faef02",
+    version: "6.0.0",
+    commitSha: "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71",
     entrypoint: "repo-guard/dist/projection-api.mjs",
   }),
   fixedSources: Object.freeze([

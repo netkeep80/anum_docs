@@ -4,10 +4,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MarkdownStructureOptions } from "../../../vendor/repo-guard/dist/projection-api.mjs";
 
-// Generic Markdown structure and projection belong to immutable RepoGuard 5.0.0.
+// Generic Markdown structure and projection belong to immutable RepoGuard 6.0.0.
 // Only MTS-owned marker configuration and repository surface selection stay here.
-export const REPO_GUARD_VERSION = "5.0.0";
-export const REPO_GUARD_SHA = "682ac7d759873bec585d6096e4fa364ab6faef02";
+export const REPO_GUARD_VERSION = "6.0.0";
+export const REPO_GUARD_SHA = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71";
 
 export type MarkdownDocumentMode = "source" | "hybrid" | "generated";
 export interface MarkdownHeading { readonly level: number; readonly title: string; }
@@ -59,7 +59,7 @@ const repositoryRoot = findRepositoryRoot();
 const upstreamRoot = resolve(repositoryRoot, "vendor/repo-guard");
 const upstreamEntrypoint = resolve(upstreamRoot, "dist/projection-api.mjs");
 if (!existsSync(upstreamEntrypoint)) {
-  fail("RepoGuard v5.0.0 gitlink is not checked out; run git submodule update --init");
+  fail("RepoGuard v6.0.0 gitlink is not checked out; run git submodule update --init");
 }
 const git = spawnSync("git", ["-C", upstreamRoot, "rev-parse", "HEAD"], {
   encoding: "utf8", timeout: 10000,

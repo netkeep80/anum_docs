@@ -54,9 +54,9 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install pinned RepoGuard 5.0.0 runtime
+      - name: Install pinned RepoGuard 6.0.0 runtime
         run: |
-          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "682ac7d759873bec585d6096e4fa364ab6faef02"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
           npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
 
       - name: Install TypeScript toolchain

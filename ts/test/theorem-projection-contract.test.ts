@@ -18,8 +18,8 @@ import {
 } from "../src/tooling/theorem-projection-contract.js";
 
 // T0 RED: this test intentionally lands before the MTS-specific contract module.
-const REPO_GUARD_SHA = "682ac7d759873bec585d6096e4fa364ab6faef02";
-const REPO_GUARD_VERSION = "5.0.0";
+const REPO_GUARD_SHA = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71";
+const REPO_GUARD_VERSION = "6.0.0";
 const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 
 function repositoryRoot(): string {
@@ -249,7 +249,7 @@ async function main(): Promise<void> {
   }
 
   console.log("THEOREM_CATALOG_T0_INTEGRATION_CONTRACT = FROZEN");
-  console.log("GENERIC_PROJECTION_RUNTIME = REPO_GUARD_V5_0_0");
+  console.log("GENERIC_PROJECTION_RUNTIME = REPO_GUARD_V6_0_0");
   console.log("MARKDOWN_PROOF_AUTHORITY = NONE");
   console.log("accepted semantic delta = NONE");
 }
