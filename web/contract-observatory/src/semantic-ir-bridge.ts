@@ -28,6 +28,18 @@ export interface ObservatorySemanticIr {
   readonly requirements: readonly ObservatoryRequirement[];
 }
 
+export interface ObservatoryCurrentProjection {
+  readonly currentContract: string;
+  readonly currentConformance: string;
+  readonly previousContract: string;
+  readonly previousConformance: string;
+  readonly currentContractPath: string;
+  readonly currentConformancePath: string;
+  readonly previousContractPath: string;
+  readonly previousConformancePath: string;
+  readonly acceptancePath: string;
+}
+
 type JsonRecord = Record<string, unknown>;
 
 function fail(message: string): never {
@@ -84,6 +96,57 @@ export function loadCompiledMtsSemanticIr(repositoryRoot: string): ObservatorySe
     fail("MTS Compiler returned malformed JSON");
   }
   return validateSemanticIr(parsed);
+}
+
+export function loadCompiledCurrentProjection(repositoryRoot: string): ObservatoryCurrentProjection {
+  const root = resolve(repositoryRoot);
+  const toolingPath = resolve(root, "ts", "dist", "src", "tooling", "docs-sync.js");
+  const toolingUrl = pathToFileURL(toolingPath).href;
+  const program = [
+    `import { loadCurrentProjection } from ${JSON.stringify(toolingUrl)};`,
+    `process.stdout.write(JSON.stringify(loadCurrentProjection(${JSON.stringify(root)})));`,
+  ].join("\n");
+
+  let output: string;
+  try {
+    output = execFileSync(process.execPath, ["--input-type=module", "--eval", program], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    fail(`current projection invocation failed: ${detail}`);
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(output);
+  } catch {
+    fail("current projection returned malformed JSON");
+  }
+  return validateCurrentProjection(parsed);
+}
+
+export function validateCurrentProjection(value: unknown): ObservatoryCurrentProjection {
+  const root = record(value, "current projection");
+  return Object.freeze({
+    currentContract: string(root.currentContract, "current projection.currentContract"),
+    currentConformance: string(root.currentConformance, "current projection.currentConformance"),
+    previousContract: string(root.previousContract, "current projection.previousContract"),
+    previousConformance: string(root.previousConformance, "current projection.previousConformance"),
+    currentContractPath: string(root.currentContractPath, "current projection.currentContractPath"),
+    currentConformancePath: string(
+      root.currentConformancePath,
+      "current projection.currentConformancePath",
+    ),
+    previousContractPath: string(root.previousContractPath, "current projection.previousContractPath"),
+    previousConformancePath: string(
+      root.previousConformancePath,
+      "current projection.previousConformancePath",
+    ),
+    acceptancePath: string(root.acceptancePath, "current projection.acceptancePath"),
+  });
 }
 
 export function validateSemanticIr(value: unknown): ObservatorySemanticIr {

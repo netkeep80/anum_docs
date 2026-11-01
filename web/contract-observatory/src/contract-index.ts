@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { loadCompiledCurrentProjection } from "./semantic-ir-bridge.js";
 
 export interface ContractVersionSummary {
   readonly contractId: string;
@@ -39,9 +40,7 @@ export type ContractIndexErrorCode =
   | "missing-conformance"
   | "orphan-conformance"
   | "pair-mismatch"
-  | "policy-path-missing"
-  | "acceptance-missing"
-  | "acceptance-mismatch";
+  | "release-pair-missing";
 
 export class ContractIndexError extends Error {
   readonly code: ContractIndexErrorCode;
@@ -79,7 +78,7 @@ interface ConformanceDocument {
   readonly requiredNegativeVectors: readonly string[];
 }
 
-interface PolicyPointers {
+export interface ReleasePointers {
   readonly currentContractPath: string;
   readonly currentConformancePath: string;
   readonly previousContractPath: string;
@@ -93,8 +92,20 @@ const CONTRACT_SCHEMA = /^mts-contract\/v(\d+(?:\.\d+)*)$/;
 const CONFORMANCE_SCHEMA = /^mts-conformance\/v(\d+(?:\.\d+)*)$/;
 
 export function buildContractObservatoryIndex(repoRoot: string): ContractObservatoryIndex {
-  const policy = readJson(join(repoRoot, "repo-policy.json"), "policy-path-missing");
-  const pointers = readPolicyPointers(policy);
+  const projection = loadCompiledCurrentProjection(repoRoot);
+  return buildContractObservatoryIndexFromReleasePointers(repoRoot, {
+    currentContractPath: projection.currentContractPath,
+    currentConformancePath: projection.currentConformancePath,
+    previousContractPath: projection.previousContractPath,
+    previousConformancePath: projection.previousConformancePath,
+    acceptancePath: projection.acceptancePath,
+  });
+}
+
+export function buildContractObservatoryIndexFromReleasePointers(
+  repoRoot: string,
+  pointers: ReleasePointers,
+): ContractObservatoryIndex {
   const contractsDirectory = join(repoRoot, "contracts");
   const entries = readdirSync(contractsDirectory, { withFileTypes: true });
   const contractPaths = entries
@@ -172,7 +183,6 @@ export function buildContractObservatoryIndex(repoRoot: string): ContractObserva
 
   requirePairPath(versions, pointers.currentContractPath, pointers.currentConformancePath);
   requirePairPath(versions, pointers.previousContractPath, pointers.previousConformancePath);
-  verifyAcceptance(repoRoot, pointers);
 
   versions.sort((left, right) => compareVersions(left.contractId, right.contractId));
   return Object.freeze({
@@ -190,31 +200,6 @@ export function serializeContractObservatoryIndex(index: ContractObservatoryInde
   return `${JSON.stringify(index, null, 2)}\n`;
 }
 
-function readPolicyPointers(policy: JsonRecord): PolicyPointers {
-  const packs = recordField(policy, "packs", "repo-policy.json");
-  const boundary = recordField(packs, "contract-conformance", "repo-policy.json.packs");
-  const current = recordField(boundary, "current", "repo-policy.json");
-  const previous = recordField(boundary, "previous", "repo-policy.json");
-  const acceptance = recordField(boundary, "acceptance", "repo-policy.json");
-  return {
-    currentContractPath: documentPath(current, "contract"),
-    currentConformancePath: documentPath(current, "conformance"),
-    previousContractPath: documentPath(previous, "contract"),
-    previousConformancePath: documentPath(previous, "conformance"),
-    acceptancePath: documentPath(acceptance, "document"),
-  };
-}
-
-function verifyAcceptance(repoRoot: string, pointers: PolicyPointers): void {
-  const absolutePath = join(repoRoot, pointers.acceptancePath);
-  const acceptance = readJson(absolutePath, "acceptance-missing");
-  const current = recordField(acceptance, "current", pointers.acceptancePath);
-  if (stringField(current, "contract", pointers.acceptancePath) !== pointers.currentContractPath
-    || stringField(current, "conformance", pointers.acceptancePath) !== pointers.currentConformancePath) {
-    throw new ContractIndexError("acceptance-mismatch", pointers.acceptancePath);
-  }
-}
-
 function requirePairPath(
   versions: readonly ContractVersionSummary[],
   contractPath: string,
@@ -222,7 +207,7 @@ function requirePairPath(
 ): void {
   if (!versions.some((version) => version.contractPath === contractPath
     && version.conformancePath === conformancePath)) {
-    throw new ContractIndexError("policy-path-missing", `${contractPath} | ${conformancePath}`);
+    throw new ContractIndexError("release-pair-missing", `${contractPath} | ${conformancePath}`);
   }
 }
 
@@ -298,14 +283,6 @@ function requireRecord(value: unknown, path: string): JsonRecord {
     throw new ContractIndexError("invalid-document", path);
   }
   return value as JsonRecord;
-}
-
-function recordField(record: JsonRecord, field: string, path: string): JsonRecord {
-  return requireRecord(record[field], path);
-}
-
-function documentPath(record: JsonRecord, field: string): string {
-  return stringField(recordField(record, field, "repo-policy.json"), "path", "repo-policy.json");
 }
 
 function stringField(record: JsonRecord, field: string, path: string): string {
