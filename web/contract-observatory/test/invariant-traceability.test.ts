@@ -229,6 +229,7 @@ try {
   for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
     cpSync(join(repositoryRoot, directory), join(fixtureRoot, directory), { recursive: true });
   }
+  cpSync(join(repositoryRoot, "README.md"), join(fixtureRoot, "README.md"));
   mkdirSync(join(fixtureRoot, "ts", "node_modules"), { recursive: true });
   cpSync(join(repositoryRoot, "ts", "dist"), join(fixtureRoot, "ts", "dist"), { recursive: true });
   cpSync(
