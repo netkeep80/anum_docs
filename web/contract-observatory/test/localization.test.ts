@@ -58,6 +58,7 @@ const candidateProjection = Object.freeze({
 const candidateHtml = renderContractObservatoryHtml(
   Object.freeze({ ...index, versions: Object.freeze([...index.versions, candidateSummary]) }),
   candidateProjection,
+  semanticIr,
 );
 assert(candidateHtml.includes("КАНДИДАТ"), "candidate classification is localized in static overview");
 
@@ -92,6 +93,11 @@ for (const marker of [
   "ТЕКУЩАЯ",
   "ПРЕДЫДУЩАЯ",
   "Исходные связи трассируемости",
+  "Текущее нормативное требование",
+  "Нормативный источник",
+  "Принятый legacy-контракт (provenance)",
+  "Legacy-текст принятого релиза",
+  "только provenance; не текущий нормативный источник",
   "Векторы строк",
   "Векторы четверичной формы",
   "Векторы формальной нотации",
