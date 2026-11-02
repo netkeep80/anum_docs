@@ -28,7 +28,7 @@ atoms:
     exclusions: ["Не принимать неполный JSON лишь по равенству сериализованных строк"]
   - id: v15-json-02
     accepted_id: V15-JSON-02
-    source_quote: "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics. In direct JSON, object-member null denotes a bare source entry, a string RHS denotes a binding, a nested object denotes an anchored source bundle, and a structured bare key denotes resolved semantic membership. A root binding alone does not publish semantic membership. A non-empty role bundle publishes its resolved role members plus its Theory->Rule admission, while a grounded empty role bundle publishes only its Theory->Rule admission."
+    source_quote: "FORMAL text and direct JSON converge to the same native source ANet roles, resolver and DAS denotation path before semantics. In direct JSON, object-member null denotes a bare source entry, a string RHS denotes a binding, a nested object denotes an anchored source bundle, and a structured bare key denotes resolved semantic membership. A root binding alone does not publish semantic membership. A non-empty role bundle publishes its resolved role members plus its Theory-to-Rule admission, while a grounded empty role bundle publishes only its Theory-to-Rule admission."
     ru: "Исходный текст FORMAL и непосредственно введённый JSON обязаны дать одну нативную исходную ANet, одинаковые разрешение ролей и DAS-денотацию до начала семантического исполнения. Наличие двух независимых путей задания смысла нарушает единый канонический маршрут."
     domain: "Схождение FORMAL и JSON в общий source ANet и DAS-денотацию"
     exclusions: ["Не вводить отдельную денотацию для JSON и FORMAL"]
