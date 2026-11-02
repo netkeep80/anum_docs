@@ -434,18 +434,45 @@ try {
     /depends on itself/,
     "F9 self depends_on",
   );
-  mutateNative(
-    "V15-AND-01",
-    (source) => source + [
-      "  - predicates: [depends_on]",
-      "    target:",
-      "      kind: requirement",
-      "      id: V15-AND-02",
-      "",
-    ].join("\n"),
-    /dependency cycle detected/,
-    "F10 native dependency cycle",
-  );
+  const cycleLeftPath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const cycleRightPath = resolve(tempRoot, nativePath("V15-GOV-03"));
+  const cycleLeftSource = readFileSync(cycleLeftPath, "utf8");
+  const cycleRightSource = readFileSync(cycleRightPath, "utf8");
+  try {
+    writeFileSync(
+      cycleLeftPath,
+      cycleLeftSource + [
+        "  - predicates: [depends_on]",
+        "    target:",
+        "      kind: requirement",
+        "      id: V15-AND-02",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    writeFileSync(
+      cycleRightPath,
+      cycleRightSource.replace(
+        [
+          "  - predicates: [depends_on]",
+          "    target:",
+          "      kind: requirement",
+          "      id: V15-GOV-01",
+          "",
+        ].join("\n"),
+        "",
+      ),
+      "utf8",
+    );
+    expect(
+      () => loadMtsSemanticIr(tempRoot),
+      /dependency cycle detected/,
+      "F10 native dependency cycle with accepted 189/33 graph cardinality preserved",
+    );
+  } finally {
+    writeFileSync(cycleLeftPath, cycleLeftSource, "utf8");
+    writeFileSync(cycleRightPath, cycleRightSource, "utf8");
+  }
   mutateNative(
     "V15-AND-01",
     (source) => source.replace(
