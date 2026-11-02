@@ -188,6 +188,13 @@ export function renderFormalNotationV015Markdown(root: string): string {
     (item) => item.mandatory !== false,
   );
   const counts = stateCounts(mandatory);
+  const currentIr = loadMtsSemanticIr(root);
+  if (currentIr.requirements.length !== mandatory.length) {
+    fail("native current normative Requirement count differs from legacy presentation metadata");
+  }
+  const currentStatements = new Map(
+    currentIr.requirements.map((item) => [item.id, item.statement] as const),
+  );
 
   const historicalIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
   const historical = historicalIr.requirements.find((item) => item.id === "V14-L2");
@@ -315,8 +322,8 @@ export function renderFormalNotationV015Markdown(root: string): string {
     "",
     "## 9a. Нормативный реестр требований v0.15",
     "",
-    "Ниже приведены все " + String(mandatory.length) + " обязательных требований из принятой " +
-      q + "requirements/mts-v0.15.json" + q + ". Это проекция принятых записей, а не новые законы или доказательства.",
+    "Ниже приведены все " + String(mandatory.length) + " обязательных требований принятого v0.15. Порядок, группа и состояние берутся из " +
+      q + "requirements/mts-v0.15.json" + q + ", а нормативное содержание — из текущего MTS Semantic IR, построенного по native " + q + ".rg" + q + ". Это проекция принятых записей, а не новые законы или доказательства.",
     "",
     "| ID | Группа | Состояние принятия | Нормативное содержание |",
     "|---|---|---|---|",
@@ -324,16 +331,19 @@ export function renderFormalNotationV015Markdown(root: string): string {
       const id = string(requirement.id, "requirement id");
       const group = string(requirement.group, id + ".group");
       const state = string(requirement.state, id + ".state");
-      const summary = "<span lang=\"en\">" + string(requirement.summary, id + ".summary")
+      const statement = currentStatements.get(id);
+      if (statement === undefined) fail("missing native current normative statement " + id);
+      const summary = "<span lang=\"en\">" + statement
         .replace(/\|/g, "\\|")
         .replace(/\r?\n/g, " ") + "</span>";
       return "| <a id=\"mts-v015-" + id.toLowerCase() + "\"></a>" + q + id + q +
         " | " + q + group + q + " | " + q + state + q + " | " + summary + " |";
     }),
     "",
-    "У каждой записи остаётся собственный машинный источник полномочий в " + q + "contracts/mts-contract-v0.15.json" +
-      q + ", трассировка в " + q + "traceability/mts-v0.15.json" +
-      q + " и свидетельство по исходному ID. Унаследованные " + q + "V14-L*" + q +
+    "Текущий нормативный источник каждой записи — native " + q + "requirements/mts-v0.15/<ID>.rg.yaml#/normative" +
+      q + " через MTS Semantic IR. " + q + "contracts/mts-contract-v0.15.json" + q + " и " +
+      q + "requirements/mts-v0.15.json" + q + " сохраняются как переходные release/presentation/evidence surfaces; трассировка остаётся в " +
+      q + "traceability/mts-v0.15.json" + q + ". Унаследованные " + q + "V14-L*" + q +
       " сохраняются ниже исключительно как историческая версия.",
     "",
     "## 10. Отложено в v0.16",
