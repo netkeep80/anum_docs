@@ -91,7 +91,7 @@ export interface ReaderCoveragePlan {
   readonly schema: "mts-reader-coverage-plan/v0.1";
   readonly status: "proposed";
   readonly semanticChange: false;
-  readonly authority: "accepted-registries-only";
+  readonly authority: "accepted-requirement-authority" | "legacy-dependency-shadow";
   readonly v014Count: 14;
   readonly v015Count: 48;
   readonly rows: readonly ReaderCoverageRow[];
@@ -108,8 +108,12 @@ export function projectReaderCoverage(
   const ids = new Set<string>();
   const convert = (item: MtsRequirementProjection, release: ReaderCoverageRow["release"]): ReaderCoverageRow => {
     if (ids.has(item.id) || item.status !== "accepted") fail("duplicate or non-accepted ID " + item.id);
-    if (!item.authorityDocument || item.authorityPointer !== "/requiredSemanticLaws/" + item.id ||
-        !item.docPath || !item.docAnchor) {
+    const acceptedAuthority =
+      release === "v0.14"
+        ? item.authorityPointer === "/requiredSemanticLaws/" + item.id
+        : item.authorityDocument === `requirements/mts-v0.15/${item.id}.rg.yaml` &&
+          item.authorityPointer === "/normative";
+    if (!item.authorityDocument || !acceptedAuthority || !item.docPath || !item.docAnchor) {
       fail("missing accepted authority or current documentation owner for " + item.id);
     }
     let proposedSection: ReaderSection | undefined;
@@ -144,7 +148,7 @@ export function projectReaderCoverage(
   }
   return Object.freeze({
     schema: "mts-reader-coverage-plan/v0.1",
-    status: "proposed", semanticChange: false, authority: "accepted-registries-only",
+    status: "proposed", semanticChange: false, authority: "accepted-requirement-authority",
     v014Count: 14, v015Count: 48, rows: Object.freeze(rows),
   });
 }
@@ -154,6 +158,55 @@ export function loadReaderCoverage(root: string): ReaderCoveragePlan {
     loadMtsSemanticIr(root).requirements,
     loadReaderRoutes(root),
   );
+}
+
+/**
+ * Transitional G5 shadow used only by the pre-existing G17/G18 editorial
+ * diagnostics. Their 100-edge analysis was authored against the legacy
+ * v0.15 dependsOn graph and remains non-authoritative research/currentization
+ * evidence. Current Requirement semantics always use loadReaderCoverage().
+ */
+export function loadReaderLegacyDependencyShadow(root: string): ReaderCoveragePlan {
+  const current = loadReaderCoverage(root);
+  const path = "requirements/mts-v0.15.json";
+  const registry = object(
+    JSON.parse(readFileSync(resolve(root, path), "utf8")) as unknown,
+    path,
+  );
+  if (!Array.isArray(registry.requirements) || registry.requirements.length !== 48) {
+    fail("legacy v0.15 dependency shadow must contain exactly 48 Requirements");
+  }
+  const legacy = new Map<string, readonly string[]>();
+  for (const [index, raw] of (registry.requirements as unknown[]).entries()) {
+    const item = object(raw, `${path}.requirements[${index}]`);
+    const id = item.id;
+    if (typeof id !== "string" || legacy.has(id) || !Array.isArray(item.dependsOn) ||
+        item.dependsOn.some((dependency) => typeof dependency !== "string" || dependency.length === 0)) {
+      fail("legacy v0.15 dependency shadow is malformed");
+    }
+    legacy.set(id, Object.freeze([...(item.dependsOn as string[])]));
+  }
+  const currentV015Ids = current.rows.filter((row) => row.release === "v0.15").map((row) => row.id).sort();
+  if (currentV015Ids.join("\n") !== [...legacy.keys()].sort().join("\n")) {
+    fail("legacy v0.15 dependency shadow ID set differs from native current authority");
+  }
+  const allIds = new Set(current.rows.map((row) => row.id));
+  const rows = current.rows.map((row) => {
+    if (row.release !== "v0.15") return row;
+    const dependencies = legacy.get(row.id);
+    if (dependencies === undefined || dependencies.some((dependency) => !allIds.has(dependency))) {
+      fail("legacy v0.15 dependency shadow has unresolved dependency for " + row.id);
+    }
+    return Object.freeze({
+      ...row,
+      normativeDependsOn: dependencies,
+    });
+  });
+  return Object.freeze({
+    ...current,
+    authority: "legacy-dependency-shadow" as const,
+    rows: Object.freeze(rows),
+  });
 }
 export function renderReaderCoverageAudit(plan: ReaderCoveragePlan): string {
   const bySection = new Map<ReaderSection, number>();
@@ -1269,7 +1322,7 @@ export function parseReaderReverseNormativeAudit(
 export function loadReaderReverseNormativeAudit(root:string):ReaderReverseNormativeAudit{
   return parseReaderReverseNormativeAudit(
     readFileSync(resolve(root,READER_INVERSION_G17_PATH),"utf8"),
-    loadReaderCoverage(root),loadReaderRoutes(root));
+    loadReaderLegacyDependencyShadow(root),loadReaderRoutes(root));
 }
 export function renderReaderReverseNormativeAudit(a:ReaderReverseNormativeAudit):string{
   return [
@@ -1446,7 +1499,7 @@ export function parseReaderChapterCycleAudit(
 export function loadReaderChapterCycleAudit(root:string):ReaderChapterCycleAudit{
   return parseReaderChapterCycleAudit(
     readFileSync(resolve(root,READER_CHAPTER_CYCLES_G18_PATH),"utf8"),
-    loadReaderCoverage(root),loadReaderRoutes(root),loadReaderReverseNormativeAudit(root));
+    loadReaderLegacyDependencyShadow(root),loadReaderRoutes(root),loadReaderReverseNormativeAudit(root));
 }
 export function renderReaderChapterCycleAudit(a:ReaderChapterCycleAudit):string{
   return [

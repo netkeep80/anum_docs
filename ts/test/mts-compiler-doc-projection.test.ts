@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import {
@@ -160,6 +160,12 @@ assert.equal(new Set(surface).size, surface.length);
 assert.ok(surface.includes("docs/research/Исходные мысли МТС.md"));
 assert.ok(surface.includes("docs/theory/Система аксиом МТС.md"));
 
+const nativeV015Paths = readdirSync(resolve(root, "requirements/mts-v0.15"), { withFileTypes: true })
+  .filter((entry) => entry.isFile() && entry.name.endsWith(".rg.yaml"))
+  .map((entry) => `requirements/mts-v0.15/${entry.name}`)
+  .sort((left, right) => left.localeCompare(right, "en"));
+assert.equal(nativeV015Paths.length, 48, "exact native v0.15 Requirement source count");
+
 const ir = loadMtsSemanticIr(root);
 assert.equal(ir.schema, "mts-requirement-registry/v0.3");
 assert.equal(ir.contract, "mts-contract/v0.15");
@@ -182,6 +188,48 @@ assert.match(
   /Дьяченко Константин Константинович/,
 );
 assert.equal(Object.values(ir.documentModes).includes("generated"), false);
+
+const currentCausalEdges = ir.requirements.flatMap((item) =>
+  item.dependsOn.map((dependency) => `${item.id}->${dependency}`)
+);
+assert.equal(currentCausalEdges.length, 33, "native depends_on must define exactly 33 current causal edges");
+assert.equal(new Set(currentCausalEdges).size, 33, "native current causal edges must be unique");
+const currentCausalSet = new Set(currentCausalEdges);
+
+const legacyV015Registry = JSON.parse(
+  readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8"),
+) as { requirements: Array<{ id: string; dependsOn: string[] }> };
+const legacyCausalEdges = legacyV015Registry.requirements.flatMap((item) =>
+  item.dependsOn.map((dependency) => `${item.id}->${dependency}`)
+);
+assert.equal(legacyCausalEdges.length, 85, "legacy shadow retains exactly 85 dependsOn edges");
+assert.ok(
+  currentCausalEdges.every((edge) => new Set(legacyCausalEdges).has(edge)),
+  "native causal graph must remain a subset of the legacy transition graph",
+);
+assert.equal(
+  legacyCausalEdges.filter((edge) => !currentCausalSet.has(edge)).length,
+  52,
+  "exactly 52 legacy-only edges must be absent from current causal authority",
+);
+
+const v015Contract = JSON.parse(
+  readFileSync(resolve(root, "contracts/mts-contract-v0.15.json"), "utf8"),
+) as { requiredSemanticLaws: Record<string, string> };
+assert.equal(Object.keys(v015Contract.requiredSemanticLaws).length, 48);
+for (const requirement of ir.requirements) {
+  assert.equal(
+    requirement.statement,
+    v015Contract.requiredSemanticLaws[requirement.id],
+    `${requirement.id}: native normative must remain 48/48 differential-equal to legacy contract shadow`,
+  );
+  assert.match(
+    requirement.authorityDocument,
+    /^requirements\/mts-v0\.15\/V15-[A-Z0-9-]+\.rg\.yaml$/,
+    `${requirement.id}: authorityDocument must name the exact native source`,
+  );
+  assert.equal(requirement.authorityPointer, "/normative", `${requirement.id}: native authority pointer`);
+}
 
 const legacyIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
 assert.equal(legacyIr.schema, "mts-requirement-registry/v0.2");
@@ -234,6 +282,7 @@ try {
     "contracts/mts-conformance-v0.14.json",
     "traceability/mts-v0.14.json",
     registryPath,
+    ...nativeV015Paths,
     ...surface,
   ]) copy(path);
 
@@ -286,6 +335,219 @@ try {
     writeFileSync(target, JSON.stringify(value), "utf8");
     expect(() => loadMtsSemanticIr(tempRoot), pattern, path);
     writeFileSync(target, source, "utf8");
+  }
+
+  const nativePath = (id: string): string => `requirements/mts-v0.15/${id}.rg.yaml`;
+  const mutateNative = (
+    id: string,
+    mutate: (source: string) => string,
+    pattern: RegExp,
+    message: string,
+  ): void => {
+    const path = nativePath(id);
+    const target = resolve(tempRoot, path);
+    const source = readFileSync(target, "utf8");
+    try {
+      writeFileSync(target, mutate(source), "utf8");
+      expect(() => loadMtsSemanticIr(tempRoot), pattern, message);
+    } finally {
+      writeFileSync(target, source, "utf8");
+    }
+  };
+
+  // G1-S1 fail-closed matrix. Legacy shadow remains intact for every native failure.
+  mutateNative("V15-AND-01", () => "format: [\n", /native YAML parse error/, "F1 malformed YAML; F13 no legacy fallback");
+  mutateNative(
+    "V15-AND-01",
+    (source) => source + "id: V15-AND-01\n",
+    /native YAML parse error/,
+    "F2 duplicate YAML key",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(/^normative: (.+)$/m, "normative: &g1 $1") + "aliasProbe: *g1\n",
+    /aliases are not allowed/,
+    "F3 YAML alias usage",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source + "<<: { probe: true }\n",
+    /merge keys are not allowed/,
+    "F4 YAML merge key",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(/^normative: (.+)$/m, "normative: !!str $1"),
+    /explicit tag/,
+    "explicit YAML tags fail closed",
+  );
+  mutateNative(
+    "V15-AND-02",
+    (source) => source.replace(/^id: V15-AND-02$/m, "id: V15-AND-01"),
+    /duplicate native Requirement ID/,
+    "F5 duplicate Requirement ID",
+  );
+
+  const missingPath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const missingSource = readFileSync(missingPath, "utf8");
+  rmSync(missingPath);
+  try {
+    expect(() => loadMtsSemanticIr(tempRoot), /source count 47 differs from accepted 48/, "F6 missing native Requirement");
+  } finally {
+    writeFileSync(missingPath, missingSource, "utf8");
+  }
+
+  const extraPath = resolve(tempRoot, "requirements/mts-v0.15/V15-EXTRA-01.rg.yaml");
+  writeFileSync(
+    extraPath,
+    [
+      "format: repo-guard/requirement-v1",
+      "id: V15-EXTRA-01",
+      'normative: "unexpected extra Requirement"',
+      "lifecycle:",
+      "  accepted: true",
+      "  current: true",
+      "relations:",
+      "  - predicates: [verified_by]",
+      "    target:",
+      "      kind: artifact",
+      "      path: ts/test/extra.test.ts",
+      "",
+    ].join("\n"),
+    "utf8",
+  );
+  try {
+    expect(() => loadMtsSemanticIr(tempRoot), /source count 49 differs from accepted 48/, "F7 extra native Requirement");
+  } finally {
+    rmSync(extraPath);
+  }
+
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(/^id: V15-AND-01$/m, "id: V15-UNEXPECTED-01"),
+    /native v0\.15 requirement id set differs/,
+    "F7b unexpected native Requirement ID with source count unchanged",
+  );
+
+  mutateNative(
+    "V15-AND-02",
+    (source) => source.replace("      id: V15-AND-01", "      id: V15-NO-SUCH-01"),
+    /depends on unknown requirement V15-NO-SUCH-01/,
+    "F8 unknown depends_on target",
+  );
+  mutateNative(
+    "V15-AND-02",
+    (source) => source.replace("      id: V15-AND-01", "      id: V15-AND-02"),
+    /depends on itself/,
+    "F9 self depends_on",
+  );
+  const cycleLeftPath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const cycleRightPath = resolve(tempRoot, nativePath("V15-GOV-03"));
+  const cycleLeftSource = readFileSync(cycleLeftPath, "utf8");
+  const cycleRightSource = readFileSync(cycleRightPath, "utf8");
+  try {
+    writeFileSync(
+      cycleLeftPath,
+      cycleLeftSource + [
+        "  - predicates: [depends_on]",
+        "    target:",
+        "      kind: requirement",
+        "      id: V15-AND-02",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    writeFileSync(
+      cycleRightPath,
+      cycleRightSource.replace(
+        [
+          "  - predicates: [depends_on]",
+          "    target:",
+          "      kind: requirement",
+          "      id: V15-GOV-01",
+          "",
+        ].join("\n"),
+        "",
+      ),
+      "utf8",
+    );
+    expect(
+      () => loadMtsSemanticIr(tempRoot),
+      /dependency cycle detected/,
+      "F10 native dependency cycle with accepted 189/33 graph cardinality preserved",
+    );
+  } finally {
+    writeFileSync(cycleLeftPath, cycleLeftSource, "utf8");
+    writeFileSync(cycleRightPath, cycleRightSource, "utf8");
+  }
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(
+      "      kind: artifact\n      path: ts/test/v015-compact-and-approved-source-integrity.test.ts",
+      "      kind: requirement\n      path: ts/test/v015-compact-and-approved-source-integrity.test.ts",
+    ),
+    /target.*(?:missing required field id|unexpected fields)/,
+    "F11 malformed verified_by relation",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(
+      "ts/test/v015-compact-and-approved-source-integrity.test.ts",
+      "ts/test/g1-valid-shape-but-wrong-gate.test.ts",
+    ),
+    /native\/legacy verified_by differential differs/,
+    "verified_by remains 48/48 differential-checked",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(/^normative: .+$/m, 'normative: "G1-S1 differential mismatch"'),
+    /native\/legacy normative differential mismatch/,
+    "F12 native normative mismatch against legacy differential",
+  );
+  mutateNative(
+    "V15-AND-01",
+    (source) => source.replace("  accepted: true", "  accepted: false"),
+    /native lifecycle must be accepted=true,current=true/,
+    "F13 native lifecycle failure must not fall back to legacy authority",
+  );
+
+  const deterministicShape = (value: ReturnType<typeof loadMtsSemanticIr>): string =>
+    JSON.stringify(value.requirements.map((item) => ({
+      id: item.id,
+      dependsOn: item.dependsOn,
+      statementDigest: item.statementDigest,
+      authorityDocument: item.authorityDocument,
+      authorityPointer: item.authorityPointer,
+      executableGateCount: item.executableGateCount,
+    })));
+  const deterministicBaseline = deterministicShape(loadMtsSemanticIr(tempRoot));
+  assert.equal(deterministicShape(loadMtsSemanticIr(tempRoot)), deterministicBaseline, "F14 repeated native load deterministic");
+  const nativeSnapshots = nativeV015Paths.map((path) => [path, readFileSync(resolve(tempRoot, path), "utf8")] as const);
+  for (const [path] of nativeSnapshots) rmSync(resolve(tempRoot, path));
+  for (const [path, source] of [...nativeSnapshots].reverse()) {
+    const target = resolve(tempRoot, path);
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, source, "utf8");
+  }
+  assert.equal(
+    deterministicShape(loadMtsSemanticIr(tempRoot)),
+    deterministicBaseline,
+    "F14 reverse native file creation order must not change IR",
+  );
+
+  const legacyV015Path = resolve(tempRoot, "requirements/mts-v0.15.json");
+  const legacyV015Source = readFileSync(legacyV015Path, "utf8");
+  try {
+    const value = JSON.parse(legacyV015Source) as any;
+    value.requirements.find((item: any) => item.id === "V15-AND-01").dependsOn = ["V15-READY-03"];
+    writeFileSync(legacyV015Path, JSON.stringify(value), "utf8");
+    assert.deepEqual(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.dependsOn,
+      [],
+      "F15 legacy-only dependsOn mutation cannot enter current causal graph",
+    );
+  } finally {
+    writeFileSync(legacyV015Path, legacyV015Source, "utf8");
   }
 
   const tempLegacyIr = loadMtsSemanticIr(tempRoot, registryPath);

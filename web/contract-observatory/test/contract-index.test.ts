@@ -109,8 +109,13 @@ try {
   for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
     cpSync(join(repositoryRoot, directory), join(nativeFixtureRoot, directory), { recursive: true });
   }
-  mkdirSync(join(nativeFixtureRoot, "ts"), { recursive: true });
+  mkdirSync(join(nativeFixtureRoot, "ts", "node_modules"), { recursive: true });
   cpSync(join(repositoryRoot, "ts", "dist"), join(nativeFixtureRoot, "ts", "dist"), { recursive: true });
+  cpSync(
+    join(repositoryRoot, "ts", "node_modules", "yaml"),
+    join(nativeFixtureRoot, "ts", "node_modules", "yaml"),
+    { recursive: true },
+  );
   cpSync(join(repositoryRoot, "README.md"), join(nativeFixtureRoot, "README.md"));
 
   const nativeBaseline = buildContractObservatoryIndex(nativeFixtureRoot);

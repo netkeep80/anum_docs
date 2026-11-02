@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { isAlias, isNode, isPair, isScalar, parseDocument, visit } from "yaml";
 import {
   listRepositoryMarkdownSurface,
   replaceOwnedMarkdownSection,
@@ -286,6 +287,218 @@ function validateDependencyGraph(requirements: readonly MtsRequirementProjection
   for (const id of ids) visit(id);
 }
 
+
+const NATIVE_V015_REQUIREMENT_DIRECTORY = "requirements/mts-v0.15";
+const NATIVE_V015_REQUIREMENT_COUNT = 48;
+const NATIVE_V015_RELATION_COUNT = 189;
+const NATIVE_V015_DEPENDS_ON_COUNT = 33;
+const NATIVE_V015_RELATION_PREDICATES = new Set([
+  "verified_by",
+  "depends_on",
+  "implemented_by",
+  "documents",
+  "requires",
+] as const);
+
+interface NativeV015RequirementAuthority {
+  readonly id: string;
+  readonly statement: string;
+  readonly sourcePath: string;
+  readonly dependsOn: readonly string[];
+  readonly verifiedBy: readonly string[];
+  readonly relationCount: number;
+}
+
+function fields(
+  value: JsonObject,
+  required: readonly string[],
+  optional: readonly string[],
+  label: string,
+): void {
+  const allowed = new Set([...required, ...optional]);
+  for (const key of required) {
+    if (!Object.hasOwn(value, key)) fail(`${label} is missing required field ${key}`);
+  }
+  const unexpected = Object.keys(value).filter((key) => !allowed.has(key)).sort();
+  if (unexpected.length > 0) fail(`${label} has unexpected fields: ${unexpected.join(", ")}`);
+}
+
+function parseStrictNativeYaml(text: string, path: string): JsonObject {
+  const document = parseDocument(text, {
+    prettyErrors: false,
+    strict: true,
+    uniqueKeys: true,
+    merge: false,
+    schema: "core",
+  });
+  const diagnostics = [...document.errors, ...document.warnings];
+  if (diagnostics.length > 0) {
+    fail(`${path} native YAML parse error: ${diagnostics.map((item) => item.message).join("; ")}`);
+  }
+
+  const forbidden: string[] = [];
+  visit(document, (_key, node) => {
+    if (isAlias(node)) forbidden.push("aliases are not allowed");
+    if (isPair(node) && isScalar(node.key) && node.key.value === "<<") {
+      forbidden.push("merge keys are not allowed");
+    }
+    if (isNode(node) && typeof node.tag === "string" && node.tag.length > 0) {
+      forbidden.push(`explicit tag ${node.tag} is not allowed`);
+    }
+  });
+  if (forbidden.length > 0) {
+    fail(`${path} native YAML is not canonical: ${[...new Set(forbidden)].sort().join("; ")}`);
+  }
+
+  try {
+    return object(document.toJS({ maxAliasCount: 0 }) as unknown, path);
+  } catch (error) {
+    fail(`${path} native YAML alias/shape rejection: ${(error as Error).message}`);
+  }
+}
+
+function nativeRequirementId(value: unknown, label: string): string {
+  const id = string(value, label);
+  if (!/^V15-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(id)) fail(`${label} is not a canonical v0.15 Requirement ID`);
+  return id;
+}
+
+function nativeArtifactPath(value: unknown, label: string): string {
+  const path = string(value, label);
+  if (
+    path.startsWith("/") ||
+    path.includes("\\") ||
+    path.includes("\0") ||
+    path.split("/").some((segment) => segment.length === 0 || segment === "." || segment === "..")
+  ) {
+    fail(`${label} is not a canonical repository path`);
+  }
+  return path;
+}
+
+function discoverNativeV015RequirementPaths(root: string): readonly string[] {
+  const directory = resolve(root, NATIVE_V015_REQUIREMENT_DIRECTORY);
+  const entries = readdirSync(directory, { withFileTypes: true });
+
+  const unexpectedNative = entries
+    .filter((entry) => entry.isFile() && /\.rg\.(?:ya?ml|json)$/i.test(entry.name) && !entry.name.endsWith(".rg.yaml"))
+    .map((entry) => entry.name)
+    .sort((left, right) => left.localeCompare(right, "en"));
+  if (unexpectedNative.length > 0) {
+    fail(`unexpected native v0.15 Requirement source format: ${unexpectedNative.join(", ")}`);
+  }
+
+  const paths = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".rg.yaml"))
+    .map((entry) => `${NATIVE_V015_REQUIREMENT_DIRECTORY}/${entry.name}`)
+    .sort((left, right) => left.localeCompare(right, "en"));
+
+  if (paths.length !== NATIVE_V015_REQUIREMENT_COUNT) {
+    fail(`native v0.15 Requirement source count ${paths.length} differs from accepted ${NATIVE_V015_REQUIREMENT_COUNT}`);
+  }
+  return Object.freeze(paths);
+}
+
+function loadNativeV015RequirementAuthority(root: string): readonly NativeV015RequirementAuthority[] {
+  const seenIds = new Set<string>();
+  const requirements = discoverNativeV015RequirementPaths(root).map((sourcePath) => {
+    const raw = readFileSync(resolve(root, sourcePath), "utf8");
+    const value = parseStrictNativeYaml(raw, sourcePath);
+    fields(value, ["format", "id", "normative", "lifecycle", "relations"], ["constraints"], sourcePath);
+
+    if (string(value.format, `${sourcePath}.format`) !== "repo-guard/requirement-v1") {
+      fail(`${sourcePath}.format must be repo-guard/requirement-v1`);
+    }
+    const id = nativeRequirementId(value.id, `${sourcePath}.id`);
+    if (seenIds.has(id)) fail(`duplicate native Requirement ID ${id}`);
+    seenIds.add(id);
+
+    const statement = string(value.normative, `${sourcePath}.normative`);
+    const lifecycle = object(value.lifecycle, `${sourcePath}.lifecycle`);
+    fields(lifecycle, ["accepted", "current"], [], `${sourcePath}.lifecycle`);
+    if (lifecycle.accepted !== true || lifecycle.current !== true) {
+      fail(`${id} native lifecycle must be accepted=true,current=true`);
+    }
+
+    if (value.constraints !== undefined) {
+      if (!Array.isArray(value.constraints)) fail(`${id}.constraints must be an array`);
+      if (value.constraints.length > 0) {
+        fail(`${id} native constraints are outside the G1-S1 MtsSemanticIr contract and must be handled explicitly`);
+      }
+    }
+
+    if (!Array.isArray(value.relations) || value.relations.length === 0) {
+      fail(`${id}.relations must be a non-empty array`);
+    }
+
+    const dependsOn = new Set<string>();
+    const verifiedBy = new Set<string>();
+    const relationKeys = new Set<string>();
+    let relationCount = 0;
+
+    for (const [index, rawRelation] of (value.relations as unknown[]).entries()) {
+      const relation = object(rawRelation, `${id}.relations[${index}]`);
+      fields(relation, ["predicates", "target"], [], `${id}.relations[${index}]`);
+      const predicates = [...strings(relation.predicates, `${id}.relations[${index}].predicates`)];
+      if (predicates.length === 0 || new Set(predicates).size !== predicates.length) {
+        fail(`${id}.relations[${index}].predicates must be non-empty and unique`);
+      }
+      for (const predicate of predicates) {
+        if (!NATIVE_V015_RELATION_PREDICATES.has(predicate as "verified_by" | "depends_on" | "implemented_by" | "documents" | "requires")) {
+          fail(`${id}.relations[${index}] has unsupported native predicate ${predicate}`);
+        }
+      }
+
+      const target = object(relation.target, `${id}.relations[${index}].target`);
+      const kind = string(target.kind, `${id}.relations[${index}].target.kind`);
+      let targetIdentity: string;
+      if (kind === "requirement") {
+        fields(target, ["kind", "id"], [], `${id}.relations[${index}].target`);
+        targetIdentity = nativeRequirementId(target.id, `${id}.relations[${index}].target.id`);
+      } else if (kind === "artifact") {
+        fields(target, ["kind", "path"], [], `${id}.relations[${index}].target`);
+        targetIdentity = nativeArtifactPath(target.path, `${id}.relations[${index}].target.path`);
+      } else {
+        fail(`${id}.relations[${index}].target.kind must be requirement or artifact`);
+      }
+
+      for (const predicate of predicates) {
+        if (predicate === "depends_on" && kind !== "requirement") {
+          fail(`${id}.relations[${index}] depends_on must target a Requirement`);
+        }
+        if (predicate !== "depends_on" && kind !== "artifact") {
+          fail(`${id}.relations[${index}] ${predicate} must target an artifact in the accepted v0.15 graph`);
+        }
+        const key = `${predicate}\0${kind}\0${targetIdentity}`;
+        if (relationKeys.has(key)) fail(`${id} has duplicate native relation ${predicate} -> ${targetIdentity}`);
+        relationKeys.add(key);
+        relationCount += 1;
+        if (predicate === "depends_on") dependsOn.add(targetIdentity);
+        if (predicate === "verified_by") verifiedBy.add(targetIdentity);
+      }
+    }
+
+    return Object.freeze({
+      id,
+      statement,
+      sourcePath,
+      dependsOn: Object.freeze([...dependsOn].sort((left, right) => left.localeCompare(right, "en"))),
+      verifiedBy: Object.freeze([...verifiedBy].sort((left, right) => left.localeCompare(right, "en"))),
+      relationCount,
+    });
+  });
+
+  const relationCount = requirements.reduce((sum, item) => sum + item.relationCount, 0);
+  const dependsOnCount = requirements.reduce((sum, item) => sum + item.dependsOn.length, 0);
+  if (relationCount !== NATIVE_V015_RELATION_COUNT) {
+    fail(`native v0.15 relation count ${relationCount} differs from accepted ${NATIVE_V015_RELATION_COUNT}`);
+  }
+  if (dependsOnCount !== NATIVE_V015_DEPENDS_ON_COUNT) {
+    fail(`native v0.15 depends_on count ${dependsOnCount} differs from accepted ${NATIVE_V015_DEPENDS_ON_COUNT}`);
+  }
+  return Object.freeze(requirements);
+}
+
 function loadAcceptedV015SemanticIr(
   root: string,
   registryPath: string,
@@ -303,37 +516,75 @@ function loadAcceptedV015SemanticIr(
   if (string(contract.traceabilityManifest, contractPath + ".traceabilityManifest") !== traceabilityPath) {
     fail("v0.15 contract traceabilityManifest differs from accepted traceability path");
   }
+
+  // G1-S1 authority boundary:
+  // native .rg supplies Requirement identity, normative statement, lifecycle,
+  // depends_on and verified_by. Legacy v0.15 JSON below is a checked
+  // presentation/evidence/release shadow only and is never a semantic fallback.
+  const nativeRequirements = loadNativeV015RequirementAuthority(root);
   const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
   const traces = object(traceability.requirements, traceabilityPath + ".requirements");
   if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
 
-  const requirements = (registry.requirements as unknown[]).map((raw, index) => {
-    const value = object(raw, registryPath + ".requirements[" + index + "]");
-    const id = string(value.id, "v0.15 requirement id");
-    const evidence = object(value.evidence, id + ".evidence");
-    const traced = object(traces[id], id + " traceability");
-    const statement = string(laws[id], contractPath + ".requiredSemanticLaws." + id);
-    if (string(traced.state, id + " trace state") !== string(value.state, id + " state")) fail(id + " registry/trace state mismatch");
+  const legacyRequirements = (registry.requirements as unknown[]).map((raw, index) => {
+    const value = object(raw, `${registryPath}.requirements[${index}]`);
     return Object.freeze({
-      id,
-      kind: string(value.group, id + ".group"),
-      status: "accepted",
-      classificationPath: "v015/" + string(value.group, id + ".group").toLowerCase().replace(/_/g, "-"),
+      id: string(value.id, `${registryPath}.requirements[${index}].id`),
+      value,
       order: index + 1,
-      dependsOn: Object.freeze([...strings(value.dependsOn, id + ".dependsOn")]),
-      statement,
-      statementDigest: createHash("sha256").update(statement, "utf8").digest("hex").slice(0, 16),
-      authorityDocument: contractPath,
-      authorityPointer: "/requiredSemanticLaws/" + id,
-      traceabilityPath,
-      positiveVectorCount: strings(evidence.positiveVectors, id + ".positiveVectors").length,
-      negativeVectorCount: strings(evidence.negativeVectors, id + ".negativeVectors").length,
-      executableGateCount: strings(evidence.requiredExecutableGates, id + ".requiredExecutableGates").length,
-      docPath: "docs/specs/Формальная нотация МТС.md",
-      docAnchor: "mts-v015-" + id.toLowerCase(),
     });
   });
-  exactSet("v0.15 requirement id set", requirements.map((item) => item.id), Object.keys(laws));
+  const legacyById = new Map<string, (typeof legacyRequirements)[number]>();
+  for (const item of legacyRequirements) {
+    if (legacyById.has(item.id)) fail(`duplicate legacy v0.15 requirement id ${item.id}`);
+    legacyById.set(item.id, item);
+  }
+
+  exactSet("native v0.15 requirement id set", nativeRequirements.map((item) => item.id), Object.keys(laws));
+  exactSet("legacy v0.15 requirement shadow id set", legacyRequirements.map((item) => item.id), nativeRequirements.map((item) => item.id));
+
+  const requirements = nativeRequirements.map((native) => {
+    const legacy = legacyById.get(native.id);
+    if (legacy === undefined) fail(`${native.id} legacy presentation/evidence shadow is missing`);
+    const value = legacy.value;
+    const evidence = object(value.evidence, native.id + ".evidence");
+    const traced = object(traces[native.id], native.id + " traceability");
+
+    const legacyStatement = string(laws[native.id], contractPath + ".requiredSemanticLaws." + native.id);
+    if (legacyStatement !== native.statement) {
+      fail(`${native.id} native/legacy normative differential mismatch`);
+    }
+
+    const legacyVerifiedBy = [...strings(evidence.requiredExecutableGates, native.id + ".requiredExecutableGates")];
+    exactSet(`${native.id} native/legacy verified_by differential`, native.verifiedBy, legacyVerifiedBy);
+
+    // This is legacy traceability metadata integrity only. It does not choose
+    // the current Requirement lifecycle/status; native lifecycle already did.
+    if (string(traced.state, native.id + " trace state") !== string(value.state, native.id + " state")) {
+      fail(native.id + " legacy registry/trace state mismatch");
+    }
+
+    const kind = string(value.group, native.id + ".group");
+    return Object.freeze({
+      id: native.id,
+      kind,
+      status: "accepted",
+      classificationPath: "v015/" + kind.toLowerCase().replace(/_/g, "-"),
+      order: legacy.order,
+      dependsOn: native.dependsOn,
+      statement: native.statement,
+      statementDigest: createHash("sha256").update(native.statement, "utf8").digest("hex").slice(0, 16),
+      authorityDocument: native.sourcePath,
+      authorityPointer: "/normative",
+      traceabilityPath,
+      positiveVectorCount: strings(evidence.positiveVectors, native.id + ".positiveVectors").length,
+      negativeVectorCount: strings(evidence.negativeVectors, native.id + ".negativeVectors").length,
+      executableGateCount: native.verifiedBy.length,
+      docPath: "docs/specs/Формальная нотация МТС.md",
+      docAnchor: "mts-v015-" + native.id.toLowerCase(),
+    });
+  }).sort((left, right) => left.order - right.order || left.id.localeCompare(right.id, "en"));
+
   validateDependencyGraph(requirements);
 
   const legacyPath = "requirements/mts-v0.14.json";
