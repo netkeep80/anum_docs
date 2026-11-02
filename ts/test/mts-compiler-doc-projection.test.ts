@@ -423,6 +423,13 @@ try {
   }
 
   mutateNative(
+    "V15-AND-01",
+    (source) => source.replace(/^id: V15-AND-01$/m, "id: V15-UNEXPECTED-01"),
+    /native v0\.15 requirement id set differs/,
+    "F7b unexpected native Requirement ID with source count unchanged",
+  );
+
+  mutateNative(
     "V15-AND-02",
     (source) => source.replace("      id: V15-AND-01", "      id: V15-NO-SUCH-01"),
     /depends on unknown requirement V15-NO-SUCH-01/,
