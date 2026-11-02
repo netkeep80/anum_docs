@@ -20,8 +20,12 @@ import {
   validateSemanticLawDocumentation,
 } from "../src/tooling/docs-sync.js";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
+import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadRepositoryTheoremProjectionSources } from "../src/tooling/theorem-projection-model.js";
-import { FORMAL_NOTATION_V015_SOURCE_PATHS } from "../src/tooling/formal-notation-v015-markdown.js";
+import {
+  FORMAL_NOTATION_V015_SOURCE_PATHS,
+  renderFormalNotationV015Markdown,
+} from "../src/tooling/formal-notation-v015-markdown.js";
 // S18 fixture must carry every generated FORMAL authority input.
 
 function expectThrow(action: () => unknown, pattern: RegExp): void {
@@ -114,8 +118,11 @@ const acceptedRequirements = JSON.parse(readFileSync(resolve(repositoryRoot, "re
 assert.equal(acceptedRequirements.accepted, true);
 const formalCurrentDoc = readFileSync(resolve(repositoryRoot, "docs/specs/Формальная нотация МТС.md"), "utf8");
 const requiredEntries = acceptedRequirements.requirements.filter((item) => item.mandatory !== false);
-assert.equal(requiredEntries.length, 48, "accepted normative registry must be explicit");
-// Before #2122 presentation redesign, accepted metadata must survive losslessly.
+assert.equal(requiredEntries.length, 48, "accepted presentation metadata registry must remain explicit");
+const currentStatements = new Map(
+  loadMtsSemanticIr(repositoryRoot).requirements.map((item) => [item.id, item.statement] as const),
+);
+// Before #2122 presentation redesign, accepted metadata must survive losslessly while normative text comes from native IR.
 function assertFormalRegistryProjection(document: string): void {
   const heading = "## 9a. Нормативный реестр требований v0.15";
   const start = document.indexOf(heading);
@@ -133,7 +140,9 @@ function assertFormalRegistryProjection(document: string): void {
   for (let i = 0; i < requiredEntries.length; i += 1) {
     const source = requiredEntries[i]!;
     const block = section.slice(anchors[i]!.index, anchors[i + 1]?.index ?? section.length);
-    const english = '<span lang="en">' + source.summary.replace(/\|/g, "\\|")
+    const statement = currentStatements.get(source.id);
+    assert.ok(statement, source.id + ": native current statement missing");
+    const english = '<span lang="en">' + statement.replace(/\|/g, "\\|")
       .replace(/\r?\n/g, " ") + "</span>";
     const pos = block.indexOf(english);
     assert.ok(pos >= 0 && block.indexOf(english, pos + 1) < 0,
@@ -167,7 +176,9 @@ assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(head
 assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(header,
   header.replace("`" + first.state + "`", "`WRONG_STATE`"))),
   "changing source status must fail");
-const exactEnglish = '<span lang="en">' + first.summary.replace(/\|/g, "\\|")
+const firstStatement = currentStatements.get(first.id);
+assert.ok(firstStatement, "first native current statement exists");
+const exactEnglish = '<span lang="en">' + firstStatement.replace(/\|/g, "\\|")
   .replace(/\r?\n/g, " ") + "</span>";
 assert.ok(formalCurrentDoc.includes(exactEnglish), "baseline must contain first source summary");
 assert.throws(() => assertFormalRegistryProjection(formalCurrentDoc.replace(exactEnglish,
@@ -339,6 +350,23 @@ try {
   assert.deepEqual(checkRepositorySemanticLawDocumentation(tempRoot), []);
   assert.deepEqual(checkRepositoryDocs(tempRoot), []);
   assert.deepEqual(syncRepositoryDocs(tempRoot), [], "clean fixture docs sync must remain a no-op");
+
+  // G3-S1 mutation C: legacy registry summary cannot change current normative documentation.
+  const legacyV015RegistryPath = resolve(tempRoot, "requirements/mts-v0.15.json");
+  const legacyV015RegistrySource = readFileSync(legacyV015RegistryPath, "utf8");
+  const nativeRenderedBaseline = renderFormalNotationV015Markdown(tempRoot);
+  try {
+    const value = JSON.parse(legacyV015RegistrySource) as any;
+    value.requirements[0].summary = "legacy presentation summary mutation";
+    writeFileSync(legacyV015RegistryPath, JSON.stringify(value), "utf8");
+    assert.equal(
+      renderFormalNotationV015Markdown(tempRoot),
+      nativeRenderedBaseline,
+      "G3-S1 mutation C: legacy registry summary cannot change current normative table",
+    );
+  } finally {
+    writeFileSync(legacyV015RegistryPath, legacyV015RegistrySource, "utf8");
+  }
 
   const policyPath = resolve(tempRoot, "repo-policy.json");
   const policySource = JSON.stringify({
