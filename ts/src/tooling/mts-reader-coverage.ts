@@ -91,7 +91,7 @@ export interface ReaderCoveragePlan {
   readonly schema: "mts-reader-coverage-plan/v0.1";
   readonly status: "proposed";
   readonly semanticChange: false;
-  readonly authority: "accepted-registries-only";
+  readonly authority: "accepted-requirement-authority";
   readonly v014Count: 14;
   readonly v015Count: 48;
   readonly rows: readonly ReaderCoverageRow[];
@@ -108,8 +108,12 @@ export function projectReaderCoverage(
   const ids = new Set<string>();
   const convert = (item: MtsRequirementProjection, release: ReaderCoverageRow["release"]): ReaderCoverageRow => {
     if (ids.has(item.id) || item.status !== "accepted") fail("duplicate or non-accepted ID " + item.id);
-    if (!item.authorityDocument || item.authorityPointer !== "/requiredSemanticLaws/" + item.id ||
-        !item.docPath || !item.docAnchor) {
+    const acceptedAuthority =
+      release === "v0.14"
+        ? item.authorityPointer === "/requiredSemanticLaws/" + item.id
+        : item.authorityDocument === `requirements/mts-v0.15/${item.id}.rg.yaml` &&
+          item.authorityPointer === "/normative";
+    if (!item.authorityDocument || !acceptedAuthority || !item.docPath || !item.docAnchor) {
       fail("missing accepted authority or current documentation owner for " + item.id);
     }
     let proposedSection: ReaderSection | undefined;
@@ -144,7 +148,7 @@ export function projectReaderCoverage(
   }
   return Object.freeze({
     schema: "mts-reader-coverage-plan/v0.1",
-    status: "proposed", semanticChange: false, authority: "accepted-registries-only",
+    status: "proposed", semanticChange: false, authority: "accepted-requirement-authority",
     v014Count: 14, v015Count: 48, rows: Object.freeze(rows),
   });
 }
