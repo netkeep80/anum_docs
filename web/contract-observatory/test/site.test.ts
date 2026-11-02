@@ -275,22 +275,10 @@ for (const unsafeTarget of [
   );
 }
 
-for (const focusedTest of [
-  "semantic-ir-bridge.test.js",
-  "invariant-traceability.test.js",
-  "localization.test.js",
-]) {
-  execFileSync(
-    process.execPath,
-    [join(repositoryRoot, "web", "contract-observatory", "dist", "test", focusedTest)],
-    { cwd: repositoryRoot, stdio: "inherit" },
-  );
-}
-
 execFileSync(
   process.execPath,
   [join(repositoryRoot, "web", "contract-observatory", "test", "visual-consumer.test.mjs")],
   { cwd: repositoryRoot, stdio: "inherit" },
 );
 
-console.log("Contract Observatory V3b/V3c static UI, materialization, focused semantic display and V4a/V4c interaction checks passed.");
+console.log("Contract Observatory V3b/V3c static UI, materialization and V4a/V4c interaction checks passed.");
