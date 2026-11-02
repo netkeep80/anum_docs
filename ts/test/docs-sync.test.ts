@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import {
@@ -315,6 +315,12 @@ try {
   copy("contracts/mts-conformance-v0.15.json");
   copy("traceability/mts-v0.15.json");
   copy("requirements/mts-v0.15.json");
+  const nativeV015RequirementPaths = readdirSync(resolve(repositoryRoot, "requirements/mts-v0.15"), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".rg.yaml"))
+    .map((entry) => `requirements/mts-v0.15/${entry.name}`)
+    .sort((left, right) => left.localeCompare(right, "en"));
+  assert.equal(nativeV015RequirementPaths.length, 48, "isolated docs fixture carries all native v0.15 Requirements");
+  for (const path of nativeV015RequirementPaths) copy(path);
   copy("traceability/mts-v0.14.json");
   copy("requirements/mts-v0.14.json");
   copy("cutover/typescript-c1-acceptance-v0.8.json");
