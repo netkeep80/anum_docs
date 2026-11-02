@@ -517,12 +517,14 @@ function loadAcceptedV015SemanticIr(
     fail("v0.15 contract traceabilityManifest differs from accepted traceability path");
   }
 
-  // G1-S1 authority boundary:
+  // G3-S1 authority boundary:
   // native .rg supplies Requirement identity, normative statement, lifecycle,
-  // depends_on and verified_by. Legacy v0.15 JSON below is a checked
-  // presentation/evidence/release shadow only and is never a semantic fallback.
+  // depends_on and verified_by. Legacy v0.15 JSON remains a transition/release/
+  // presentation/evidence shadow. Its requiredSemanticLaws keys still provide
+  // an identity-integrity cross-check, but their text cannot select, override,
+  // veto, repair or fall back for the current native normative statement.
   const nativeRequirements = loadNativeV015RequirementAuthority(root);
-  const laws = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
+  const legacyLawInventory = object(contract.requiredSemanticLaws, contractPath + ".requiredSemanticLaws");
   const traces = object(traceability.requirements, traceabilityPath + ".requirements");
   if (!Array.isArray(registry.requirements)) fail(registryPath + ".requirements must be an array");
 
@@ -540,7 +542,7 @@ function loadAcceptedV015SemanticIr(
     legacyById.set(item.id, item);
   }
 
-  exactSet("native v0.15 requirement id set", nativeRequirements.map((item) => item.id), Object.keys(laws));
+  exactSet("native v0.15 requirement id set", nativeRequirements.map((item) => item.id), Object.keys(legacyLawInventory));
   exactSet("legacy v0.15 requirement shadow id set", legacyRequirements.map((item) => item.id), nativeRequirements.map((item) => item.id));
 
   const requirements = nativeRequirements.map((native) => {
@@ -549,11 +551,6 @@ function loadAcceptedV015SemanticIr(
     const value = legacy.value;
     const evidence = object(value.evidence, native.id + ".evidence");
     const traced = object(traces[native.id], native.id + " traceability");
-
-    const legacyStatement = string(laws[native.id], contractPath + ".requiredSemanticLaws." + native.id);
-    if (legacyStatement !== native.statement) {
-      fail(`${native.id} native/legacy normative differential mismatch`);
-    }
 
     const legacyVerifiedBy = [...strings(evidence.requiredExecutableGates, native.id + ".requiredExecutableGates")];
     exactSet(`${native.id} native/legacy verified_by differential`, native.verifiedBy, legacyVerifiedBy);

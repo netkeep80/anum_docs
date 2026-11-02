@@ -217,12 +217,16 @@ const v015Contract = JSON.parse(
   readFileSync(resolve(root, "contracts/mts-contract-v0.15.json"), "utf8"),
 ) as { requiredSemanticLaws: Record<string, string> };
 assert.equal(Object.keys(v015Contract.requiredSemanticLaws).length, 48);
+const legacyNormativeDivergence = ir.requirements
+  .filter((requirement) => requirement.statement !== v015Contract.requiredSemanticLaws[requirement.id])
+  .map((requirement) => requirement.id)
+  .sort();
+assert.deepEqual(
+  legacyNormativeDivergence,
+  ["V15-FORMAL-PROOF-01", "V15-JSON-02", "V15-JSON-03", "V15-ONTO-02"].sort(),
+  "G3-S1 legacy normative text divergence must be exactly the four accepted G2 native owners",
+);
 for (const requirement of ir.requirements) {
-  assert.equal(
-    requirement.statement,
-    v015Contract.requiredSemanticLaws[requirement.id],
-    `${requirement.id}: native normative must remain 48/48 differential-equal to legacy contract shadow`,
-  );
   assert.match(
     requirement.authorityDocument,
     /^requirements\/mts-v0\.15\/V15-[A-Z0-9-]+\.rg\.yaml$/,
@@ -230,6 +234,62 @@ for (const requirement of ir.requirements) {
   );
   assert.equal(requirement.authorityPointer, "/normative", `${requirement.id}: native authority pointer`);
 }
+
+const classCLegacyRegistry = JSON.parse(
+  readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8"),
+) as {
+  requirements: Array<{
+    id: string;
+    evidence?: { positiveVectors?: string[]; negativeVectors?: string[] };
+  }>;
+};
+const classCConformance = JSON.parse(
+  readFileSync(resolve(root, "contracts/mts-conformance-v0.15.json"), "utf8"),
+) as { requiredPositiveVectors: string[]; requiredNegativeVectors: string[] };
+const classCConstraints = [
+  { vector: "no-proof-specific-grammar-opcodes", family: "C-GRAMMAR", legacyOwner: "V15-FORMAL-PROOF-01", polarity: "negative", semanticOwner: "V15-FORMAL-PROOF-01", explicit: "proof models must not introduce proof-specific Grammar opcodes" },
+  { vector: "proof-specific-grammar-zero", family: "C-GRAMMAR", legacyOwner: "V15-ONTO-02", polarity: "negative", semanticOwner: "V15-ONTO-02", explicit: "proof-specific Grammar forms must not be introduced as MTS semantic authority" },
+  { vector: "direct-json-nested-object-to-anchored-source-anet", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a nested object denotes an anchored source bundle" },
+  { vector: "direct-json-null-to-bare-source-entry", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "object-member null denotes a bare source entry" },
+  { vector: "direct-json-string-rhs-to-binding", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a string RHS denotes a binding" },
+  { vector: "direct-json-structured-bare-key-to-resolved-membership", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a structured bare key denotes resolved semantic membership" },
+  { vector: "grounded-empty-role-bundle-admission-only", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a grounded empty role bundle publishes only its Theory-to-Rule admission" },
+  { vector: "role-bundle-membership-plus-admission", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "A non-empty role bundle publishes its resolved role members plus its Theory-to-Rule admission" },
+  { vector: "root-binding-does-not-publish-membership", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "A root binding alone does not publish semantic membership" },
+  { vector: "array-null-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "null inside arrays" },
+  { vector: "duplicate-decoded-json-key-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "keys that become equal after JSON escape decoding" },
+  { vector: "duplicate-key-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "duplicate object keys" },
+  { vector: "duplicate-local-name-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "duplicate local names" },
+  { vector: "structured-binding-head-fails-closed-bounded-fragment", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "structured binding heads outside the supported bounded fragment" },
+  { vector: "top-level-null-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "top-level null" },
+  { vector: "unknown-field-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "unknown fields" },
+  { vector: "unsupported-profile-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "unsupported profile/schema identifiers" },
+] as const;
+assert.equal(classCConstraints.length, 17, "G2 exact accepted Class-C inventory");
+assert.deepEqual(
+  [...new Set(classCConstraints.map((item) => item.semanticOwner))].sort(),
+  ["V15-FORMAL-PROOF-01", "V15-JSON-02", "V15-JSON-03", "V15-ONTO-02"].sort(),
+  "G2 must close Class-C only in existing native owners",
+);
+for (const item of classCConstraints) {
+  const legacyOwner = classCLegacyRegistry.requirements.find((candidate) => candidate.id === item.legacyOwner);
+  assert.ok(legacyOwner, item.vector + ": accepted legacy owner exists");
+  const legacyVectors = item.polarity === "positive"
+    ? legacyOwner.evidence?.positiveVectors ?? []
+    : legacyOwner.evidence?.negativeVectors ?? [];
+  assert.ok(legacyVectors.includes(item.vector), item.vector + ": accepted legacy conformance assignment remains present");
+  const acceptedVectors = item.polarity === "positive"
+    ? classCConformance.requiredPositiveVectors
+    : classCConformance.requiredNegativeVectors;
+  assert.ok(acceptedVectors.includes(item.vector), item.vector + ": accepted v0.15 conformance obligation remains present");
+  const nativeOwner = ir.requirements.find((candidate) => candidate.id === item.semanticOwner);
+  assert.ok(nativeOwner, item.vector + ": existing native semantic owner exists");
+  assert.ok(
+    nativeOwner.statement.includes(item.explicit),
+    item.vector + ": Class-C constraint must be explicit in native normative authority",
+  );
+}
+
 
 const legacyIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
 assert.equal(legacyIr.schema, "mts-requirement-registry/v0.2");
@@ -335,6 +395,22 @@ try {
     writeFileSync(target, JSON.stringify(value), "utf8");
     expect(() => loadMtsSemanticIr(tempRoot), pattern, path);
     writeFileSync(target, source, "utf8");
+  }
+
+  // G3-S1 mutation A: legacy normative text is transition evidence only.
+  const legacyContractPath = resolve(tempRoot, "contracts/mts-contract-v0.15.json");
+  const legacyContractSource = readFileSync(legacyContractPath, "utf8");
+  try {
+    const value = JSON.parse(legacyContractSource) as any;
+    value.requiredSemanticLaws["V15-AND-01"] = "legacy text mutation must not veto native authority";
+    writeFileSync(legacyContractPath, JSON.stringify(value), "utf8");
+    assert.equal(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      ir.requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      "G3-S1 mutation A: legacy normative text cannot change current IR statement",
+    );
+  } finally {
+    writeFileSync(legacyContractPath, legacyContractSource, "utf8");
   }
 
   const nativePath = (id: string): string => `requirements/mts-v0.15/${id}.rg.yaml`;
@@ -498,12 +574,23 @@ try {
     /native\/legacy verified_by differential differs/,
     "verified_by remains 48/48 differential-checked",
   );
-  mutateNative(
-    "V15-AND-01",
-    (source) => source.replace(/^normative: .+$/m, 'normative: "G1-S1 differential mismatch"'),
-    /native\/legacy normative differential mismatch/,
-    "F12 native normative mismatch against legacy differential",
-  );
+  // G3-S1 mutation B: native normative text changes current IR without legacy synchronization.
+  const nativeNormativePath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const nativeNormativeSource = readFileSync(nativeNormativePath, "utf8");
+  try {
+    writeFileSync(
+      nativeNormativePath,
+      nativeNormativeSource.replace(/^normative: .+$/m, 'normative: "G3-S1 native-only normative mutation"'),
+      "utf8",
+    );
+    assert.equal(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      "G3-S1 native-only normative mutation",
+      "G3-S1 mutation B: current IR statement follows native .rg without legacy text synchronization",
+    );
+  } finally {
+    writeFileSync(nativeNormativePath, nativeNormativeSource, "utf8");
+  }
   mutateNative(
     "V15-AND-01",
     (source) => source.replace("  accepted: true", "  accepted: false"),
@@ -535,6 +622,24 @@ try {
     "F14 reverse native file creation order must not change IR",
   );
 
+  // G3-S1 mutation D: current causal projection follows native depends_on.
+  const nativeDependsPath = resolve(tempRoot, nativePath("V15-AND-02"));
+  const nativeDependsSource = readFileSync(nativeDependsPath, "utf8");
+  try {
+    writeFileSync(
+      nativeDependsPath,
+      nativeDependsSource.replace("      id: V15-AND-01", "      id: V15-AUTH-01"),
+      "utf8",
+    );
+    assert.deepEqual(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-02")?.dependsOn,
+      ["V15-AUTH-01"],
+      "G3-S1 mutation D: native depends_on changes current causal projection",
+    );
+  } finally {
+    writeFileSync(nativeDependsPath, nativeDependsSource, "utf8");
+  }
+
   const legacyV015Path = resolve(tempRoot, "requirements/mts-v0.15.json");
   const legacyV015Source = readFileSync(legacyV015Path, "utf8");
   try {
@@ -544,7 +649,7 @@ try {
     assert.deepEqual(
       loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.dependsOn,
       [],
-      "F15 legacy-only dependsOn mutation cannot enter current causal graph",
+      "G3-S1 mutation E: legacy-only dependsOn mutation cannot enter current causal graph",
     );
   } finally {
     writeFileSync(legacyV015Path, legacyV015Source, "utf8");

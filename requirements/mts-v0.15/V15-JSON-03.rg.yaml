@@ -1,6 +1,6 @@
 format: repo-guard/requirement-v1
 id: V15-JSON-03
-normative: "Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority."
+normative: "Semantic JSON mutations must predictably change or reject source/denotation/execution behavior; transport-only mutations must not create semantic authority. JSON is invalid and must fail closed for duplicate object keys, including keys that become equal after JSON escape decoding; duplicate local names; unsupported profile/schema identifiers; unknown fields; top-level null; null inside arrays; and structured binding heads outside the supported bounded fragment."
 lifecycle:
   accepted: true
   current: true

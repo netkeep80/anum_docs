@@ -34,7 +34,7 @@ atoms:
     exclusions: ["Не приписывать host-типам самостоятельную семантическую власть"]
   - id: v15-onto-02
     accepted_id: V15-ONTO-02
-    source_quote: "Prefer ordinary Link + ExactSequence + self-reference topology before extending Grammar."
+    source_quote: "The accepted v0.15 fragment uses ordinary Link + ExactSequence + self-reference topology; proof-specific Grammar forms must not be introduced as MTS semantic authority."
     ru: "Прежде чем вводить новый элемент Grammar, следует проверить выражение требуемой структуры посредством обычных Связей, ExactSequence и топологии самоссылок. Это дисциплина минимальности источника, а не доказательство того, что любая будущая конструкция заранее выразима."
     domain: "Минимизация Grammar посредством обычной Link-топологии и ExactSequence"
     exclusions: ["Не расширять грамматику без проверки существующей Link-топологии"]
