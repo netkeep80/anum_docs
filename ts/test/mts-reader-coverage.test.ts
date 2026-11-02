@@ -27,14 +27,19 @@ const plan = loadReaderCoverage(root);
 assert.equal(plan.schema, "mts-reader-coverage-plan/v0.1");
 assert.equal(plan.status, "proposed");
 assert.equal(plan.semanticChange, false);
-assert.equal(plan.authority, "accepted-registries-only");
+assert.equal(plan.authority, "accepted-requirement-authority");
 assert.equal(plan.rows.length, 62);
 assert.equal(new Set(plan.rows.map(row => row.id)).size, 62);
 assert.equal(plan.rows.filter(row => row.release === "v0.14").length, 14);
 assert.equal(plan.rows.filter(row => row.release === "v0.15").length, 48);
 assert.ok(plan.rows.every(row => row.authorApproval === "not-recorded" && row.publication === "blocked"));
 assert.ok(plan.rows.every(row => row.readerDependsOn === "scientific-review-pending"));
-assert.ok(plan.rows.every(row => row.acceptedAuthority.pointer === "/requiredSemanticLaws/" + row.id));
+assert.ok(plan.rows.every(row =>
+  row.release === "v0.14"
+    ? row.acceptedAuthority.pointer === "/requiredSemanticLaws/" + row.id
+    : row.acceptedAuthority.path === `requirements/mts-v0.15/${row.id}.rg.yaml` &&
+      row.acceptedAuthority.pointer === "/normative"
+));
 assert.ok(plan.rows.every(row => row.currentDocOwner.path.length > 0 && row.currentDocOwner.anchor.length > 0));
 const source = new Map([...v14, ...v15].map(item => [item.id, item]));
 for (const row of plan.rows) {
@@ -61,7 +66,7 @@ assert.throws(() => projectReaderCoverage(v14, [
   { ...v15[0]!, dependsOn: ["nonexistent"] }, ...v15.slice(1),
 ], routes), /unresolved normative dependency/);
 assert.throws(() => projectReaderCoverage(v14, [
-  { ...v15[0]!, authorityPointer: "/requiredSemanticLaws/FORGED" }, ...v15.slice(1),
+  { ...v15[0]!, authorityPointer: "/FORGED" }, ...v15.slice(1),
 ], routes), /missing accepted authority/);
 assert.throws(() => projectReaderCoverage(v14, [
   { ...v15[0]!, status: "proposed" }, ...v15.slice(1),
