@@ -22,7 +22,7 @@ atoms:
     exclusions: ["Не подменять универсальную Γ межтекущим join или host-командами"]
   - id: v15-formal-proof-01
     accepted_id: V15-FORMAL-PROOF-01
-    source_quote: "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence."
+    source_quote: "Lean4 and Rocq independently formalize the supported v0.15 FORMAL mathematical core and classify exact premises/domain/exclusions for contextual names, source denotation, DAS and ExactSequence; those proof models must not introduce proof-specific Grammar opcodes."
     ru: "Lean 4 и Rocq независимо формализуют поддерживаемую часть математического ядра FORMAL: контекстные имена, денотацию, DAS и ExactSequence. Для каждой теоремы фиксируются точные предпосылки и область действия; утверждение о поддерживаемом фрагменте не означает доказанность языка целиком."
     domain: "Поддерживаемый математический FORMAL-фрагмент в Lean 4 и Rocq"
     exclusions: ["Не выдавать покрытие фрагмента FORMAL за полноту всех его форм"]
