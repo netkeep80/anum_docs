@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
 import { loadMtsSourceRequirement } from "../src/tooling/mts-source-requirement.js";
-import { loadReaderCoverage, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
+import { loadReaderCoverage, loadReaderLegacyDependencyShadow, loadReaderRoutes, parseReaderRoutes, projectReaderCoverage, renderReaderCoverageAudit,
   loadReaderIntro, parseReaderIntro, loadReaderG7, parseReaderG7, loadReaderG8, parseReaderG8,
   loadReaderScienceCensus, projectReaderScienceCensus, renderReaderScienceCensus,
   loadReaderV14G10, parseReaderV14G10, loadReaderV15G11, parseReaderV15G11,
@@ -24,6 +24,29 @@ const v14 = loadMtsSemanticIr(root, "requirements/mts-v0.14.json").requirements;
 const v15 = loadMtsSemanticIr(root).requirements;
 const routes = loadReaderRoutes(root);
 const plan = loadReaderCoverage(root);
+const legacyDependencyShadow = loadReaderLegacyDependencyShadow(root);
+assert.equal(
+  plan.rows.reduce((count, row) => count + row.normativeDependsOn.length, 0),
+  48,
+  "current reader coverage must expose 15 v0.14 + 33 native v0.15 causal edges",
+);
+assert.equal(
+  plan.rows.filter((row) => row.release === "v0.15")
+    .reduce((count, row) => count + row.normativeDependsOn.length, 0),
+  33,
+  "current v0.15 reader coverage must use native depends_on only",
+);
+assert.equal(
+  legacyDependencyShadow.rows.reduce((count, row) => count + row.normativeDependsOn.length, 0),
+  100,
+  "transitional G17/G18 shadow retains 15 v0.14 + 85 legacy v0.15 dependency edges",
+);
+assert.equal(
+  legacyDependencyShadow.rows.filter((row) => row.release === "v0.15")
+    .reduce((count, row) => count + row.normativeDependsOn.length, 0),
+  85,
+  "legacy dependency shadow is isolated from current native causal coverage",
+);
 assert.equal(plan.schema, "mts-reader-coverage-plan/v0.1");
 assert.equal(plan.status, "proposed");
 assert.equal(plan.semanticChange, false);
@@ -480,10 +503,17 @@ assert.ok(g17.reversedChapterEdges.every(x=>x.review==="pending" &&
   x.riskRu.length>=85 && x.proposalRu.length>=85));
 assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V14-L6"&&x.consumer==="V14-L7"));
 assert.ok(g17.reversedChapterEdges.some(x=>x.prerequisite==="V15-TERM-01"&&x.consumer==="V15-NAME-01"));
-assert.deepEqual(deriveReaderReverseNormativeEdges(plan,routes).map(x=>[x.prerequisite,x.consumer]),
-  g17.reversedChapterEdges.map(x=>[x.prerequisite,x.consumer]));
+assert.throws(
+  () => deriveReaderReverseNormativeEdges(plan,routes),
+  /accepted normative dependency source drift/,
+  "current native 48-edge coverage must not impersonate the historical 100-edge G17 shadow",
+);
+assert.deepEqual(
+  deriveReaderReverseNormativeEdges(legacyDependencyShadow,routes).map(x=>[x.prerequisite,x.consumer]),
+  g17.reversedChapterEdges.map(x=>[x.prerequisite,x.consumer]),
+);
 assert.ok(renderReaderReverseNormativeAudit(g17).includes("Авторски утверждённых reader DAG переходов: 0."));
-const g17Parse=(text:string,coverage=plan,routeModel=routes)=>
+const g17Parse=(text:string,coverage=legacyDependencyShadow,routeModel=routes)=>
   parseReaderReverseNormativeAudit(text,coverage,routeModel);
 assert.throws(()=>g17Parse(g17Source.replace("status: proposed","status: accepted")),
   /cannot approve editorial or normative\/reader DAG equivalence/);
@@ -496,7 +526,7 @@ assert.throws(()=>g17Parse(g17Source.replace("    review: pending","    review: 
   /each inversion needs individual unapproved scientific rationale/);
 assert.throws(()=>g17Parse(g17Source.replace("observations:\n","observations:\n  - prerequisite: V14-L6\n    prerequisite: V14-L6\n")),
   /G17 invalid inversion YAML/);
-const alteredPlan={...plan,rows:plan.rows.map(x=>x.id==="V14-L7"?{
+const alteredPlan={...legacyDependencyShadow,rows:legacyDependencyShadow.rows.map(x=>x.id==="V14-L7"?{
   ...x,normativeDependsOn:["V14-L13"],
 }:x)};
 assert.throws(()=>g17Parse(g17Source,alteredPlan),/accepted normative dependency source drift/);
@@ -522,12 +552,17 @@ assert.ok(g18.components.every(x=>x.review==="pending" && x.riskRu.length>=110 &
   x.repairRu.length>=110));
 assert.equal(g18.authorApproval,"not-recorded");
 assert.equal(g18.publication,"blocked");
-const derivedCycles=deriveReaderChapterCycles(plan,routes);
+assert.throws(
+  () => deriveReaderChapterCycles(plan,routes),
+  /historical normative edge count drift/,
+  "current native causal graph must not satisfy historical G18 counts",
+);
+const derivedCycles=deriveReaderChapterCycles(legacyDependencyShadow,routes);
 assert.equal(derivedCycles.crossChapterEdges,37);
 assert.equal(derivedCycles.normativeLawDagAcyclic,true);
 assert.deepEqual(derivedCycles.cyclicComponents,g18.components.map(x=>x.members));
 assert.ok(renderReaderChapterCycleAudit(g18).includes("не противоречие в принятых законах"));
-const g18Parse=(text:string,coverage=plan,routeModel=routes,audit=g17)=>
+const g18Parse=(text:string,coverage=legacyDependencyShadow,routeModel=routes,audit=g17)=>
   parseReaderChapterCycleAudit(text,coverage,routeModel,audit);
 assert.throws(()=>g18Parse(g18Source.replace("status: proposed","status: accepted")),
   /cannot approve chapter ordering or conflate distinct graphs/);
@@ -545,7 +580,7 @@ assert.throws(()=>g18Parse(g18Source.replace("singletons: [execution, inversion-
   /isolated chapter set drift/);
 assert.throws(()=>g18Parse(g18Source.replace("components:\n",
   "components:\n  - id: fake\n    id: fake\n")),/G18 invalid cycle YAML/);
-const normativeCycle={...plan,rows:plan.rows.map(x=>x.id==="V14-L1"?{
+const normativeCycle={...legacyDependencyShadow,rows:legacyDependencyShadow.rows.map(x=>x.id==="V14-L1"?{
   ...x,normativeDependsOn:["V14-L2"],
 }:x)};
 assert.throws(()=>deriveReaderChapterCycles(normativeCycle,routes),
