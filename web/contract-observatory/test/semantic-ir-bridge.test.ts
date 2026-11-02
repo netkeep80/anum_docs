@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
 import { loadCompiledCurrentProjection, loadCompiledMtsSemanticIr, validateCurrentProjection, validateSemanticIr } from "../src/semantic-ir-bridge.js";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -45,10 +42,13 @@ assert(/^[0-9a-f]{16}$/.test(authority.statementDigest), "V15-AUTH-01 statement 
 same(authority.docPath, "docs/specs/Формальная нотация МТС.md", "V15-AUTH-01 Markdown owner");
 same(authority.docAnchor, "mts-v015-v15-auth-01", "V15-AUTH-01 Markdown anchor");
 
-const contract = JSON.parse(
-  readFileSync(resolve(repositoryRoot, ir.contractPath), "utf8"),
-) as { requiredSemanticLaws: Record<string, string> };
-same(authority.statement, contract.requiredSemanticLaws["V15-AUTH-01"], "statement comes through compiler from contract authority");
+same(
+  authority.authorityDocument,
+  "requirements/mts-v0.15/V15-AUTH-01.rg.yaml",
+  "current normative authority comes through compiler from native .rg",
+);
+same(authority.authorityPointer, "/normative", "current normative authority pointer is native /normative");
+assert(authority.statement.length > 0, "native current normative statement is present");
 
 const clone = JSON.parse(JSON.stringify(ir)) as any;
 clone.requirements.push({ ...clone.requirements[0] });
