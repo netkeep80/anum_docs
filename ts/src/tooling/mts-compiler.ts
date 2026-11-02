@@ -290,6 +290,8 @@ function validateDependencyGraph(requirements: readonly MtsRequirementProjection
 
 const NATIVE_V015_REQUIREMENT_DIRECTORY = "requirements/mts-v0.15";
 const NATIVE_V015_REQUIREMENT_COUNT = 48;
+const NATIVE_V015_RELATION_COUNT = 189;
+const NATIVE_V015_DEPENDS_ON_COUNT = 33;
 const NATIVE_V015_RELATION_PREDICATES = new Set([
   "verified_by",
   "depends_on",
@@ -486,6 +488,14 @@ function loadNativeV015RequirementAuthority(root: string): readonly NativeV015Re
     });
   });
 
+  const relationCount = requirements.reduce((sum, item) => sum + item.relationCount, 0);
+  const dependsOnCount = requirements.reduce((sum, item) => sum + item.dependsOn.length, 0);
+  if (relationCount !== NATIVE_V015_RELATION_COUNT) {
+    fail(`native v0.15 relation count ${relationCount} differs from accepted ${NATIVE_V015_RELATION_COUNT}`);
+  }
+  if (dependsOnCount !== NATIVE_V015_DEPENDS_ON_COUNT) {
+    fail(`native v0.15 depends_on count ${dependsOnCount} differs from accepted ${NATIVE_V015_DEPENDS_ON_COUNT}`);
+  }
   return Object.freeze(requirements);
 }
 
