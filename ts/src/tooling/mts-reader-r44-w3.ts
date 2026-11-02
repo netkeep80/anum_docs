@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseDocument } from "yaml";
+import { loadMtsSemanticIr } from "./mts-compiler.js";
 import { loadReaderG42 } from "./mts-reader-g42.js";
 import { loadReaderR44W2, renderReaderR44W2Preview } from "./mts-reader-r44-w2.js";
 
@@ -57,6 +58,11 @@ export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
   must(accepted.accepted===true&&accepted.mtsVersion==="v0.15"&&
     accepted.requirements.length===48&&accepted.requirements.every(x=>x.mandatory===true),
     "accepted registry must have exactly 48 mandatory nodes");
+  const currentNative=loadMtsSemanticIr(root).requirements;
+  must(currentNative.length===48,"current native IR must have exactly 48 accepted requirements");
+  const currentById=new Map(currentNative.map(x=>[x.id,x] as const));
+  must(accepted.requirements.every(x=>currentById.has(x.id)),
+    "legacy presentation metadata IDs must resolve to current native Requirements");
   const source:Atom[]=[];
   const sourceWave:string[]=[];
   for(let w=0;w<4;w++){
@@ -95,23 +101,24 @@ export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
     traced.authorDecision.decision==="ACCEPT_MTS_V0_15"&&
     traced.authorDecision.decisionEvidence==="netkeep80/anum_docs#1876 issuecomment-6046228475",
     "historical exception needs accepted Author evidence");
+  must(
+    accepted.requirements.find(x=>x.id===historical.id)?.summary===historical.accepted_summary,
+    "historical READY-03 presentation summary provenance must remain exact",
+  );
   const raw=array(doc.reviews,"individual reviews");
   must(raw.length===48,"every one of the 48 v0.15 requirements needs its own signed editorial judgement");
   const permitted=new Set(["terminology","semantic-contract","execution-contract","evidence-condition","governance-rule"]);
-  let sourceQuoteExceptions=0;
   const reviewed=raw.map((v,i)=>{
     const row=ob(v,"review "+i);
     keys(row,["id","source_wave","source_atom","source_authority_state","type",
       "audit_state","assessment_ru","limitation_ru"],"individual review");
     const canonical=accepted.requirements[i]!,original=source[i]!;
+    const current=currentById.get(canonical.id);
+    must(current!==undefined,"current native Requirement missing: "+canonical.id);
     must(row.id===canonical.id&&row.source_atom===original.id&&row.source_wave===sourceWave[i]&&
-      original.accepted_id===canonical.id&&
-      (original.source_quote===canonical.summary||
-        (canonical.id===historical.id&&sourceWave[i]===historical.source_wave&&
-          original.source_quote===historical.historical_quote&&
-          canonical.summary===historical.accepted_summary&&++sourceQuoteExceptions===1))&&
+      original.accepted_id===canonical.id&&original.source_quote===current.statement&&
       row.source_authority_state===canonical.state,
-      "review cannot detach source or misquote accepted requirement: "+canonical.id);
+      "review cannot detach source or misquote current native requirement: "+canonical.id);
     must(row.audit_state==="individually-scoped-editorial-review-pending-author"&&
       permitted.has(row.type as string),"cannot self-promote 48 editor judgements");
     must(composition.chapters.some(ch=>ch.atomIds.includes("g11:"+original.id)),
@@ -124,7 +131,6 @@ export function parseReaderR44W3(documentText:string,root:string):ReaderR44W3{
     return {id:canonical.id,atom:original.id,wave:sourceWave[i]!,requirementState:canonical.state,
       kind:row.type as string,assessmentRu,limitationRu};
   });
-  must(sourceQuoteExceptions===1,"G11 v0.15 47/48 exact quotes plus one historically explained author cutover");
   must(new Set(reviewed.map(x=>x.assessmentRu)).size===48&&
     new Set(reviewed.map(x=>x.limitationRu)).size===48,
     "all 48 judgements must be distinct");
@@ -192,7 +198,7 @@ export function renderReaderR44W3Preview(root:string):string {
   const anchor="## Редакционные ограничения R40";
   must(base.split(anchor).length===2,"exact one reader R40 boundary");
   const appendix=["## R44-W3 — индивидуальная научно-редакционная проверка требований v0.15","",
-    "Все 48 обязательных требований сопоставлены с принятым реестром и первичными формулировками G11. У 47 цитат дословное совпадение; у V15-READY-03 зафиксирована историческая разница между правилом допуска ACCEPT/REJECT и уже принятым решением ACCEPT. Эти редакционные оценки не заменяют формального доказательства или решения Автора.","",
+    "Все 48 обязательных требований сопоставлены с текущим native MTS Semantic IR и первичными формулировками G11: 48 текущих native-цитат совпадают дословно. Историческая разница V15-READY-03 между прежним presentation summary и правилом допуска ACCEPT/REJECT сохранена только как provenance уже принятого решения ACCEPT. Эти редакционные оценки не заменяют формального доказательства или решения Автора.","",
     "### Исторические MP и Γ: переход нормативных областей","",review.mp.scientificRu,"",
     "**Не следует:** "+review.mp.exclusionRu,"",
     "### Парные FORMAL-свидетельства и их реальные пределы","",review.proof.scientificRu,"",
