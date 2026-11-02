@@ -1,5 +1,4 @@
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { buildContractObservatoryIndex } from "../src/contract-index.js";
@@ -225,7 +224,7 @@ const historicalTopLevelCard = invariantCardHtml(html, "topLevelDot");
 assert(historicalTopLevelCard.includes("<dt>Закон контракта</dt>"), "historical invariant keeps historical contract-law presentation");
 assert(historicalTopLevelCard.includes(". -&gt; R under TopBind(R,S)"), "historical v0.11 exact contract value remains intact");
 
-const fixtureRoot = mkdtempSync(join(tmpdir(), "mts-observatory-g3-s2a-"));
+const fixtureRoot = mkdtempSync(join(repositoryRoot, ".mts-observatory-g3-s2a-"));
 try {
   for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
     cpSync(join(repositoryRoot, directory), join(fixtureRoot, directory), { recursive: true });
