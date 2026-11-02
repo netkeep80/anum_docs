@@ -51,6 +51,11 @@ assert.equal(plan.schema, "mts-reader-coverage-plan/v0.1");
 assert.equal(plan.status, "proposed");
 assert.equal(plan.semanticChange, false);
 assert.equal(plan.authority, "accepted-requirement-authority");
+assert.equal(
+  legacyDependencyShadow.authority,
+  "legacy-dependency-shadow",
+  "G17/G18 historical dependency shadow must never present itself as current Requirement authority",
+);
 assert.equal(plan.rows.length, 62);
 assert.equal(new Set(plan.rows.map(row => row.id)).size, 62);
 assert.equal(plan.rows.filter(row => row.release === "v0.14").length, 14);
