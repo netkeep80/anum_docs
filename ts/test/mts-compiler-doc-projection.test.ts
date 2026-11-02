@@ -231,6 +231,62 @@ for (const requirement of ir.requirements) {
   assert.equal(requirement.authorityPointer, "/normative", `${requirement.id}: native authority pointer`);
 }
 
+const classCLegacyRegistry = JSON.parse(
+  readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8"),
+) as {
+  requirements: Array<{
+    id: string;
+    evidence?: { positiveVectors?: string[]; negativeVectors?: string[] };
+  }>;
+};
+const classCConformance = JSON.parse(
+  readFileSync(resolve(root, "contracts/mts-conformance-v0.15.json"), "utf8"),
+) as { requiredPositiveVectors: string[]; requiredNegativeVectors: string[] };
+const classCConstraints = [
+  { vector: "no-proof-specific-grammar-opcodes", family: "C-GRAMMAR", legacyOwner: "V15-FORMAL-PROOF-01", polarity: "negative", semanticOwner: "V15-FORMAL-PROOF-01", explicit: "proof models must not introduce proof-specific Grammar opcodes" },
+  { vector: "proof-specific-grammar-zero", family: "C-GRAMMAR", legacyOwner: "V15-ONTO-02", polarity: "negative", semanticOwner: "V15-ONTO-02", explicit: "proof-specific Grammar forms must not be introduced as MTS semantic authority" },
+  { vector: "direct-json-nested-object-to-anchored-source-anet", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a nested object denotes an anchored source bundle" },
+  { vector: "direct-json-null-to-bare-source-entry", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "object-member null denotes a bare source entry" },
+  { vector: "direct-json-string-rhs-to-binding", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a string RHS denotes a binding" },
+  { vector: "direct-json-structured-bare-key-to-resolved-membership", family: "C-JSON-MAP", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a structured bare key denotes resolved semantic membership" },
+  { vector: "grounded-empty-role-bundle-admission-only", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "a grounded empty role bundle publishes only its Theory->Rule admission" },
+  { vector: "role-bundle-membership-plus-admission", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "A non-empty role bundle publishes its resolved role members plus its Theory->Rule admission" },
+  { vector: "root-binding-does-not-publish-membership", family: "C-BIND-MEM", legacyOwner: "V15-JSON-02", polarity: "positive", semanticOwner: "V15-JSON-02", explicit: "A root binding alone does not publish semantic membership" },
+  { vector: "array-null-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "null inside arrays" },
+  { vector: "duplicate-decoded-json-key-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "keys that become equal after JSON escape decoding" },
+  { vector: "duplicate-key-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "duplicate object keys" },
+  { vector: "duplicate-local-name-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "duplicate local names" },
+  { vector: "structured-binding-head-fails-closed-bounded-fragment", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "structured binding heads outside the supported bounded fragment" },
+  { vector: "top-level-null-rejects", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-02", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "top-level null" },
+  { vector: "unknown-field-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "unknown fields" },
+  { vector: "unsupported-profile-reject", family: "C-JSON-STRICT", legacyOwner: "V15-JSON-03", polarity: "negative", semanticOwner: "V15-JSON-03", explicit: "unsupported profile/schema identifiers" },
+] as const;
+assert.equal(classCConstraints.length, 17, "G2 exact accepted Class-C inventory");
+assert.deepEqual(
+  [...new Set(classCConstraints.map((item) => item.semanticOwner))].sort(),
+  ["V15-FORMAL-PROOF-01", "V15-JSON-02", "V15-JSON-03", "V15-ONTO-02"].sort(),
+  "G2 must close Class-C only in existing native owners",
+);
+for (const item of classCConstraints) {
+  const legacyOwner = classCLegacyRegistry.requirements.find((candidate) => candidate.id === item.legacyOwner);
+  assert.ok(legacyOwner, item.vector + ": accepted legacy owner exists");
+  const legacyVectors = item.polarity === "positive"
+    ? legacyOwner.evidence?.positiveVectors ?? []
+    : legacyOwner.evidence?.negativeVectors ?? [];
+  assert.ok(legacyVectors.includes(item.vector), item.vector + ": accepted legacy conformance assignment remains present");
+  const acceptedVectors = item.polarity === "positive"
+    ? classCConformance.requiredPositiveVectors
+    : classCConformance.requiredNegativeVectors;
+  assert.ok(acceptedVectors.includes(item.vector), item.vector + ": accepted v0.15 conformance obligation remains present");
+  const nativeOwner = ir.requirements.find((candidate) => candidate.id === item.semanticOwner);
+  assert.ok(nativeOwner, item.vector + ": existing native semantic owner exists");
+  assert.ok(
+    nativeOwner.statement.includes(item.explicit),
+    item.vector + ": Class-C constraint must be explicit in native normative authority",
+  );
+}
+
+
 const legacyIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
 assert.equal(legacyIr.schema, "mts-requirement-registry/v0.2");
 assert.equal(legacyIr.contract, "mts-contract/v0.14");
