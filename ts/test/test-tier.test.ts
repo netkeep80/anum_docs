@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
@@ -120,6 +120,13 @@ try {
   ]) {
     copy(path);
   }
+
+  const nativeV015RequirementPaths = readdirSync(resolve(repositoryRoot, "requirements/mts-v0.15"), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".rg.yaml"))
+    .map((entry) => `requirements/mts-v0.15/${entry.name}`)
+    .sort((left, right) => left.localeCompare(right, "en"));
+  assert.equal(nativeV015RequirementPaths.length, 48, "test-tier fixture carries all native v0.15 Requirements");
+  for (const path of nativeV015RequirementPaths) copy(path);
 
   for (const path of plan.allSourceTests) {
     const target = resolve(fixtureRoot, path);
