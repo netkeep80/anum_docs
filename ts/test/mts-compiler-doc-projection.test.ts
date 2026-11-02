@@ -217,12 +217,16 @@ const v015Contract = JSON.parse(
   readFileSync(resolve(root, "contracts/mts-contract-v0.15.json"), "utf8"),
 ) as { requiredSemanticLaws: Record<string, string> };
 assert.equal(Object.keys(v015Contract.requiredSemanticLaws).length, 48);
+const legacyNormativeDivergence = ir.requirements
+  .filter((requirement) => requirement.statement !== v015Contract.requiredSemanticLaws[requirement.id])
+  .map((requirement) => requirement.id)
+  .sort();
+assert.deepEqual(
+  legacyNormativeDivergence,
+  ["V15-FORMAL-PROOF-01", "V15-JSON-02", "V15-JSON-03", "V15-ONTO-02"].sort(),
+  "G3-S1 legacy normative text divergence must be exactly the four accepted G2 native owners",
+);
 for (const requirement of ir.requirements) {
-  assert.equal(
-    requirement.statement,
-    v015Contract.requiredSemanticLaws[requirement.id],
-    `${requirement.id}: native normative must remain 48/48 differential-equal to legacy contract shadow`,
-  );
   assert.match(
     requirement.authorityDocument,
     /^requirements\/mts-v0\.15\/V15-[A-Z0-9-]+\.rg\.yaml$/,
@@ -393,6 +397,22 @@ try {
     writeFileSync(target, source, "utf8");
   }
 
+  // G3-S1 mutation A: legacy normative text is transition evidence only.
+  const legacyContractPath = resolve(tempRoot, "contracts/mts-contract-v0.15.json");
+  const legacyContractSource = readFileSync(legacyContractPath, "utf8");
+  try {
+    const value = JSON.parse(legacyContractSource) as any;
+    value.requiredSemanticLaws["V15-AND-01"] = "legacy text mutation must not veto native authority";
+    writeFileSync(legacyContractPath, JSON.stringify(value), "utf8");
+    assert.equal(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      ir.requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      "G3-S1 mutation A: legacy normative text cannot change current IR statement",
+    );
+  } finally {
+    writeFileSync(legacyContractPath, legacyContractSource, "utf8");
+  }
+
   const nativePath = (id: string): string => `requirements/mts-v0.15/${id}.rg.yaml`;
   const mutateNative = (
     id: string,
@@ -554,12 +574,23 @@ try {
     /native\/legacy verified_by differential differs/,
     "verified_by remains 48/48 differential-checked",
   );
-  mutateNative(
-    "V15-AND-01",
-    (source) => source.replace(/^normative: .+$/m, 'normative: "G1-S1 differential mismatch"'),
-    /native\/legacy normative differential mismatch/,
-    "F12 native normative mismatch against legacy differential",
-  );
+  // G3-S1 mutation B: native normative text changes current IR without legacy synchronization.
+  const nativeNormativePath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const nativeNormativeSource = readFileSync(nativeNormativePath, "utf8");
+  try {
+    writeFileSync(
+      nativeNormativePath,
+      nativeNormativeSource.replace(/^normative: .+$/m, 'normative: "G3-S1 native-only normative mutation"'),
+      "utf8",
+    );
+    assert.equal(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.statement,
+      "G3-S1 native-only normative mutation",
+      "G3-S1 mutation B: current IR statement follows native .rg without legacy text synchronization",
+    );
+  } finally {
+    writeFileSync(nativeNormativePath, nativeNormativeSource, "utf8");
+  }
   mutateNative(
     "V15-AND-01",
     (source) => source.replace("  accepted: true", "  accepted: false"),
@@ -591,6 +622,24 @@ try {
     "F14 reverse native file creation order must not change IR",
   );
 
+  // G3-S1 mutation D: current causal projection follows native depends_on.
+  const nativeDependsPath = resolve(tempRoot, nativePath("V15-AND-02"));
+  const nativeDependsSource = readFileSync(nativeDependsPath, "utf8");
+  try {
+    writeFileSync(
+      nativeDependsPath,
+      nativeDependsSource.replace("      id: V15-AND-01", "      id: V15-AUTH-01"),
+      "utf8",
+    );
+    assert.deepEqual(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-02")?.dependsOn,
+      ["V15-AUTH-01"],
+      "G3-S1 mutation D: native depends_on changes current causal projection",
+    );
+  } finally {
+    writeFileSync(nativeDependsPath, nativeDependsSource, "utf8");
+  }
+
   const legacyV015Path = resolve(tempRoot, "requirements/mts-v0.15.json");
   const legacyV015Source = readFileSync(legacyV015Path, "utf8");
   try {
@@ -600,7 +649,7 @@ try {
     assert.deepEqual(
       loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.dependsOn,
       [],
-      "F15 legacy-only dependsOn mutation cannot enter current causal graph",
+      "G3-S1 mutation E: legacy-only dependsOn mutation cannot enter current causal graph",
     );
   } finally {
     writeFileSync(legacyV015Path, legacyV015Source, "utf8");
