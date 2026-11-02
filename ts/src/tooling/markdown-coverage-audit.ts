@@ -228,9 +228,18 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     const registry = JSON.parse(readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8")) as {
       requirements: { id: string; group: string; state: string; summary: string; mandatory: boolean }[];
     };
-    const accepted = registry.requirements.filter((item) => item.mandatory !== false);
+    const currentStatements = new Map(
+      currentIr.requirements.map((item) => [item.id, item.statement] as const),
+    );
+    const accepted = registry.requirements
+      .filter((item) => item.mandatory !== false)
+      .map((item) => {
+        const statement = currentStatements.get(item.id);
+        if (statement === undefined) fail("legacy presentation metadata has no native current Requirement: " + item.id);
+        return Object.freeze({ ...item, summary: statement });
+      });
     if (accepted.length !== currentIr.requirements.length) {
-      fail("accepted v0.15 semantic IR and normative source requirement set differ");
+      fail("accepted v0.15 semantic IR and presentation metadata Requirement set differ");
     }
     projectedV015Count = auditAcceptedV015RequirementRows(
       readFileSync(resolve(root, "docs/specs/Формальная нотация МТС.md"), "utf8"),
