@@ -91,7 +91,7 @@ export interface ReaderCoveragePlan {
   readonly schema: "mts-reader-coverage-plan/v0.1";
   readonly status: "proposed";
   readonly semanticChange: false;
-  readonly authority: "accepted-requirement-authority";
+  readonly authority: "accepted-requirement-authority" | "legacy-dependency-shadow";
   readonly v014Count: 14;
   readonly v015Count: 48;
   readonly rows: readonly ReaderCoverageRow[];
@@ -204,6 +204,7 @@ export function loadReaderLegacyDependencyShadow(root: string): ReaderCoveragePl
   });
   return Object.freeze({
     ...current,
+    authority: "legacy-dependency-shadow" as const,
     rows: Object.freeze(rows),
   });
 }
