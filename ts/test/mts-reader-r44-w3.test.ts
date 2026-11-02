@@ -18,7 +18,7 @@ for(const x of reviewed.rows){
   assert.equal(manuscript.split(x.limitationRu).length-1,1);
 }
 assert.equal(reviewed.rows.filter(x=>x.id==="V15-READY-03")[0]?.requirementState,"ACCEPTED");
-assert.ok(manuscript.includes("47 цитат дословное совпадение"));
+assert.ok(manuscript.includes("48 текущих native-цитат совпадают дословно"));
 assert.ok(manuscript.includes("V15-READY-03"));
 assert.ok(manuscript.includes("A14→A16→A17→A72w"));
 assert.ok(manuscript.includes("Γ предпосылкой"));
@@ -40,4 +40,4 @@ assert.throws(()=>p(original.replace("audit_state: individually-scoped-editorial
 assert.throws(()=>p(original.replace("  - id: V15-TERM-01\n","  - id: V15-TERM-02\n")),/cannot detach source/);
 assert.throws(()=>p(original.replace("open: [R40-06","open: [R40-07")),/cannot silently close R40/);
 assert.throws(()=>p(original+"\npublication: ready\n"),/malformed\/duplicate YAML/);
-console.log("R44-W3: 48 individually source-traced v0.15 reviews (4x12), 47 exact G11 quotes + explicit V15-READY-03 acceptance-history exception, MP→Γ history, 8 FRM proof classifications, author/governance distinctions, 119 original atoms preserved, no science acceptance.");
+console.log("R44-W3: 48 individually source-traced v0.15 reviews (4x12), 48 exact current native G11 quotes + preserved V15-READY-03 presentation-history provenance, MP→Γ history, 8 FRM proof classifications, author/governance distinctions, 119 original atoms preserved, no science acceptance.");
