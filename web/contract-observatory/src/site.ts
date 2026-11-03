@@ -306,7 +306,6 @@ function currentInvariantSemanticMap(
   semanticIr: ObservatorySemanticIr | undefined,
 ): ReadonlyMap<string, CurrentInvariantSemantic> {
   const currentVersions = projection.versions.filter((version) => version.isCurrent);
-  if (currentVersions.length === 0) return new Map();
   if (currentVersions.length !== 1) {
     throw new Error("Contract Observatory G3-S2a: methodology must expose exactly one current version");
   }

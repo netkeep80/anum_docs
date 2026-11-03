@@ -318,7 +318,18 @@ try {
     writeFileSync(nativePath, nativeSource, "utf8");
   }
 
-  // Falsifier C: missing/duplicate/mismatched current native IR must fail closed with no contractValue fallback.
+  // Falsifier C: zero-current/missing/duplicate/mismatched current native IR must fail closed with no contractValue fallback.
+  const zeroCurrentProjection = Object.freeze({
+    ...fixtureProjection,
+    versions: Object.freeze(fixtureProjection.versions.map((version) => Object.freeze({
+      ...version,
+      isCurrent: false,
+    }))),
+  });
+  throws(
+    () => renderContractObservatoryHtml(fixtureIndex, zeroCurrentProjection, fixtureIr),
+    "falsifier C: zero current methodology versions fail closed before legacy contractValue rendering",
+  );
   throws(
     () => renderContractObservatoryHtml(fixtureIndex, fixtureProjection, withoutRequirement(fixtureIr, targetId)),
     "falsifier C: missing current semantic IR Requirement fails closed",
