@@ -21,7 +21,7 @@ export function renderContractObservatoryHtml(
   const interactive = methodology !== undefined;
   const timeline = index.versions.map((version, ordinal) => renderTimelineItem(version, ordinal, interactive)).join("\n");
   const versions = index.versions.map((version, ordinal) => renderVersionSection(version, ordinal)).join("\n");
-  const methodologyMap = methodology === undefined ? "" : renderMethodologyMap(methodology);
+  const methodologyMap = methodology === undefined ? "" : renderMethodologyMap(methodology, semanticIr);
   const requirementMap = semanticIr === undefined ? "" : renderSemanticRequirementMap(semanticIr);
   const coverageMap = markdownCoverage === undefined ? "" : renderMarkdownCoverageMap(markdownCoverage);
 
@@ -299,7 +299,53 @@ function renderRequirementFilterControllerScript(): string {
     </script>`;
 }
 
-function renderMethodologyMap(projection: MethodologyProjection): string {
+type CurrentInvariantSemantic = ObservatorySemanticIr["requirements"][number];
+
+function currentInvariantSemanticMap(
+  projection: MethodologyProjection,
+  semanticIr: ObservatorySemanticIr | undefined,
+): ReadonlyMap<string, CurrentInvariantSemantic> {
+  const currentVersions = projection.versions.filter((version) => version.isCurrent);
+  if (currentVersions.length !== 1) {
+    throw new Error("Contract Observatory G3-S2a: methodology must expose exactly one current version");
+  }
+  if (semanticIr === undefined) {
+    throw new Error("Contract Observatory G3-S2a: current invariant anatomy requires compiled native semantic IR");
+  }
+
+  const current = currentVersions[0]!;
+  if (semanticIr.contract !== current.contractId || semanticIr.contractPath !== current.contractPath) {
+    throw new Error("Contract Observatory G3-S2a: current methodology/native semantic IR release mismatch");
+  }
+
+  const byId = new Map<string, CurrentInvariantSemantic>();
+  for (const requirement of semanticIr.requirements) {
+    if (byId.has(requirement.id)) {
+      throw new Error(`Contract Observatory G3-S2a: duplicate current semantic IR Requirement ID ${requirement.id}`);
+    }
+    byId.set(requirement.id, requirement);
+  }
+
+  const invariantIds = current.semanticInvariants.map((invariant) => invariant.id);
+  const invariantIdSet = new Set(invariantIds);
+  if (invariantIdSet.size !== invariantIds.length) {
+    throw new Error("Contract Observatory G3-S2a: duplicate current invariant ID");
+  }
+  const missing = invariantIds.filter((id) => !byId.has(id));
+  const extra = [...byId.keys()].filter((id) => !invariantIdSet.has(id));
+  if (missing.length !== 0 || extra.length !== 0) {
+    throw new Error(
+      `Contract Observatory G3-S2a: current invariant/native semantic IR Requirement identity mismatch; missing=${missing.join(",")}; extra=${extra.join(",")}`,
+    );
+  }
+  return byId;
+}
+
+function renderMethodologyMap(
+  projection: MethodologyProjection,
+  semanticIr: ObservatorySemanticIr | undefined,
+): string {
+  const currentSemantics = currentInvariantSemanticMap(projection, semanticIr);
   const config = buildObservatoryInteractionConfig(projection);
   const state = createObservatoryInteractionKernel(config).initialState();
   const model = buildInteractiveMethodologyModel(projection, state);
@@ -310,7 +356,7 @@ function renderMethodologyMap(projection: MethodologyProjection): string {
     entry,
     config.versions[ordinal]!,
   )).join("\n");
-  const anatomy = projection.versions.map(renderInvariantAnatomy).join("\n");
+  const anatomy = projection.versions.map((version) => renderInvariantAnatomy(version, currentSemantics)).join("\n");
 
   return `    <section class="methodology-map" aria-labelledby="methodology-title">
       <div class="methodology-heading"><p class="eyebrow">Основное объясняющее представление · производная методология</p><h2 id="methodology-title">Карта методологии и жизненного цикла версий</h2><p>Две координированные, но не тождественные структуры: метод разработки и состояние жизненного цикла версии.</p></div>
@@ -339,9 +385,14 @@ function renderMethodologyLane(
   return `<div class="methodology-lane${model.selected ? " selected" : ""}" data-version-lane="${escapeAttribute(model.contractId)}"><div class="lane-version"><button type="button" class="version-select" data-version-id="${escapeAttribute(model.contractId)}" aria-pressed="${model.selected ? "true" : "false"}" title="Выбрать версию и синхронизировать представления обозревателя">${escapeHtml(model.contractId)}</button><span class="lane-classification">${classificationLabel(model.classification)}</span></div>${stages}<div class="evidence-items" aria-label="Ссылки на свидетельства для ${escapeAttribute(model.contractId)}">${evidenceItems || "<span>Нет связанных ссылок на свидетельства</span>"}</div></div>`;
 }
 
-function renderInvariantAnatomy(version: MethodologyVersionProjection): string {
+function renderInvariantAnatomy(
+  version: MethodologyVersionProjection,
+  currentSemantics: ReadonlyMap<string, CurrentInvariantSemantic>,
+): string {
   const manifest = version.traceabilityManifestPath ?? "нет";
-  const cards = version.semanticInvariants.map((invariant) => renderInvariantCard(version, invariant)).join("\n");
+  const cards = version.semanticInvariants.map((invariant) =>
+    renderInvariantCard(version, invariant, version.isCurrent ? currentSemantics.get(invariant.id) : undefined)
+  ).join("\n");
   const missing = version.semanticInvariants.length === 0
     ? `<p class="trace-none">Нет семантических инвариантов, связанных с источником. Манифест трассируемости: ${escapeHtml(manifest)}.</p>`
     : "";
@@ -351,11 +402,26 @@ function renderInvariantAnatomy(version: MethodologyVersionProjection): string {
 function renderInvariantCard(
   version: MethodologyVersionProjection,
   invariant: MethodologyVersionProjection["semanticInvariants"][number],
+  currentSemantic: CurrentInvariantSemantic | undefined,
 ): string {
   const vectorIds = invariantVectorIds(invariant);
   const evidenceReferences = linkedEvidenceReferences(version, vectorIds);
   const acceptance = version.acceptanceReferences.map((reference) => Object.freeze({ id: reference.id, label: `${reference.id} · ${reference.sourcePath}` }));
-  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4><dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>${renderPositiveTraceGroups(invariant)}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details></article>`;
+
+  let semanticMetadata: string;
+  let rawProvenance: string;
+  if (version.isCurrent) {
+    if (currentSemantic === undefined) {
+      throw new Error(`Contract Observatory G3-S2a: missing native semantic IR Requirement ${invariant.id}`);
+    }
+    semanticMetadata = `<dl class="invariant-meta"><dt>Текущее нормативное требование</dt><dd>${escapeHtml(currentSemantic.statement)}</dd><dt>Нормативный источник</dt><dd>${escapeHtml(currentSemantic.authorityDocument)}#${escapeHtml(currentSemantic.authorityPointer)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>`;
+    rawProvenance = `<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Принятый legacy-контракт (provenance)</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Legacy-текст принятого релиза</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Статус legacy-текста</dt><dd>только provenance; не текущий нормативный источник</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details>`;
+  } else {
+    semanticMetadata = `<dl class="invariant-meta"><dt>Путь контракта</dt><dd>${escapeHtml(version.contractPath)}</dd><dt>JSON Pointer контракта</dt><dd>${escapeHtml(invariant.contractPointer)}</dd><dt>Закон контракта</dt><dd>${escapeHtml(invariant.contractValue)}</dd><dt>Путь корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd><dt>Ссылка на теорию</dt><dd>нет (нет исходной связи уровня инварианта)</dd></dl>`;
+    rawProvenance = `<details class="raw-provenance"><summary>Исходное происхождение данных</summary><dl class="invariant-meta"><dt>ID инварианта</dt><dd>${escapeHtml(invariant.id)}</dd><dt>Источник трассируемости</dt><dd>${escapeHtml(invariant.traceabilitySourcePath)}</dd><dt>Источник контракта</dt><dd>${escapeHtml(version.contractPath)}#${escapeHtml(invariant.contractPointer)}</dd><dt>Источник корпуса соответствия</dt><dd>${escapeHtml(version.conformancePath)}</dd></dl></details>`;
+  }
+
+  return `<article class="invariant-card" data-invariant-id="${escapeAttribute(invariant.id)}"><h4><button type="button" class="invariant-select" data-item-id="invariant:${escapeAttribute(invariant.id)}" aria-pressed="false">${escapeHtml(invariant.id)}</button></h4>${semanticMetadata}${renderPositiveTraceGroups(invariant)}${renderTraceGroup("Отрицательные векторы", invariant.negative.requiredNegativeVectors, "vector")}${renderTraceGroup("Исполняемые проверки", invariant.requiredExecutableGates, "gate")}${renderEvidenceGroup("Существующие свидетельства", evidenceReferences)}${renderReferenceGroup("Происхождение приёмки", acceptance)}${rawProvenance}</article>`;
 }
 
 function renderPositiveTraceGroups(
