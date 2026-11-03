@@ -549,11 +549,15 @@ function loadAcceptedV015SemanticIr(
     const legacy = legacyById.get(native.id);
     if (legacy === undefined) fail(`${native.id} legacy presentation/evidence shadow is missing`);
     const value = legacy.value;
-    const evidence = object(value.evidence, native.id + ".evidence");
     const traced = object(traces[native.id], native.id + " traceability");
-
-    const legacyVerifiedBy = [...strings(evidence.requiredExecutableGates, native.id + ".requiredExecutableGates")];
-    exactSet(`${native.id} native/legacy verified_by differential`, native.verifiedBy, legacyVerifiedBy);
+    const tracedPositiveVectors = strings(
+      traced.positiveVectors,
+      native.id + " traceability positiveVectors",
+    );
+    const tracedNegativeVectors = strings(
+      traced.negativeVectors,
+      native.id + " traceability negativeVectors",
+    );
 
     // This is legacy traceability metadata integrity only. It does not choose
     // the current Requirement lifecycle/status; native lifecycle already did.
@@ -574,8 +578,8 @@ function loadAcceptedV015SemanticIr(
       authorityDocument: native.sourcePath,
       authorityPointer: "/normative",
       traceabilityPath,
-      positiveVectorCount: strings(evidence.positiveVectors, native.id + ".positiveVectors").length,
-      negativeVectorCount: strings(evidence.negativeVectors, native.id + ".negativeVectors").length,
+      positiveVectorCount: tracedPositiveVectors.length,
+      negativeVectorCount: tracedNegativeVectors.length,
       executableGateCount: native.verifiedBy.length,
       docPath: "docs/specs/Формальная нотация МТС.md",
       docAnchor: "mts-v015-" + native.id.toLowerCase(),

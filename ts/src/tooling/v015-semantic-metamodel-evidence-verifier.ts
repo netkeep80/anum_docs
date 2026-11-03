@@ -103,10 +103,6 @@ function strings(value: unknown, label: string): string[] {
   return arr(value, label).map((item, index) => text(item, label + "[" + index + "]"));
 }
 
-function sameStrings(left: readonly string[], right: readonly string[], label: string): void {
-  assertFact(JSON.stringify(left) === JSON.stringify(right), label + " differs");
-}
-
 function includesAll(haystack: readonly string[], needles: readonly string[], label: string): void {
   for (const needle of needles) assertFact(haystack.includes(needle), label + " missing " + needle);
 }
@@ -114,6 +110,7 @@ function includesAll(haystack: readonly string[], needles: readonly string[], la
 function acceptedFacts(root: string): Obj {
   const requirements = json(root, "requirements/mts-v0.15.json");
   const trace = json(root, "traceability/mts-v0.15.json");
+  const conformance = json(root, "contracts/mts-conformance-v0.15.json");
   const kernel = json(root, "profiles/mts-v015-meta-interpreter-kernel.json");
   const reaction = json(root, "profiles/mts-v015-generalized-reaction-candidate.json");
 
@@ -129,12 +126,12 @@ function acceptedFacts(root: string): Obj {
   assertFact(and04.state === "VERTICAL_GREEN", "V15-AND-04 not VERTICAL_GREEN");
   assertFact(ctx01.state === "COMPONENT_GREEN", "V15-CTX-01 not COMPONENT_GREEN");
 
-  const gammaEvidence = obj(gamma.evidence, "V15-GAMMA-01.evidence");
-  const andEvidence = obj(and04.evidence, "V15-AND-04.evidence");
-  const ctxEvidence = obj(ctx01.evidence, "V15-CTX-01.evidence");
-  const gammaPositive = strings(gammaEvidence.positiveVectors, "V15-GAMMA-01 positiveVectors");
-  const andPositive = strings(andEvidence.positiveVectors, "V15-AND-04 positiveVectors");
-  const ctxPositive = strings(ctxEvidence.positiveVectors, "V15-CTX-01 positiveVectors");
+  const gammaTrace = traceRequirement(trace, "V15-GAMMA-01");
+  const andTrace = traceRequirement(trace, "V15-AND-04");
+  const ctxTrace = traceRequirement(trace, "V15-CTX-01");
+  const gammaPositive = strings(gammaTrace.positiveVectors, "V15-GAMMA-01 trace positiveVectors");
+  const andPositive = strings(andTrace.positiveVectors, "V15-AND-04 trace positiveVectors");
+  const ctxPositive = strings(ctxTrace.positiveVectors, "V15-CTX-01 trace positiveVectors");
   includesAll(gammaPositive, [
     "a9-structural-unary-one-command-sufficiency",
     "grounded-zero-role-is-generic-refinement",
@@ -147,10 +144,26 @@ function acceptedFacts(root: string): Obj {
     "a9-one-gamma-structural-execution-no-external-current-scope-theory-pointer",
   ], "CTX vectors");
 
-  for (const [id, row] of [["V15-GAMMA-01", gamma], ["V15-AND-04", and04], ["V15-CTX-01", ctx01]] as const) {
-    const reqGates = strings(obj(row.evidence, id + ".evidence").requiredExecutableGates, id + " req gates");
-    const traceGates = strings(traceRequirement(trace, id).requiredExecutableGates, id + " trace gates");
-    sameStrings(traceGates, reqGates, id + " requirement/traceability executable gates");
+  const positiveAuthority = new Set(strings(
+    conformance.requiredPositiveVectors,
+    "v0.15 conformance requiredPositiveVectors",
+  ));
+  const allowedGateAuthority = new Set([
+    ...strings(conformance.requiredExecutableGates, "v0.15 conformance requiredExecutableGates"),
+    ...strings(conformance.requiredNonKernelAcceptanceGates, "v0.15 conformance requiredNonKernelAcceptanceGates"),
+    ...strings(conformance.requiredExternalExecutableGates, "v0.15 conformance requiredExternalExecutableGates"),
+  ]);
+  for (const [id, row] of [
+    ["V15-GAMMA-01", gammaTrace],
+    ["V15-AND-04", andTrace],
+    ["V15-CTX-01", ctxTrace],
+  ] as const) {
+    for (const vector of strings(row.positiveVectors, id + " trace positiveVectors")) {
+      assertFact(positiveAuthority.has(vector), id + " trace positive vector outside conformance: " + vector);
+    }
+    for (const gate of strings(row.requiredExecutableGates, id + " trace requiredExecutableGates")) {
+      assertFact(allowedGateAuthority.has(gate), id + " trace executable gate outside conformance: " + gate);
+    }
   }
 
   assertFact(kernel.status === "ACCEPTED_EXECUTION_AUTHORITY", "kernel status");

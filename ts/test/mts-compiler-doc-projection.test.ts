@@ -565,15 +565,25 @@ try {
     /target.*(?:missing required field id|unexpected fields)/,
     "F11 malformed verified_by relation",
   );
-  mutateNative(
-    "V15-AND-01",
-    (source) => source.replace(
-      "ts/test/v015-compact-and-approved-source-integrity.test.ts",
-      "ts/test/g1-valid-shape-but-wrong-gate.test.ts",
-    ),
-    /native\/legacy verified_by differential differs/,
-    "verified_by remains 48/48 differential-checked",
-  );
+  const nativeEvidencePath = resolve(tempRoot, nativePath("V15-AND-01"));
+  const nativeEvidenceSource = readFileSync(nativeEvidencePath, "utf8");
+  const nativeEvidenceBaseline = loadMtsSemanticIr(tempRoot).requirements
+    .find((item) => item.id === "V15-AND-01");
+  assert.ok(nativeEvidenceBaseline, "G3-S2c native evidence baseline exists");
+  try {
+    writeFileSync(
+      nativeEvidencePath,
+      nativeEvidenceSource.replace("  - predicates: [verified_by]", "  - predicates: [implemented_by]"),
+      "utf8",
+    );
+    assert.equal(
+      loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-01")?.executableGateCount,
+      nativeEvidenceBaseline.executableGateCount - 1,
+      "G3-S2c mutation G: native verified_by controls current executableGateCount without legacy registry veto",
+    );
+  } finally {
+    writeFileSync(nativeEvidencePath, nativeEvidenceSource, "utf8");
+  }
   // G3-S1 mutation B: native normative text changes current IR without legacy synchronization.
   const nativeNormativePath = resolve(tempRoot, nativePath("V15-AND-01"));
   const nativeNormativeSource = readFileSync(nativeNormativePath, "utf8");
@@ -653,6 +663,90 @@ try {
     );
   } finally {
     writeFileSync(legacyV015Path, legacyV015Source, "utf8");
+  }
+
+  const evidenceShadowBaseline = loadMtsSemanticIr(tempRoot).requirements
+    .find((item) => item.id === "V15-AND-02");
+  assert.ok(evidenceShadowBaseline, "G3-S2c evidence shadow baseline exists");
+
+  const mutateLegacyEvidence = (
+    mutate: (evidence: any) => void,
+    label: string,
+  ): void => {
+    try {
+      const value = JSON.parse(legacyV015Source) as any;
+      const evidence = value.requirements.find((item: any) => item.id === "V15-AND-02").evidence;
+      mutate(evidence);
+      writeFileSync(legacyV015Path, JSON.stringify(value), "utf8");
+      assert.deepEqual(
+        loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-02"),
+        evidenceShadowBaseline,
+        label,
+      );
+    } finally {
+      writeFileSync(legacyV015Path, legacyV015Source, "utf8");
+    }
+  };
+  mutateLegacyEvidence(
+    (evidence) => { evidence.positiveVectors = ["g3-s2c-legacy-shadow-positive-only"]; },
+    "G3-S2c mutation A: registry positiveVectors cannot change current IR",
+  );
+  mutateLegacyEvidence(
+    (evidence) => { evidence.negativeVectors = ["g3-s2c-legacy-shadow-negative-only"]; },
+    "G3-S2c mutation B: registry negativeVectors cannot change current IR",
+  );
+  mutateLegacyEvidence(
+    (evidence) => { evidence.requiredExecutableGates = ["ts/test/g3-s2c-legacy-shadow-gate.test.ts"]; },
+    "G3-S2c mutation C: registry requiredExecutableGates cannot veto or change current IR",
+  );
+
+  const traceV015Path = resolve(tempRoot, "traceability/mts-v0.15.json");
+  const traceV015Source = readFileSync(traceV015Path, "utf8");
+  const mutateTrace = (
+    mutate: (traceRequirement: any) => void,
+    assertMutation: (current: NonNullable<typeof evidenceShadowBaseline>) => void,
+  ): void => {
+    try {
+      const value = JSON.parse(traceV015Source) as any;
+      const traced = value.requirements["V15-AND-02"];
+      mutate(traced);
+      writeFileSync(traceV015Path, JSON.stringify(value), "utf8");
+      const current = loadMtsSemanticIr(tempRoot).requirements.find((item) => item.id === "V15-AND-02");
+      assert.ok(current, "G3-S2c mutated trace Requirement remains projected");
+      assertMutation(current);
+    } finally {
+      writeFileSync(traceV015Path, traceV015Source, "utf8");
+    }
+  };
+
+  mutateTrace(
+    (traced) => { traced.positiveVectors = traced.positiveVectors.slice(0, 1); },
+    (current) => assert.equal(
+      current.positiveVectorCount,
+      evidenceShadowBaseline.positiveVectorCount - 1,
+      "G3-S2c mutation D: traceability positive mapping controls current IR count",
+    ),
+  );
+  mutateTrace(
+    (traced) => { traced.negativeVectors = traced.negativeVectors.slice(0, 2); },
+    (current) => assert.equal(
+      current.negativeVectorCount,
+      evidenceShadowBaseline.negativeVectorCount - 1,
+      "G3-S2c mutation E: traceability negative mapping controls current IR count",
+    ),
+  );
+
+  try {
+    const value = JSON.parse(traceV015Source) as any;
+    delete value.requirements["V15-AND-02"].positiveVectors;
+    writeFileSync(traceV015Path, JSON.stringify(value), "utf8");
+    expect(
+      () => loadMtsSemanticIr(tempRoot),
+      /V15-AND-02 traceability positiveVectors must be an array/,
+      "G3-S2c mutation F: missing current traceability vector mapping fails closed with no registry fallback",
+    );
+  } finally {
+    writeFileSync(traceV015Path, traceV015Source, "utf8");
   }
 
   const tempLegacyIr = loadMtsSemanticIr(tempRoot, registryPath);
