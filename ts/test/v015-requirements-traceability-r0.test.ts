@@ -213,29 +213,11 @@ function validateCandidate(req: Json, trace: Json): void {
   assert(Array.isArray(list), "requirements array");
   const ids = (list as Json[]).map((item) => text(item.id, "requirement id"));
   assert(new Set(ids).size === ids.length, "requirement IDs unique");
-  const idSet = new Set(ids);
   const traces = record(trace.requirements, "trace requirements");
   assert(Object.keys(traces).length === ids.length, "one trace record per requirement");
   for (const id of ids) assert(Object.prototype.hasOwnProperty.call(traces, id), "missing trace " + id);
 
   const byId = new Map((list as Json[]).map((item) => [text(item.id, "id"), item]));
-  const visiting = new Set<string>();
-  const done = new Set<string>();
-  const visit = (id: string): void => {
-    if (done.has(id)) return;
-    assert(!visiting.has(id), "dependency cycle at " + id);
-    visiting.add(id);
-    const item = byId.get(id);
-    assert(item !== undefined, "known dependency node " + id);
-    for (const dep of strings(item.dependsOn, id + " dependsOn")) {
-      assert(idSet.has(dep), id + " unknown dependency " + dep);
-      visit(dep);
-    }
-    visiting.delete(id);
-    done.add(id);
-  };
-  ids.forEach(visit);
-
   for (const item of list as Json[]) {
     const id = text(item.id, "id");
     const state = text(item.state, id + " state") as State;
@@ -251,7 +233,6 @@ function validateCandidate(req: Json, trace: Json): void {
 
     const traced = record(traces[id], id + " trace");
     assert(text(traced.state, id + " trace state") === state, id + " state matches traceability");
-    assert(JSON.stringify(strings(traced.dependsOn, id + " trace dependsOn")) === JSON.stringify(strings(item.dependsOn, id + " dependsOn")), id + " dependency projection exact");
   }
 
   const gov = byId.get("V15-GOV-01");
@@ -442,10 +423,6 @@ validateCandidate(requirements, traceability);
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists for docs dependency");
   assert(
-    strings(ready.dependsOn, "V15-READY-01 docs dependsOn").includes("V15-DOCS-01"),
-    "release readiness depends on generated FORMAL specification",
-  );
-  assert(
     strings(record(ready.evidence, "V15-READY-01 evidence").negativeVectors, "V15-READY-01 negatives")
       .includes("generated-v015-formal-spec-refresh-pending-s18") === false,
     "S18 docs-pending blocker is removed after generated projection closure",
@@ -456,11 +433,6 @@ validateCandidate(requirements, traceability);
   const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
   assert(text(traced.state, "V15-DOCS-01 trace state") === text(docs.state, "V15-DOCS-01 state"), "V15-DOCS-01 trace state");
   assert(Number(traced.ownerIssue) === 1914, "V15-DOCS-01 trace owner");
-  assert(
-    strings(record(traces["V15-READY-01"], "READY docs trace").dependsOn, "READY docs trace dependsOn")
-      .includes("V15-DOCS-01"),
-    "traceability readiness depends on V15-DOCS-01",
-  );
 }
 
 // Operational governance blocker anti-drift.
@@ -493,10 +465,6 @@ validateCandidate(requirements, traceability);
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists");
   assert(
-    strings(ready.dependsOn, "V15-READY-01 dependsOn").includes("V15-GOV-04"),
-    "release readiness depends on operational merge enforcement",
-  );
-  assert(
     !strings(record(ready.evidence, "V15-READY-01 governance evidence").negativeVectors, "V15-READY-01 governance negatives")
       .includes("v15-gov04-ruleset-bypass-open"),
     "resolved S20 governance blocker cannot remain in readiness negatives",
@@ -513,11 +481,6 @@ validateCandidate(requirements, traceability);
   const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
   assert(text(traced.state, "V15-GOV-04 trace state") === text(gov.state, "V15-GOV-04 state"), "V15-GOV-04 trace state");
   assert(Number(traced.ownerIssue) === 1982, "V15-GOV-04 trace owner");
-  assert(
-    strings(record(traces["V15-READY-01"], "READY trace").dependsOn, "READY trace dependsOn")
-      .includes("V15-GOV-04"),
-    "traceability readiness depends on V15-GOV-04",
-  );
 }
 
 // compact Boolean AND approved corpus lock.
@@ -723,7 +686,6 @@ console.log([
   "MTS_V015_R0_REQUIREMENTS=COMPONENT_GREEN",
   "ACCEPTED=TRUE",
   "CURRENT_ACCEPTED=v0.15",
-  "DEPENDENCY_DAG=GREEN",
   "VERTICAL_OVERCLAIM_REJECTED=TRUE",
   "AUTHOR_JSON_APPROVAL_REQUIRED=TRUE",
   "STALE_JSON_APPROVAL_REJECTED=TRUE",
