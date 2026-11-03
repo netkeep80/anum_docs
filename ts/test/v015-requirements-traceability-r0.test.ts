@@ -217,6 +217,20 @@ function validateCandidate(req: Json, trace: Json): void {
   assert(Object.keys(traces).length === ids.length, "one trace record per requirement");
   for (const id of ids) assert(Object.prototype.hasOwnProperty.call(traces, id), "missing trace " + id);
 
+  const positiveAuthority = new Set(strings(
+    acceptedConformance15.requiredPositiveVectors,
+    "accepted v0.15 positive vectors",
+  ));
+  const negativeAuthority = new Set(strings(
+    acceptedConformance15.requiredNegativeVectors,
+    "accepted v0.15 negative vectors",
+  ));
+  const allowedGateAuthority = new Set([
+    ...strings(acceptedConformance15.requiredExecutableGates, "accepted v0.15 executable gates"),
+    ...strings(acceptedConformance15.requiredNonKernelAcceptanceGates, "accepted v0.15 non-kernel acceptance gates"),
+    ...strings(acceptedConformance15.requiredExternalExecutableGates, "accepted v0.15 external executable gates"),
+  ]);
+
   const byId = new Map((list as Json[]).map((item) => [text(item.id, "id"), item]));
   for (const item of list as Json[]) {
     const id = text(item.id, "id");
@@ -226,22 +240,26 @@ function validateCandidate(req: Json, trace: Json): void {
     if (state === "RELEASE_READY") {
       assert(id === "V15-READY-01" || id === "V15-READY-02", id + " only readiness gates may be RELEASE_READY");
     }
-    const evidence = record(item.evidence, id + " evidence");
-    strings(evidence.positiveVectors, id + " positiveVectors");
-    strings(evidence.negativeVectors, id + " negativeVectors");
-    strings(evidence.requiredExecutableGates, id + " requiredExecutableGates");
-
     const traced = record(traces[id], id + " trace");
     assert(text(traced.state, id + " trace state") === state, id + " state matches traceability");
+    for (const vector of strings(traced.positiveVectors, id + " trace positiveVectors")) {
+      assert(positiveAuthority.has(vector), id + " trace positive vector is admitted by conformance: " + vector);
+    }
+    for (const vector of strings(traced.negativeVectors, id + " trace negativeVectors")) {
+      assert(negativeAuthority.has(vector), id + " trace negative vector is admitted by conformance: " + vector);
+    }
+    for (const gate of strings(traced.requiredExecutableGates, id + " trace requiredExecutableGates")) {
+      assert(allowedGateAuthority.has(gate), id + " trace executable gate is admitted by conformance: " + gate);
+    }
   }
 
   const gov = byId.get("V15-GOV-01");
   assert(gov !== undefined, "V15-GOV-01 exists");
   assert(text(gov.state, "V15-GOV-01 state") === "COMPONENT_GREEN", "R0 registry itself is only COMPONENT_GREEN");
-  const govEvidence = record(gov.evidence, "V15-GOV-01 evidence");
-  assert(strings(govEvidence.positiveVectors, "GOV positive").length > 0, "GOV positive evidence");
-  assert(strings(govEvidence.negativeVectors, "GOV negative").length >= 3, "GOV overclaim negatives");
-  for (const gate of strings(govEvidence.requiredExecutableGates, "GOV gates")) {
+  const govTrace = record(traces["V15-GOV-01"], "V15-GOV-01 trace evidence");
+  assert(strings(govTrace.positiveVectors, "GOV trace positive").length > 0, "GOV positive evidence");
+  assert(strings(govTrace.negativeVectors, "GOV trace negative").length >= 3, "GOV overclaim negatives");
+  for (const gate of strings(govTrace.requiredExecutableGates, "GOV trace gates")) {
     assert(existsSync(join(repoRoot, gate)), "GOV gate exists: " + gate);
   }
 
@@ -283,18 +301,18 @@ validateCandidate(requirements, traceability);
     "repo-guard negative-vector test evidence exactly covers accepted v0.15 conformance",
   );
 
-  const list = requirements.requirements;
-  assert(Array.isArray(list), "requirements array for negative-vector evidence");
+  const traces = record(traceability.requirements, "trace requirements for negative-vector evidence");
   for (const vector of V015_NEGATIVE_VECTOR_TEST_EVIDENCE) {
-    const owner = (list as Json[]).find((item) => {
-      const evidence = record(item.evidence, text(item.id, "negative owner id") + " evidence");
-      return strings(evidence.negativeVectors, "negativeVectors").includes(vector);
+    const owner = Object.entries(traces).find(([id, raw]) => {
+      const traced = record(raw, id + " negative-vector trace");
+      return strings(traced.negativeVectors, id + " trace negativeVectors").includes(vector);
     });
-    assert(owner !== undefined, "negative vector has requirement owner: " + vector);
-    const evidence = record(owner.evidence, text(owner.id, "negative owner id") + " evidence");
+    assert(owner !== undefined, "negative vector has traceability Requirement owner: " + vector);
+    const [ownerId, rawOwner] = owner;
+    const tracedOwner = record(rawOwner, ownerId + " negative-vector trace owner");
     assert(
-      strings(evidence.requiredExecutableGates, "negative owner executable gates").length > 0,
-      "negative vector owner has executable gate evidence: " + vector,
+      strings(tracedOwner.requiredExecutableGates, ownerId + " trace executable gates").length > 0,
+      "negative vector trace owner has executable gate evidence: " + vector,
     );
   }
 }
@@ -393,9 +411,10 @@ validateCandidate(requirements, traceability);
   assert(/generated projection/i.test(text(docs.summary, "V15-DOCS-01 summary")), "V15-DOCS-01 requires generated projection");
   assert(/Формальная нотация МТС\.md/u.test(text(docs.summary, "V15-DOCS-01 target")), "V15-DOCS-01 owns canonical FORMAL document");
   assert(text(docs.state, "V15-DOCS-01 state") === "COMPONENT_GREEN", "S18 generated FORMAL specification is component-green");
-  const docsEvidence = record(docs.evidence, "V15-DOCS-01 evidence");
+  const traces = record(traceability.requirements, "trace requirements for documentation blocker");
+  const docsTrace = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace evidence");
   assert(
-    strings(docsEvidence.positiveVectors, "V15-DOCS-01 positive vectors")
+    strings(docsTrace.positiveVectors, "V15-DOCS-01 trace positive vectors")
       .includes("generated-formal-spec-component-green") === false,
     "component state is evidenced by concrete generation vectors, not a self-referential readiness label",
   );
@@ -422,14 +441,14 @@ validateCandidate(requirements, traceability);
 
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists for docs dependency");
+  const readyTrace = record(traces["V15-READY-01"], "V15-READY-01 trace evidence");
   assert(
-    strings(record(ready.evidence, "V15-READY-01 evidence").negativeVectors, "V15-READY-01 negatives")
+    strings(readyTrace.negativeVectors, "V15-READY-01 trace negatives")
       .includes("generated-v015-formal-spec-refresh-pending-s18") === false,
     "S18 docs-pending blocker is removed after generated projection closure",
   );
   assert(text(ready.state, "V15-READY-01 state") === "RELEASE_READY", "S21 final readiness promotes READY-01");
 
-  const traces = record(traceability.requirements, "trace requirements for documentation blocker");
   const traced = record(traces["V15-DOCS-01"], "V15-DOCS-01 trace");
   assert(text(traced.state, "V15-DOCS-01 trace state") === text(docs.state, "V15-DOCS-01 state"), "V15-DOCS-01 trace state");
   assert(Number(traced.ownerIssue) === 1914, "V15-DOCS-01 trace owner");
@@ -464,8 +483,10 @@ validateCandidate(requirements, traceability);
 
   const ready = byId.get("V15-READY-01");
   assert(ready !== undefined, "V15-READY-01 exists");
+  const traces = record(traceability.requirements, "trace requirements for governance blocker");
+  const readyTrace = record(traces["V15-READY-01"], "V15-READY-01 governance trace evidence");
   assert(
-    !strings(record(ready.evidence, "V15-READY-01 governance evidence").negativeVectors, "V15-READY-01 governance negatives")
+    !strings(readyTrace.negativeVectors, "V15-READY-01 governance trace negatives")
       .includes("v15-gov04-ruleset-bypass-open"),
     "resolved S20 governance blocker cannot remain in readiness negatives",
   );
@@ -477,7 +498,6 @@ validateCandidate(requirements, traceability);
   assert(bool(requirements.acceptanceReady, "S21 requirements acceptanceReady") === true, "S21 acceptanceReady true");
   assert(existsSync(join(repoRoot, "formal/v0.15/evidence/final-readiness-r3.json")), "S21 final readiness evidence exists");
 
-  const traces = record(traceability.requirements, "trace requirements for governance blocker");
   const traced = record(traces["V15-GOV-04"], "V15-GOV-04 trace");
   assert(text(traced.state, "V15-GOV-04 trace state") === text(gov.state, "V15-GOV-04 state"), "V15-GOV-04 trace state");
   assert(Number(traced.ownerIssue) === 1982, "V15-GOV-04 trace owner");
