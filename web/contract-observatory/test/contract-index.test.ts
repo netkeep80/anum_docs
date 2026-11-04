@@ -116,7 +116,9 @@ try {
     join(nativeFixtureRoot, "ts", "node_modules", "yaml"),
     { recursive: true },
   );
+  cpSync(join(repositoryRoot, "docs"), join(nativeFixtureRoot, "docs"), { recursive: true });
   cpSync(join(repositoryRoot, "README.md"), join(nativeFixtureRoot, "README.md"));
+  cpSync(join(repositoryRoot, "PORTFOLIO.md"), join(nativeFixtureRoot, "PORTFOLIO.md"));
 
   const nativeBaseline = buildContractObservatoryIndex(nativeFixtureRoot);
   same(
