@@ -756,7 +756,7 @@ function loadLegacyMtsSemanticIr(
 ): MtsSemanticIr {
   const schema = string(registry.schema, `${registryPath}.schema`);
   if (schema !== "mts-requirement-registry/v0.1" && schema !== "mts-requirement-registry/v0.2") {
-    fail(`unsupported historical registry schema ${schema}`);
+    fail(`unsupported registry schema ${schema}`);
   }
 
   const source = object(registry.semanticSource, `${registryPath}.semanticSource`);
