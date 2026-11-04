@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -58,6 +59,41 @@ assert(
   "coverage inventory remains structurally coherent",
 );
 same(JSON.stringify(again), JSON.stringify(report), "coverage audit is deterministic");
+
+const docsCoverageCli = resolve(root, "ts/dist/src/tooling/docs-coverage.js");
+const humanCoverageOutput = execFileSync(process.execPath, [docsCoverageCli], {
+  cwd: root,
+  encoding: "utf8",
+});
+assert(
+  humanCoverageOutput.includes("projectedRequirements=16"),
+  "docs:coverage human output exposes total projected requirement count",
+);
+assert(
+  humanCoverageOutput.includes("inheritedV014=14"),
+  "docs:coverage human output exposes inherited v0.14 law count separately",
+);
+assert(
+  humanCoverageOutput.includes("currentProjectFacts=2"),
+  "docs:coverage human output exposes current project fact count separately",
+);
+assert(
+  humanCoverageOutput.includes("currentNormative=48/48"),
+  "docs:coverage human output preserves current normative projection count",
+);
+assert(
+  !humanCoverageOutput.includes("requirements=16 (inherited v0.14)"),
+  "docs:coverage human output must not conflate total projected blocks with inherited v0.14 laws",
+);
+const jsonCoverageOutput = execFileSync(process.execPath, [docsCoverageCli, "--json"], {
+  cwd: root,
+  encoding: "utf8",
+});
+same(
+  JSON.stringify(JSON.parse(jsonCoverageOutput)),
+  JSON.stringify(report),
+  "docs:coverage --json payload semantics remain identical to the coverage audit",
+);
 
 const acceptedFixture = [{ id: "V15-TEST-01", group: "TEST", state: "COMPONENT_GREEN", summary: "Accepted test" }];
 const acceptedRow = '| <a id="mts-v015-v15-test-01"></a>`V15-TEST-01` | `TEST` | `COMPONENT_GREEN` | Accepted test |';
