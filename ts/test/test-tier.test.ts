@@ -218,10 +218,11 @@ try {
       return removed;
     }
     if (value !== null && typeof value === "object") {
-      return Object.values(value).reduce(
-        (sum, item) => sum + removeExactReference(item, target),
-        0,
-      );
+      let removed = 0;
+      for (const item of Object.values(value)) {
+        removed += removeExactReference(item, target);
+      }
+      return removed;
     }
     return 0;
   };
