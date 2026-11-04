@@ -1328,6 +1328,9 @@ const postV013ToolingDeltaFiles = new Set([
   "ts/src/tooling/v015-native-evidence-verifier.ts",
   "ts/src/tooling/v015-root-basis-evidence-verifier.ts",
   "ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts",
+  // G3-S2c-B Phase A: versioned evidence verifier only; post-v0.13 documentation tooling,
+  // not an MTS runtime semantic authority.
+  "ts/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.ts",
   "ts/src/tooling/v015-theorem-statement-evidence-verifier.ts",
   "ts/src/tooling/v015-markdown-prose-audit.ts",
   "ts/src/tooling/markdown-coverage-audit.ts",

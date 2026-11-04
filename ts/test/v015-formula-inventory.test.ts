@@ -416,8 +416,10 @@ for (const entry of semanticMetamodel) {
   assert.equal(entry.denotation, "VERIFIED_AGAINST_ACCEPTED_V015");
   const semantic = (entry as typeof entry & { semanticEvidence?: Record<string, any> }).semanticEvidence;
   assert.ok(semantic, entry.id + " metamodel requires semanticEvidence");
-  assert.equal(semantic!.compilerVersion, "mts-v015-semantic-metamodel-evidence/v0.1");
+  assert.equal(semantic!.compilerVersion, "mts-v015-semantic-metamodel-evidence/v0.2");
   assert.equal(semantic!.acceptedFormalVersion, "v0.15");
+  assert.equal((entry as typeof entry & { reviewReference?: string }).reviewReference,
+    "https://github.com/netkeep80/anum_docs/issues/1951#issuecomment-6067969510");
   assert.equal(semantic!.executionApplicability, "NOT_APPLICABLE");
   assert.ok(String(semantic!.executionRationale).length >= 20);
   const expected = expectedMetamodel.get(entry.id);
@@ -429,21 +431,21 @@ for (const entry of semanticMetamodel) {
     semanticLinks: "METAMODEL_STAGE_SEMANTIC_LINKS",
   })) {
     const stageEvidence = semantic![stage] as { path: string; gitBlobSha: string; testCase: string };
-    assert.equal(stageEvidence.path, "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts");
-    assert.equal(stageEvidence.gitBlobSha, "9ee507cb7c29b1b78740228c80da11c6cd7a99ba");
+    assert.equal(stageEvidence.path, "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts");
+    assert.equal(stageEvidence.gitBlobSha, "b8352fde3bf0e1d1d4a3eaa76d8305056ddf13e9");
     assert.equal(stageEvidence.testCase, marker);
   }
   const receipt = semantic!.machineReceipt as Record<string, string>;
-  assert.equal(receipt.profile, "mts-v015-semantic-metamodel-evidence/v0.1");
+  assert.equal(receipt.profile, "mts-v015-semantic-metamodel-evidence/v0.2");
   assert.equal(receipt.outcome, "PASS");
   assert.equal(receipt.caseId, entry.id);
   assert.equal(receipt.formalSourceSha256, expected![0]);
   assert.equal(receipt.semanticAnetSha256, expected![1]);
   assert.equal(receipt.runnerSourceSha256,
-    "a24e4ef23f3563548f789401e6aa3f4c0f48ecf60f763ffd9426ea7f8ccf916c");
-  assert.equal(receipt.evidenceCommit, "209b3be3f3bee0065d20fd4b5f9149868c040dc4");
-  assert.equal(receipt.ciRun, "37835687233");
-  assert.equal(receipt.ciJob, "113511990164");
+    "d1a27f9ba8dbd44948adbf2c70dc52dcca57813725a998ee497013bc8d5492d1");
+  assert.equal(receipt.evidenceCommit, "ad9e2d0d7aa63e34df93e6de626d96834f7adc41");
+  assert.equal(receipt.ciRun, "41745691550");
+  assert.equal(receipt.ciJob, "126297970484");
 }
 
 const pending = inventory.candidates.filter((entry) => entry.role === "UNCLASSIFIED");

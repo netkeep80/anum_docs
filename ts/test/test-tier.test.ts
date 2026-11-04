@@ -21,6 +21,11 @@ assert.ok(
   plan.historicalResearchSourceTests.length > 0,
   "historical research witness tier is non-empty",
 );
+assert.deepEqual(
+  plan.historicalAcceptedEvidenceSourceTests,
+  ["ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"],
+  "historical accepted evidence is an exact one-test allowlist",
+);
 assert.ok(
   plan.machineReferencedSourceTests.length > 0,
   "machine-readable current surfaces reference executable tests",
@@ -29,6 +34,7 @@ assert.ok(
 const allSet = new Set(plan.allSourceTests);
 const currentSet = new Set(plan.currentSourceTests);
 const referencedSet = new Set(plan.machineReferencedSourceTests);
+const historicalAcceptedSet = new Set(plan.historicalAcceptedEvidenceSourceTests);
 
 assert.ok(
   plan.authoritySources.includes("theorems/current-v0.14.json"),
@@ -61,15 +67,37 @@ for (const path of plan.machineReferencedSourceTests) {
 }
 for (const path of plan.allSourceTests) {
   const name = path.slice("ts/test/".length);
-  if (!name.startsWith("research-")) {
-    assert.ok(currentSet.has(path), `non-research test must be current: ${path}`);
+  if (!name.startsWith("research-") && !historicalAcceptedSet.has(path)) {
+    assert.ok(currentSet.has(path), `ordinary non-research test must be current: ${path}`);
   }
 }
 for (const path of plan.historicalResearchSourceTests) {
   const name = path.slice("ts/test/".length);
-  assert.ok(name.startsWith("research-"), `full-only test must be research-prefixed: ${path}`);
-  assert.equal(referencedSet.has(path), false, `full-only test must not be machine-referenced: ${path}`);
+  assert.ok(name.startsWith("research-"), `historical research test must be research-prefixed: ${path}`);
+  assert.equal(referencedSet.has(path), false, `historical research test must not be machine-referenced: ${path}`);
+  assert.equal(historicalAcceptedSet.has(path), false, `historical research and accepted-evidence classes are disjoint: ${path}`);
 }
+for (const path of plan.historicalAcceptedEvidenceSourceTests) {
+  assert.ok(allSet.has(path), `historical accepted evidence remains in full tier: ${path}`);
+  assert.equal(currentSet.has(path), false, `historical accepted evidence stays out of current tier: ${path}`);
+  assert.equal(referencedSet.has(path), false, `historical accepted evidence must not be machine-referenced: ${path}`);
+  assert.equal(path.startsWith("ts/test/research-"), false, `historical accepted evidence is not a research-prefix escape: ${path}`);
+}
+assert.equal(
+  currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),
+  false,
+  "immutable v0.1 semantic-metamodel replay is not current",
+);
+assert.equal(
+  currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts"),
+  true,
+  "v0.2 semantic-metamodel verifier remains current",
+);
+assert.equal(
+  historicalAcceptedSet.has("ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts"),
+  false,
+  "v0.2 semantic-metamodel verifier is not historical accepted evidence",
+);
 
 assert.deepEqual(selectTestTier(plan, "full"), plan.allSourceTests);
 assert.deepEqual(selectTestTier(plan, "current"), plan.currentSourceTests);
@@ -77,6 +105,7 @@ assert.deepEqual(selectTestTier(plan, "current"), plan.currentSourceTests);
 const synthetic = classifyTestPaths(
   [
     "ts/test/core.test.ts",
+    "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
     "ts/test/research-current.test.ts",
     "ts/test/research-history.test.ts",
   ],
@@ -89,6 +118,18 @@ assert.deepEqual(synthetic.currentSourceTests, [
 assert.deepEqual(synthetic.historicalResearchSourceTests, [
   "ts/test/research-history.test.ts",
 ]);
+assert.deepEqual(synthetic.historicalAcceptedEvidenceSourceTests, [
+  "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+]);
+assert.ok(
+  synthetic.currentSourceTests.includes("ts/test/core.test.ts"),
+  "arbitrary non-research test remains current",
+);
+assert.equal(
+  synthetic.currentSourceTests.includes("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),
+  false,
+  "only the exact immutable accepted-evidence path is excluded from current",
+);
 
 assert.throws(
   () =>
@@ -209,6 +250,7 @@ console.log(
     `current=${plan.currentSourceTests.length}`,
     `machine-referenced=${plan.machineReferencedSourceTests.length}`,
     `historical-research=${plan.historicalResearchSourceTests.length}`,
+    `historical-accepted-evidence=${plan.historicalAcceptedEvidenceSourceTests.length}`,
     "policy-pointer=IGNORED",
     "native-authority-mismatch=RED",
     "contract-conformance-selector-mismatch=RED",

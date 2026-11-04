@@ -272,6 +272,10 @@ const V015_EVIDENCE_RUNNERS = Object.freeze({
     sourcePath: "ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts",
     distPath: "ts/dist/src/tooling/v015-semantic-metamodel-evidence-verifier.js",
   }),
+  "mts-v015-semantic-metamodel-evidence/v0.2": Object.freeze({
+    sourcePath: "ts/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.ts",
+    distPath: "ts/dist/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.js",
+  }),
   "mts-v015-theorem-statement-evidence/v0.1": Object.freeze({
     sourcePath: "ts/src/tooling/v015-theorem-statement-evidence-verifier.ts",
     distPath: "ts/dist/src/tooling/v015-theorem-statement-evidence-verifier.js",
@@ -604,6 +608,11 @@ export function assessV015DocumentationAcceptance(root: string): V015Documentati
     } else {
       const rr = receipt as Obj;
       const runnerProfile = evidenceRunner(rr.profile);
+      if (rr.profile === "mts-v015-semantic-metamodel-evidence/v0.2" &&
+          version !== rr.profile) {
+        evidenceDefects.push(id + ": v0.2 compilerVersion differs from machineReceipt profile");
+        continue;
+      }
       if (runnerProfile === undefined ||
           rr.outcome !== "PASS" ||
           typeof rr.formalSourceSha256 !== "string" || rr.formalSourceSha256 !== sourceDigest ||
