@@ -53,6 +53,95 @@ export interface MtsSemanticIr {
   readonly projectionState: string;
 }
 
+export interface CurrentProjectDocumentConfigurationCandidate {
+  readonly documentModes: Readonly<Record<string, unknown>>;
+  readonly repositoryRequirements: readonly unknown[];
+}
+
+export interface CurrentProjectDocumentConfigurationProjection {
+  readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
+  readonly repositoryRequirements: readonly RepositoryRequirementProjection[];
+}
+
+interface CurrentReadmeLinkFact {
+  readonly id: "README-OBSERVATORY";
+  readonly kind: "readme-link";
+  readonly status: "required";
+  readonly projection: {
+    readonly path: string;
+    readonly anchor: string;
+  };
+  readonly label: string;
+  readonly url: string;
+  readonly description: string;
+}
+
+interface CurrentReadmeContributorsFact {
+  readonly id: "README-AUTHORS";
+  readonly kind: "readme-contributors";
+  readonly status: "required";
+  readonly projection: {
+    readonly path: string;
+    readonly anchor: string;
+  };
+  readonly contributors: readonly {
+    readonly name: string;
+    readonly url: string;
+  }[];
+}
+
+interface CurrentProjectDocumentConfiguration {
+  readonly documentModes: Readonly<Record<string, MarkdownDocumentMode>>;
+  readonly repositoryRequirements: readonly (CurrentReadmeLinkFact | CurrentReadmeContributorsFact)[];
+}
+
+const CURRENT_PROJECT_DOCUMENT_CONFIGURATION = Object.freeze({
+  documentModes: Object.freeze({
+    "README.md": "hybrid",
+    "PORTFOLIO.md": "source",
+    "docs/CONTRIBUTING.md": "source",
+    "docs/research/Исходные мысли МТС.md": "source",
+    "docs/research/Новое осмысление МТС.md": "source",
+    "docs/specs/Апамять и управление сетью связей.md": "hybrid",
+    "docs/specs/Ачисла и сериализация.md": "hybrid",
+    "docs/specs/Пучки связей.md": "source",
+    "docs/specs/Формальная нотация МТС.md": "hybrid",
+    "docs/theory/Основания МТС.md": "hybrid",
+    "docs/theory/Система аксиом МТС.md": "hybrid",
+    "docs/Словарь терминов МТС.md": "hybrid",
+  }),
+  repositoryRequirements: Object.freeze([
+    Object.freeze({
+      id: "README-OBSERVATORY",
+      kind: "readme-link",
+      status: "required",
+      projection: Object.freeze({
+        path: "README.md",
+        anchor: "mts-readme-contract-observatory",
+      }),
+      label: "Открыть Обозреватель контрактов",
+      url: "https://netkeep80.github.io/anum_docs/",
+      description: "Производная визуализация принятых машинных свидетельств только для чтения; она не является смысловым авторитетом.",
+    }),
+    Object.freeze({
+      id: "README-AUTHORS",
+      kind: "readme-contributors",
+      status: "required",
+      projection: Object.freeze({
+        path: "README.md",
+        anchor: "mts-readme-authors",
+      }),
+      contributors: Object.freeze([
+        Object.freeze({ name: "Вертушкин Роман Павлович", url: "https://github.com/netkeep80" }),
+        Object.freeze({ name: "Дьяченко Константин Константинович", url: "https://github.com/konard" }),
+        Object.freeze({ name: "Шакиров Тимур Эдуардович", url: "https://github.com/TimaxLacs" }),
+        Object.freeze({ name: "Бурдуков Александр Николаевич", url: "https://github.com/InAiwetrustAGI" }),
+        Object.freeze({ name: "Глазунов Иван Сергеевич", url: "https://github.com/ivansglazunov" }),
+      ]),
+    }),
+  ]),
+} satisfies CurrentProjectDocumentConfiguration);
+
 function fail(message: string): never {
   throw new Error(`mts-compiler: ${message}`);
 }
@@ -173,45 +262,89 @@ function exactSet(name: string, left: readonly string[], right: readonly string[
   }
 }
 
+function validateDocumentModes(
+  root: string,
+  candidate: Readonly<Record<string, unknown>>,
+  sourceLabel: string,
+): Readonly<Record<string, MarkdownDocumentMode>> {
+  const documentModes: Record<string, MarkdownDocumentMode> = {};
+  for (const [path, rawMode] of Object.entries(candidate)) {
+    const mode = string(rawMode, `${sourceLabel}.${path}`);
+    if (mode !== "source" && mode !== "hybrid" && mode !== "generated") {
+      fail(`${path}: unknown Markdown document mode ${mode}`);
+    }
+    if (mode === "generated") {
+      fail(`${path}: whole-file GENERATED mode is forbidden in P1`);
+    }
+    documentModes[path] = mode;
+  }
+
+  const semanticMarkdownSurface = listRepositoryMarkdownSurface(root).filter(
+    (path) => path !== THEOREM_CATALOG_PATH,
+  );
+  exactSet("Markdown document surface", Object.keys(documentModes), semanticMarkdownSurface);
+  return Object.freeze(documentModes);
+}
+
+export function validateCurrentProjectDocumentConfiguration(
+  root: string,
+  candidate: CurrentProjectDocumentConfigurationCandidate,
+): CurrentProjectDocumentConfigurationProjection {
+  const documentModes = validateDocumentModes(
+    root,
+    candidate.documentModes,
+    "current project/document configuration.documentModes",
+  );
+  const repositoryRequirements = loadRepositoryRequirementValues(
+    root,
+    candidate.repositoryRequirements,
+    "current project/document configuration.repositoryRequirements",
+    documentModes,
+  );
+  return Object.freeze({ documentModes, repositoryRequirements });
+}
+
+export function loadCurrentProjectDocumentConfiguration(
+  root: string,
+): CurrentProjectDocumentConfigurationProjection {
+  return validateCurrentProjectDocumentConfiguration(root, CURRENT_PROJECT_DOCUMENT_CONFIGURATION);
+}
+
 const REQUIRED_REPOSITORY_REQUIREMENT_IDS = Object.freeze([
   "README-AUTHORS",
   "README-OBSERVATORY",
 ] as const);
 
-function loadRepositoryRequirements(
+function loadRepositoryRequirementValues(
   root: string,
-  registry: JsonObject,
-  registryPath: string,
+  rawRequirements: readonly unknown[],
+  sourceLabel: string,
   documentModes: Readonly<Record<string, MarkdownDocumentMode>>,
 ): readonly RepositoryRequirementProjection[] {
-  if (!Array.isArray(registry.repositoryRequirements)) {
-    fail(`${registryPath}.repositoryRequirements must be an array`);
-  }
-
   const seen = new Set<string>();
-  const requirements = (registry.repositoryRequirements as unknown[]).map((raw, index) => {
-    const value = object(raw, `${registryPath}.repositoryRequirements[${index}]`);
-    const id = string(value.id, `repositoryRequirements[${index}].id`);
+  const requirements = rawRequirements.map((raw, index) => {
+    const value = object(raw, `${sourceLabel}[${index}]`);
+    const id = string(value.id, `${sourceLabel}[${index}].id`);
     if (seen.has(id)) fail(`duplicate repository requirement id ${id}`);
     seen.add(id);
 
-    const status = string(value.status, `repositoryRequirements[${index}].status`);
+    const status = string(value.status, `${sourceLabel}[${index}].status`);
     if (status !== "required") fail(`${id} repository requirement status must be required`);
 
-    const projection = object(value.projection, `repositoryRequirements[${index}].projection`);
-    const docPath = string(projection.path, `repositoryRequirements[${index}].projection.path`);
-    const docAnchor = string(projection.anchor, `repositoryRequirements[${index}].projection.anchor`);
+    const projection = object(value.projection, `${sourceLabel}[${index}].projection`);
+    const docPath = string(projection.path, `${sourceLabel}[${index}].projection.path`);
+    const docAnchor = string(projection.anchor, `${sourceLabel}[${index}].projection.anchor`);
     if (!existsSync(resolve(root, docPath))) fail(`${id} projection target does not exist: ${docPath}`);
     if (documentModes[docPath] !== "hybrid") {
       fail(`${id} projection target must be HYBRID, found ${documentModes[docPath] ?? "unclassified"}: ${docPath}`);
     }
 
-    const kind = string(value.kind, `repositoryRequirements[${index}].kind`);
+    const kind = string(value.kind, `${sourceLabel}[${index}].kind`);
     let generatedContent: string;
     if (kind === "readme-link") {
-      const label = string(value.label, `repositoryRequirements[${index}].label`);
-      const url = string(value.url, `repositoryRequirements[${index}].url`);
-      const description = string(value.description, `repositoryRequirements[${index}].description`);
+      const label = string(value.label, `${sourceLabel}[${index}].label`);
+      const url = string(value.url, `${sourceLabel}[${index}].url`);
+      const description = string(value.description, `${sourceLabel}[${index}].description`);
       if (!/^https:\/\//.test(url)) fail(`${id}.url must be an absolute https URL`);
       generatedContent = `[${label}](${url}) — ${description}`;
     } else if (kind === "readme-contributors") {
@@ -220,18 +353,9 @@ function loadRepositoryRequirements(
       }
       const contributorKeys = new Set<string>();
       generatedContent = (value.contributors as unknown[]).map((rawContributor, contributorIndex) => {
-        const contributor = object(
-          rawContributor,
-          `repositoryRequirements[${index}].contributors[${contributorIndex}]`,
-        );
-        const name = string(
-          contributor.name,
-          `repositoryRequirements[${index}].contributors[${contributorIndex}].name`,
-        );
-        const url = string(
-          contributor.url,
-          `repositoryRequirements[${index}].contributors[${contributorIndex}].url`,
-        );
+        const contributor = object(rawContributor, `${sourceLabel}[${index}].contributors[${contributorIndex}]`);
+        const name = string(contributor.name, `${sourceLabel}[${index}].contributors[${contributorIndex}].name`);
+        const url = string(contributor.url, `${sourceLabel}[${index}].contributors[${contributorIndex}].url`);
         if (!/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/?$/.test(url)) {
           fail(`${id}.contributors[${contributorIndex}].url must be a GitHub profile URL`);
         }
@@ -260,6 +384,23 @@ function loadRepositoryRequirements(
     REQUIRED_REPOSITORY_REQUIREMENT_IDS,
   );
   return Object.freeze(requirements.sort((left, right) => left.id.localeCompare(right.id)));
+}
+
+function loadRepositoryRequirements(
+  root: string,
+  registry: JsonObject,
+  registryPath: string,
+  documentModes: Readonly<Record<string, MarkdownDocumentMode>>,
+): readonly RepositoryRequirementProjection[] {
+  if (!Array.isArray(registry.repositoryRequirements)) {
+    fail(`${registryPath}.repositoryRequirements must be an array`);
+  }
+  return loadRepositoryRequirementValues(
+    root,
+    registry.repositoryRequirements as unknown[],
+    `${registryPath}.repositoryRequirements`,
+    documentModes,
+  );
 }
 
 function validateDependencyGraph(requirements: readonly MtsRequirementProjection[]): void {
@@ -588,15 +729,7 @@ function loadAcceptedV015SemanticIr(
 
   validateDependencyGraph(requirements);
 
-  const legacyPath = "requirements/mts-v0.14.json";
-  const legacy = readJson(root, legacyPath);
-  const legacySurface = object(legacy.documentSurface, legacyPath + ".documentSurface");
-  const legacyModes: Record<string, MarkdownDocumentMode> = {};
-  for (const [path, rawMode] of Object.entries(legacySurface)) {
-    const descriptor = object(rawMode, legacyPath + ".documentSurface." + path);
-    legacyModes[path] = string(descriptor.mode, path + ".mode") as MarkdownDocumentMode;
-  }
-  const repositoryRequirements = loadRepositoryRequirements(root, legacy, legacyPath, legacyModes);
+  const { documentModes, repositoryRequirements } = loadCurrentProjectDocumentConfiguration(root);
   return Object.freeze({
     schema: string(registry.schema, registryPath + ".schema"),
     contract: contractId,
@@ -605,7 +738,7 @@ function loadAcceptedV015SemanticIr(
     conformancePath,
     requirements: Object.freeze(requirements),
     repositoryRequirements,
-    documentModes: Object.freeze(legacyModes),
+    documentModes,
     projectionState: "MATERIALIZED",
   });
 }
@@ -656,22 +789,16 @@ export function loadMtsSemanticIr(
     ? registry.projectionState
     : "MATERIALIZED";
   const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
-  const documentModes: Record<string, MarkdownDocumentMode> = {};
+  const rawDocumentModes: Record<string, unknown> = {};
   for (const [path, rawMode] of Object.entries(documentSurface)) {
     const descriptor = object(rawMode, `${registryPath}.documentSurface.${path}`);
-    const mode = string(descriptor.mode, `${registryPath}.documentSurface.${path}.mode`);
-    if (mode !== "source" && mode !== "hybrid" && mode !== "generated") {
-      fail(`${path}: unknown Markdown document mode ${mode}`);
-    }
-    if (mode === "generated") {
-      fail(`${path}: whole-file GENERATED mode is forbidden in P1`);
-    }
-    documentModes[path] = mode;
+    rawDocumentModes[path] = descriptor.mode;
   }
-  const semanticMarkdownSurface = listRepositoryMarkdownSurface(root).filter(
-    (path) => path !== THEOREM_CATALOG_PATH,
+  const documentModes = validateDocumentModes(
+    root,
+    rawDocumentModes,
+    `${registryPath}.documentSurface`,
   );
-  exactSet("Markdown document surface", Object.keys(documentModes), semanticMarkdownSurface);
 
   const repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
 
@@ -815,18 +942,18 @@ export function upsertRequirementProjection(
 
 export function compileRequirementDocuments(root: string, write: boolean): string[] {
   const currentIr = loadMtsSemanticIr(root);
-  // Compiler-owned V14 law blocks are immutable inherited provenance,
-  // not a replacement for the accepted V15 normative requirements indexed
-  // by formal-notation-v015-markdown and validated in Markdown coverage.
+  // Compiler-owned V14 law blocks are immutable inherited provenance.
+  // Their historical Requirement bodies remain explicit replay input, while
+  // current document mutation policy and README project facts come only from
+  // the current project/document configuration.
   const historicalOwnerIr = currentIr.schema === "mts-requirement-registry/v0.3"
     ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
     : currentIr;
-  const ir = historicalOwnerIr;
-  if (ir.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
+  if (historicalOwnerIr.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
     return [];
   }
   const grouped = new Map<string, MtsRequirementProjection[]>();
-  for (const requirement of ir.requirements) {
+  for (const requirement of historicalOwnerIr.requirements) {
     const items = grouped.get(requirement.docPath) ?? [];
     items.push(requirement);
     grouped.set(requirement.docPath, items);
@@ -836,7 +963,7 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
   for (const [path, items] of grouped) {
     const fullPath = resolve(root, path);
     const source = readFileSync(fullPath, "utf8");
-    const mode = ir.documentModes[path];
+    const mode = currentIr.documentModes[path];
     if (mode === undefined) fail(`${path}: Markdown mode is not classified`);
     const updated = items.reduce((text, item) => upsertRequirementProjection(text, item, mode), source);
     if (updated === source) continue;
@@ -845,7 +972,7 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
   }
 
   const repositoryGrouped = new Map<string, RepositoryRequirementProjection[]>();
-  for (const requirement of ir.repositoryRequirements) {
+  for (const requirement of currentIr.repositoryRequirements) {
     const items = repositoryGrouped.get(requirement.docPath) ?? [];
     items.push(requirement);
     repositoryGrouped.set(requirement.docPath, items);
@@ -853,7 +980,7 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
   for (const [path, items] of repositoryGrouped) {
     const fullPath = resolve(root, path);
     const source = readFileSync(fullPath, "utf8");
-    const mode = ir.documentModes[path];
+    const mode = currentIr.documentModes[path];
     if (mode === undefined) fail(`${path}: Markdown mode is not classified`);
     const updated = items.reduce(
       (text, item) => replaceOwnedMarkdownSection({
