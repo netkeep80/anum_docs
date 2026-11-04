@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { listMarkdownAnchorIds } from "./markdown-section-adapter.js";
+import { loadMtsSemanticIr } from "./mts-compiler.js";
 
 export const STABLE_ANCHOR_BASELINE_PATH = "traceability/markdown-stable-anchor-baseline.json";
 
@@ -154,10 +155,7 @@ export function auditStableAnchorDocuments(
 
 export function auditRepositoryStableAnchors(root: string): readonly StableAnchorBaselineIssue[] {
   const baseline = loadStableAnchorBaseline(root);
-  const registryPath = resolve(root, "requirements/mts-v0.13.json");
-  const registry = record(JSON.parse(readFileSync(registryPath, "utf8")), "requirements/mts-v0.13.json");
-  const surface = record(registry.documentSurface, "requirements/mts-v0.13.json.documentSurface");
-  const registeredPaths = Object.keys(surface);
+  const registeredPaths = Object.keys(loadMtsSemanticIr(root).documentModes);
 
   const documents: Record<string, string> = {};
   for (const path of Object.keys(baseline.anchorsByDocument)) {
