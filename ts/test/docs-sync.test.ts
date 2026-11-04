@@ -373,6 +373,11 @@ try {
       nativeRenderedBaseline,
       "G4-A2 FORMAL: historical README URL cannot veto/change current v0.15 rendering",
     );
+    assert.deepEqual(
+      syncRepositoryDocs(tempRoot),
+      [],
+      "G4-A2 FORMAL: historical README URL cannot veto current docs-sync",
+    );
   } finally {
     writeFileSync(historicalV014RegistryPath, historicalV014RegistrySource, "utf8");
   }
@@ -380,12 +385,17 @@ try {
   try {
     const value = JSON.parse(historicalV014RegistrySource) as any;
     assert.equal(value.documentSurface["PORTFOLIO.md"].mode, "source");
-    value.documentSurface["PORTFOLIO.md"].mode = "hybrid";
+    value.documentSurface["PORTFOLIO.md"].mode = "INVALID_HISTORICAL_MODE";
     writeFileSync(historicalV014RegistryPath, JSON.stringify(value), "utf8");
     assert.equal(
       renderFormalNotationV015Markdown(tempRoot),
       nativeRenderedBaseline,
-      "G4-A2 FORMAL: historical documentSurface mode cannot veto/change current v0.15 rendering",
+      "G4-A2 FORMAL: invalid historical documentSurface mode cannot veto/change current v0.15 rendering",
+    );
+    assert.deepEqual(
+      syncRepositoryDocs(tempRoot),
+      [],
+      "G4-A2 FORMAL: invalid historical documentSurface mode cannot veto current docs-sync",
     );
   } finally {
     writeFileSync(historicalV014RegistryPath, historicalV014RegistrySource, "utf8");
