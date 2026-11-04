@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import {
   buildTestTierPlan,
   classifyTestPaths,
   selectTestTier,
 } from "../src/tooling/test-tier.js";
+import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
 
 const repositoryRoot = resolve("..");
 const plan = buildTestTierPlan(repositoryRoot);
@@ -150,17 +152,25 @@ try {
 
   for (const path of [
     "requirements/mts-v0.15.json",
-    "requirements/mts-v0.14.json",
     "traceability/mts-v0.15.json",
     "contracts/mts-contract-v0.15.json",
     "contracts/mts-conformance-v0.15.json",
     "cutover/typescript-c1-acceptance-v0.8.json",
     "proofs/provers.json",
     "theorems/current-v0.14.json",
-    "README.md",
   ]) {
     copy(path);
   }
+
+  const currentMarkdownSurface = listRepositoryMarkdownSurface(repositoryRoot)
+    .filter((path) => path !== THEOREM_CATALOG_PATH);
+  assert.equal(currentMarkdownSurface.length, 12, "test-tier fixture carries the exact current semantic Markdown surface");
+  for (const path of currentMarkdownSurface) copy(path);
+  assert.equal(
+    currentMarkdownSurface.includes("README.md"),
+    true,
+    "test-tier fixture current document surface includes README project-fact target",
+  );
 
   const nativeV015RequirementPaths = readdirSync(resolve(repositoryRoot, "requirements/mts-v0.15"), { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".rg.yaml"))
