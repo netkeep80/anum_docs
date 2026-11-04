@@ -92,6 +92,53 @@ const realSemanticIr = loadCompiledMtsSemanticIr(repositoryRoot);
 const realMarkdownCoverage = loadCompiledMarkdownCoverage(repositoryRoot);
 const realHtml = renderContractObservatoryHtml(realIndex, realProjection, realSemanticIr, realMarkdownCoverage);
 
+const coverageDecompositionFixture = {
+  schema: "mts-markdown-coverage/v0.1",
+  contract: "mts-contract/v0.15",
+  projectionState: "MATERIALIZED",
+  proseMaterializationPending: false,
+  documents: [{
+    path: "README.md",
+    mode: "hybrid",
+    headingCount: 16,
+    stableAnchorCount: 16,
+    canonicalNodeCount: 16,
+    nonCanonicalAnchorIds: [],
+    requirementCount: 16,
+    ownedBlockCount: 16,
+    sections: Array.from({ length: 16 }, (_, index) => ({
+      anchorId: `coverage-fixture-${index + 1}`,
+      knowledgeClass: "requirements-backed",
+      authoredContentPolicy: "preserve",
+      wholeNodeMutation: "not-authorized",
+    })),
+  }],
+  summary: {
+    documentCount: 1,
+    headingCount: 16,
+    stableAnchorCount: 16,
+    canonicalNodeCount: 16,
+    nonCanonicalAnchorCount: 0,
+    requirementCount: 16,
+    currentNormativeRequirementCount: 48,
+    currentNormativeProjectedCount: 48,
+    inheritedV014RequirementCount: 14,
+    currentProjectFactCount: 2,
+    requirementBackedSectionCount: 16,
+    ownedBlockCount: 16,
+    unanchoredHeadingCount: 0,
+    researchHistoricalSectionCount: 0,
+    currentlyUnclassifiedSectionCount: 0,
+  },
+};
+const mutateCoverageSummary = (mutate: (summary: Record<string, unknown>) => void): unknown => {
+  const candidate = JSON.parse(JSON.stringify(coverageDecompositionFixture)) as {
+    summary: Record<string, unknown>;
+  };
+  mutate(candidate.summary);
+  return candidate;
+};
+
 assert(realIndex.versions.length >= 2, "repository exposes at least current and previous accepted versions");
 assert(realHtml.startsWith("<!doctype html>\n<html lang=\"ru\">"), "browser document baseline");
 assert(realHtml.includes("<meta charset=\"utf-8\">"), "UTF-8 metadata");
@@ -126,6 +173,7 @@ same(realMarkdownCoverage.summary.requirementCount, 16, "P5 renders semantic + r
 same(realMarkdownCoverage.summary.currentNormativeRequirementCount, 48, "P5 current accepted normative requirement count");
 same(realMarkdownCoverage.summary.currentNormativeProjectedCount, 48, "P5 all current requirements uniquely indexed");
 same(realMarkdownCoverage.summary.inheritedV014RequirementCount, 14, "P5 inherited v0.14 Requirement-law blocks distinct");
+same(realMarkdownCoverage.summary.currentProjectFactCount, 2, "P5 current project/document facts are separately accounted");
 
 same(realMarkdownCoverage.summary.requirementBackedSectionCount, 16, "P5 materializes every projected requirement owner");
 same(realMarkdownCoverage.summary.ownedBlockCount, 16, "P5 exposes exactly one compiler-owned block per projected requirement");
@@ -146,6 +194,39 @@ assert(realHtml.includes("Авторский текст:</strong> PRESERVE"), "a
 assert(realHtml.includes("NOT AUTHORIZED"), "destructive whole-node mutation boundary is visible");
 assert(realHtml.includes("отсутствие requirement ID не означает"), "no-ID safety law is visible");
 throws(() => validateMarkdownCoverage({ schema: "mts-markdown-coverage/v0.1", contract: "x", documents: [], summary: {} }), "malformed coverage payload fails closed");
+
+const validCoverageDecomposition = validateMarkdownCoverage(coverageDecompositionFixture);
+same(validCoverageDecomposition.summary.inheritedV014RequirementCount, 14, "G4-A2 bridge accepts 14 inherited law blocks");
+same(validCoverageDecomposition.summary.currentProjectFactCount, 2, "G4-A2 bridge accepts 2 current project facts");
+same(validCoverageDecomposition.summary.requirementCount, 16, "G4-A2 bridge accepts total 16 projected blocks");
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.inheritedV014RequirementCount = 13; })),
+  "G4-A2 bridge rejects 13 + 2 != 16",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.currentProjectFactCount = 1; })),
+  "G4-A2 bridge rejects 14 + 1 != 16",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.currentProjectFactCount = 3; })),
+  "G4-A2 bridge rejects 14 + 3 != 16",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.requirementCount = 15; })),
+  "G4-A2 bridge rejects 14 + 2 != 15",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { delete summary.currentProjectFactCount; })),
+  "G4-A2 bridge requires currentProjectFactCount on current v0.15",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.currentProjectFactCount = -1; })),
+  "G4-A2 bridge rejects negative currentProjectFactCount",
+);
+throws(
+  () => validateMarkdownCoverage(mutateCoverageSummary((summary) => { summary.currentProjectFactCount = 1.5; })),
+  "G4-A2 bridge rejects non-integer currentProjectFactCount",
+);
 
 assert(realHtml.includes("<section class=\"methodology-map\""), "V4c methodology map is rendered as the primary explanatory view");
 assert(realHtml.includes("aria-label=\"Стадии методологии\""), "methodology stages expose a semantic keyboard-navigation group");
