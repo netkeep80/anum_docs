@@ -117,7 +117,7 @@ export interface TheoremProjectionModel {
   schema: "mts-theorem-projection-model/v0.5";
   mtsVersion: string;
   formalCandidateVersion: string;
-  sourceInventory: "theorems/current-v0.14.json";
+  sourceInventory: "theorems/current-v0.15.json";
   formalOverlay: "theorems/formal-v0.15.json";
   authority: {
     theoremInventory: string;
@@ -438,7 +438,7 @@ function collectRepositoryPaths(
 export function loadRepositoryTheoremProjectionSources(
   root = findRepositoryRoot(),
 ): TheoremProjectionSources {
-  const currentIndex = readJson(root, "theorems/current-v0.14.json");
+  const currentIndex = readJson(root, "theorems/current-v0.15.json");
   const formalOverlay = readJson(root, "theorems/formal-v0.15.json");
   const provers = readJson(root, "proofs/provers.json");
   const externalAssurance = readJson(root, "proofs/external-proof-assurance.json");
@@ -478,11 +478,21 @@ export function loadRepositoryTheoremProjectionSources(
 export function buildTheoremProjectionModel(
   sources: TheoremProjectionSources,
 ): TheoremProjectionModel {
-  const current = object(sources.currentIndex, "theorems/current-v0.14.json");
+  const current = object(sources.currentIndex, "theorems/current-v0.15.json");
   if (current.schema !== "mts-current-theorem-index/v0.1") {
     fail("unexpected current theorem index schema");
   }
   const mtsVersion = text(current.mtsVersion, "current theorem index.mtsVersion");
+  if (mtsVersion !== "v0.15") fail("current theorem capsule must select v0.15");
+  if (current.sourceInventory !== "theorems/current-v0.14.json") {
+    fail("current theorem capsule historical source inventory mismatch");
+  }
+  if (current.historicalSourceInventory !== "theorems/p0-v0.14.json") {
+    fail("current theorem capsule frozen historical source mismatch");
+  }
+  if (current.formalOverlay !== "theorems/formal-v0.15.json") {
+    fail("current theorem capsule FORMAL overlay mismatch");
+  }
   const theoremSources = Array.isArray(current.theorems)
     ? current.theorems.map((value: unknown, index: number) =>
         object(value, `current theorem index.theorems[${index}]`),
@@ -851,7 +861,7 @@ export function buildTheoremProjectionModel(
     schema: "mts-theorem-projection-model/v0.5" as const,
     mtsVersion,
     formalCandidateVersion,
-    sourceInventory: "theorems/current-v0.14.json" as const,
+    sourceInventory: "theorems/current-v0.15.json" as const,
     formalOverlay: "theorems/formal-v0.15.json" as const,
     authority: Object.freeze({
       ...THEOREM_CATALOG_INTEGRATION_CONTRACT.authority,

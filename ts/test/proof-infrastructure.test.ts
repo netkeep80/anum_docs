@@ -24,6 +24,9 @@ const currentIndexPath = String(infrastructure.currentTheoremIndex);
 const currentIndex = JSON.parse(
   readFileSync(resolve(root, currentIndexPath), "utf8"),
 );
+const historicalCurrentIndex = JSON.parse(
+  readFileSync(resolve(root, "theorems", "current-v0.14.json"), "utf8"),
+);
 const historicalRegistry = JSON.parse(
   readFileSync(resolve(root, "theorems", "registry.json"), "utf8"),
 );
@@ -39,7 +42,7 @@ const externalProofAssurance = JSON.parse(
 
 assert.equal(infrastructure.schema, "mts-proof-infrastructure/v0.1");
 assert.equal(infrastructure.authority, "routing-and-provenance-only");
-assert.equal(infrastructure.currentTheoremIndex, "theorems/current-v0.14.json");
+assert.equal(infrastructure.currentTheoremIndex, "theorems/current-v0.15.json");
 assert.equal(infrastructure.historicalTheoremRegistry, "theorems/registry.json");
 assert.notEqual(
   infrastructure.currentTheoremIndex,
@@ -96,8 +99,19 @@ execFileSync(
 
 assert.equal(currentIndex.schema, "mts-current-theorem-index/v0.1");
 assert.equal(currentIndex.authority, "generated-index-only");
-assert.equal(currentIndex.mtsVersion, "v0.14");
-assert.equal(currentIndex.sourceInventory, "theorems/p0-v0.14.json");
+assert.equal(currentIndex.mtsVersion, "v0.15");
+assert.equal(currentIndex.sourceInventory, "theorems/current-v0.14.json");
+assert.equal(currentIndex.historicalSourceInventory, "theorems/p0-v0.14.json");
+assert.equal(currentIndex.formalOverlay, "theorems/formal-v0.15.json");
+assert.equal(historicalCurrentIndex.schema, "mts-current-theorem-index/v0.1");
+assert.equal(historicalCurrentIndex.authority, "generated-index-only");
+assert.equal(historicalCurrentIndex.mtsVersion, "v0.14");
+assert.equal(historicalCurrentIndex.sourceInventory, "theorems/p0-v0.14.json");
+assert.deepEqual(
+  currentIndex.theorems,
+  historicalCurrentIndex.theorems,
+  "current v0.15 capsule preserves exact historical theorem identity/content/evidence coordinates",
+);
 assert.equal(currentIndex.historicalRegistry.path, "theorems/registry.json");
 assert.equal(currentIndex.historicalRegistry.version, "v0.13");
 assert.equal(currentIndex.historicalRegistry.currentSelector, false);
