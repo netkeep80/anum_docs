@@ -48,6 +48,7 @@ same(report.summary.requirementCount, 16, "semantic + repository requirement cou
 same(report.summary.currentNormativeRequirementCount, 48, "current accepted normative requirement count");
 same(report.summary.currentNormativeProjectedCount, 48, "all current accepted normative requirement rows materialized");
 same(report.summary.inheritedV014RequirementCount, 14, "only historical v0.14 Requirement-law blocks are inherited");
+same(report.summary.currentProjectFactCount, 2, "exact current project/document fact count");
 
 same(report.summary.requirementBackedSectionCount, 16, "all projected requirements are materialized");
 same(report.summary.ownedBlockCount, 16, "compiler-owned block count");
