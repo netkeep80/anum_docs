@@ -69,6 +69,7 @@ try {
   const historicalRegistryPath = resolve(fixtureRoot, "requirements/mts-v0.13.json");
   const currentBefore = loadMtsSemanticIr(fixtureRoot).documentModes;
   const auditBefore = auditRepositoryStableAnchors(fixtureRoot);
+  assert.deepEqual(auditBefore, [], "G4-B fixture starts from a GREEN stable-anchor audit");
   const historicalRegistry = JSON.parse(readFileSync(historicalRegistryPath, "utf8")) as {
     documentSurface: Record<string, unknown>;
   };
