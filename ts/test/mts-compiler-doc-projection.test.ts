@@ -4,9 +4,11 @@ import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import {
   compileRequirementDocuments,
+  loadCurrentProjectDocumentConfiguration,
   loadMtsSemanticIr,
   renderRequirementProjection,
   upsertRequirementProjection,
+  validateCurrentProjectDocumentConfiguration,
 } from "../src/tooling/mts-compiler.js";
 import {
   assertOutsideOwnedBlockUnchanged,
@@ -189,6 +191,75 @@ assert.match(
 );
 assert.equal(Object.values(ir.documentModes).includes("generated"), false);
 
+const expectedCurrentDocumentModes = Object.freeze({
+  "README.md": "hybrid",
+  "PORTFOLIO.md": "source",
+  "docs/CONTRIBUTING.md": "source",
+  "docs/research/Исходные мысли МТС.md": "source",
+  "docs/research/Новое осмысление МТС.md": "source",
+  "docs/specs/Апамять и управление сетью связей.md": "hybrid",
+  "docs/specs/Ачисла и сериализация.md": "hybrid",
+  "docs/specs/Пучки связей.md": "source",
+  "docs/specs/Формальная нотация МТС.md": "hybrid",
+  "docs/theory/Основания МТС.md": "hybrid",
+  "docs/theory/Система аксиом МТС.md": "hybrid",
+  "docs/Словарь терминов МТС.md": "hybrid",
+});
+assert.equal(Object.keys(ir.documentModes).length, 12, "G4-A exact current document mode fact count");
+assert.deepEqual(ir.documentModes, expectedCurrentDocumentModes, "G4-A exact current document modes");
+const loadedCurrentProjectConfiguration = loadCurrentProjectDocumentConfiguration(root);
+assert.deepEqual(loadedCurrentProjectConfiguration.documentModes, ir.documentModes, "G4-A current typed document configuration must project directly into current IR");
+assert.deepEqual(loadedCurrentProjectConfiguration.repositoryRequirements, ir.repositoryRequirements, "G4-A current typed README project facts must project directly into current IR");
+
+const currentProjectConfigurationCandidate = {
+  documentModes: { ...expectedCurrentDocumentModes },
+  repositoryRequirements: [
+    {
+      id: "README-OBSERVATORY",
+      kind: "readme-link",
+      status: "required",
+      projection: { path: "README.md", anchor: "mts-readme-contract-observatory" },
+      label: "Открыть Обозреватель контрактов",
+      url: "https://netkeep80.github.io/anum_docs/",
+      description: "Производная визуализация принятых машинных свидетельств только для чтения; она не является смысловым авторитетом.",
+    },
+    {
+      id: "README-AUTHORS",
+      kind: "readme-contributors",
+      status: "required",
+      projection: { path: "README.md", anchor: "mts-readme-authors" },
+      contributors: [
+        { name: "Вертушкин Роман Павлович", url: "https://github.com/netkeep80" },
+        { name: "Дьяченко Константин Константинович", url: "https://github.com/konard" },
+        { name: "Шакиров Тимур Эдуардович", url: "https://github.com/TimaxLacs" },
+        { name: "Бурдуков Александр Николаевич", url: "https://github.com/InAiwetrustAGI" },
+        { name: "Глазунов Иван Сергеевич", url: "https://github.com/ivansglazunov" },
+      ],
+    },
+  ],
+} as const;
+assert.deepEqual(validateCurrentProjectDocumentConfiguration(root, currentProjectConfigurationCandidate), loadedCurrentProjectConfiguration, "G4-A typed current configuration validator must reproduce the production projection");
+const mutateCurrentProjectConfiguration = (
+  mutate: (candidate: { documentModes: Record<string, unknown>; repositoryRequirements: any[] }) => void,
+): void => {
+  const candidate = JSON.parse(JSON.stringify(currentProjectConfigurationCandidate)) as {
+    documentModes: Record<string, unknown>;
+    repositoryRequirements: any[];
+  };
+  mutate(candidate);
+  expect(() => validateCurrentProjectDocumentConfiguration(root, candidate), /mts-compiler:/, "G4-A current project/document configuration must fail closed");
+};
+mutateCurrentProjectConfiguration((candidate) => { delete candidate.documentModes["PORTFOLIO.md"]; });
+mutateCurrentProjectConfiguration((candidate) => { candidate.documentModes["docs/unknown-current-document.md"] = "source"; });
+mutateCurrentProjectConfiguration((candidate) => { candidate.documentModes["PORTFOLIO.md"] = "invalid-mode"; });
+mutateCurrentProjectConfiguration((candidate) => {
+  candidate.repositoryRequirements = candidate.repositoryRequirements.filter((item) => item.id !== "README-AUTHORS");
+});
+mutateCurrentProjectConfiguration((candidate) => {
+  candidate.repositoryRequirements.push(JSON.parse(JSON.stringify(candidate.repositoryRequirements[0])));
+});
+mutateCurrentProjectConfiguration((candidate) => { candidate.documentModes["README.md"] = "source"; });
+
 const currentCausalEdges = ir.requirements.flatMap((item) =>
   item.dependsOn.map((dependency) => `${item.id}->${dependency}`)
 );
@@ -350,6 +421,37 @@ try {
   assert.deepEqual(tempIr, ir, "isolated accepted fixture must preserve the real repository semantic IR");
   assert.equal(tempIr.requirements.length, 48);
   assert.equal(tempIr.contract, "mts-contract/v0.15");
+
+  const historicalRegistrySource = readFileSync(resolve(tempRoot, registryPath), "utf8");
+
+  try {
+    const historicalModeMutation = JSON.parse(historicalRegistrySource) as any;
+    assert.equal(historicalModeMutation.documentSurface["PORTFOLIO.md"].mode, "source", "G4-A historical mode falsifier baseline");
+    historicalModeMutation.documentSurface["PORTFOLIO.md"].mode = "hybrid";
+    writeRegistry(historicalModeMutation);
+    assert.deepEqual(loadMtsSemanticIr(tempRoot).documentModes, ir.documentModes, "G4-A historical v0.14 mode mutation cannot change current v0.15 documentModes");
+    assert.equal(loadMtsSemanticIr(tempRoot, registryPath).documentModes["PORTFOLIO.md"], "hybrid", "G4-A explicit historical v0.14 replay must still observe historical mode mutation");
+    assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A historical v0.14 mode mutation cannot change current docs behavior");
+  } finally {
+    writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
+  }
+
+  try {
+    const historicalReadmeMutation = JSON.parse(historicalRegistrySource) as any;
+    const observatory = historicalReadmeMutation.repositoryRequirements.find((item: any) => item.id === "README-OBSERVATORY");
+    assert.ok(observatory, "G4-A historical README-OBSERVATORY baseline exists");
+    observatory.label = "Историческая мутация README-OBSERVATORY";
+    writeRegistry(historicalReadmeMutation);
+    assert.deepEqual(loadMtsSemanticIr(tempRoot).repositoryRequirements, ir.repositoryRequirements, "G4-A historical v0.14 README mutation cannot change current repositoryRequirements");
+    assert.match(
+      loadMtsSemanticIr(tempRoot, registryPath).repositoryRequirements.find((item) => item.id === "README-OBSERVATORY")?.generatedContent ?? "",
+      /Историческая мутация README-OBSERVATORY/,
+      "G4-A explicit historical v0.14 replay must still observe historical README mutation",
+    );
+    assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A historical v0.14 README mutation cannot change current generated README expectation");
+  } finally {
+    writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
+  }
 
   const policyPath = resolve(tempRoot, "repo-policy.json");
   const policySource = JSON.stringify({

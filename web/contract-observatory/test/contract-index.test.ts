@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   ContractIndexError,
   buildContractObservatoryIndex,
@@ -116,7 +116,24 @@ try {
     join(nativeFixtureRoot, "ts", "node_modules", "yaml"),
     { recursive: true },
   );
-  cpSync(join(repositoryRoot, "README.md"), join(nativeFixtureRoot, "README.md"));
+  for (const markdownPath of [
+    "README.md",
+    "PORTFOLIO.md",
+    "docs/CONTRIBUTING.md",
+    "docs/research/Исходные мысли МТС.md",
+    "docs/research/Новое осмысление МТС.md",
+    "docs/specs/Апамять и управление сетью связей.md",
+    "docs/specs/Ачисла и сериализация.md",
+    "docs/specs/Пучки связей.md",
+    "docs/specs/Формальная нотация МТС.md",
+    "docs/theory/Основания МТС.md",
+    "docs/theory/Система аксиом МТС.md",
+    "docs/Словарь терминов МТС.md",
+  ] as const) {
+    const target = join(nativeFixtureRoot, markdownPath);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(repositoryRoot, markdownPath), target);
+  }
 
   const nativeBaseline = buildContractObservatoryIndex(nativeFixtureRoot);
   same(
