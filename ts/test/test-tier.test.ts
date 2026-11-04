@@ -230,7 +230,7 @@ try {
   const historicalTheoremPath = resolve(fixtureRoot, "theorems/current-v0.14.json");
   const historicalTheoremSource = readFileSync(historicalTheoremPath, "utf8");
   const historicalTheoremMutation = JSON.parse(historicalTheoremSource) as any;
-  assert.equal(removeExactReference(historicalTheoremMutation, selectorResearchTest), 1);
+  assert.equal(removeExactReference(historicalTheoremMutation, selectorResearchTest), 2);
   writeFileSync(historicalTheoremPath, JSON.stringify(historicalTheoremMutation), "utf8");
   assert.deepEqual(
     buildTestTierPlan(fixtureRoot),
@@ -242,7 +242,7 @@ try {
   const currentTheoremPath = resolve(fixtureRoot, "theorems/current-v0.15.json");
   const currentTheoremSource = readFileSync(currentTheoremPath, "utf8");
   const currentTheoremMutation = JSON.parse(currentTheoremSource) as any;
-  assert.equal(removeExactReference(currentTheoremMutation, selectorResearchTest), 1);
+  assert.equal(removeExactReference(currentTheoremMutation, selectorResearchTest), 2);
   writeFileSync(currentTheoremPath, JSON.stringify(currentTheoremMutation), "utf8");
   const selectorMutationPlan = buildTestTierPlan(fixtureRoot);
   assert.equal(
