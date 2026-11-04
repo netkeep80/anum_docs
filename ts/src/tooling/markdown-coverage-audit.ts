@@ -8,7 +8,7 @@ import {
   resolveMarkdownAnchor,
   type MarkdownDocumentMode,
 } from "./markdown-section-adapter.js";
-import { loadMtsSemanticIr } from "./mts-compiler.js";
+import { loadHistoricalRequirementLawProjection, loadMtsSemanticIr } from "./mts-compiler.js";
 
 export type MarkdownKnowledgeClass =
   | "requirements-backed"
@@ -50,8 +50,10 @@ export interface MarkdownCoverageSummary {
   /** Accepted current normative records indexed, not historical V14 owned blocks. */
   readonly currentNormativeRequirementCount: number;
   readonly currentNormativeProjectedCount: number;
-  /** Historical inherited v0.14 law/repository blocks retained by owner. */
+  /** Historical inherited v0.14 Requirement-law blocks retained by owner. */
   readonly inheritedV014RequirementCount: number;
+  /** Current project/document facts projected as compiler-owned blocks. */
+  readonly currentProjectFactCount: number;
   readonly requirementBackedSectionCount: number;
   readonly ownedBlockCount: number;
   readonly unanchoredHeadingCount: number;
@@ -220,9 +222,12 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
   // V14 is retained solely as inherited law-block provenance. It is not
   // a fallback authority for accepted v0.15 current requirements.
   const isV015 = currentIr.schema === "mts-requirement-registry/v0.3";
-  const historicalOwnerIr = isV015
-    ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
-    : currentIr;
+  const historicalLawProjection = isV015
+    ? loadHistoricalRequirementLawProjection(root, "requirements/mts-v0.14.json")
+    : Object.freeze({
+        projectionState: currentIr.projectionState,
+        requirements: currentIr.requirements,
+      });
   let projectedV015Count = 0;
   if (isV015) {
     const registry = JSON.parse(readFileSync(resolve(root, "requirements/mts-v0.15.json"), "utf8")) as {
@@ -246,22 +251,24 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
       accepted,
     );
   }
-  const projectionIr = historicalOwnerIr;
+  const projectionRequirements = historicalLawProjection.requirements;
+  const projectRequirements = currentIr.repositoryRequirements;
+  const documentModes = currentIr.documentModes;
   const proseMaterializationPending =
-    projectionIr.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
-  const documents = Object.keys(projectionIr.documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
+    historicalLawProjection.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585";
+  const documents = Object.keys(documentModes).sort((a, b) => a.localeCompare(b)).map((path) => {
     const source = readFileSync(resolve(root, path), "utf8");
     const requirements = proseMaterializationPending
       ? []
       : [
-          ...projectionIr.requirements
+          ...projectionRequirements
             .filter((item) => item.docPath === path)
             .map((item) => Object.freeze({
               id: item.id,
               docAnchor: item.docAnchor,
               canonicalNodeRequired: true,
             })),
-          ...projectionIr.repositoryRequirements
+          ...projectRequirements
             .filter((item) => item.docPath === path)
             .map((item) => Object.freeze({
               id: item.id,
@@ -271,7 +278,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
         ];
     return auditMarkdownDocument({
       path,
-      mode: projectionIr.documentModes[path]!,
+      mode: documentModes[path]!,
       source,
       requirements,
       allowUnprojectedOwnedBlocks: proseMaterializationPending,
@@ -285,10 +292,11 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     stableAnchorCount: documents.reduce((sum, document) => sum + document.stableAnchorCount, 0),
     canonicalNodeCount: documents.reduce((sum, document) => sum + document.canonicalNodeCount, 0),
     nonCanonicalAnchorCount: documents.reduce((sum, document) => sum + document.nonCanonicalAnchorIds.length, 0),
-    requirementCount: projectionIr.requirements.length + projectionIr.repositoryRequirements.length,
-    currentNormativeRequirementCount: isV015 ? currentIr.requirements.length : projectionIr.requirements.length,
-    currentNormativeProjectedCount: isV015 ? projectedV015Count : projectionIr.requirements.length,
-    inheritedV014RequirementCount: isV015 ? projectionIr.requirements.length + projectionIr.repositoryRequirements.length : 0,
+    requirementCount: projectionRequirements.length + projectRequirements.length,
+    currentNormativeRequirementCount: currentIr.requirements.length,
+    currentNormativeProjectedCount: isV015 ? projectedV015Count : currentIr.requirements.length,
+    inheritedV014RequirementCount: isV015 ? projectionRequirements.length : 0,
+    currentProjectFactCount: projectRequirements.length,
     requirementBackedSectionCount: sections.filter((section) => section.knowledgeClass === "requirements-backed").length,
     ownedBlockCount: documents.reduce((sum, document) => sum + document.ownedBlockCount, 0),
     unanchoredHeadingCount: sections.filter((section) => section.anchorId === null).length,
@@ -301,7 +309,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     contract: currentIr.contract,
     projectionState: isV015
       ? "V015_ACCEPTED_48_NORMATIVE_ROWS_PROJECTED_FORMULA_MIGRATION_PENDING_1951"
-      : projectionIr.projectionState,
+      : historicalLawProjection.projectionState,
     proseMaterializationPending,
     documents: Object.freeze(documents),
     summary,

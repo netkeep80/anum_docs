@@ -355,6 +355,66 @@ try {
   const legacyV015RegistryPath = resolve(tempRoot, "requirements/mts-v0.15.json");
   const legacyV015RegistrySource = readFileSync(legacyV015RegistryPath, "utf8");
   const nativeRenderedBaseline = renderFormalNotationV015Markdown(tempRoot);
+  const historicalV014RegistryPath = resolve(tempRoot, "requirements/mts-v0.14.json");
+  const historicalV014RegistrySource = readFileSync(historicalV014RegistryPath, "utf8");
+
+  // G4-A2 FORMAL current-authority closure: historical project/document policy
+  // must not veto or alter the current accepted v0.15 FORMAL projection.
+  try {
+    const value = JSON.parse(historicalV014RegistrySource) as any;
+    const observatory = value.repositoryRequirements.find(
+      (item: any) => item.id === "README-OBSERVATORY",
+    );
+    assert.ok(observatory, "historical README-OBSERVATORY fixture exists");
+    observatory.url = "http://historical-project-field.invalid/";
+    writeFileSync(historicalV014RegistryPath, JSON.stringify(value), "utf8");
+    assert.equal(
+      renderFormalNotationV015Markdown(tempRoot),
+      nativeRenderedBaseline,
+      "G4-A2 FORMAL: historical README URL cannot veto/change current v0.15 rendering",
+    );
+    assert.deepEqual(
+      syncRepositoryDocs(tempRoot),
+      [],
+      "G4-A2 FORMAL: historical README URL cannot veto current docs-sync",
+    );
+  } finally {
+    writeFileSync(historicalV014RegistryPath, historicalV014RegistrySource, "utf8");
+  }
+
+  try {
+    const value = JSON.parse(historicalV014RegistrySource) as any;
+    assert.equal(value.documentSurface["PORTFOLIO.md"].mode, "source");
+    value.documentSurface["PORTFOLIO.md"].mode = "INVALID_HISTORICAL_MODE";
+    writeFileSync(historicalV014RegistryPath, JSON.stringify(value), "utf8");
+    assert.equal(
+      renderFormalNotationV015Markdown(tempRoot),
+      nativeRenderedBaseline,
+      "G4-A2 FORMAL: invalid historical documentSurface mode cannot veto/change current v0.15 rendering",
+    );
+    assert.deepEqual(
+      syncRepositoryDocs(tempRoot),
+      [],
+      "G4-A2 FORMAL: invalid historical documentSurface mode cannot veto current docs-sync",
+    );
+  } finally {
+    writeFileSync(historicalV014RegistryPath, historicalV014RegistrySource, "utf8");
+  }
+
+  try {
+    const value = JSON.parse(historicalV014RegistrySource) as any;
+    const law = value.requirements.find((item: any) => item.id === "V14-L2");
+    assert.ok(law, "historical V14-L2 fixture exists");
+    law.authority.pointer = "/requiredSemanticLaws/V14-L1";
+    writeFileSync(historicalV014RegistryPath, JSON.stringify(value), "utf8");
+    expectThrow(
+      () => renderFormalNotationV015Markdown(tempRoot),
+      /V14-L2 authority must point to its accepted contract law/,
+    );
+  } finally {
+    writeFileSync(historicalV014RegistryPath, historicalV014RegistrySource, "utf8");
+  }
+
   try {
     const value = JSON.parse(legacyV015RegistrySource) as any;
     value.requirements[0].summary = "legacy presentation summary mutation";

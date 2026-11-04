@@ -5,6 +5,7 @@ import { dirname, resolve } from "node:path";
 import {
   compileRequirementDocuments,
   loadCurrentProjectDocumentConfiguration,
+  loadHistoricalRequirementLawProjection,
   loadMtsSemanticIr,
   renderRequirementProjection,
   upsertRequirementProjection,
@@ -423,6 +424,7 @@ try {
   assert.equal(tempIr.contract, "mts-contract/v0.15");
 
   const historicalRegistrySource = readFileSync(resolve(tempRoot, registryPath), "utf8");
+  const historicalLawProjection = loadHistoricalRequirementLawProjection(tempRoot, registryPath);
 
   try {
     const historicalModeMutation = JSON.parse(historicalRegistrySource) as any;
@@ -432,6 +434,11 @@ try {
     assert.deepEqual(loadMtsSemanticIr(tempRoot).documentModes, ir.documentModes, "G4-A historical v0.14 mode mutation cannot change current v0.15 documentModes");
     assert.equal(loadMtsSemanticIr(tempRoot, registryPath).documentModes["PORTFOLIO.md"], "hybrid", "G4-A explicit historical v0.14 replay must still observe historical mode mutation");
     assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A historical v0.14 mode mutation cannot change current docs behavior");
+    assert.deepEqual(
+      loadHistoricalRequirementLawProjection(tempRoot, registryPath),
+      historicalLawProjection,
+      "G4-A2 F1 inherited law projection must ignore historical document mode mutation",
+    );
   } finally {
     writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
   }
@@ -449,6 +456,76 @@ try {
       "G4-A explicit historical v0.14 replay must still observe historical README mutation",
     );
     assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A historical v0.14 README mutation cannot change current generated README expectation");
+    assert.deepEqual(
+      loadHistoricalRequirementLawProjection(tempRoot, registryPath),
+      historicalLawProjection,
+      "G4-A2 F2 inherited law projection must ignore historical README project mutation",
+    );
+  } finally {
+    writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
+  }
+
+  try {
+    const invalidHistoricalReadmeUrl = JSON.parse(historicalRegistrySource) as any;
+    invalidHistoricalReadmeUrl.repositoryRequirements
+      .find((item: any) => item.id === "README-OBSERVATORY").url =
+      "http://netkeep80.github.io/anum_docs/";
+    writeRegistry(invalidHistoricalReadmeUrl);
+    assert.deepEqual(loadMtsSemanticIr(tempRoot), ir, "G4-A2 F3 invalid historical README URL cannot veto current IR");
+    assert.deepEqual(
+      loadHistoricalRequirementLawProjection(tempRoot, registryPath),
+      historicalLawProjection,
+      "G4-A2 F3 inherited law projection ignores historical README URL validation",
+    );
+    assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A2 F3 invalid historical README URL cannot veto current compile");
+    expect(
+      () => loadMtsSemanticIr(tempRoot, registryPath),
+      /absolute https URL/,
+      "G4-A2 F3 full historical replay remains strict",
+    );
+  } finally {
+    writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
+  }
+
+  try {
+    const historicalWithoutProjectRequirements = JSON.parse(historicalRegistrySource) as any;
+    delete historicalWithoutProjectRequirements.repositoryRequirements;
+    writeRegistry(historicalWithoutProjectRequirements);
+    assert.deepEqual(loadMtsSemanticIr(tempRoot), ir, "G4-A2 F4 missing historical repositoryRequirements cannot veto current IR");
+    assert.deepEqual(
+      loadHistoricalRequirementLawProjection(tempRoot, registryPath),
+      historicalLawProjection,
+      "G4-A2 F4 inherited law projection does not require historical repositoryRequirements",
+    );
+    assert.deepEqual(compileRequirementDocuments(tempRoot, false), [], "G4-A2 F4 missing historical repositoryRequirements cannot veto current compile");
+    expect(
+      () => loadMtsSemanticIr(tempRoot, registryPath),
+      /repositoryRequirements must be an array/,
+      "G4-A2 F4 full historical replay still requires historical project payload",
+    );
+  } finally {
+    writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
+  }
+
+  try {
+    const historicalLawProvenanceMutation = JSON.parse(historicalRegistrySource) as any;
+    historicalLawProvenanceMutation.requirements[0].authority.pointer = "/requiredSemanticLaws/V14-L2";
+    writeRegistry(historicalLawProvenanceMutation);
+    expect(
+      () => loadHistoricalRequirementLawProjection(tempRoot, registryPath),
+      /authority must point to its accepted contract law/,
+      "G4-A2 F5 inherited law projection must fail closed on historical law provenance mutation",
+    );
+    expect(
+      () => compileRequirementDocuments(tempRoot, false),
+      /authority must point to its accepted contract law/,
+      "G4-A2 F5 inherited current compilation must remain sensitive to historical law provenance",
+    );
+    expect(
+      () => loadMtsSemanticIr(tempRoot, registryPath),
+      /authority must point to its accepted contract law/,
+      "G4-A2 F5 full historical replay must remain sensitive to historical law provenance",
+    );
   } finally {
     writeFileSync(resolve(tempRoot, registryPath), historicalRegistrySource, "utf8");
   }

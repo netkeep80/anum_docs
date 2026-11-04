@@ -743,13 +743,18 @@ function loadAcceptedV015SemanticIr(
   });
 }
 
-export function loadMtsSemanticIr(
+export interface HistoricalRequirementLawProjection {
+  readonly projectionState: string;
+  readonly requirements: readonly MtsRequirementProjection[];
+}
+
+function loadLegacyMtsSemanticIr(
   root: string,
-  registryPath = MTS_REQUIREMENT_REGISTRY_PATH,
+  registryPath: string,
+  registry: JsonObject,
+  includeProjectConfiguration: boolean,
 ): MtsSemanticIr {
-  const registry = readJson(root, registryPath);
   const schema = string(registry.schema, `${registryPath}.schema`);
-  if (schema === "mts-requirement-registry/v0.3") return loadAcceptedV015SemanticIr(root, registryPath, registry);
   if (schema !== "mts-requirement-registry/v0.1" && schema !== "mts-requirement-registry/v0.2") {
     fail(`unsupported registry schema ${schema}`);
   }
@@ -788,19 +793,23 @@ export function loadMtsSemanticIr(
   const projectionState = typeof registry.projectionState === "string"
     ? registry.projectionState
     : "MATERIALIZED";
-  const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
-  const rawDocumentModes: Record<string, unknown> = {};
-  for (const [path, rawMode] of Object.entries(documentSurface)) {
-    const descriptor = object(rawMode, `${registryPath}.documentSurface.${path}`);
-    rawDocumentModes[path] = descriptor.mode;
-  }
-  const documentModes = validateDocumentModes(
-    root,
-    rawDocumentModes,
-    `${registryPath}.documentSurface`,
-  );
+  let documentModes: Readonly<Record<string, MarkdownDocumentMode>> = Object.freeze({});
+  let repositoryRequirements: readonly RepositoryRequirementProjection[] = Object.freeze([]);
+  if (includeProjectConfiguration) {
+    const documentSurface = object(registry.documentSurface, `${registryPath}.documentSurface`);
+    const rawDocumentModes: Record<string, unknown> = {};
+    for (const [path, rawMode] of Object.entries(documentSurface)) {
+      const descriptor = object(rawMode, `${registryPath}.documentSurface.${path}`);
+      rawDocumentModes[path] = descriptor.mode;
+    }
+    documentModes = validateDocumentModes(
+      root,
+      rawDocumentModes,
+      `${registryPath}.documentSurface`,
+    );
 
-  const repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
+    repositoryRequirements = loadRepositoryRequirements(root, registry, registryPath, documentModes);
+  }
 
   if (!Array.isArray(registry.requirements)) fail(`${registryPath}.requirements must be an array`);
   const rawRequirements = registry.requirements as unknown[];
@@ -868,7 +877,7 @@ export function loadMtsSemanticIr(
       }
     }
     if (!existsSync(resolve(root, docPath))) fail(`${id} doc projection target does not exist: ${docPath}`);
-    if (documentModes[docPath] !== "hybrid") {
+    if (includeProjectConfiguration && documentModes[docPath] !== "hybrid") {
       fail(`${id} doc projection target must be HYBRID, found ${documentModes[docPath] ?? "unclassified"}: ${docPath}`);
     }
 
@@ -910,6 +919,30 @@ export function loadMtsSemanticIr(
   });
 }
 
+export function loadHistoricalRequirementLawProjection(
+  root: string,
+  registryPath = "requirements/mts-v0.14.json",
+): HistoricalRequirementLawProjection {
+  const registry = readJson(root, registryPath);
+  const historical = loadLegacyMtsSemanticIr(root, registryPath, registry, false);
+  return Object.freeze({
+    projectionState: historical.projectionState,
+    requirements: historical.requirements,
+  });
+}
+
+export function loadMtsSemanticIr(
+  root: string,
+  registryPath = MTS_REQUIREMENT_REGISTRY_PATH,
+): MtsSemanticIr {
+  const registry = readJson(root, registryPath);
+  const schema = string(registry.schema, `${registryPath}.schema`);
+  if (schema === "mts-requirement-registry/v0.3") {
+    return loadAcceptedV015SemanticIr(root, registryPath, registry);
+  }
+  return loadLegacyMtsSemanticIr(root, registryPath, registry, true);
+}
+
 function marker(id: string, side: "начало" | "конец"): string {
   return `<!-- мтс:требование:${id}:${side} -->`;
 }
@@ -947,8 +980,11 @@ export function compileRequirementDocuments(root: string, write: boolean): strin
   // current document mutation policy and README project facts come only from
   // the current project/document configuration.
   const historicalOwnerIr = currentIr.schema === "mts-requirement-registry/v0.3"
-    ? loadMtsSemanticIr(root, "requirements/mts-v0.14.json")
-    : currentIr;
+    ? loadHistoricalRequirementLawProjection(root, "requirements/mts-v0.14.json")
+    : Object.freeze({
+        projectionState: currentIr.projectionState,
+        requirements: currentIr.requirements,
+      });
   if (historicalOwnerIr.projectionState === "ACCEPTED_OWNER_PROJECTION_PROSE_RECONSTRUCTION_PENDING_1585") {
     return [];
   }
