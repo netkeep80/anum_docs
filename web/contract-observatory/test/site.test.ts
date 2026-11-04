@@ -125,7 +125,7 @@ same(realMarkdownCoverage.proseMaterializationPending, false, "P5 has no pending
 same(realMarkdownCoverage.summary.requirementCount, 16, "P5 renders semantic + repository requirements");
 same(realMarkdownCoverage.summary.currentNormativeRequirementCount, 48, "P5 current accepted normative requirement count");
 same(realMarkdownCoverage.summary.currentNormativeProjectedCount, 48, "P5 all current requirements uniquely indexed");
-same(realMarkdownCoverage.summary.inheritedV014RequirementCount, 16, "P5 inherited v0.14 owner blocks distinct");
+same(realMarkdownCoverage.summary.inheritedV014RequirementCount, 14, "P5 inherited v0.14 Requirement-law blocks distinct");
 
 same(realMarkdownCoverage.summary.requirementBackedSectionCount, 16, "P5 materializes every projected requirement owner");
 same(realMarkdownCoverage.summary.ownedBlockCount, 16, "P5 exposes exactly one compiler-owned block per projected requirement");
