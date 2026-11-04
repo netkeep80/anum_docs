@@ -52,6 +52,8 @@ export interface MarkdownCoverageSummary {
   readonly currentNormativeProjectedCount: number;
   /** Historical inherited v0.14 Requirement-law blocks retained by owner. */
   readonly inheritedV014RequirementCount: number;
+  /** Current project/document facts projected as compiler-owned blocks. */
+  readonly currentProjectFactCount: number;
   readonly requirementBackedSectionCount: number;
   readonly ownedBlockCount: number;
   readonly unanchoredHeadingCount: number;
@@ -294,6 +296,7 @@ export function buildMarkdownCoverageAudit(root: string): MarkdownCoverageAudit 
     currentNormativeRequirementCount: currentIr.requirements.length,
     currentNormativeProjectedCount: isV015 ? projectedV015Count : currentIr.requirements.length,
     inheritedV014RequirementCount: isV015 ? projectionRequirements.length : 0,
+    currentProjectFactCount: projectRequirements.length,
     requirementBackedSectionCount: sections.filter((section) => section.knowledgeClass === "requirements-backed").length,
     ownedBlockCount: documents.reduce((sum, document) => sum + document.ownedBlockCount, 0),
     unanchoredHeadingCount: sections.filter((section) => section.anchorId === null).length,
