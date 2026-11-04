@@ -20,7 +20,7 @@ import { checkRepositoryDocs } from "../src/tooling/docs-sync.js";
 function repositoryRoot(): string {
   const candidates = [resolve(process.cwd(), ".."), process.cwd()];
   const root = candidates.find((candidate) =>
-    existsSync(resolve(candidate, "theorems", "current-v0.14.json")),
+    existsSync(resolve(candidate, "theorems", "current-v0.15.json")),
   );
   if (root === undefined) throw new Error("theorem catalog repository root not found");
   return root;
@@ -49,6 +49,8 @@ function main(): void {
     "catalog must disclose derived/no-proof-authority status",
   );
   assert.match(first, /Доказательная проекция в принятой `FORMAL v0\.15`:/i);
+  assert.match(first, /theorems\/current-v0\.15\.json.*Версия доказательного реестра: `v0\.15`/);
+  assert.match(first, /Исходный индекс теорем v0\.14: .*theorems\/current-v0\.14\.json/);
   const migratedCount = model.theorems.filter((item) => item.formalV015.migrationStatus === "FORMAL_MIGRATED").length;
   assert.ok(first.includes("`FORMAL v0.15`: `" + migratedCount + "` / `" + model.theorems.length + "`"),
     "theorem catalog must disclose measured, not inferred, FORMAL migration coverage");

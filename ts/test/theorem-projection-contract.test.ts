@@ -25,7 +25,7 @@ const REPO_GUARD_URL = "https://github.com/netkeep80/repo-guard.git";
 function repositoryRoot(): string {
   const candidates = [resolve(process.cwd(), ".."), process.cwd()];
   const root = candidates.find((candidate) =>
-    existsSync(resolve(candidate, "theorems", "current-v0.14.json")),
+    existsSync(resolve(candidate, "theorems", "current-v0.15.json")),
   );
   if (root === undefined) throw new Error("theorem projection repository root not found");
   return root;
@@ -68,12 +68,13 @@ function run(command: string, args: readonly string[], cwd?: string): string {
 
 async function main(): Promise<void> {
   const root = repositoryRoot();
-  const current = readJson(root, "theorems/current-v0.14.json");
+  const current = readJson(root, "theorems/current-v0.15.json");
   const provers = readJson(root, "proofs/provers.json");
   const acceptedContract = readJson(root, "contracts/mts-contract-v0.14.json");
 
   assert.equal(current.schema, "mts-current-theorem-index/v0.1");
-  assert.equal(current.mtsVersion, "v0.14");
+  assert.equal(current.mtsVersion, "v0.15");
+  assert.equal(current.sourceInventory, "theorems/current-v0.14.json");
   assert.equal(current.theorems.length, 21);
 
   assert.equal(
@@ -83,6 +84,7 @@ async function main(): Promise<void> {
   assert.deepEqual(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.fixedSources,
     [
+      "theorems/current-v0.15.json",
       "theorems/current-v0.14.json",
       "theorems/formal-v0.15.json",
       "proofs/provers.json",
@@ -153,6 +155,10 @@ async function main(): Promise<void> {
       );
     }
   }
+  assert.equal(
+    THEOREM_CATALOG_INTEGRATION_CONTRACT.authority.theoremInventory,
+    "theorems/current-v0.15.json",
+  );
   assert.equal(
     THEOREM_CATALOG_INTEGRATION_CONTRACT.authority.semanticLawInventory,
     "contracts/mts-contract-v0.14.json",

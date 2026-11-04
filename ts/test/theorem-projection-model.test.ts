@@ -10,7 +10,7 @@ import {
 function repositoryRoot(): string {
   const candidates = [resolve(process.cwd(), ".."), process.cwd()];
   const root = candidates.find((candidate) =>
-    existsSync(resolve(candidate, "theorems", "current-v0.14.json")),
+    existsSync(resolve(candidate, "theorems", "current-v0.15.json")),
   );
   if (root === undefined) throw new Error("theorem projection repository root not found");
   return root;
@@ -40,12 +40,16 @@ function main(): void {
     "projection model must be byte-deterministic under repeated load",
   );
   assert.equal(first.schema, "mts-theorem-projection-model/v0.5");
-  assert.equal(first.mtsVersion, "v0.14");
-  assert.equal(first.sourceInventory, "theorems/current-v0.14.json");
+  assert.equal(first.mtsVersion, "v0.15");
+  assert.equal(first.sourceInventory, "theorems/current-v0.15.json");
   assert.equal(first.formalOverlay, "theorems/formal-v0.15.json");
   assert.equal(first.formalCandidateVersion, "v0.15-candidate");
   assert.equal(first.theorems.length, 21);
   assert.equal(first.candidateProofs.length, 17);
+  assert.equal(first.theorems.filter((theorem) => theorem.formalV015.formalArtifactKind === "CLOSED_PROOF").length, 1);
+  assert.equal(first.theorems.filter((theorem) => theorem.formalV015.formalArtifactKind === "OPEN_PROOF").length, 2);
+  assert.equal(first.theorems.filter((theorem) => theorem.formalV015.formalArtifactKind === "KERNEL_REALIZATION").length, 2);
+  assert.equal(first.theorems.filter((theorem) => theorem.formalV015.formalArtifactKind === "STATEMENT_ONLY").length, 16);
   assert.deepEqual(
     first.candidateProofs.map((proof) => proof.id),
     [

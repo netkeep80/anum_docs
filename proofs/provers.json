@@ -58,6 +58,6 @@
     "proof evidence records require exact MTS source and prover source/toolchain provenance",
     "stored JSON, hashes, caches, theorem names and UI state are never proof truth"
   ],
-  "currentTheoremIndex": "theorems/current-v0.14.json",
+  "currentTheoremIndex": "theorems/current-v0.15.json",
   "historicalTheoremRegistry": "theorems/registry.json"
 }

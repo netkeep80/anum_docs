@@ -39,8 +39,13 @@ const referencedSet = new Set(plan.machineReferencedSourceTests);
 const historicalAcceptedSet = new Set(plan.historicalAcceptedEvidenceSourceTests);
 
 assert.ok(
+  plan.authoritySources.includes("theorems/current-v0.15.json"),
+  "current v0.15 theorem capsule participates in current test-tier authority",
+);
+assert.equal(
   plan.authoritySources.includes("theorems/current-v0.14.json"),
-  "current theorem projection participates in current test-tier authority",
+  false,
+  "historical v0.14 theorem index must not control current test-tier selection",
 );
 assert.equal(
   plan.authoritySources.includes("theorems/registry.json"),
@@ -157,6 +162,7 @@ try {
     "contracts/mts-conformance-v0.15.json",
     "cutover/typescript-c1-acceptance-v0.8.json",
     "proofs/provers.json",
+    "theorems/current-v0.15.json",
     "theorems/current-v0.14.json",
   ]) {
     copy(path);
@@ -191,6 +197,70 @@ try {
     plan,
     "isolated accepted fixture must reproduce the real repository test-tier plan",
   );
+
+  const selectorResearchTest = "ts/test/research-v013-explicit-zero-image-a72y.test.ts";
+  assert.ok(
+    fixturePlan.currentSourceTests.includes(selectorResearchTest),
+    "selector falsifier research test is current before mutation",
+  );
+
+  const removeExactReference = (value: any, target: string): number => {
+    if (Array.isArray(value)) {
+      let removed = 0;
+      for (let index = value.length - 1; index >= 0; index -= 1) {
+        if (value[index] === target) {
+          value.splice(index, 1);
+          removed += 1;
+        } else {
+          removed += removeExactReference(value[index], target);
+        }
+      }
+      return removed;
+    }
+    if (value !== null && typeof value === "object") {
+      let removed = 0;
+      for (const item of Object.values(value)) {
+        removed += removeExactReference(item, target);
+      }
+      return removed;
+    }
+    return 0;
+  };
+
+  const historicalTheoremPath = resolve(fixtureRoot, "theorems/current-v0.14.json");
+  const historicalTheoremSource = readFileSync(historicalTheoremPath, "utf8");
+  const historicalTheoremMutation = JSON.parse(historicalTheoremSource) as any;
+  assert.equal(removeExactReference(historicalTheoremMutation, selectorResearchTest), 2);
+  writeFileSync(historicalTheoremPath, JSON.stringify(historicalTheoremMutation), "utf8");
+  assert.deepEqual(
+    buildTestTierPlan(fixtureRoot),
+    fixturePlan,
+    "F1: historical v0.14 theorem-index mutation must not alter current theorem/test selection",
+  );
+  writeFileSync(historicalTheoremPath, historicalTheoremSource, "utf8");
+
+  const currentTheoremPath = resolve(fixtureRoot, "theorems/current-v0.15.json");
+  const currentTheoremSource = readFileSync(currentTheoremPath, "utf8");
+  const currentTheoremMutation = JSON.parse(currentTheoremSource) as any;
+  assert.equal(removeExactReference(currentTheoremMutation, selectorResearchTest), 2);
+  writeFileSync(currentTheoremPath, JSON.stringify(currentTheoremMutation), "utf8");
+  const selectorMutationPlan = buildTestTierPlan(fixtureRoot);
+  assert.equal(
+    selectorMutationPlan.currentSourceTests.includes(selectorResearchTest),
+    false,
+    "F2: current v0.15 capsule mutation must remove the theorem-only research test from CURRENT",
+  );
+  assert.equal(
+    selectorMutationPlan.currentSourceTests.length,
+    fixturePlan.currentSourceTests.length - 1,
+    "F2: current selector mutation changes exactly one current-tier member",
+  );
+  assert.equal(
+    selectorMutationPlan.machineReferencedSourceTests.length,
+    fixturePlan.machineReferencedSourceTests.length - 1,
+    "F2: current selector mutation changes exactly one machine reference",
+  );
+  writeFileSync(currentTheoremPath, currentTheoremSource, "utf8");
 
   const policyPath = resolve(fixtureRoot, "repo-policy.json");
   const policySource = JSON.stringify({

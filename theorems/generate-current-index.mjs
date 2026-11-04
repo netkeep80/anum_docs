@@ -33,7 +33,7 @@ function sameSet(actual, expected, label) {
   }
 }
 
-function buildCurrentIndex(root) {
+function buildHistoricalIndex(root) {
   const p0Path = "theorems/p0-v0.14.json";
   const assurancePath = "proofs/external-proof-assurance.json";
   const evidenceRoot = "proofs/evidence";
@@ -131,19 +131,77 @@ function buildCurrentIndex(root) {
   };
 }
 
+function buildCurrentV015Index(root, historicalIndex) {
+  const historicalPath = "theorems/current-v0.14.json";
+  const formalOverlayPath = "theorems/formal-v0.15.json";
+  const overlay = readJson(root, formalOverlayPath);
+
+  if (overlay.schema !== "mts-formal-theorem-overlay/v0.4") {
+    fail("unexpected FORMAL v0.15 theorem overlay schema");
+  }
+  if (overlay.authority !== "formal-migration-descriptor-only") {
+    fail("FORMAL v0.15 theorem overlay must remain descriptor-only");
+  }
+  if (overlay.baseInventory !== historicalPath) {
+    fail("FORMAL v0.15 theorem overlay base inventory mismatch");
+  }
+  if (overlay.mtsVersion !== "v0.15-candidate") {
+    fail("unexpected FORMAL v0.15 theorem overlay version");
+  }
+
+  const historicalIds = historicalIndex.theorems.map((theorem) => String(theorem.id));
+  const entries = Array.isArray(overlay.entries) ? overlay.entries : [];
+  const overlayIds = entries.map((entry) => String(entry.id));
+  if (new Set(overlayIds).size !== overlayIds.length) {
+    fail("duplicate theorem ID in FORMAL v0.15 overlay");
+  }
+  sameSet(overlayIds, historicalIds, "FORMAL v0.15 theorem overlay ID set");
+  for (const entry of entries) {
+    if (entry.migrationStatus !== "FORMAL_MIGRATED") {
+      fail(`current v0.15 theorem capsule requires FORMAL_MIGRATED descriptor for ${entry.id}`);
+    }
+  }
+
+  return {
+    schema: historicalIndex.schema,
+    authority: historicalIndex.authority,
+    mtsVersion: "v0.15",
+    sourceInventory: historicalPath,
+    historicalSourceInventory: historicalIndex.sourceInventory,
+    premiseClassification: historicalIndex.premiseClassification,
+    formalOverlay: formalOverlayPath,
+    externalProofAssurance: historicalIndex.externalProofAssurance,
+    evidenceRoot: historicalIndex.evidenceRoot,
+    historicalRegistry: historicalIndex.historicalRegistry,
+    theorems: historicalIndex.theorems,
+  };
+}
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const outputPath = resolve(root, "theorems", "current-v0.14.json");
-const serialized = JSON.stringify(buildCurrentIndex(root)) + "\n";
+const historicalOutputPath = resolve(root, "theorems", "current-v0.14.json");
+const currentOutputPath = resolve(root, "theorems", "current-v0.15.json");
+const historicalIndex = buildHistoricalIndex(root);
+const currentIndex = buildCurrentV015Index(root, historicalIndex);
+const historicalSerialized = JSON.stringify(historicalIndex) + "\n";
+const currentSerialized = JSON.stringify(currentIndex) + "\n";
 const mode = process.argv[2] ?? "--check";
 
+function checkGenerated(path, serialized, label) {
+  if (!existsSync(path)) fail(`generated ${label} index is missing`);
+  const actual = readFileSync(path, "utf8");
+  if (actual !== serialized) {
+    fail(`generated ${label} index is stale; run node theorems/generate-current-index.mjs --write`);
+  }
+}
+
 if (mode === "--write") {
-  writeFileSync(outputPath, serialized, "utf8");
-  console.log("current-theorem-index: wrote theorems/current-v0.14.json");
+  writeFileSync(historicalOutputPath, historicalSerialized, "utf8");
+  writeFileSync(currentOutputPath, currentSerialized, "utf8");
+  console.log("current-theorem-index: wrote historical v0.14 index and current v0.15 capsule");
 } else if (mode === "--check") {
-  if (!existsSync(outputPath)) fail("generated current index is missing");
-  const actual = readFileSync(outputPath, "utf8");
-  if (actual !== serialized) fail("generated current index is stale; run node theorems/generate-current-index.mjs --write");
-  console.log("current-theorem-index: GREEN current=P0-v0.14 historical-registry=inactive");
+  checkGenerated(historicalOutputPath, historicalSerialized, "historical v0.14");
+  checkGenerated(currentOutputPath, currentSerialized, "current v0.15");
+  console.log("current-theorem-index: GREEN current=v0.15 historical=v0.14 provenance-preserved");
 } else {
   fail("usage: generate-current-index.mjs [--check|--write]");
 }

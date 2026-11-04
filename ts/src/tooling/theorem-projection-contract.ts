@@ -6,6 +6,7 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
     entrypoint: "repo-guard/dist/projection-api.mjs",
   }),
   fixedSources: Object.freeze([
+    "theorems/current-v0.15.json",
     "theorems/current-v0.14.json",
     "theorems/formal-v0.15.json",
     "proofs/provers.json",
@@ -70,7 +71,7 @@ export const THEOREM_CATALOG_INTEGRATION_CONTRACT = Object.freeze({
     ]),
   }),
   authority: Object.freeze({
-    theoremInventory: "theorems/current-v0.14.json",
+    theoremInventory: "theorems/current-v0.15.json",
     formalOverlay: "theorems/formal-v0.15.json",
     laneRoles: "proofs/provers.json",
     externalAssurance: "proofs/external-proof-assurance.json",
