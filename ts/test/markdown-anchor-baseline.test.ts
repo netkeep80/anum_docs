@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 import { findRepositoryRoot } from "../src/tooling/docs-sync.js";
+import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
+import { loadMtsSemanticIr } from "../src/tooling/mts-compiler.js";
+import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
 import {
   auditRepositoryStableAnchors,
   auditStableAnchorDocuments,
@@ -15,9 +21,33 @@ const baselineCount = Object.values(baseline.anchorsByDocument)
   .reduce((sum, ids) => sum + ids.length, 0);
 
 assert.equal(baseline.schema, "mts-markdown-stable-anchor-baseline/v0.1");
+assert.equal(baseline.capturedMain, "af264da1d844f9b5949df34f829ed87ba24d722b");
+assert.equal(baseline.sourceContract, "mts-contract/v0.13");
 assert.equal(baseline.allowAdditionalAnchors, true);
-assert.equal(baselinePaths.length, 12, "baseline covers the registered Markdown surface");
+assert.equal(baseline.migrationPolicy, "explicit-baseline-update-required-for-remove-move-or-rekey");
+assert.equal(baselinePaths.length, 12, "baseline preserves 12 historical document owners");
 assert.equal(baselineCount, 40, "all pre-reconstruction stable anchors are pinned");
+
+const currentDocumentPaths = Object.keys(loadMtsSemanticIr(root).documentModes).sort();
+assert.equal(currentDocumentPaths.length, 12, "current project/document carrier has 12 documents");
+assert.deepEqual(
+  currentDocumentPaths,
+  baselinePaths,
+  "current document membership and baseline ownership remain independently equal",
+);
+
+const observedMarkdownSurface = new Set(listRepositoryMarkdownSurface(root));
+for (const path of currentDocumentPaths) {
+  assert.ok(observedMarkdownSurface.has(path), `current configured document is observed on filesystem: ${path}`);
+}
+assert.ok(
+  observedMarkdownSurface.has(THEOREM_CATALOG_PATH),
+  "generated theorem catalog remains independently observed Markdown",
+);
+assert.ok(
+  !currentDocumentPaths.includes(THEOREM_CATALOG_PATH),
+  "theorem catalog observation does not make it current project/document membership",
+);
 assert.equal(baseline.anchorsByDocument["docs/specs/Апамять и управление сетью связей.md"]?.length, 13);
 assert.equal(baseline.anchorsByDocument["docs/specs/Ачисла и сериализация.md"]?.length, 17);
 assert.equal(baseline.anchorsByDocument["docs/specs/Формальная нотация МТС.md"]?.length, 10);
@@ -26,6 +56,42 @@ assert.deepEqual(
   [],
   "repository preserves every baseline stable anchor",
 );
+
+const fixtureRoot = mkdtempSync(join(tmpdir(), "anum-docs-g4b-"));
+try {
+  for (const path of ["requirements", "contracts", "traceability", "cutover", "docs"]) {
+    cpSync(resolve(root, path), resolve(fixtureRoot, path), { recursive: true });
+  }
+  for (const path of ["README.md", "PORTFOLIO.md"]) {
+    cpSync(resolve(root, path), resolve(fixtureRoot, path));
+  }
+
+  const historicalRegistryPath = resolve(fixtureRoot, "requirements/mts-v0.13.json");
+  const currentBefore = loadMtsSemanticIr(fixtureRoot).documentModes;
+  const auditBefore = auditRepositoryStableAnchors(fixtureRoot);
+  const historicalRegistry = JSON.parse(readFileSync(historicalRegistryPath, "utf8")) as {
+    documentSurface: Record<string, unknown>;
+  };
+  assert.ok(
+    Object.hasOwn(historicalRegistry.documentSurface, "PORTFOLIO.md"),
+    "G4-B historical mutation fixture starts from accepted v0.13 membership",
+  );
+  delete historicalRegistry.documentSurface["PORTFOLIO.md"];
+  writeFileSync(historicalRegistryPath, `${JSON.stringify(historicalRegistry, null, 2)}\n`, "utf8");
+
+  assert.deepEqual(
+    loadMtsSemanticIr(fixtureRoot).documentModes,
+    currentBefore,
+    "G4-B F1 historical v0.13 membership mutation cannot change current document membership",
+  );
+  assert.deepEqual(
+    auditRepositoryStableAnchors(fixtureRoot),
+    auditBefore,
+    "G4-B F1 historical v0.13 membership mutation cannot change stable-anchor repository audit",
+  );
+} finally {
+  rmSync(fixtureRoot, { recursive: true, force: true });
+}
 
 function sourceFor(ids: readonly string[]): string {
   return ids.map((id, index) => [
@@ -121,10 +187,10 @@ assert.ok(
 );
 
 assert.ok(
-  auditStableAnchorDocuments(baseline, baselinePaths.slice(1), documents).some(
+  auditStableAnchorDocuments(baseline, currentDocumentPaths.slice(1), documents).some(
     (entry) => entry.code === "surface-mismatch",
   ),
-  "registered document surface drift is explicit",
+  "G4-B F2 current membership drift against independent baseline ownership fails closed",
 );
 
 assert.throws(
