@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
+  loadHistoricalRequirementLawProjection,
   loadMtsSemanticIr,
   renderRequirementProjectionBody,
 } from "./mts-compiler.js";
@@ -196,8 +197,11 @@ export function renderFormalNotationV015Markdown(root: string): string {
     currentIr.requirements.map((item) => [item.id, item.statement] as const),
   );
 
-  const historicalIr = loadMtsSemanticIr(root, "requirements/mts-v0.14.json");
-  const historical = historicalIr.requirements.find((item) => item.id === "V14-L2");
+  const historicalLawProjection = loadHistoricalRequirementLawProjection(
+    root,
+    "requirements/mts-v0.14.json",
+  );
+  const historical = historicalLawProjection.requirements.find((item) => item.id === "V14-L2");
   if (historical === undefined) fail("historical V14-L2 projection missing");
 
   const stableAnchors = strings(model.stableAnchors, "stableAnchors");
