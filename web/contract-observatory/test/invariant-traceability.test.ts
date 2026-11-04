@@ -1,5 +1,5 @@
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { buildContractObservatoryIndex } from "../src/contract-index.js";
 import { buildMethodologyProjection, type MethodologyProjection } from "../src/methodology-projection.js";
@@ -229,7 +229,24 @@ try {
   for (const directory of ["contracts", "requirements", "traceability", "cutover"] as const) {
     cpSync(join(repositoryRoot, directory), join(fixtureRoot, directory), { recursive: true });
   }
-  cpSync(join(repositoryRoot, "README.md"), join(fixtureRoot, "README.md"));
+  for (const markdownPath of [
+    "README.md",
+    "PORTFOLIO.md",
+    "docs/CONTRIBUTING.md",
+    "docs/research/Исходные мысли МТС.md",
+    "docs/research/Новое осмысление МТС.md",
+    "docs/specs/Апамять и управление сетью связей.md",
+    "docs/specs/Ачисла и сериализация.md",
+    "docs/specs/Пучки связей.md",
+    "docs/specs/Формальная нотация МТС.md",
+    "docs/theory/Основания МТС.md",
+    "docs/theory/Система аксиом МТС.md",
+    "docs/Словарь терминов МТС.md",
+  ] as const) {
+    const target = join(fixtureRoot, markdownPath);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(repositoryRoot, markdownPath), target);
+  }
   mkdirSync(join(fixtureRoot, "ts", "node_modules"), { recursive: true });
   cpSync(join(repositoryRoot, "ts", "dist"), join(fixtureRoot, "ts", "dist"), { recursive: true });
   cpSync(
