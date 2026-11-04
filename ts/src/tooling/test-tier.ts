@@ -10,9 +10,14 @@ export interface TestTierPlan {
   readonly allSourceTests: readonly string[];
   readonly currentSourceTests: readonly string[];
   readonly historicalResearchSourceTests: readonly string[];
+  readonly historicalAcceptedEvidenceSourceTests: readonly string[];
   readonly machineReferencedSourceTests: readonly string[];
   readonly authoritySources: readonly string[];
 }
+
+const HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS = Object.freeze([
+  "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+] as const);
 
 function fail(message: string): never {
   throw new Error(`test-tier: ${message}`);
@@ -72,22 +77,40 @@ export function classifyTestPaths(
   }
 
   const referencedSet = new Set(referenced);
-  const current = all.filter((path) => !isResearchTest(path) || referencedSet.has(path));
-  const historical = all.filter((path) => isResearchTest(path) && !referencedSet.has(path));
+  const historicalAcceptedEvidence = all.filter((path) =>
+    HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS.includes(
+      path as (typeof HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)[number],
+    )
+  );
+  const historicalAcceptedEvidenceSet = new Set(historicalAcceptedEvidence);
+  const current = all.filter((path) =>
+    !historicalAcceptedEvidenceSet.has(path) &&
+    (!isResearchTest(path) || referencedSet.has(path))
+  );
+  const historicalResearch = all.filter((path) =>
+    !historicalAcceptedEvidenceSet.has(path) &&
+    isResearchTest(path) &&
+    !referencedSet.has(path)
+  );
 
   if (current.length === 0) fail("current tier is empty");
-  if (current.length + historical.length !== all.length) {
-    fail("current + historical partition does not cover full test set");
+  if (current.length + historicalResearch.length + historicalAcceptedEvidence.length !== all.length) {
+    fail("current + historical research + historical accepted evidence partition does not cover full test set");
   }
-  for (const path of historical) {
-    if (!isResearchTest(path)) fail(`non-research test excluded from current tier: ${path}`);
+  for (const path of historicalResearch) {
+    if (!isResearchTest(path)) fail(`non-research test excluded as historical research: ${path}`);
     if (referencedSet.has(path)) fail(`machine-referenced test excluded from current tier: ${path}`);
+  }
+  for (const path of historicalAcceptedEvidence) {
+    if (isResearchTest(path)) fail(`historical accepted evidence test must not be research-prefixed: ${path}`);
+    if (referencedSet.has(path)) fail(`machine-referenced historical accepted evidence test excluded from current tier: ${path}`);
   }
 
   return Object.freeze({
     allSourceTests: Object.freeze(all),
     currentSourceTests: Object.freeze(current),
-    historicalResearchSourceTests: Object.freeze(historical),
+    historicalResearchSourceTests: Object.freeze(historicalResearch),
+    historicalAcceptedEvidenceSourceTests: Object.freeze(historicalAcceptedEvidence),
     machineReferencedSourceTests: Object.freeze(referenced),
   });
 }
@@ -148,6 +171,12 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
   }
 
   const classified = classifyTestPaths(allSourceTests, [...references]);
+  if (
+    JSON.stringify(classified.historicalAcceptedEvidenceSourceTests) !==
+    JSON.stringify(HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)
+  ) {
+    fail("historical accepted evidence test set differs from the exact immutable allowlist");
+  }
   return Object.freeze({
     ...classified,
     authoritySources: Object.freeze([
