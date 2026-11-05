@@ -450,6 +450,11 @@ interface NativeV015RequirementAuthority {
   readonly relationCount: number;
 }
 
+export interface CurrentNativeVerificationProjection {
+  readonly verifiedByArtifactPaths: readonly string[];
+  readonly verifiedByTestPaths: readonly string[];
+}
+
 function fields(
   value: JsonObject,
   required: readonly string[],
@@ -638,6 +643,32 @@ function loadNativeV015RequirementAuthority(root: string): readonly NativeV015Re
     fail(`native v0.15 depends_on count ${dependsOnCount} differs from accepted ${NATIVE_V015_DEPENDS_ON_COUNT}`);
   }
   return Object.freeze(requirements);
+}
+
+/**
+ * G11-S2 execution-authority projection.
+ *
+ * The strict native .rg loader above remains the single parser/validation path.
+ * This projection only flattens accepted native verified_by artifact targets and
+ * identifies the flat ts/test/*.test.ts subset used by the CURRENT selector.
+ * No legacy registry, traceability, conformance or theorem surface can repair or
+ * supplement this native execution-owner projection.
+ */
+export function loadCurrentNativeVerificationProjection(
+  repositoryRoot: string,
+): CurrentNativeVerificationProjection {
+  const requirements = loadNativeV015RequirementAuthority(repositoryRoot);
+  const verifiedByArtifactPaths = Object.freeze(
+    [...new Set(requirements.flatMap((requirement) => requirement.verifiedBy))]
+      .sort((left, right) => left.localeCompare(right, "en")),
+  );
+  const verifiedByTestPaths = Object.freeze(
+    verifiedByArtifactPaths.filter((path) => /^ts\/test\/[^/]+\.test\.ts$/.test(path)),
+  );
+  return Object.freeze({
+    verifiedByArtifactPaths,
+    verifiedByTestPaths,
+  });
 }
 
 function loadAcceptedV015SemanticIr(
