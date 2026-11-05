@@ -68,31 +68,48 @@ const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ]);
 
-const EXPECTED_BOUNDED: readonly { readonly path: string; readonly sunset: string }[] = Object.freeze([]);
-// G14 RED-first: these exact role assertions must fail against the pre-fix 5/3 production partition.
+const EXPECTED_BOUNDED_CURRENTIZATION: readonly string[] = Object.freeze([]);
+// G14 RED-first: these exact role assertions fail against the pre-fix 5/3 production partition.
+
+const PRE_G14_CURRENT_ASSURANCE = Object.freeze(
+  EXPECTED_CURRENT_ASSURANCE.filter(
+    (path) => !G14_TRANSITIONED_CURRENT_ASSURANCE.includes(path),
+  ),
+);
+
+const EXPECTED_PRE_G14_CURRENT = Object.freeze(
+  [...new Set([
+    ...EXPECTED_NATIVE_VERIFIED_BY,
+    ...PRE_G14_CURRENT_ASSURANCE,
+    ...G14_TRANSITIONED_CURRENT_ASSURANCE,
+  ])].sort(),
+);
 
 const EXPECTED_TARGET_CURRENT = Object.freeze(
   [...new Set([
     ...EXPECTED_NATIVE_VERIFIED_BY,
     ...EXPECTED_CURRENT_ASSURANCE,
-    ...EXPECTED_BOUNDED.map((item) => item.path),
+    ...EXPECTED_BOUNDED_CURRENTIZATION,
   ])].sort(),
 );
 
 assert.equal(EXPECTED_NATIVE_VERIFIED_BY.length, 35);
+assert.equal(PRE_G14_CURRENT_ASSURANCE.length, 5);
 assert.equal(EXPECTED_CURRENT_ASSURANCE.length, 8);
-assert.equal(EXPECTED_BOUNDED.length, 0);
+assert.equal(EXPECTED_BOUNDED_CURRENTIZATION.length, 0);
+assert.equal(EXPECTED_PRE_G14_CURRENT.length, 43);
 assert.equal(EXPECTED_TARGET_CURRENT.length, 43);
+assert.deepEqual(
+  EXPECTED_TARGET_CURRENT,
+  EXPECTED_PRE_G14_CURRENT,
+  "G14 sunset changes lifecycle roles only; exact CURRENT membership is byte/logically identical",
+);
 
 const plan = buildTestTierPlan(repositoryRoot);
 const executionPlan = plan as typeof plan & {
   readonly nativeVerifiedByCurrentSourceTests: readonly string[];
   readonly currentAssuranceSourceTests: readonly string[];
   readonly boundedCurrentizationSourceTests: readonly string[];
-  readonly boundedCurrentizationTests: readonly {
-    readonly path: string;
-    readonly sunset: string;
-  }[];
   readonly evidenceRoutingSources: readonly string[];
 };
 
@@ -112,13 +129,8 @@ assert.deepEqual(
 );
 assert.deepEqual(
   executionPlan.boundedCurrentizationSourceTests,
-  EXPECTED_BOUNDED.map((item) => item.path).sort(),
+  EXPECTED_BOUNDED_CURRENTIZATION,
   "G14 sunset: bounded currentization owner set is empty",
-);
-assert.deepEqual(
-  executionPlan.boundedCurrentizationTests,
-  EXPECTED_BOUNDED,
-  "G14 sunset: obsolete bounded-currentization metadata is retired",
 );
 
 for (const path of G14_TRANSITIONED_CURRENT_ASSURANCE) {
