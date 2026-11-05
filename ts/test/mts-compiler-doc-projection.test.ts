@@ -1000,6 +1000,15 @@ try {
 }
 
 
+// G11-S2 RED-1: the old non-research default must die before the new compiler API is exercised.
+const g11S2PreImplementationPlan =
+  (await import("../src/tooling/test-tier.js")).buildTestTierPlan(root);
+assert.equal(
+  g11S2PreImplementationPlan.currentSourceTests.includes("ts/test/v016-functional-formal-t09.test.ts"),
+  false,
+  "G11-S2 RED-1: v016 development witness must be FULL-only despite non-research filename",
+);
+
 // G11-S2 RED-10: expose native verified_by through the existing strict native parser.
 const g11S2CompilerModule = await import("../src/tooling/mts-compiler.js");
 const g11S2ProjectionLoaderUnknown =
