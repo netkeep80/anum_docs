@@ -68,7 +68,7 @@ const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ]);
 
-const EXPECTED_BOUNDED = Object.freeze([] as const);
+const EXPECTED_BOUNDED: readonly { readonly path: string; readonly sunset: string }[] = Object.freeze([]);
 // G14 RED-first: these exact role assertions must fail against the pre-fix 5/3 production partition.
 
 const EXPECTED_TARGET_CURRENT = Object.freeze(
