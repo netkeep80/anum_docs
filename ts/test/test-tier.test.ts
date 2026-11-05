@@ -13,6 +13,9 @@ import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js
 const repositoryRoot = resolve("..");
 const plan = buildTestTierPlan(repositoryRoot);
 
+assert.equal(plan.allSourceTests.length, 569, "F5: exact full-tier membership remains 569");
+assert.equal(plan.currentSourceTests.length, 370, "F5: exact current-tier membership remains 370");
+assert.equal(plan.machineReferencedSourceTests.length, 111, "F5: exact evidence-reference diagnostic remains 111");
 assert.ok(plan.allSourceTests.length > 0, "full tier is non-empty");
 assert.ok(plan.currentSourceTests.length > 0, "current tier is non-empty");
 assert.ok(
@@ -247,18 +250,76 @@ try {
   const selectorMutationPlan = buildTestTierPlan(fixtureRoot);
   assert.equal(
     selectorMutationPlan.currentSourceTests.includes(selectorResearchTest),
-    false,
-    "F2: current v0.15 capsule mutation must remove the theorem-only research test from CURRENT",
+    true,
+    "F2: current theorem evidence-coordinate mutation must not demote an accepted transitional-current research test",
   );
   assert.equal(
     selectorMutationPlan.currentSourceTests.length,
-    fixturePlan.currentSourceTests.length - 1,
-    "F2: current selector mutation changes exactly one current-tier member",
+    fixturePlan.currentSourceTests.length,
+    "F2: current theorem evidence-coordinate mutation must not change CURRENT membership",
   );
   assert.equal(
     selectorMutationPlan.machineReferencedSourceTests.length,
     fixturePlan.machineReferencedSourceTests.length - 1,
-    "F2: current selector mutation changes exactly one machine reference",
+    "F2: current theorem evidence-coordinate mutation still changes the evidence-reference diagnostic",
+  );
+  writeFileSync(currentTheoremPath, currentTheoremSource, "utf8");
+
+  const conformanceOnlyResearchTest = "ts/test/research-v012-interpreter-delta-c2.test.ts";
+  assert.ok(
+    fixturePlan.currentSourceTests.includes(conformanceOnlyResearchTest),
+    "F3: conformance-only transitional research witness is current before evidence mutation",
+  );
+  const conformanceFixturePath = resolve(fixtureRoot, "contracts/mts-conformance-v0.15.json");
+  const conformanceSource = readFileSync(conformanceFixturePath, "utf8");
+  const conformanceMutation = JSON.parse(conformanceSource) as any;
+  assert.ok(
+    removeExactReference(conformanceMutation, conformanceOnlyResearchTest) > 0,
+    "F3: fixture must contain the conformance-only evidence coordinate",
+  );
+  writeFileSync(conformanceFixturePath, JSON.stringify(conformanceMutation), "utf8");
+  const conformanceMutationPlan = buildTestTierPlan(fixtureRoot);
+  assert.equal(
+    conformanceMutationPlan.currentSourceTests.includes(conformanceOnlyResearchTest),
+    true,
+    "F3: conformance evidence-coordinate mutation must not demote the transitional-current research test",
+  );
+  assert.equal(
+    conformanceMutationPlan.currentSourceTests.length,
+    fixturePlan.currentSourceTests.length,
+    "F3: conformance evidence-coordinate mutation must not change CURRENT membership",
+  );
+  assert.equal(
+    conformanceMutationPlan.machineReferencedSourceTests.length,
+    fixturePlan.machineReferencedSourceTests.length - 1,
+    "F3: conformance evidence-coordinate mutation changes only the evidence-reference diagnostic",
+  );
+  writeFileSync(conformanceFixturePath, conformanceSource, "utf8");
+
+  const evidenceOnlyResearchTest = "ts/test/research-v013-context-dualization-a75b.test.ts";
+  assert.equal(
+    fixturePlan.currentSourceTests.includes(evidenceOnlyResearchTest),
+    false,
+    "F4: unselected historical research witness starts outside CURRENT",
+  );
+  const evidenceAddition = JSON.parse(currentTheoremSource) as any;
+  evidenceAddition.g11S1EvidenceOnlyProbe = evidenceOnlyResearchTest;
+  writeFileSync(currentTheoremPath, JSON.stringify(evidenceAddition), "utf8");
+  const evidenceAdditionPlan = buildTestTierPlan(fixtureRoot);
+  assert.equal(
+    evidenceAdditionPlan.machineReferencedSourceTests.length,
+    fixturePlan.machineReferencedSourceTests.length + 1,
+    "F4: added evidence coordinate appears in the evidence-reference diagnostic",
+  );
+  assert.equal(
+    evidenceAdditionPlan.currentSourceTests.includes(evidenceOnlyResearchTest),
+    false,
+    "F4: adding an evidence coordinate must not promote an otherwise non-current research test",
+  );
+  assert.equal(
+    evidenceAdditionPlan.currentSourceTests.length,
+    fixturePlan.currentSourceTests.length,
+    "F4: evidence-only addition must not change CURRENT membership",
   );
   writeFileSync(currentTheoremPath, currentTheoremSource, "utf8");
 
