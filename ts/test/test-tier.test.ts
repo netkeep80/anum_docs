@@ -141,14 +141,14 @@ assert.ok(
   "G14 metadata invariant: bounded currentization lifecycle surface remains present",
 );
 assert.deepEqual(
-  executionPlan.boundedCurrentizationTests,
-  [],
-  "G14 metadata invariant: all currently bounded obligations are sunset while metadata surface remains inspectable",
-);
-assert.deepEqual(
   executionPlan.boundedCurrentizationSourceTests,
   executionPlan.boundedCurrentizationTests.map((item) => item.path).sort(),
   "G14 metadata invariant: bounded execution paths are derived from metadata-bearing lifecycle entries",
+);
+assert.deepEqual(
+  executionPlan.boundedCurrentizationTests,
+  [],
+  "G14 metadata invariant: all currently bounded obligations are sunset while metadata surface remains inspectable",
 );
 
 for (const path of G14_TRANSITIONED_CURRENT_ASSURANCE) {
