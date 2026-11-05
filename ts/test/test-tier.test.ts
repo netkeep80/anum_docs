@@ -69,6 +69,7 @@ const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
 ]);
 
 const EXPECTED_BOUNDED = Object.freeze([] as const);
+// G14 RED-first: these exact role assertions must fail against the pre-fix 5/3 production partition.
 
 const EXPECTED_TARGET_CURRENT = Object.freeze(
   [...new Set([
