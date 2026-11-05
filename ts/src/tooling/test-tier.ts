@@ -36,34 +36,26 @@ const HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS = Object.freeze([
   "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
 ] as const);
 
-// G11-S2 current assurance is explicit execution ownership, not filename,
-// evidence-coordinate or residency inference. Exact filenames can be replaced
-// later by equivalent accepted verifier functions without changing this model.
+// Current assurance is explicit execution ownership, not filename,
+// evidence-coordinate or residency inference. G14 Author acceptance retired
+// the temporary bounded-currentization lifecycle for the three terminal witness
+// functions while preserving their independently justified PR-blocking role.
 const CURRENT_ASSURANCE_SOURCE_TESTS = Object.freeze([
   "ts/test/historical-images-protection.test.ts",
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/portable-derivation.test.ts",
+  "ts/test/proof-infrastructure.test.ts",
   "ts/test/public-api.test.ts",
   "ts/test/test-tier.test.ts",
   "ts/test/v015-documentation-acceptance.test.ts",
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ] as const);
 
-// G11-S2 bounded currentization obligations are temporary by construction.
-// G14 witness acceptance is the explicit sunset; these paths are not permanent
-// project Requirement ownership and imply no J1 relation.
-const BOUNDED_CURRENTIZATION_TESTS = Object.freeze([
-  Object.freeze({
-    path: "ts/test/portable-derivation.test.ts",
-    sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED",
-  }),
-  Object.freeze({
-    path: "ts/test/portable-derivation-digest.test.ts",
-    sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED",
-  }),
-  Object.freeze({
-    path: "ts/test/proof-infrastructure.test.ts",
-    sunset: "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED",
-  }),
-] satisfies readonly BoundedCurrentizationTest[]);
+// Keep the metadata-bearing bounded-currentization owner class explicit even
+// though G14 closes its current membership. Future bounded obligations require
+// a new explicit architecture decision and an inspectable sunset.
+const BOUNDED_CURRENTIZATION_TESTS: readonly BoundedCurrentizationTest[] =
+  Object.freeze([]);
 
 function fail(message: string): never {
   throw new Error(`test-tier: ${message}`);

@@ -51,32 +51,59 @@ const EXPECTED_NATIVE_VERIFIED_BY: readonly string[] = Object.freeze([
   "ts/test/v015-two-role-approved-source-integrity.test.ts",
 ]);
 
+const G14_TRANSITIONED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
+  "ts/test/portable-derivation.test.ts",
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/proof-infrastructure.test.ts",
+]);
+
 const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
   "ts/test/historical-images-protection.test.ts",
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/portable-derivation.test.ts",
+  "ts/test/proof-infrastructure.test.ts",
   "ts/test/public-api.test.ts",
   "ts/test/test-tier.test.ts",
   "ts/test/v015-documentation-acceptance.test.ts",
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ]);
 
-const EXPECTED_BOUNDED = Object.freeze([
-  Object.freeze({ path: "ts/test/portable-derivation.test.ts", sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED" }),
-  Object.freeze({ path: "ts/test/portable-derivation-digest.test.ts", sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED" }),
-  Object.freeze({ path: "ts/test/proof-infrastructure.test.ts", sunset: "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED" }),
-] as const);
+const EXPECTED_BOUNDED_CURRENTIZATION: readonly string[] = Object.freeze([]);
+// G14 RED-first: these exact role assertions fail against the pre-fix 5/3 production partition.
+
+const PRE_G14_CURRENT_ASSURANCE = Object.freeze(
+  EXPECTED_CURRENT_ASSURANCE.filter(
+    (path) => !G14_TRANSITIONED_CURRENT_ASSURANCE.includes(path),
+  ),
+);
+
+const EXPECTED_PRE_G14_CURRENT = Object.freeze(
+  [...new Set([
+    ...EXPECTED_NATIVE_VERIFIED_BY,
+    ...PRE_G14_CURRENT_ASSURANCE,
+    ...G14_TRANSITIONED_CURRENT_ASSURANCE,
+  ])].sort(),
+);
 
 const EXPECTED_TARGET_CURRENT = Object.freeze(
   [...new Set([
     ...EXPECTED_NATIVE_VERIFIED_BY,
     ...EXPECTED_CURRENT_ASSURANCE,
-    ...EXPECTED_BOUNDED.map((item) => item.path),
+    ...EXPECTED_BOUNDED_CURRENTIZATION,
   ])].sort(),
 );
 
 assert.equal(EXPECTED_NATIVE_VERIFIED_BY.length, 35);
-assert.equal(EXPECTED_CURRENT_ASSURANCE.length, 5);
-assert.equal(EXPECTED_BOUNDED.length, 3);
+assert.equal(PRE_G14_CURRENT_ASSURANCE.length, 5);
+assert.equal(EXPECTED_CURRENT_ASSURANCE.length, 8);
+assert.equal(EXPECTED_BOUNDED_CURRENTIZATION.length, 0);
+assert.equal(EXPECTED_PRE_G14_CURRENT.length, 43);
 assert.equal(EXPECTED_TARGET_CURRENT.length, 43);
+assert.deepEqual(
+  EXPECTED_TARGET_CURRENT,
+  EXPECTED_PRE_G14_CURRENT,
+  "G14 sunset changes lifecycle roles only; exact CURRENT membership is byte/logically identical",
+);
 
 const plan = buildTestTierPlan(repositoryRoot);
 const executionPlan = plan as typeof plan & {
@@ -102,18 +129,50 @@ assert.deepEqual(
 assert.deepEqual(
   executionPlan.currentAssuranceSourceTests,
   EXPECTED_CURRENT_ASSURANCE,
-  "explicit current-assurance owner set is exact 5",
+  "G14 sunset: explicit current-assurance owner set is exact 8",
 );
 assert.deepEqual(
   executionPlan.boundedCurrentizationSourceTests,
-  EXPECTED_BOUNDED.map((item) => item.path).sort(),
-  "bounded currentization owner set is exact 3",
+  EXPECTED_BOUNDED_CURRENTIZATION,
+  "G14 sunset: bounded currentization owner set is empty",
+);
+assert.ok(
+  Array.isArray(executionPlan.boundedCurrentizationTests),
+  "G14 metadata invariant: bounded currentization lifecycle surface remains present",
+);
+assert.deepEqual(
+  executionPlan.boundedCurrentizationSourceTests,
+  executionPlan.boundedCurrentizationTests.map((item) => item.path).sort(),
+  "G14 metadata invariant: bounded execution paths are derived from metadata-bearing lifecycle entries",
 );
 assert.deepEqual(
   executionPlan.boundedCurrentizationTests,
-  EXPECTED_BOUNDED,
-  "bounded currentization obligations expose exact inspectable sunsets",
+  [],
+  "G14 metadata invariant: all currently bounded obligations are sunset while metadata surface remains inspectable",
 );
+
+for (const path of G14_TRANSITIONED_CURRENT_ASSURANCE) {
+  assert.equal(
+    executionPlan.currentAssuranceSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: CURRENT_ASSURANCE owns exact path: ${path}`,
+  );
+  assert.equal(
+    executionPlan.boundedCurrentizationSourceTests.includes(path),
+    false,
+    `G14 sunset role transition: BOUNDED_CURRENTIZATION no longer owns exact path: ${path}`,
+  );
+  assert.equal(
+    plan.currentSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: exact path remains CURRENT: ${path}`,
+  );
+  assert.equal(
+    plan.allSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: exact path remains FULL: ${path}`,
+  );
+}
 assert.ok(
   executionPlan.evidenceRoutingSources.includes("theorems/current-v0.15.json"),
   "current theorem capsule remains an evidence-routing surface",
@@ -419,7 +478,7 @@ try {
   assert.throws(
     () => buildTestTierPlan(fixtureRoot),
     /current.*missing|missing.*current/i,
-    "G11-S2 RED-9: missing bounded-currentization test fails closed",
+    "G14 sunset: missing transitioned current-assurance test fails closed",
   );
   writeFileSync(boundedPath, "", "utf8");
 
