@@ -51,19 +51,24 @@ const EXPECTED_NATIVE_VERIFIED_BY: readonly string[] = Object.freeze([
   "ts/test/v015-two-role-approved-source-integrity.test.ts",
 ]);
 
+const G14_TRANSITIONED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
+  "ts/test/portable-derivation.test.ts",
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/proof-infrastructure.test.ts",
+]);
+
 const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
   "ts/test/historical-images-protection.test.ts",
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/portable-derivation.test.ts",
+  "ts/test/proof-infrastructure.test.ts",
   "ts/test/public-api.test.ts",
   "ts/test/test-tier.test.ts",
   "ts/test/v015-documentation-acceptance.test.ts",
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ]);
 
-const EXPECTED_BOUNDED = Object.freeze([
-  Object.freeze({ path: "ts/test/portable-derivation.test.ts", sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED" }),
-  Object.freeze({ path: "ts/test/portable-derivation-digest.test.ts", sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED" }),
-  Object.freeze({ path: "ts/test/proof-infrastructure.test.ts", sunset: "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED" }),
-] as const);
+const EXPECTED_BOUNDED = Object.freeze([] as const);
 
 const EXPECTED_TARGET_CURRENT = Object.freeze(
   [...new Set([
@@ -74,8 +79,8 @@ const EXPECTED_TARGET_CURRENT = Object.freeze(
 );
 
 assert.equal(EXPECTED_NATIVE_VERIFIED_BY.length, 35);
-assert.equal(EXPECTED_CURRENT_ASSURANCE.length, 5);
-assert.equal(EXPECTED_BOUNDED.length, 3);
+assert.equal(EXPECTED_CURRENT_ASSURANCE.length, 8);
+assert.equal(EXPECTED_BOUNDED.length, 0);
 assert.equal(EXPECTED_TARGET_CURRENT.length, 43);
 
 const plan = buildTestTierPlan(repositoryRoot);
@@ -102,18 +107,41 @@ assert.deepEqual(
 assert.deepEqual(
   executionPlan.currentAssuranceSourceTests,
   EXPECTED_CURRENT_ASSURANCE,
-  "explicit current-assurance owner set is exact 5",
+  "G14 sunset: explicit current-assurance owner set is exact 8",
 );
 assert.deepEqual(
   executionPlan.boundedCurrentizationSourceTests,
   EXPECTED_BOUNDED.map((item) => item.path).sort(),
-  "bounded currentization owner set is exact 3",
+  "G14 sunset: bounded currentization owner set is empty",
 );
 assert.deepEqual(
   executionPlan.boundedCurrentizationTests,
   EXPECTED_BOUNDED,
-  "bounded currentization obligations expose exact inspectable sunsets",
+  "G14 sunset: obsolete bounded-currentization metadata is retired",
 );
+
+for (const path of G14_TRANSITIONED_CURRENT_ASSURANCE) {
+  assert.equal(
+    executionPlan.currentAssuranceSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: CURRENT_ASSURANCE owns exact path: ${path}`,
+  );
+  assert.equal(
+    executionPlan.boundedCurrentizationSourceTests.includes(path),
+    false,
+    `G14 sunset role transition: BOUNDED_CURRENTIZATION no longer owns exact path: ${path}`,
+  );
+  assert.equal(
+    plan.currentSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: exact path remains CURRENT: ${path}`,
+  );
+  assert.equal(
+    plan.allSourceTests.includes(path),
+    true,
+    `G14 sunset role transition: exact path remains FULL: ${path}`,
+  );
+}
 assert.ok(
   executionPlan.evidenceRoutingSources.includes("theorems/current-v0.15.json"),
   "current theorem capsule remains an evidence-routing surface",
@@ -419,7 +447,7 @@ try {
   assert.throws(
     () => buildTestTierPlan(fixtureRoot),
     /current.*missing|missing.*current/i,
-    "G11-S2 RED-9: missing bounded-currentization test fails closed",
+    "G14 sunset: missing transitioned current-assurance test fails closed",
   );
   writeFileSync(boundedPath, "", "utf8");
 
