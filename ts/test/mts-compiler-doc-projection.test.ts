@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import {
   compileRequirementDocuments,
   loadCurrentProjectDocumentConfiguration,
@@ -997,6 +997,138 @@ try {
   );
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
+}
+
+
+// G11-S2 RED-1: the old non-research default must die before the new compiler API is exercised.
+const g11S2PreImplementationPlan =
+  (await import("../src/tooling/test-tier.js")).buildTestTierPlan(root);
+assert.equal(
+  g11S2PreImplementationPlan.currentSourceTests.includes("ts/test/v016-functional-formal-t09.test.ts"),
+  false,
+  "G11-S2 RED-1: v016 development witness must be FULL-only despite non-research filename",
+);
+
+// G11-S2 RED-10: expose native verified_by through the existing strict native parser.
+const g11S2CompilerModule = await import("../src/tooling/mts-compiler.js");
+const g11S2ProjectionLoaderUnknown =
+  (g11S2CompilerModule as unknown as Record<string, unknown>).loadCurrentNativeVerificationProjection;
+assert.equal(
+  typeof g11S2ProjectionLoaderUnknown,
+  "function",
+  "G11-S2 native verification projection must be exported without a second YAML parser",
+);
+if (typeof g11S2ProjectionLoaderUnknown === "function") {
+  const g11S2ProjectionLoader = g11S2ProjectionLoaderUnknown as (repositoryRoot: string) => {
+    readonly verifiedByArtifactPaths: readonly string[];
+    readonly verifiedByTestPaths: readonly string[];
+  };
+  const expectedNativeVerifiedByTests: readonly string[] = Object.freeze([
+  "ts/test/docs-current-surface.test.ts",
+  "ts/test/docs-size-budget.test.ts",
+  "ts/test/docs-sync.test.ts",
+  "ts/test/release-cutover.test.ts",
+  "ts/test/v015-boolean-package-replay-a2.test.ts",
+  "ts/test/v015-compact-and-approved-source-integrity.test.ts",
+  "ts/test/v015-compact-not-approved-source-integrity.test.ts",
+  "ts/test/v015-compact-or-approved-source-integrity.test.ts",
+  "ts/test/v015-compact-xor-approved-source-integrity.test.ts",
+  "ts/test/v015-context-authority-closure-c1.test.ts",
+  "ts/test/v015-context-theory-self-contained-a6.test.ts",
+  "ts/test/v015-direct-formal-source-b20.test.ts",
+  "ts/test/v015-direct-json-denotation-das-a2b.test.ts",
+  "ts/test/v015-direct-structural-aspects-s1.test.ts",
+  "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+  "ts/test/v015-final-readiness-r3.test.ts",
+  "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+  "ts/test/v015-formal-decoder-b2.test.ts",
+  "ts/test/v015-formal-exact-sequence-b7.test.ts",
+  "ts/test/v015-formal-json-j1-b9.test.ts",
+  "ts/test/v015-formal-production-refinement-f1.test.ts",
+  "ts/test/v015-formal-proof-assurance-f0.test.ts",
+  "ts/test/v015-frozen-replay-artifact-integrity.test.ts",
+  "ts/test/v015-grounded-approved-source-integrity.test.ts",
+  "ts/test/v015-independent-readiness-r2.test.ts",
+  "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+  "ts/test/v015-positive-aset-currentness-a8.test.ts",
+  "ts/test/v015-requirements-traceability-r0.test.ts",
+  "ts/test/v015-rule-bundle-denotation-das-a2c.test.ts",
+  "ts/test/v015-self-contained-context-freeze-resume-a5.test.ts",
+  "ts/test/v015-source-anet-denotation-core-das-a2a.test.ts",
+  "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts",
+  "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
+  "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+  "ts/test/v015-two-role-approved-source-integrity.test.ts",
+  ]);
+  const projection = g11S2ProjectionLoader(root);
+  assert.deepEqual(
+    projection.verifiedByTestPaths,
+    expectedNativeVerifiedByTests,
+    "native verified_by test projection is exact accepted 35",
+  );
+  assert.equal(new Set(projection.verifiedByTestPaths).size, 35, "native verified_by test projection has no duplicates");
+  assert.deepEqual(
+    projection.verifiedByTestPaths,
+    [...projection.verifiedByTestPaths].sort((left, right) => left.localeCompare(right, "en")),
+    "native verified_by test projection is deterministic and sorted",
+  );
+  assert.deepEqual(
+    projection.verifiedByArtifactPaths,
+    [...projection.verifiedByArtifactPaths].sort((left, right) => left.localeCompare(right, "en")),
+    "native verified_by artifact projection is deterministic and sorted",
+  );
+  assert.ok(
+    projection.verifiedByArtifactPaths.includes(".github/workflows/amemory-v015-regression.yml"),
+    "non-test native verified_by workflow remains visible in artifact projection",
+  );
+  assert.equal(
+    projection.verifiedByTestPaths.includes(".github/workflows/amemory-v015-regression.yml"),
+    false,
+    "non-test native verified_by artifact never enters test projection",
+  );
+  assert.ok(
+    projection.verifiedByTestPaths.every((path) => /^ts\/test\/[^/]+\.test\.ts$/.test(path)),
+    "test projection accepts only flat ts/test/*.test.ts paths",
+  );
+  assert.deepEqual(g11S2ProjectionLoader(root), projection, "native verification projection is deterministic");
+
+  const projectionFixture = mkdtempSync(join(tmpdir(), "mts-native-verification-s2-"));
+  try {
+    const sourceDirectory = resolve(root, "requirements/mts-v0.15");
+    const targetDirectory = resolve(projectionFixture, "requirements/mts-v0.15");
+    mkdirSync(targetDirectory, { recursive: true });
+    for (const entry of readdirSync(sourceDirectory, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith(".rg.yaml")) {
+        copyFileSync(resolve(sourceDirectory, entry.name), resolve(targetDirectory, entry.name));
+      }
+    }
+    const isolatedPath = resolve(targetDirectory, "V15-DOCS-01.rg.yaml");
+    const isolatedSource = readFileSync(isolatedPath, "utf8");
+    const witness = "ts/test/docs-size-budget.test.ts";
+    const needle = [
+      "  - predicates: [verified_by]",
+      "    target:",
+      "      kind: artifact",
+      `      path: ${witness}`,
+    ].join("\n");
+    const replacement = [
+      "  - predicates: [implemented_by]",
+      "    target:",
+      "      kind: artifact",
+      `      path: ${witness}`,
+    ].join("\n");
+    assert.ok(isolatedSource.includes(needle), "isolated native fixture contains unique verified_by witness");
+    writeFileSync(isolatedPath, isolatedSource.replace(needle, replacement), "utf8");
+    const mutated = g11S2ProjectionLoader(projectionFixture);
+    assert.equal(
+      mutated.verifiedByTestPaths.includes(witness),
+      false,
+      "isolated native relation mutation removes witness without any traceability fallback",
+    );
+    assert.equal(mutated.verifiedByTestPaths.length, 34);
+  } finally {
+    rmSync(projectionFixture, { recursive: true, force: true });
+  }
 }
 
 console.log("MTS Compiler D20: GREEN CURRENT_REQUIREMENTS=48 CURRENT_REGISTRY=v0.3 MARKDOWN_COMPATIBILITY_REQUIREMENTS=14 LEGACY_REGISTRY=v0.2");

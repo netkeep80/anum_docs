@@ -1,60 +1,69 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadMtsSemanticIr } from "./mts-compiler.js";
+import {
+  loadCurrentNativeVerificationProjection,
+  loadMtsSemanticIr,
+} from "./mts-compiler.js";
 
 export type TestTier = "current" | "full";
 
 type JsonObject = Record<string, unknown>;
 
+export interface BoundedCurrentizationTest {
+  readonly path: string;
+  readonly sunset:
+    | "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED"
+    | "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED";
+}
+
 export interface TestTierPlan {
   readonly allSourceTests: readonly string[];
   readonly currentSourceTests: readonly string[];
+  readonly fullReplaySourceTests: readonly string[];
   readonly historicalResearchSourceTests: readonly string[];
   readonly historicalAcceptedEvidenceSourceTests: readonly string[];
   readonly machineReferencedSourceTests: readonly string[];
-  readonly transitionalCurrentResearchSourceTests: readonly string[];
-  readonly authoritySources: readonly string[];
+  readonly nativeVerifiedByCurrentSourceTests: readonly string[];
+  readonly currentAssuranceSourceTests: readonly string[];
+  readonly boundedCurrentizationSourceTests: readonly string[];
+  readonly boundedCurrentizationTests: readonly BoundedCurrentizationTest[];
+  readonly evidenceRoutingSources: readonly string[];
 }
+
+const EXACT_SOURCE_TEST_PATH = /^ts\/test\/[^/]+\.test\.ts$/;
 
 const HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS = Object.freeze([
   "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
 ] as const);
 
-// G11-S1 transitional execution set: these 30 accepted F3B research witnesses
-// keep exact pre-S1 CURRENT membership while evidence coordinates lose execution authority.
-// G11-S2 owns their final execution-role disposition.
-const TRANSITIONAL_CURRENT_RESEARCH_SOURCE_TESTS = Object.freeze([
-  "ts/test/research-v012-interpreter-delta-c2.test.ts",
-  "ts/test/research-v013-application-closed-frontier-a17.test.ts",
-  "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
-  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
-  "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts",
-  "ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
-  "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
-  "ts/test/research-v014-a4-operational-equivalence.test.ts",
-  "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
-  "ts/test/research-v014-add-constructor-authority-boundary.test.ts",
-  "ts/test/research-v014-add-dependent-witness-boundary.test.ts",
-  "ts/test/research-v014-add-general-functionality.test.ts",
-  "ts/test/research-v014-add-general-proof-boundary.test.ts",
-  "ts/test/research-v014-constructor-inversion.test.ts",
-  "ts/test/research-v014-constructor-scoped-proof.test.ts",
-  "ts/test/research-v014-context-relative-a4prime.test.ts",
-  "ts/test/research-v014-count-nat-degree-separation.test.ts",
-  "ts/test/research-v014-dependent-witness-closure.test.ts",
-  "ts/test/research-v014-foundation-orientation-witness.test.ts",
-  "ts/test/research-v014-immutable-link-chiral-rewrite.test.ts",
-  "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
-  "ts/test/research-v014-nat-add-bounded-closure.test.ts",
-  "ts/test/research-v014-nat-add-left-zero-closure.test.ts",
-  "ts/test/research-v014-nat-least-closed-authority.test.ts",
-  "ts/test/research-v014-order-replay-mul-scope.test.ts",
-  "ts/test/research-v014-orientation-gauge-view.test.ts",
-  "ts/test/research-v014-ostensive-formal-grammar.test.ts",
-  "ts/test/research-v014-parametric-closure.test.ts",
-  "ts/test/research-v014-preacceptance-closure.test.ts",
-  "ts/test/research-v014-reaction-result-basis.test.ts",
+// G11-S2 current assurance is explicit execution ownership, not filename,
+// evidence-coordinate or residency inference. Exact filenames can be replaced
+// later by equivalent accepted verifier functions without changing this model.
+const CURRENT_ASSURANCE_SOURCE_TESTS = Object.freeze([
+  "ts/test/historical-images-protection.test.ts",
+  "ts/test/public-api.test.ts",
+  "ts/test/test-tier.test.ts",
+  "ts/test/v015-documentation-acceptance.test.ts",
+  "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ] as const);
+
+// G11-S2 bounded currentization obligations are temporary by construction.
+// G14 witness acceptance is the explicit sunset; these paths are not permanent
+// project Requirement ownership and imply no J1 relation.
+const BOUNDED_CURRENTIZATION_TESTS = Object.freeze([
+  Object.freeze({
+    path: "ts/test/portable-derivation.test.ts",
+    sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED",
+  }),
+  Object.freeze({
+    path: "ts/test/portable-derivation-digest.test.ts",
+    sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED",
+  }),
+  Object.freeze({
+    path: "ts/test/proof-infrastructure.test.ts",
+    sunset: "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED",
+  }),
+] satisfies readonly BoundedCurrentizationTest[]);
 
 function fail(message: string): never {
   throw new Error(`test-tier: ${message}`);
@@ -80,7 +89,7 @@ function readJson(root: string, path: string): unknown {
 
 function collectExactTestReferences(value: unknown, result: Set<string>): void {
   if (typeof value === "string") {
-    if (/^ts\/test\/[^/]+\.test\.ts$/.test(value)) result.add(value);
+    if (EXACT_SOURCE_TEST_PATH.test(value)) result.add(value);
     return;
   }
   if (Array.isArray(value)) {
@@ -95,73 +104,111 @@ function collectExactTestReferences(value: unknown, result: Set<string>): void {
 }
 
 function isResearchTest(path: string): boolean {
-  const name = path.slice("ts/test/".length);
-  return name.startsWith("research-");
+  return path.slice("ts/test/".length).startsWith("research-");
+}
+
+function sortedUnique(paths: readonly string[]): readonly string[] {
+  return Object.freeze([...new Set(paths)].sort());
+}
+
+function validateExecutionOwnerSet(
+  allSet: ReadonlySet<string>,
+  name: string,
+  paths: readonly string[],
+): void {
+  if (new Set(paths).size !== paths.length) {
+    fail(`${name} contains duplicate current execution test paths`);
+  }
+  for (const path of paths) {
+    if (!EXACT_SOURCE_TEST_PATH.test(path)) {
+      fail(`${name} has invalid current execution test path: ${path}`);
+    }
+    if (!allSet.has(path)) {
+      fail(`${name} current execution test is missing: ${path}`);
+    }
+    if (
+      HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS.includes(
+        path as (typeof HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)[number],
+      )
+    ) {
+      fail(`${name} cannot select historical accepted evidence as current: ${path}`);
+    }
+  }
+}
+
+function combineExecutionOwnerSets(
+  allSet: ReadonlySet<string>,
+  sets: readonly {
+    readonly name: string;
+    readonly paths: readonly string[];
+  }[],
+): readonly string[] {
+  const ownerByPath = new Map<string, string>();
+  for (const ownerSet of sets) {
+    validateExecutionOwnerSet(allSet, ownerSet.name, ownerSet.paths);
+    for (const path of ownerSet.paths) {
+      const previous = ownerByPath.get(path);
+      if (previous !== undefined) {
+        fail(`current execution owner overlap for ${path}: ${previous} and ${ownerSet.name}`);
+      }
+      ownerByPath.set(path, ownerSet.name);
+    }
+  }
+  return Object.freeze([...ownerByPath.keys()].sort());
 }
 
 export function classifyTestPaths(
   allSourceTests: readonly string[],
   evidenceReferencedSourceTests: readonly string[],
-  explicitCurrentResearchSourceTests: readonly string[],
-): Omit<TestTierPlan, "authoritySources"> {
-  const all = [...new Set(allSourceTests)].sort();
+  explicitCurrentSourceTests: readonly string[],
+): Pick<
+  TestTierPlan,
+  | "allSourceTests"
+  | "currentSourceTests"
+  | "fullReplaySourceTests"
+  | "historicalResearchSourceTests"
+  | "historicalAcceptedEvidenceSourceTests"
+  | "machineReferencedSourceTests"
+> {
+  const all = sortedUnique(allSourceTests);
   const allSet = new Set(all);
-  const referenced = [...new Set(evidenceReferencedSourceTests)].sort();
+  for (const path of all) {
+    if (!EXACT_SOURCE_TEST_PATH.test(path)) {
+      fail(`physical test path is invalid: ${path}`);
+    }
+  }
 
+  const referenced = sortedUnique(evidenceReferencedSourceTests);
   for (const path of referenced) {
     if (!allSet.has(path)) {
       fail(`machine-readable evidence references missing test: ${path}`);
     }
   }
 
-  const referencedSet = new Set(referenced);
-  const historicalAcceptedEvidence = all.filter((path) =>
-    HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS.includes(
-      path as (typeof HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)[number],
-    )
-  );
-  const historicalAcceptedEvidenceSet = new Set(historicalAcceptedEvidence);
-  const transitionalCurrentResearch = [...new Set(explicitCurrentResearchSourceTests)].sort();
-  const transitionalCurrentResearchSet = new Set(transitionalCurrentResearch);
-
-  for (const path of transitionalCurrentResearch) {
-    if (!allSet.has(path)) fail(`explicit current research test is missing: ${path}`);
-    if (!isResearchTest(path)) fail(`explicit current research test must be research-prefixed: ${path}`);
-    if (historicalAcceptedEvidenceSet.has(path)) {
-      fail(`historical accepted evidence cannot be explicit current research: ${path}`);
-    }
-  }
-
-  const current = all.filter((path) =>
-    !historicalAcceptedEvidenceSet.has(path) &&
-    (!isResearchTest(path) || transitionalCurrentResearchSet.has(path))
-  );
-  const historicalResearch = all.filter((path) =>
-    !historicalAcceptedEvidenceSet.has(path) &&
-    isResearchTest(path) &&
-    !transitionalCurrentResearchSet.has(path)
-  );
-
+  validateExecutionOwnerSet(allSet, "explicit", explicitCurrentSourceTests);
+  const current = Object.freeze([...explicitCurrentSourceTests].sort());
+  const currentSet = new Set(current);
   if (current.length === 0) fail("current tier is empty");
-  if (current.length + historicalResearch.length + historicalAcceptedEvidence.length !== all.length) {
-    fail("current + historical research + historical accepted evidence partition does not cover full test set");
-  }
-  for (const path of historicalResearch) {
-    if (!isResearchTest(path)) fail(`non-research test excluded as historical research: ${path}`);
-    if (transitionalCurrentResearchSet.has(path)) fail(`explicit current research test excluded from current tier: ${path}`);
-  }
-  for (const path of historicalAcceptedEvidence) {
-    if (isResearchTest(path)) fail(`historical accepted evidence test must not be research-prefixed: ${path}`);
-    if (referencedSet.has(path)) fail(`machine-referenced historical accepted evidence test excluded from current tier: ${path}`);
-  }
+
+  const fullReplay = Object.freeze(all.filter((path) => !currentSet.has(path)));
+  const historicalResearch = Object.freeze(
+    all.filter((path) => isResearchTest(path) && !currentSet.has(path)),
+  );
+  const historicalAcceptedEvidence = Object.freeze(
+    all.filter((path) =>
+      HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS.includes(
+        path as (typeof HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)[number],
+      ),
+    ),
+  );
 
   return Object.freeze({
-    allSourceTests: Object.freeze(all),
-    currentSourceTests: Object.freeze(current),
-    historicalResearchSourceTests: Object.freeze(historicalResearch),
-    historicalAcceptedEvidenceSourceTests: Object.freeze(historicalAcceptedEvidence),
-    machineReferencedSourceTests: Object.freeze(referenced),
-    transitionalCurrentResearchSourceTests: Object.freeze(transitionalCurrentResearch),
+    allSourceTests: all,
+    currentSourceTests: current,
+    fullReplaySourceTests: fullReplay,
+    historicalResearchSourceTests: historicalResearch,
+    historicalAcceptedEvidenceSourceTests: historicalAcceptedEvidence,
+    machineReferencedSourceTests: referenced,
   });
 }
 
@@ -171,8 +218,37 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     .filter((name) => name.endsWith(".test.ts"))
     .map((name) => `ts/test/${name}`)
     .sort();
+  const allSet = new Set(allSourceTests);
 
   const semanticIr = loadMtsSemanticIr(repositoryRoot);
+  const nativeVerification = loadCurrentNativeVerificationProjection(repositoryRoot);
+  const nativeVerifiedByCurrentSourceTests = sortedUnique(nativeVerification.verifiedByTestPaths);
+  const currentAssuranceSourceTests = sortedUnique(CURRENT_ASSURANCE_SOURCE_TESTS);
+
+  const boundedCurrentizationTests = Object.freeze(
+    BOUNDED_CURRENTIZATION_TESTS.map((item) => Object.freeze({ ...item })),
+  );
+  const boundedPathList = boundedCurrentizationTests.map((item) => item.path);
+  if (new Set(boundedPathList).size !== boundedPathList.length) {
+    fail("bounded currentization metadata contains duplicate test paths");
+  }
+  const boundedCurrentizationSourceTests = sortedUnique(boundedPathList);
+
+  const explicitCurrentSourceTests = combineExecutionOwnerSets(allSet, [
+    Object.freeze({
+      name: "native verified_by",
+      paths: nativeVerifiedByCurrentSourceTests,
+    }),
+    Object.freeze({
+      name: "current assurance",
+      paths: currentAssuranceSourceTests,
+    }),
+    Object.freeze({
+      name: "bounded currentization",
+      paths: boundedCurrentizationSourceTests,
+    }),
+  ]);
+
   const contractPath = semanticIr.contractPath;
   const traceabilityPath = semanticIr.traceabilityPath;
   const conformancePath = semanticIr.conformancePath;
@@ -223,7 +299,7 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
   const classified = classifyTestPaths(
     allSourceTests,
     [...references],
-    TRANSITIONAL_CURRENT_RESEARCH_SOURCE_TESTS,
+    explicitCurrentSourceTests,
   );
   if (
     JSON.stringify(classified.historicalAcceptedEvidenceSourceTests) !==
@@ -231,9 +307,14 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
   ) {
     fail("historical accepted evidence test set differs from the exact immutable allowlist");
   }
+
   return Object.freeze({
     ...classified,
-    authoritySources: Object.freeze([
+    nativeVerifiedByCurrentSourceTests,
+    currentAssuranceSourceTests,
+    boundedCurrentizationSourceTests,
+    boundedCurrentizationTests,
+    evidenceRoutingSources: Object.freeze([
       acceptancePath,
       contractPath,
       conformancePath,
