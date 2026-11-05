@@ -10,6 +10,7 @@ import {
 } from "../src/tooling/test-tier.js";
 import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
 
+// G11-S1 RED: evidence coordinates must be diagnostic, not execution selectors.
 const repositoryRoot = resolve("..");
 const plan = buildTestTierPlan(repositoryRoot);
 
