@@ -10,9 +10,10 @@ import {
 } from "../src/tooling/test-tier.js";
 import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
 
-// RED receipt synchronize: keep this commit test-only until behavioral failure is observed.\nconst repositoryRoot = resolve("..");
+// RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
+const repositoryRoot = resolve("..");
 
-const EXPECTED_NATIVE_VERIFIED_BY = Object.freeze([
+const EXPECTED_NATIVE_VERIFIED_BY: readonly string[] = Object.freeze([
   "ts/test/docs-current-surface.test.ts",
   "ts/test/docs-size-budget.test.ts",
   "ts/test/docs-sync.test.ts",
@@ -48,15 +49,15 @@ const EXPECTED_NATIVE_VERIFIED_BY = Object.freeze([
   "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
   "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
   "ts/test/v015-two-role-approved-source-integrity.test.ts",
-] as const);
+]);
 
-const EXPECTED_CURRENT_ASSURANCE = Object.freeze([
+const EXPECTED_CURRENT_ASSURANCE: readonly string[] = Object.freeze([
   "ts/test/historical-images-protection.test.ts",
   "ts/test/public-api.test.ts",
   "ts/test/test-tier.test.ts",
   "ts/test/v015-documentation-acceptance.test.ts",
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
-] as const);
+]);
 
 const EXPECTED_BOUNDED = Object.freeze([
   Object.freeze({ path: "ts/test/portable-derivation.test.ts", sunset: "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED" }),

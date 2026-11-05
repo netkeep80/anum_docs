@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import {
   compileRequirementDocuments,
   loadCurrentProjectDocumentConfiguration,
@@ -1014,7 +1014,7 @@ if (typeof g11S2ProjectionLoaderUnknown === "function") {
     readonly verifiedByArtifactPaths: readonly string[];
     readonly verifiedByTestPaths: readonly string[];
   };
-  const expectedNativeVerifiedByTests = Object.freeze([
+  const expectedNativeVerifiedByTests: readonly string[] = Object.freeze([
   "ts/test/docs-current-surface.test.ts",
   "ts/test/docs-size-budget.test.ts",
   "ts/test/docs-sync.test.ts",
@@ -1050,7 +1050,7 @@ if (typeof g11S2ProjectionLoaderUnknown === "function") {
   "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
   "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
   "ts/test/v015-two-role-approved-source-integrity.test.ts",
-  ] as const);
+  ]);
   const projection = g11S2ProjectionLoader(root);
   assert.deepEqual(
     projection.verifiedByTestPaths,
