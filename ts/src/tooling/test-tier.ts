@@ -12,11 +12,48 @@ export interface TestTierPlan {
   readonly historicalResearchSourceTests: readonly string[];
   readonly historicalAcceptedEvidenceSourceTests: readonly string[];
   readonly machineReferencedSourceTests: readonly string[];
+  readonly transitionalCurrentResearchSourceTests: readonly string[];
   readonly authoritySources: readonly string[];
 }
 
 const HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS = Object.freeze([
   "ts/test/v015-semantic-metamodel-evidence-verifier.test.ts",
+] as const);
+
+// G11-S1 transitional execution set: these 30 accepted F3B research witnesses
+// keep exact pre-S1 CURRENT membership while evidence coordinates lose execution authority.
+// G11-S2 owns their final execution-role disposition.
+const TRANSITIONAL_CURRENT_RESEARCH_SOURCE_TESTS = Object.freeze([
+  "ts/test/research-v012-interpreter-delta-c2.test.ts",
+  "ts/test/research-v013-application-closed-frontier-a17.test.ts",
+  "ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts",
+  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts",
+  "ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
+  "ts/test/research-v013-root-asymmetry-chirality-a14.test.ts",
+  "ts/test/research-v014-a4-operational-equivalence.test.ts",
+  "ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts",
+  "ts/test/research-v014-add-constructor-authority-boundary.test.ts",
+  "ts/test/research-v014-add-dependent-witness-boundary.test.ts",
+  "ts/test/research-v014-add-general-functionality.test.ts",
+  "ts/test/research-v014-add-general-proof-boundary.test.ts",
+  "ts/test/research-v014-constructor-inversion.test.ts",
+  "ts/test/research-v014-constructor-scoped-proof.test.ts",
+  "ts/test/research-v014-context-relative-a4prime.test.ts",
+  "ts/test/research-v014-count-nat-degree-separation.test.ts",
+  "ts/test/research-v014-dependent-witness-closure.test.ts",
+  "ts/test/research-v014-foundation-orientation-witness.test.ts",
+  "ts/test/research-v014-immutable-link-chiral-rewrite.test.ts",
+  "ts/test/research-v014-minimal-chiral-foundation-extension.test.ts",
+  "ts/test/research-v014-nat-add-bounded-closure.test.ts",
+  "ts/test/research-v014-nat-add-left-zero-closure.test.ts",
+  "ts/test/research-v014-nat-least-closed-authority.test.ts",
+  "ts/test/research-v014-order-replay-mul-scope.test.ts",
+  "ts/test/research-v014-orientation-gauge-view.test.ts",
+  "ts/test/research-v014-ostensive-formal-grammar.test.ts",
+  "ts/test/research-v014-parametric-closure.test.ts",
+  "ts/test/research-v014-preacceptance-closure.test.ts",
+  "ts/test/research-v014-reaction-result-basis.test.ts",
 ] as const);
 
 function fail(message: string): never {
@@ -64,15 +101,16 @@ function isResearchTest(path: string): boolean {
 
 export function classifyTestPaths(
   allSourceTests: readonly string[],
-  machineReferencedSourceTests: readonly string[],
+  evidenceReferencedSourceTests: readonly string[],
+  explicitCurrentResearchSourceTests: readonly string[],
 ): Omit<TestTierPlan, "authoritySources"> {
   const all = [...new Set(allSourceTests)].sort();
   const allSet = new Set(all);
-  const referenced = [...new Set(machineReferencedSourceTests)].sort();
+  const referenced = [...new Set(evidenceReferencedSourceTests)].sort();
 
   for (const path of referenced) {
     if (!allSet.has(path)) {
-      fail(`machine-readable authority references missing test: ${path}`);
+      fail(`machine-readable evidence references missing test: ${path}`);
     }
   }
 
@@ -83,14 +121,25 @@ export function classifyTestPaths(
     )
   );
   const historicalAcceptedEvidenceSet = new Set(historicalAcceptedEvidence);
+  const transitionalCurrentResearch = [...new Set(explicitCurrentResearchSourceTests)].sort();
+  const transitionalCurrentResearchSet = new Set(transitionalCurrentResearch);
+
+  for (const path of transitionalCurrentResearch) {
+    if (!allSet.has(path)) fail(`explicit current research test is missing: ${path}`);
+    if (!isResearchTest(path)) fail(`explicit current research test must be research-prefixed: ${path}`);
+    if (historicalAcceptedEvidenceSet.has(path)) {
+      fail(`historical accepted evidence cannot be explicit current research: ${path}`);
+    }
+  }
+
   const current = all.filter((path) =>
     !historicalAcceptedEvidenceSet.has(path) &&
-    (!isResearchTest(path) || referencedSet.has(path))
+    (!isResearchTest(path) || transitionalCurrentResearchSet.has(path))
   );
   const historicalResearch = all.filter((path) =>
     !historicalAcceptedEvidenceSet.has(path) &&
     isResearchTest(path) &&
-    !referencedSet.has(path)
+    !transitionalCurrentResearchSet.has(path)
   );
 
   if (current.length === 0) fail("current tier is empty");
@@ -99,7 +148,7 @@ export function classifyTestPaths(
   }
   for (const path of historicalResearch) {
     if (!isResearchTest(path)) fail(`non-research test excluded as historical research: ${path}`);
-    if (referencedSet.has(path)) fail(`machine-referenced test excluded from current tier: ${path}`);
+    if (transitionalCurrentResearchSet.has(path)) fail(`explicit current research test excluded from current tier: ${path}`);
   }
   for (const path of historicalAcceptedEvidence) {
     if (isResearchTest(path)) fail(`historical accepted evidence test must not be research-prefixed: ${path}`);
@@ -112,6 +161,7 @@ export function classifyTestPaths(
     historicalResearchSourceTests: Object.freeze(historicalResearch),
     historicalAcceptedEvidenceSourceTests: Object.freeze(historicalAcceptedEvidence),
     machineReferencedSourceTests: Object.freeze(referenced),
+    transitionalCurrentResearchSourceTests: Object.freeze(transitionalCurrentResearch),
   });
 }
 
@@ -170,7 +220,11 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     collectExactTestReferences(surface, references);
   }
 
-  const classified = classifyTestPaths(allSourceTests, [...references]);
+  const classified = classifyTestPaths(
+    allSourceTests,
+    [...references],
+    TRANSITIONAL_CURRENT_RESEARCH_SOURCE_TESTS,
+  );
   if (
     JSON.stringify(classified.historicalAcceptedEvidenceSourceTests) !==
     JSON.stringify(HISTORICAL_ACCEPTED_EVIDENCE_SOURCE_TESTS)

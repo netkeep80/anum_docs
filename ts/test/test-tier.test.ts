@@ -17,6 +17,11 @@ const plan = buildTestTierPlan(repositoryRoot);
 assert.equal(plan.allSourceTests.length, 569, "F5: exact full-tier membership remains 569");
 assert.equal(plan.currentSourceTests.length, 370, "F5: exact current-tier membership remains 370");
 assert.equal(plan.machineReferencedSourceTests.length, 111, "F5: exact evidence-reference diagnostic remains 111");
+assert.equal(
+  plan.transitionalCurrentResearchSourceTests.length,
+  30,
+  "G11-S1: exact accepted transitional-current research set remains 30",
+);
 assert.ok(plan.allSourceTests.length > 0, "full tier is non-empty");
 assert.ok(plan.currentSourceTests.length > 0, "current tier is non-empty");
 assert.ok(
@@ -58,7 +63,7 @@ assert.equal(
 );
 assert.ok(
   currentSet.has("ts/test/research-v013-recursive-link-inversion-a75a.test.ts"),
-  "historical-named witness remains current when frozen v0.14 P0 still references it",
+  "accepted F3B witness remains transitional-current independently of evidence coordinates",
 );
 for (const path of [
   "ts/test/research-v013-context-dualization-a75b.test.ts",
@@ -74,7 +79,11 @@ for (const path of plan.currentSourceTests) {
   assert.ok(allSet.has(path), `current test must exist in full tier: ${path}`);
 }
 for (const path of plan.machineReferencedSourceTests) {
-  assert.ok(currentSet.has(path), `machine-referenced test must be current: ${path}`);
+  assert.ok(allSet.has(path), `evidence-referenced test must exist in full tier: ${path}`);
+}
+for (const path of plan.transitionalCurrentResearchSourceTests) {
+  assert.ok(currentSet.has(path), `explicit transitional-current research test must be current: ${path}`);
+  assert.ok(path.startsWith("ts/test/research-"), `transitional-current research test must be research-prefixed: ${path}`);
 }
 for (const path of plan.allSourceTests) {
   const name = path.slice("ts/test/".length);
@@ -85,7 +94,6 @@ for (const path of plan.allSourceTests) {
 for (const path of plan.historicalResearchSourceTests) {
   const name = path.slice("ts/test/".length);
   assert.ok(name.startsWith("research-"), `historical research test must be research-prefixed: ${path}`);
-  assert.equal(referencedSet.has(path), false, `historical research test must not be machine-referenced: ${path}`);
   assert.equal(historicalAcceptedSet.has(path), false, `historical research and accepted-evidence classes are disjoint: ${path}`);
 }
 for (const path of plan.historicalAcceptedEvidenceSourceTests) {
@@ -120,6 +128,10 @@ const synthetic = classifyTestPaths(
     "ts/test/research-current.test.ts",
     "ts/test/research-history.test.ts",
   ],
+  [
+    "ts/test/research-current.test.ts",
+    "ts/test/research-history.test.ts",
+  ],
   ["ts/test/research-current.test.ts"],
 );
 assert.deepEqual(synthetic.currentSourceTests, [
@@ -147,8 +159,19 @@ assert.throws(
     classifyTestPaths(
       ["ts/test/core.test.ts"],
       ["ts/test/research-missing.test.ts"],
+      [],
     ),
-  /machine-readable authority references missing test/,
+  /machine-readable evidence references missing test/,
+);
+
+assert.throws(
+  () =>
+    classifyTestPaths(
+      ["ts/test/core.test.ts"],
+      [],
+      ["ts/test/research-missing.test.ts"],
+    ),
+  /explicit current research test is missing/,
 );
 
 const fixtureRoot = mkdtempSync(join(tmpdir(), "mts-test-tier-"));
