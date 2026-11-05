@@ -10,7 +10,7 @@ import {
 } from "../src/tooling/test-tier.js";
 import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
 
-const repositoryRoot = resolve("..");
+// RED receipt synchronize: keep this commit test-only until behavioral failure is observed.\nconst repositoryRoot = resolve("..");
 
 const EXPECTED_NATIVE_VERIFIED_BY = Object.freeze([
   "ts/test/docs-current-surface.test.ts",
