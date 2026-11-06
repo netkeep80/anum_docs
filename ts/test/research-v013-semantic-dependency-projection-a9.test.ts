@@ -823,10 +823,21 @@ if (projection.packageDirectSemanticWriteAudit === undefined) {
   );
 }
 
+// P6-D1: the immutable v0.13 research projection retains the retired
+// instantiation owner as historical provenance. Only surviving HEAD writers
+// are current sources; require the live delta to be exactly this one owner.
+const p6RetiredHistoricalWriteOwner =
+  "ts/src/derived-derivation-instantiation.ts#instantiateTemplate";
+const historicalWriteOwners: string[] =
+  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id);
+assert(historicalWriteOwners.includes(p6RetiredHistoricalWriteOwner),
+  "pre-P6 historical write owner remains in original provenance");
+assert(!observedDirectWriteOwners.includes(p6RetiredHistoricalWriteOwner),
+  "retired P6 writer is absent from current HEAD write sites");
 setEqual(
   observedDirectWriteOwners,
-  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id),
-  "package-wide direct semantic write owners",
+  historicalWriteOwners.filter((id) => id !== p6RetiredHistoricalWriteOwner),
+  "package-wide live direct write owners equal historical inventory minus the exact retired P6 writer",
 );
 
 const allowedWriteOwnerCategories = [
@@ -868,8 +879,8 @@ setEqual(
 );
 same(
   projection.metrics.directSemanticWriteOwnerCount,
-  observedDirectWriteOwners.length,
-  "direct semantic write owner count",
+  observedDirectWriteOwners.length + 1,
+  "historical direct semantic write owner count includes exactly one retired P6 writer",
 );
 same(
   projection.metrics.unclassifiedDirectSemanticWriteOwnerCount,
