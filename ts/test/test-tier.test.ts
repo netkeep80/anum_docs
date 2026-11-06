@@ -117,7 +117,7 @@ const executionPlan = plan as typeof plan & {
   readonly evidenceRoutingSources: readonly string[];
 };
 
-assert.equal(plan.allSourceTests.length, 569, "G11-S2 FULL remains exact 569");
+assert.equal(plan.allSourceTests.length, 169, "P6-D1 exact surviving FULL after 419 removals and six evidence restores");
 assert.equal(plan.currentSourceTests.length, 43, "G11-S2 RED-1/2: CURRENT must contract from 370 to exact 43");
 assert.equal(plan.machineReferencedSourceTests.length, 111, "evidence-reference diagnostic remains exact 111");
 assert.deepEqual(plan.currentSourceTests, EXPECTED_TARGET_CURRENT, "G11-S2 RED-2: exact CURRENT identity, not count only");
@@ -216,9 +216,10 @@ assert.equal(
   false,
   "historical v01 remains FULL-only",
 );
-assert.ok(
+assert.equal(
   allSet.has("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),
-  "historical v01 remains physically executable in FULL",
+  false,
+  "P6-D1: retired v01 is preserved by Git history, not forced into current HEAD",
 );
 assert.equal(
   currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts"),
