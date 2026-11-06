@@ -20,13 +20,6 @@ assert.equal(report.normative.projected, 48);
 assert.equal(report.theorems.historical, 21);
 assert.equal(report.theorems.formal + report.theorems.missing.length, report.theorems.historical);
 assert.equal(report.formulas.total, 216);
-if (report.formulas.verified !== 31) {
-  console.error("P6_D1_DOCUMENTATION_DIAGNOSTIC=" + JSON.stringify({
-    verified: report.formulas.verified,
-    pending: report.formulas.pending,
-    blockers: report.blockers,
-  }));
-}
 assert.equal(report.formulas.verified, 31, "all current primary FORMAL occurrences have bounded receipts, including all twenty-one migrated theorem statements");
 assert.equal(report.formulas.pending, 0, "primary FORMAL source/denotation backlog is closed; missing theorem migrations remain separate blockers");
 assert.equal(report.prose.files, 11, "full current markdown surface includes PORTFOLIO and theorem catalog");
