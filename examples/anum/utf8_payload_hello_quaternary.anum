@@ -1,7 +1,0 @@
-# anum-format: quaternary
-# anum-payload: utf8-text
-#
-# Это UTF-8 payload, закодированный четверичными абитами.
-# Это не string symbolic anum и не десериализация связи.
-
-[01101000][01100101][01101100][01101100][01101111]
