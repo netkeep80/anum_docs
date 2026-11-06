@@ -35,9 +35,9 @@ const P6_RECOVERY_COMMIT = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
 function read(root: string, path: string): string {
   const target = join(root, path);
   if (existsSync(target)) return readFileSync(target, "utf8");
-  // Retired source witnesses remain immutable in Git history; current
-  // profiles and active code continue to require physical HEAD residency.
-  if (path.startsWith("ts/test/") && path.endsWith(".test.ts")) {
+  // Only the explicitly accepted, retired M5 source is historical.
+  // Any other missing CURRENT test remains a hard failure in HEAD.
+  if (path === "ts/test/v015-variadic-grounding-m5.test.ts") {
     return execFileSync("git", ["show", `${P6_RECOVERY_COMMIT}:${path}`], {
       cwd: root,
       encoding: "utf8",
@@ -245,13 +245,24 @@ const cleanEvidence = strings(kernel.cleanMainExecutableEvidence, "clean-main ex
 for (const path of [
   "ts/test/v015-positive-aset-currentness-a8.test.ts",
   "ts/test/v015-context-theory-self-contained-a6.test.ts",
-  "ts/test/v015-variadic-grounding-m5.test.ts",
   "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
   "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
   "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts",
 ]) {
   assert(cleanEvidence.includes(path), "kernel pins clean evidence: " + path);
+  assert(existsSync(join(root, path)), "clean-main executable evidence physically exists: " + path);
 }
+assert(!cleanEvidence.includes("ts/test/v015-variadic-grounding-m5.test.ts"),
+  "retired M5 is not misrepresented as current executable HEAD evidence");
+const historicalKernelEvidence = kernel.historicalAcceptedExecutableEvidence;
+assert(Array.isArray(historicalKernelEvidence) && historicalKernelEvidence.length === 1,
+  "one explicitly classified historical kernel witness");
+const historicalM5 = record(historicalKernelEvidence[0], "historical M5 evidence");
+assert(historicalM5.path === "ts/test/v015-variadic-grounding-m5.test.ts", "historical M5 source identity");
+assert(historicalM5.recoveryCommit === P6_RECOVERY_COMMIT, "historical M5 recovery commit");
+assert(historicalM5.gitBlobSha === "1b69fcf3d0c03436d48c20fd6cb3377b249c1307", "historical M5 immutable blob SHA");
+assert(!existsSync(join(root, "ts/test/v015-variadic-grounding-m5.test.ts")),
+  "retired M5 remains absent from physical HEAD");
 assert(
   !cleanEvidence.includes("ts/test/v015-structural-aset-one-command-a9.test.ts"),
   "obsolete A9 monolith is not clean kernel evidence",
