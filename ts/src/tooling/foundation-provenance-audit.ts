@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 
@@ -204,7 +205,22 @@ export function auditHistoricalV013FoundationProvenance(root: string): Historica
     const fullPath = resolve(repositoryRoot, path);
     const relativePath = relative(repositoryRoot, fullPath);
     if (relativePath === ".." || relativePath.startsWith(`..${sep}`)) return false;
-    return existsSync(fullPath) && statSync(fullPath).isFile();
+    if (existsSync(fullPath)) return statSync(fullPath).isFile();
+    // Accepted v0.13 evidence is historical: absence from current HEAD does
+    // not invalidate an exact source preserved at the recovery commit.
+    if (!relativePath.startsWith("ts/test/") ||
+        !relativePath.endsWith(".test.ts") ||
+        relativePath.slice("ts/test/".length).includes("/")) return false;
+    try {
+      execFileSync("git", ["cat-file", "-e",
+        `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${relativePath}`], {
+        cwd: repositoryRoot,
+        stdio: "ignore",
+      });
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   return historicalV013Summary(validateFoundationProvenance({
