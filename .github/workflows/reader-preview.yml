@@ -7,7 +7,7 @@ on:
       - ".github/workflows/reader-preview.yml"
       - "ts/src/tooling/mts-reader-r44-w6*.ts"
       - "ts/src/tooling/mts-reader-r44-w*.ts"
-        - "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
+      - "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
       - "requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml"
       - "tools/reader-preview/**"
   workflow_dispatch:
@@ -27,6 +27,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          submodules: true
           persist-credentials: false
 
       - name: Check expected Draft source authority

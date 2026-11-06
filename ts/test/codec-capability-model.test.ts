@@ -732,9 +732,17 @@ const repositoryRoot = resolve(process.cwd(), "..");
 // P6-D1 retires historical test files from HEAD. Their exact recovery-commit
 // identities remain available as historical evidence, never as current tests.
 const P6_RECOVERY_COMMIT = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
+// Only these four retired codec witnesses may be sourced from immutable Git history.
+// Any other missing evidence path remains a hard failure (including CURRENT tests).
+const P6_RETIRED_CODEC_EVIDENCE = new Set<string>([
+  "ts/test/v013-codec-comparison.test.ts",
+  "ts/test/v013-v012-utf8-carrier-parity.test.ts",
+  "ts/test/v014-release-cutover-a75.test.ts",
+  "ts/test/v09-byte-carrier.test.ts",
+]);
 function evidencePathPresent(path: string): boolean {
   if (existsSync(join(repositoryRoot, path))) return true;
-  if (!path.startsWith("ts/test/") || !path.endsWith(".test.ts")) return false;
+  if (!P6_RETIRED_CODEC_EVIDENCE.has(path)) return false;
   try {
     execFileSync("git", ["cat-file", "-e", `${P6_RECOVERY_COMMIT}:${path}`], {
       cwd: repositoryRoot,
