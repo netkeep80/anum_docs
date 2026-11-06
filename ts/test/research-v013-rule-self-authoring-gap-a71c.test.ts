@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -436,12 +437,8 @@ function staticGuards():void{
   const own=readFileSync(
     join(root,"ts/test/research-v013-rule-self-authoring-gap-a71c.test.ts"),"utf8",
   );
-  const a70g=readFileSync(
-    join(root,"ts/test/research-v013-intrinsic-application-results-a70g.test.ts"),"utf8",
-  );
-  const a52=readFileSync(
-    join(root,"ts/test/research-v013-application-normal-form-a52.test.ts"),"utf8",
-  );
+  const a70g=readPreP6ResearchSource("ts/test/research-v013-intrinsic-application-results-a70g.test.ts");
+  const a52=readPreP6ResearchSource("ts/test/research-v013-application-normal-form-a52.test.ts");
 
   same(
     sourceSlice(own,"function intrinsicApplicationResults(","\ninterface IntrinsicNonFinalStep"),
@@ -481,6 +478,14 @@ function staticGuards():void{
     "natural A70/A71 path contains no hidden A52 dispatch");
   assert(!natural.includes("memory.ensure(futureApplication,yFuture)"),
     "natural path does not directly author wanted rule");
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main():void{

@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -740,24 +741,23 @@ function staticGuards(): void {
   assert(!reaction.includes("carry"),
     "naive reaction has no terminal carry-forward path");
 
-  const a72r = readFileSync(
-    join(root, "ts/test/research-v013-recursive-variadic-all-a72r.test.ts"),
-    "utf8",
-  );
+  const a72r = readPreP6ResearchSource("ts/test/research-v013-recursive-variadic-all-a72r.test.ts");
   assert(a72r.includes("RECURSIVE_VARIADIC_ALL=GREEN_SCOPED_RESEARCH"),
     "A72r recursive variadic base remains retained");
 
-  const a72p = readFileSync(
-    join(
-      root,
-      "ts/test/research-v013-multivalued-deterministic-composition-a72p.test.ts",
-    ),
-    "utf8",
-  );
+  const a72p = readPreP6ResearchSource("ts/test/research-v013-multivalued-deterministic-composition-a72p.test.ts");
   assert(
     a72p.includes("MULTIVALUED_DETERMINISTIC_COMPOSITION=GREEN_SCOPED_RESEARCH"),
     "A72p multivalued composition base remains retained",
   );
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main(): void {

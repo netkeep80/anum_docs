@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -615,10 +616,7 @@ function staticGuards(): void {
     "flat witness imports no Context/state interpreter",
   );
 
-  const a72m = readFileSync(
-    join(root, "ts/test/research-v013-working-scope-reachability-a72m.test.ts"),
-    "utf8",
-  );
+  const a72m = readPreP6ResearchSource("ts/test/research-v013-working-scope-reachability-a72m.test.ts");
   assert(
     a72m.includes("WORKING_STATE_AS_SCOPE_REACHABILITY=GREEN_SCOPED_RESEARCH"),
     "A72m Scope-reachability baseline remains retained",
@@ -632,6 +630,14 @@ function staticGuards(): void {
     a72n.includes("PLAIN_APPEND_ONLY_CURRENT_BINDING_IS_INSUFFICIENT"),
     "A72n append-only currentness falsifier remains retained",
   );
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main(): void {

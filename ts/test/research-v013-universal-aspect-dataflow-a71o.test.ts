@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -431,10 +432,7 @@ function staticGuards():void{
     join(root,"ts/src/structural-unification.ts"),
     "utf8",
   );
-  const a71n=readFileSync(
-    join(root,"ts/test/research-v013-rule-driven-homomorphism-dataflow-a71n.test.ts"),
-    "utf8",
-  );
+  const a71n=readPreP6ResearchSource("ts/test/research-v013-rule-driven-homomorphism-dataflow-a71n.test.ts");
 
   const parity=sourceSlice(
     own,
@@ -474,6 +472,14 @@ function staticGuards():void{
 
   assert(a71n.includes("RULE_NETWORK_AUTHORING_FROM_TEMPLATE=RESIDUAL"),
     "A71o starts from exact A71n universalization boundary");
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main():void{

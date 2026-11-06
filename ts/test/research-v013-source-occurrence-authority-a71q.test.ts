@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -229,10 +230,7 @@ function staticGuards():void{
     join(root,"ts/test/research-v013-source-occurrence-authority-a71q.test.ts"),
     "utf8",
   );
-  const a71p=readFileSync(
-    join(root,"ts/test/research-v013-aspect-preserving-rule-matcher-a71p.test.ts"),
-    "utf8",
-  );
+  const a71p=readPreP6ResearchSource("ts/test/research-v013-aspect-preserving-rule-matcher-a71p.test.ts");
 
   const selected=sourceSlice(
     own,
@@ -260,6 +258,14 @@ function staticGuards():void{
 
   assert(a71p.includes("PROJECTION_VS_RULE_MATCHING_SPLIT=GREEN_SCOPED_RESEARCH"),
     "A71q starts after A71p aspect ambiguity is resolved");
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main():void{
