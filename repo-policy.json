@@ -715,8 +715,7 @@
         "allow_classes": [
           "theorem-catalog-generated-doc",
           "theorem-catalog-tooling-source",
-          "theorem-catalog-test"
-        ],
+          ],
         "max_per_class": {
           "theorem-catalog-generated-doc": 1,
           "theorem-catalog-tooling-source": 1,
