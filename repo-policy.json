@@ -656,9 +656,6 @@
     "theorem-catalog-tooling-source": [
       "ts/src/tooling/theorem-catalog-markdown.ts"
     ],
-    "theorem-catalog-test": [
-      "ts/test/theorem-catalog-markdown.test.ts"
-    ],
     "historical-pics-readme": [
       "pics/README.md"
     ],
