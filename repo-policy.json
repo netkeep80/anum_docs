@@ -714,12 +714,11 @@
       "new_files": {
         "allow_classes": [
           "theorem-catalog-generated-doc",
-          "theorem-catalog-tooling-source",
-          ],
+          "theorem-catalog-tooling-source"
+        ],
         "max_per_class": {
           "theorem-catalog-generated-doc": 1,
-          "theorem-catalog-tooling-source": 1,
-          "theorem-catalog-test": 1
+          "theorem-catalog-tooling-source": 1
         },
         "max_new_files": 3
       },
