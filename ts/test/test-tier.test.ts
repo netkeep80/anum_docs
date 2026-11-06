@@ -207,9 +207,10 @@ assert.equal(
   false,
   "G11-S2 RED-1: v0.16 development witness must leave CURRENT despite non-research filename",
 );
-assert.ok(
+assert.equal(
   allSet.has("ts/test/v016-functional-formal-t09.test.ts"),
-  "G11-S2 RED-1: v0.16 development witness remains FULL",
+  false,
+  "P6-D1: retired v0.16 development witness is recoverable from Git history, not a current FULL obligation",
 );
 assert.equal(
   currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),

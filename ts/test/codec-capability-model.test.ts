@@ -1,5 +1,6 @@
 // #1583 R18/R19/R20 post-v0.14 representation research; not semantic authority.
 // Cost order is defined only under the same workload and preserved-identity contract.
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -728,6 +729,33 @@ function sameHandles(
 
 const repositoryRoot = resolve(process.cwd(), "..");
 
+// P6-D1 retires historical test files from HEAD. Their exact recovery-commit
+// identities remain available as historical evidence, never as current tests.
+const P6_RECOVERY_COMMIT = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
+function evidencePathPresent(path: string): boolean {
+  if (existsSync(join(repositoryRoot, path))) return true;
+  if (!path.startsWith("ts/test/") || !path.endsWith(".test.ts")) return false;
+  try {
+    execFileSync("git", ["cat-file", "-e", `${P6_RECOVERY_COMMIT}:${path}`], {
+      cwd: repositoryRoot,
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+function readLegacyEvidence(path: string): string {
+  if (existsSync(join(repositoryRoot, path))) {
+    return readFileSync(join(repositoryRoot, path), "utf8");
+  }
+  if (!evidencePathPresent(path)) throw new Error(`codec capability model: missing historical evidence: ${path}`);
+  return execFileSync("git", ["show", `${P6_RECOVERY_COMMIT}:${path}`], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  });
+}
+
 // Matrix shape is total: every representation has one explicit state for every
 // capability. Non-claims stay OPEN/NOT_APPLICABLE instead of becoming guesses.
 {
@@ -763,7 +791,7 @@ const repositoryRoot = resolve(process.cwd(), "..");
       }
 
       for (const path of value.evidence) {
-        assert(existsSync(join(repositoryRoot, path)), `missing evidence path: ${path}`);
+        assert(evidencePathPresent(path), `missing current or immutable historical evidence path: ${path}`);
       }
     }
   }
@@ -1072,10 +1100,7 @@ for (const representation of CODEC_CAPABILITY_MODEL) {
 // The old bounded comparison remains useful evidence that generic recursive wire
 // cost and specialized transport cost must not be collapsed into one score.
 {
-  const comparison = readFileSync(
-    join(repositoryRoot, "ts/test/v013-codec-comparison.test.ts"),
-    "utf8",
-  );
+  const comparison = readLegacyEvidence("ts/test/v013-codec-comparison.test.ts");
   assert(comparison.includes("shared-DAG"), "existing shared-DAG cost witness retained");
   assert(comparison.includes("v012PhysicalBytes"), "existing specialized STRING cost witness retained");
 }
