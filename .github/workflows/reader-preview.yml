@@ -64,6 +64,8 @@ jobs:
           python -m venv /tmp/mts-reader-venv
           /tmp/mts-reader-venv/bin/pip install --disable-pip-version-check --quiet \
             "weasyprint==68.0"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
           npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           pandoc --version | head -1
           /tmp/mts-reader-venv/bin/weasyprint --version
