@@ -7,8 +7,7 @@ on:
       - ".github/workflows/reader-preview.yml"
       - "ts/src/tooling/mts-reader-r44-w6*.ts"
       - "ts/src/tooling/mts-reader-r44-w*.ts"
-      - "ts/test/mts-reader-r44-w6.test.ts"
-      - "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
+        - "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml"
       - "requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml"
       - "tools/reader-preview/**"
   workflow_dispatch:
