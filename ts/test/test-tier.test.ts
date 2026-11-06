@@ -117,7 +117,7 @@ const executionPlan = plan as typeof plan & {
   readonly evidenceRoutingSources: readonly string[];
 };
 
-assert.equal(plan.allSourceTests.length, 569, "G11-S2 FULL remains exact 569");
+assert.equal(plan.allSourceTests.length, 170, "P6-D1 exact FULL after 419 initial removals and seven failure-proven restores");
 assert.equal(plan.currentSourceTests.length, 43, "G11-S2 RED-1/2: CURRENT must contract from 370 to exact 43");
 assert.equal(plan.machineReferencedSourceTests.length, 111, "evidence-reference diagnostic remains exact 111");
 assert.deepEqual(plan.currentSourceTests, EXPECTED_TARGET_CURRENT, "G11-S2 RED-2: exact CURRENT identity, not count only");
@@ -207,18 +207,20 @@ assert.equal(
   false,
   "G11-S2 RED-1: v0.16 development witness must leave CURRENT despite non-research filename",
 );
-assert.ok(
+assert.equal(
   allSet.has("ts/test/v016-functional-formal-t09.test.ts"),
-  "G11-S2 RED-1: v0.16 development witness remains FULL",
+  false,
+  "P6-D1: retired v0.16 development witness is recoverable from Git history, not a current FULL obligation",
 );
 assert.equal(
   currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),
   false,
   "historical v01 remains FULL-only",
 );
-assert.ok(
+assert.equal(
   allSet.has("ts/test/v015-semantic-metamodel-evidence-verifier.test.ts"),
-  "historical v01 remains physically executable in FULL",
+  false,
+  "P6-D1: retired v01 is preserved by Git history, not forced into current HEAD",
 );
 assert.equal(
   currentSet.has("ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts"),

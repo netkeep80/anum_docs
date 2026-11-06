@@ -14,10 +14,6 @@ on:
       - "ts/src/v015-link-definition.ts"
       - "ts/src/v013-hierarchical-carrier.ts"
       - "ts/src/exact-sequence.ts"
-      - "ts/test/v015-grounded-approved-recursive-r1.test.ts"
-      - "ts/test/v015-grounded-approved-amemory-package-r2.test.ts"
-      - "ts/test/v015-two-role-approved-recursive-r3.test.ts"
-      - "ts/test/v015-two-role-approved-amemory-package-r4.test.ts"
       - "ts/test/v015-compact-and-role-bundle-a1.test.ts"
       - "ts/test/v015-boolean-package-replay-a2.test.ts"
       - ".github/workflows/amemory-v015-regression.yml"
@@ -43,6 +39,9 @@ jobs:
     steps:
       - name: Checkout anum_docs
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
 
       - name: Checkout exact frozen A-memory
         uses: actions/checkout@v6
@@ -134,6 +133,9 @@ jobs:
     steps:
       - name: Checkout anum_docs
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
 
       - name: Checkout exact frozen A-memory
         uses: actions/checkout@v6
@@ -242,6 +244,9 @@ jobs:
     steps:
       - name: Checkout anum_docs
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
 
       - name: Checkout exact frozen A-memory
         uses: actions/checkout@v6

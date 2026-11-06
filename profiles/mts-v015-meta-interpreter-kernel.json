@@ -120,11 +120,17 @@
   "cleanMainExecutableEvidence": [
     "ts/test/v015-positive-aset-currentness-a8.test.ts",
     "ts/test/v015-context-theory-self-contained-a6.test.ts",
-    "ts/test/v015-variadic-grounding-m5.test.ts",
     "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
     "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
     "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts",
     ".github/workflows/amemory-v015-regression.yml"
+  ],
+  "historicalAcceptedExecutableEvidence": [
+    {
+      "path": "ts/test/v015-variadic-grounding-m5.test.ts",
+      "recoveryCommit": "6044ad5ca0ea82f3ab5009d509a95ca8914316e9",
+      "gitBlobSha": "1b69fcf3d0c03436d48c20fd6cb3377b249c1307"
+    }
   ],
   "architectureEvidence": [
     "profiles/mts-v015-generalized-reaction-candidate.json"

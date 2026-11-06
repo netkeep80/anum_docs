@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -629,17 +630,11 @@ function staticGuards(): void {
       "kernel excludes semantic/cardinality dispatch: " + forbidden);
   }
 
-  const a72g = readFileSync(
-    join(root, "ts/test/research-v013-relational-bundle-1-to-0-a72g.test.ts"),
-    "utf8",
-  );
+  const a72g = readPreP6ResearchSource("ts/test/research-v013-relational-bundle-1-to-0-a72g.test.ts");
   assert(a72g.includes("NO_RULE_MEANS_DELETE=FALSE"),
     "A72g no-rule boundary remains retained");
 
-  const a72t = readFileSync(
-    join(root, "ts/test/research-v013-mixed-scope-early-collapse-a72t.test.ts"),
-    "utf8",
-  );
+  const a72t = readPreP6ResearchSource("ts/test/research-v013-mixed-scope-early-collapse-a72t.test.ts");
   assert(a72t.includes("MIXED_WORKING_SCOPE_EARLY_RESULT_COLLAPSE=GREEN_SCOPED_RESEARCH"),
     "A72t mixed stable/active witness remains retained");
 
@@ -649,6 +644,14 @@ function staticGuards(): void {
   );
   assert(a72w.includes("FLAT_GENERALIZED_MODUS_PONENS=GREEN_SCOPED_RESEARCH"),
     "A72w historical flat floor remains retained");
+}
+
+// Retired research witnesses are immutable Git-history evidence, not current HEAD files.
+function readPreP6ResearchSource(path: string): string {
+  const root = resolve(process.cwd(), "..");
+  return execFileSync("git", ["show", `6044ad5ca0ea82f3ab5009d509a95ca8914316e9:${path}`], {
+    cwd: root, encoding: "utf8",
+  });
 }
 
 function main(): void {

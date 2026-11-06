@@ -1,4 +1,5 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import * as ts from "typescript";
 
@@ -823,10 +824,21 @@ if (projection.packageDirectSemanticWriteAudit === undefined) {
   );
 }
 
+// P6-D1: the immutable v0.13 research projection retains the retired
+// instantiation owner as historical provenance. Only surviving HEAD writers
+// are current sources; require the live delta to be exactly this one owner.
+const p6RetiredHistoricalWriteOwner =
+  "ts/src/derived-derivation-instantiation.ts#instantiateTemplate";
+const historicalWriteOwners: string[] =
+  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id);
+assert(historicalWriteOwners.includes(p6RetiredHistoricalWriteOwner),
+  "pre-P6 historical write owner remains in original provenance");
+assert(!observedDirectWriteOwners.includes(p6RetiredHistoricalWriteOwner),
+  "retired P6 writer is absent from current HEAD write sites");
 setEqual(
   observedDirectWriteOwners,
-  projection.packageDirectSemanticWriteAudit.owners.map((entry: any) => entry.id),
-  "package-wide direct semantic write owners",
+  historicalWriteOwners.filter((id) => id !== p6RetiredHistoricalWriteOwner),
+  "package-wide live direct write owners equal historical inventory minus the exact retired P6 writer",
 );
 
 const allowedWriteOwnerCategories = [
@@ -868,8 +880,8 @@ setEqual(
 );
 same(
   projection.metrics.directSemanticWriteOwnerCount,
-  observedDirectWriteOwners.length,
-  "direct semantic write owner count",
+  observedDirectWriteOwners.length + 1,
+  "historical direct semantic write owner count includes exactly one retired P6 writer",
 );
 same(
   projection.metrics.unclassifiedDirectSemanticWriteOwnerCount,
@@ -901,16 +913,56 @@ same(
 // host-owned decision candidates. Unlike P1e's deliberately syntax-only write
 // inventory, this pass resolves the called/read member to declarations in
 // memory.ts so unrelated methods with the same spelling are excluded.
-const sourcePaths = tsSourceFiles("ts/src");
+// P6-D1: S3 is a frozen v0.13 *historical* package measurement, not a
+// requirement to retain former implementation files in current HEAD. When a
+// source was deliberately retired, typecheck its exact recovery-commit bytes
+// in memory only. This preserves the accepted 531-site audit without silently
+// converting historical code into current public/runtime ownership.
+const historicalS3RetiredPaths = [
+  "ts/src/derived-derivation-application.ts",
+  "ts/src/derived-derivation-cross-scope.ts",
+  "ts/src/derived-derivation-instantiation.ts",
+  "ts/src/derived-derivation-specialization.ts",
+  "ts/src/node-json-backend.ts",
+  "ts/src/v015-writing-projection.ts",
+] as const;
+const historicalS3RecoveryCommit = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
+const historicalS3Bytes = new Map<string, string>();
+for (const path of historicalS3RetiredPaths) {
+  assert(!existsSync(join(repoRoot, path)), `historical S3 retired source stays absent from HEAD: ${path}`);
+  const content = execFileSync("git", ["show", `${historicalS3RecoveryCommit}:${path}`], {
+    cwd: repoRoot, encoding: "utf8", maxBuffer: 8 * 1024 * 1024,
+  });
+  assert(content.length > 0, `historical S3 recovery blob exists: ${path}`);
+  historicalS3Bytes.set(join(repoRoot, path).replaceAll("\\\\", "/"), content);
+}
+const sourcePaths = [...new Set([...tsSourceFiles("ts/src"), ...historicalS3RetiredPaths])].sort();
+const historicalS3Options: ts.CompilerOptions = {
+  target: ts.ScriptTarget.ES2022,
+  module: ts.ModuleKind.NodeNext,
+  moduleResolution: ts.ModuleResolutionKind.NodeNext,
+  strict: true,
+  skipLibCheck: true,
+};
+const historicalS3Host = ts.createCompilerHost(historicalS3Options);
+const originalHistoricalGetSourceFile = historicalS3Host.getSourceFile.bind(historicalS3Host);
+const originalHistoricalFileExists = historicalS3Host.fileExists.bind(historicalS3Host);
+const originalHistoricalReadFile = historicalS3Host.readFile.bind(historicalS3Host);
+const historicalPath = (fileName: string): string => fileName.replaceAll("\\\\", "/");
+historicalS3Host.fileExists = (fileName) =>
+  historicalS3Bytes.has(historicalPath(fileName)) || originalHistoricalFileExists(fileName);
+historicalS3Host.readFile = (fileName) =>
+  historicalS3Bytes.get(historicalPath(fileName)) ?? originalHistoricalReadFile(fileName);
+historicalS3Host.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
+  const historical = historicalS3Bytes.get(historicalPath(fileName));
+  return historical === undefined
+    ? originalHistoricalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile)
+    : ts.createSourceFile(fileName, historical, languageVersion, true, ts.ScriptKind.TS);
+};
 const typedProgram = ts.createProgram({
   rootNames: sourcePaths.map((path) => join(repoRoot, path)),
-  options: {
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.NodeNext,
-    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-    strict: true,
-    skipLibCheck: true,
-  },
+  options: historicalS3Options,
+  host: historicalS3Host,
 });
 const typeChecker = typedProgram.getTypeChecker();
 const memorySourceSuffix = "/ts/src/memory.ts";

@@ -1,5 +1,6 @@
 // mts-version-evidence: candidate-from=0.14
 
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -248,15 +249,19 @@ function main(): void {
     );
   }
 
-  // The accepted zero-rooted Peano witnesses must remain present as independent
-  // structural evidence, not be replaced by this finite harness.
+  // P6-D1: these three independent Peano falsifiers are accepted historical
+  // evidence, not current executable HEAD obligations. Their immutable source
+  // identities remain available in the exact pre-cleanup recovery commit.
+  const historicalEvidenceCommit = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
   for (const path of [
     "ts/test/nat-refoundation-carrier.test.ts",
     "ts/test/nat-peano-successor-injective.test.ts",
     "ts/test/nat-peano-zero-not-successor.test.ts",
   ]) {
-    const source = readFileSync(join(root, path), "utf8");
-    assert(source.length > 0, "required existing Nat witness " + path);
+    const source = execFileSync("git", ["show", `${historicalEvidenceCommit}:${path}`], {
+      cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024,
+    });
+    assert(source.length > 0, "historical Nat witness remains recoverable " + path);
   }
 
   console.log([

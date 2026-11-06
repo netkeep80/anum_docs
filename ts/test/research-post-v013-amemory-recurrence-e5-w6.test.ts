@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -237,10 +238,10 @@ function exerciseStructuralEndIsNotGlobalHalt(): void {
 function staticGuards(): void {
   const root = resolve(process.cwd(), "..");
 
-  const e4 = readFileSync(
-    join(root, "ts/test/research-post-v013-amemory-theory-visibility-e4.test.ts"),
-    "utf8",
-  );
+  // E4 is an accepted historical research witness, not a current HEAD root.
+  const e4 = execFileSync("git", ["show",
+    "6044ad5ca0ea82f3ab5009d509a95ca8914316e9:ts/test/research-post-v013-amemory-theory-visibility-e4.test.ts",
+  ], { cwd: root, encoding: "utf8" });
   assert(
     e4.includes("E4_CLASSIFICATION=V013_PLUS_EXECUTION_PROFILE"),
     "E5 builds on the selected E4 execution-profile boundary",
