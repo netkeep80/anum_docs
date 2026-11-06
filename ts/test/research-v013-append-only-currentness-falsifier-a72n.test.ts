@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -208,12 +209,14 @@ function staticGuards(): void {
       "plain currentness reader has no hidden ordering/lifecycle semantics: " + forbidden);
   }
 
-  const prior = readFileSync(
-    join(root, "ts/test/research-v013-working-scope-reachability-a72m.test.ts"),
-    "utf8",
-  );
+  // A72m is retired from HEAD. Its accepted research marker remains
+  // available from the immutable pre-P6 recovery commit, not a live file.
+  const prior = execFileSync("git", [
+    "show",
+    "6044ad5ca0ea82f3ab5009d509a95ca8914316e9:ts/test/research-v013-working-scope-reachability-a72m.test.ts",
+  ], { cwd: root, encoding: "utf8" });
   assert(prior.includes("WORKING_STATE_AS_SCOPE_REACHABILITY=GREEN_SCOPED_RESEARCH"),
-    "A72m single-current-scope baseline remains retained");
+    "A72m historical single-current-scope baseline remains recoverable");
 }
 
 function main(): void {
