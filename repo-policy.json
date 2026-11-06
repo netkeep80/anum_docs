@@ -259,6 +259,11 @@
           },
           {
             "kind": "regex",
+            "glob": "ts/test/v014-release-cutover-a75.test.ts",
+            "pattern": "negativeVector\\(\\\"([^\\\"]+)\\\""
+          },
+          {
+            "kind": "regex",
             "glob": "ts/test/v015-requirements-traceability-r0.test.ts",
             "pattern": "negativeVector\\(\"([^\"]+)\""
           }
@@ -548,6 +553,7 @@
       "ts/src/tooling/theorem-catalog-markdown.ts",
       "ts/src/tooling/docs-sync.ts",
       "ts/src/tooling/mts-compiler.ts",
+      "ts/test/theorem-catalog-markdown.test.ts",
       "ts/test/docs-sync.test.ts"
     ],
     "historical-pics-readme": [
@@ -563,7 +569,8 @@
       "ts/test/research-v013-semantic-dependency-projection-a9.test.ts"
     ],
     "science-shared-reader-coverage-files": [
-      "ts/src/tooling/mts-reader-coverage.ts"
+      "ts/src/tooling/mts-reader-coverage.ts",
+      "ts/test/mts-reader-coverage.test.ts"
     ],
     "science-corpus-pr2173-exact-files": [
       ".github/workflows/ci.yml",
@@ -646,7 +653,35 @@
       "ts/src/tooling/mts-reader-review-m06.ts",
       "ts/src/tooling/mts-reader-review-p02-p03.ts",
       "ts/src/tooling/mts-reader-review-r01-r02.ts",
-      "ts/src/tooling/mts-reader-review-r03-r04.ts"
+      "ts/src/tooling/mts-reader-review-r03-r04.ts",
+      "ts/test/mts-reader-f03-kernel-candidate.test.ts",
+      "ts/test/mts-reader-g20.test.ts",
+      "ts/test/mts-reader-g42.test.ts",
+      "ts/test/mts-reader-r42.test.ts",
+      "ts/test/mts-reader-r43.test.ts",
+      "ts/test/mts-reader-r44-w2.test.ts",
+      "ts/test/mts-reader-r44-w3.test.ts",
+      "ts/test/mts-reader-r44-w4.test.ts",
+      "ts/test/mts-reader-r44-w5.test.ts",
+      "ts/test/mts-reader-r44-w6.test.ts",
+      "ts/test/mts-reader-r44.test.ts",
+      "ts/test/mts-reader-review-f01-f02-p01.test.ts",
+      "ts/test/mts-reader-review-f03-f04-f05.test.ts",
+      "ts/test/mts-reader-review-f06-f07.test.ts",
+      "ts/test/mts-reader-review-g01-g02-g03.test.ts",
+      "ts/test/mts-reader-review-l01-l02-l03.test.ts",
+      "ts/test/mts-reader-review-m01.test.ts",
+      "ts/test/mts-reader-review-m02.test.ts",
+      "ts/test/mts-reader-review-m03.test.ts",
+      "ts/test/mts-reader-review-m04.test.ts",
+      "ts/test/mts-reader-review-m05.test.ts",
+      "ts/test/mts-reader-review-m06-w1.test.ts",
+      "ts/test/mts-reader-review-m06-w2.test.ts",
+      "ts/test/mts-reader-review-m06-w3.test.ts",
+      "ts/test/mts-reader-review-m06.test.ts",
+      "ts/test/mts-reader-review-p02-p03.test.ts",
+      "ts/test/mts-reader-review-r01-r02.test.ts",
+      "ts/test/mts-reader-review-r03-r04.test.ts"
     ]
   },
   "new_file_classes": {
@@ -655,6 +690,9 @@
     ],
     "theorem-catalog-tooling-source": [
       "ts/src/tooling/theorem-catalog-markdown.ts"
+    ],
+    "theorem-catalog-test": [
+      "ts/test/theorem-catalog-markdown.test.ts"
     ],
     "historical-pics-readme": [
       "pics/README.md"
@@ -714,11 +752,13 @@
       "new_files": {
         "allow_classes": [
           "theorem-catalog-generated-doc",
-          "theorem-catalog-tooling-source"
+          "theorem-catalog-tooling-source",
+          "theorem-catalog-test"
         ],
         "max_per_class": {
           "theorem-catalog-generated-doc": 1,
-          "theorem-catalog-tooling-source": 1
+          "theorem-catalog-tooling-source": 1,
+          "theorem-catalog-test": 1
         },
         "max_new_files": 3
       },
