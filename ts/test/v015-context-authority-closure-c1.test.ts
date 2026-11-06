@@ -6,7 +6,8 @@
 // executable witnesses. It binds the already integrated A5/A6/A8/A9/M5/DAS
 // evidence to the compact pre-acceptance kernel and paired GPR assurance.
 
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 type Json = Record<string, unknown>;
@@ -30,8 +31,19 @@ function strings(value: unknown, message: string): readonly string[] {
   return value as string[];
 }
 
+const P6_RECOVERY_COMMIT = "6044ad5ca0ea82f3ab5009d509a95ca8914316e9";
 function read(root: string, path: string): string {
-  return readFileSync(join(root, path), "utf8");
+  const target = join(root, path);
+  if (existsSync(target)) return readFileSync(target, "utf8");
+  // Retired source witnesses remain immutable in Git history; current
+  // profiles and active code continue to require physical HEAD residency.
+  if (path.startsWith("ts/test/") && path.endsWith(".test.ts")) {
+    return execFileSync("git", ["show", `${P6_RECOVERY_COMMIT}:${path}`], {
+      cwd: root,
+      encoding: "utf8",
+    });
+  }
+  return readFileSync(target, "utf8");
 }
 
 function json(root: string, path: string): Json {

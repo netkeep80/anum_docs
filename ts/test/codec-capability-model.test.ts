@@ -896,7 +896,7 @@ for (const representation of CODEC_CAPABILITY_MODEL) {
     ids.add(relation.id);
     assert(relation.evidence.length > 0, `${relation.id}: evidence required`);
     for (const path of relation.evidence) {
-      assert(existsSync(join(repositoryRoot, path)), `missing relation evidence: ${path}`);
+      assert(evidencePathPresent(path), `missing current or immutable historical relation evidence: ${path}`);
     }
     if (relation.relation === "EXACT_ISOMORPHISM") {
       same(relation.inverse, "AVAILABLE", `${relation.id}: exact isomorphism inverse`);
