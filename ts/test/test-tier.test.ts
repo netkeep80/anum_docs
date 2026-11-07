@@ -117,7 +117,38 @@ const executionPlan = plan as typeof plan & {
   readonly evidenceRoutingSources: readonly string[];
 };
 
-assert.equal(plan.allSourceTests.length, 170, "P6-D1 exact FULL after 419 initial removals and seven failure-proven restores");
+// P6-D1 had exactly 170 FULL tests; P6-D2 may retire historical tests without changing
+// the durable CURRENT owners. Guard actual FULL coverage rather than freezing a past census.
+const physicalFullTestPaths = readdirSync(resolve(repositoryRoot, "ts/test"))
+  .filter((name) => name.endsWith(".test.ts"))
+  .map((name) => `ts/test/${name}`)
+  .sort();
+assert.deepEqual(
+  plan.allSourceTests,
+  physicalFullTestPaths,
+  "FULL must contain every physical test exactly once, without stale or synthetic paths",
+);
+const RETIRED_P6_D2_RESEARCH_PATHS = Object.freeze([
+  "ts/test/research-v013-branch-skew-completion-falsifier-a72s.test.ts",
+  "ts/test/research-v013-readiness-scope-review-a73s.test.ts",
+  "ts/test/research-v013-rule-self-authoring-gap-a71c.test.ts",
+  "ts/test/research-v013-self-admission-local-index-a73i.test.ts",
+  "ts/test/research-v013-source-occurrence-authority-a71q.test.ts",
+  "ts/test/research-v013-universal-aspect-dataflow-a71o.test.ts",
+  // Second bounded retirement: only two research tests with zero observed references.
+  "ts/test/research-historical-coq-self-context.test.ts",
+  "ts/test/research-post-v013-amemory-recurrence-e5-w6.test.ts",
+  // Historical v0.11 executable witnesses; no current v0.15 or theorem routing.
+  "ts/test/research-minimal-sign-basis-c2.test.ts",
+  "ts/test/research-zero-context-genesis.test.ts",
+]);
+for (const path of RETIRED_P6_D2_RESEARCH_PATHS) {
+  assert.equal(
+    plan.allSourceTests.includes(path),
+    false,
+    `P6-D2 retired historical research test must not be silently reintroduced: ${path}`,
+  );
+}
 assert.equal(plan.currentSourceTests.length, 43, "G11-S2 RED-1/2: CURRENT must contract from 370 to exact 43");
 assert.equal(plan.machineReferencedSourceTests.length, 111, "evidence-reference diagnostic remains exact 111");
 assert.deepEqual(plan.currentSourceTests, EXPECTED_TARGET_CURRENT, "G11-S2 RED-2: exact CURRENT identity, not count only");
