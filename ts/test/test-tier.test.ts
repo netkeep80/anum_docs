@@ -1,4 +1,4 @@
-import { verifyProjectOwnership } from "../src/tooling/project-ownership.js";
+import { verifyProjectOwnership } from "./support/project-ownership.js";
 import assert from "node:assert/strict";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

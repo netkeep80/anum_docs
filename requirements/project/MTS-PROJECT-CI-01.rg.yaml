@@ -53,7 +53,7 @@ relations:
     target:
       kind: artifact
       path: ts/browser/indexeddb-dataset-repository.test.ts
-  - predicates: [implemented_by]
+  - predicates: [requires]
     target:
       kind: artifact
-      path: ts/src/tooling/project-ownership.ts
+      path: ts/test/support/project-ownership.ts
