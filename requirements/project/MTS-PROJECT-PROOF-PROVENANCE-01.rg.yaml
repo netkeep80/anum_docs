@@ -1,0 +1,59 @@
+format: repo-guard/requirement-v1
+id: MTS-PROJECT-PROOF-PROVENANCE-01
+normative: "Current proof and theorem publication must preserve the independently classified external-versus-native evidence authority, exact external toolchain identity and machine-verifiable evidence record schema. Historical proof registries and accepted evidence are provenance, not new MTS semantic authority; the verification infrastructure must reject absent or contradictory evidence records."
+lifecycle:
+  accepted: false
+  current: false
+relations:
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/provers.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence-record.schema.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/external-toolchains.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/external-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-external-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-formal-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/native-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: theorems/registry.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: theorems/current-v0.15.json
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: theorems/generate-current-index.mjs
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: theorems/validate-registry.mjs
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/proof-infrastructure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-proof-assurance-f0.test.ts
