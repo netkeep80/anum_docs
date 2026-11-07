@@ -1,0 +1,67 @@
+name: P7 exact candidate full and external J1 (temporary)
+on:
+  push:
+    branches: [feat/p7-bounded-project-ownership-20261108]
+permissions:
+  contents: read
+jobs:
+  full-and-j1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: repoguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Assert identities and install
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C candidate rev-parse HEAD)" = "$GITHUB_SHA"
+          echo "EXACT_HEAD=$(git -C candidate rev-parse HEAD)"
+          echo "EXACT_TREE=$(git -C candidate rev-parse HEAD^{tree})"
+          test "$(git -C candidate/vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+          npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Complete FULL / docs / browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix candidate/ts run check:full
+          git -C candidate diff --exit-code
+      - name: Exact external RepoGuard 6.0.1 J1/J2/J3 receipt
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p7"
+          sha="$(git -C candidate rev-parse HEAD)"
+          echo "$sha" > "$RUNNER_TEMP/p7/head.txt"
+          git -C candidate rev-parse HEAD^{tree} > "$RUNNER_TEMP/p7/tree.txt"
+          set +e
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "$sha" --head "$sha" --format json > "$RUNNER_TEMP/p7/check.json" 2> "$RUNNER_TEMP/p7/stderr.txt"
+          rc=$?
+          set -e
+          echo "$rc" > "$RUNNER_TEMP/p7/exit.txt"
+          jq -e '.j1 | (.tracked|type=="number") and (.justified|type=="number")' "$RUNNER_TEMP/p7/check.json" >/dev/null
+          jq -r '"P7_EXACT_J1=\(.j1.tracked)/\(.j1.justified)/\(.j1.tracked - .j1.justified) J2=\(.j2.rooted) DIAGNOSTICS=\(.diagnostics | length)"' "$RUNNER_TEMP/p7/check.json"
+          test "$rc" -le 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-exact-full-and-j1
+          path: ${{ runner.temp }}/p7/
+          retention-days: 3
