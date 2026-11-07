@@ -33,8 +33,8 @@ assert.throws(
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [packageOwnerFile]: packageOwnerText.replace(
-      "  - predicates: [implemented_by]\\n    target:\\n      kind: artifact\\n      path: ts/src/anum.ts",
-      "  - predicates: [verified_by]\\n    target:\\n      kind: artifact\\n      path: ts/src/anum.ts",
+      "  - predicates: [implemented_by]\n    target:\n      kind: artifact\n      path: ts/src/anum.ts",
+      "  - predicates: [verified_by]\n    target:\n      kind: artifact\n      path: ts/src/anum.ts",
     ),
   }),
   /public API implemented_by relation coverage mismatches/,
@@ -43,7 +43,7 @@ assert.throws(
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [proofOwnerFile]: proofOwnerText.replace(
-      "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: proofs/evidence/FND-01/coq.json",
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: proofs/evidence/FND-01/coq.json",
       "",
     ),
   }),
