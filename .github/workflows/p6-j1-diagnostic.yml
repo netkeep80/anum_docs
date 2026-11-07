@@ -112,3 +112,41 @@ jobs:
           path: ${{ runner.temp }}/p6-j1/
           if-no-files-found: warn
           retention-days: 3
+
+  d2-full-regression:
+    name: P6-D2 exact candidate FULL suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout current D2 candidate and pinned consumer gitlink
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Verify candidate identity and expected physical test count
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = 'b8aaf22b11d8f045bc47b78f0a2a0808ae208b71'
+          count="$(git ls-files -z 'ts/test/*.test.ts' | tr -cd '\0' | wc -c)"
+          printf 'D2 full physical TS test files = %s\n' "$count"
+          test "$count" -eq 164
+
+      - name: Install exact current consumer and TS dependencies
+        run: |
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+
+      - name: FULL tier, typechecks, documentation and browser regression
+        run: npm --prefix ts run check:full
+
+      - name: No tracked source or documentation change from checks
+        run: git diff --exit-code
