@@ -1,0 +1,114 @@
+# Temporary P6 diagnostic. Branch-scoped; remove before acceptance/merge.
+name: P6 exact J1 read-only census
+
+on:
+  push:
+    branches:
+      - chore/p6-j1-census-20261108
+
+permissions:
+  contents: read
+
+jobs:
+  j1-census:
+    if: github.repository == 'netkeep80/anum_docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact accepted anum_docs/main with full history
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/anum_docs
+          ref: 271b881a1ccc979b4877398528c3ebbecfd94bf9
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+          path: anum_docs
+
+      - name: Checkout external RepoGuard v6.0.1 by immutable commit
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: repo-guard-6.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Assert exact identities and capture Git facts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p6-j1"
+          test "$(git -C anum_docs rev-parse HEAD)" = '271b881a1ccc979b4877398528c3ebbecfd94bf9'
+          test "$(git -C anum_docs rev-parse 'HEAD^{tree}')" = '19b9c3d39b1c7be950781f05941495728080172b'
+          test "$(git -C repo-guard-6.0.1 rev-parse HEAD)" = '74db97791e6da8a75287164f0d0b41579108f114'
+          test "$(node -p "require('./repo-guard-6.0.1/package.json').version")" = '6.0.1'
+          test -z "$(git -C anum_docs status --porcelain)"
+          git -C anum_docs ls-tree -r -z HEAD | tr -cd '\0' | wc -c | tr -d ' ' > "$RUNNER_TEMP/p6-j1/tracked-git.txt"
+          test "$(cat "$RUNNER_TEMP/p6-j1/tracked-git.txt")" = 676
+          cat > "$RUNNER_TEMP/p6-j1/identities.txt" <<'FACTS'
+          anum_docs commit: 271b881a1ccc979b4877398528c3ebbecfd94bf9
+          anum_docs tree: 19b9c3d39b1c7be950781f05941495728080172b
+          RepoGuard 6.0.1 commit: 74db97791e6da8a75287164f0d0b41579108f114
+          Consumer vendor gitlink remains v6.0.0; not used for the external census.
+          FACTS
+          cat "$RUNNER_TEMP/p6-j1/identities.txt"
+
+      - name: Install external RepoGuard runtime dependencies only
+        working-directory: repo-guard-6.0.1
+        run: npm ci --ignore-scripts --omit=dev --no-audit --no-fund
+
+      - name: Run compiler J1 (RED from unjustified resources is a valid census)
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p "$RUNNER_TEMP/p6-j1"
+          set +e
+          node "$GITHUB_WORKSPACE/repo-guard-6.0.1/dist/repo-guard.mjs" \
+            --repo-root "$GITHUB_WORKSPACE/anum_docs" \
+            check \
+            --base 271b881a1ccc979b4877398528c3ebbecfd94bf9 \
+            --head 271b881a1ccc979b4877398528c3ebbecfd94bf9 \
+            --format json \
+            > "$RUNNER_TEMP/p6-j1/repo-guard-check.json" \
+            2> "$RUNNER_TEMP/p6-j1/stderr.txt"
+          rc=$?
+          set -e
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/p6-j1/exit-code.txt"
+          cat "$RUNNER_TEMP/p6-j1/stderr.txt"
+          jq -e '.j1 | (.tracked | type == "number") and (.justified | type == "number")' \
+            "$RUNNER_TEMP/p6-j1/repo-guard-check.json" >/dev/null
+          jq -e '.diagnostics | type == "array"' "$RUNNER_TEMP/p6-j1/repo-guard-check.json" >/dev/null
+          tracked=$(jq -r '.j1.tracked' "$RUNNER_TEMP/p6-j1/repo-guard-check.json")
+          justified=$(jq -r '.j1.justified' "$RUNNER_TEMP/p6-j1/repo-guard-check.json")
+          unjustified=$((tracked - justified))
+          printf 'tracked=%s\njustified=%s\nunjustified=%s\nexit_code=%s\n' \
+            "$tracked" "$justified" "$unjustified" "$rc" \
+            | tee "$RUNNER_TEMP/p6-j1/summary.txt"
+          {
+            echo '## RepoGuard v6.0.1 exact J1 — read-only execution receipt'
+            echo ''
+            echo "- Exact main: 271b881a1ccc979b4877398528c3ebbecfd94bf9"
+            echo "- Tracked: **$tracked** / predicted 676"
+            echo "- Justified: **$justified** / predicted 88"
+            echo "- Unjustified: **$unjustified** / predicted 588"
+            echo "- RepoGuard exit code: **$rc** (1 can be expected J1 RED)"
+            echo '- Full diagnostics and Git identities attached as workflow artifact'
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$rc" -le 1
+          test "$tracked" -eq 676
+          test "$justified" -eq 88
+          test "$unjustified" -eq 588
+
+      - name: Preserve read-only receipt (even on compiler failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p6-exact-j1-v6-0-1-readonly
+          path: \${{ runner.temp }}/p6-j1/
+          if-no-files-found: warn
+          retention-days: 3
