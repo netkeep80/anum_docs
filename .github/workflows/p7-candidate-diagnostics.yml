@@ -59,6 +59,24 @@ jobs:
           jq -e '.j1 | (.tracked|type=="number") and (.justified|type=="number")' "$RUNNER_TEMP/p7/check.json" >/dev/null
           jq -r '"P7_EXACT_J1=\(.j1.tracked)/\(.j1.justified)/\(.j1.tracked - .j1.justified) J2=\(.j2.rooted) DIAGNOSTICS=\(.diagnostics | length)"' "$RUNNER_TEMP/p7/check.json"
           test "$rc" -le 1
+      - name: Negative — dangling declared artifact fails under exact v6
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate config user.name "RepoGuard falsifier"
+          git -C candidate config user.email "falsifier@invalid.example"
+          sed -i 's#path: ts/package.json#path: ts/nonexistent-project-package.json#' candidate/requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml
+          grep -q 'path: ts/nonexistent-project-package.json' candidate/requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml
+          git -C candidate add requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml
+          git -C candidate commit -m "NEGATIVE_ONLY: project ownership dangling resource witness"
+          negative="$(git -C candidate rev-parse HEAD)"
+          set +e
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "$negative" --head "$negative" --format json > "$RUNNER_TEMP/p7/negative.json" 2> "$RUNNER_TEMP/p7/negative-stderr.txt"
+          rc=$?
+          set -e
+          test "$rc" -eq 1
+          grep -q 'missing_resource_target' "$RUNNER_TEMP/p7/negative.json"
+          echo "P7_NEGATIVE_DANGLING_EXACT_ARTIFACT=REJECTED"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
