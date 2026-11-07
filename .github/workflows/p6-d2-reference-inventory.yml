@@ -1,0 +1,129 @@
+name: P6-D2 exact source-reference inventory (temporary)
+on:
+  push:
+    branches: [chore/p6-j1-census-20261108]
+permissions:
+  contents: read
+jobs:
+  exact-reference-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: false
+          persist-credentials: false
+      - name: Reproduce source paths and scan present-tense exact consumers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p6-ref"
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          root=pathlib.Path.cwd()
+          allpaths=subprocess.check_output(["git","ls-files","-z"]).decode().strip("\0").split("\0")
+          tests=sorted(p for p in allpaths if p.startswith("ts/test/") and p.endswith(".test.ts"))
+          textfiles={}
+          for path in allpaths:
+              if path in tests or path.startswith("vendor/"): continue
+              try:
+                  data=(root/path).read_bytes()
+                  if b"\0" not in data:
+                      textfiles[path]=data.decode("utf-8","replace")
+              except (FileNotFoundError,IsADirectoryError): pass
+          results=[]
+          for path in tests:
+              basename=path.rsplit("/",1)[-1]
+              basename_without_ts=basename[:-3]
+              # Include matches in another executable test, not only non-test text files
+              refs=[]
+              for candidate in allpaths:
+                  if candidate==path or candidate.startswith("vendor/"): continue
+                  data=textfiles.get(candidate)
+                  if data is None and candidate in tests:
+                      try: data=(root/candidate).read_text(encoding="utf-8")
+                      except (UnicodeError,OSError): continue
+                  if data and (path in data or basename in data or basename_without_ts in data):
+                      refs.append(candidate)
+              results.append({"path":path,"referencedBy":refs,"isResearch":basename.startswith("research-")})
+          out={"sha":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
+               "tracked":len(allpaths),"physicalTests":len(tests),
+               "exactOrBasenameRefCount":sum(bool(x["referencedBy"]) for x in results),
+               "unreferencedResearch":[x["path"] for x in results if x["isResearch"] and not x["referencedBy"]],
+               "all":results}
+          open(pathlib.Path(__import__("os").environ["RUNNER_TEMP"])/"p6-ref"/"reference-candidates.json","w").write(json.dumps(out,ensure_ascii=False,indent=2)+"\n")
+          print("physicalTests",len(tests),"unreferencedResearch",len(out["unreferencedResearch"]))
+          for p in out["unreferencedResearch"]: print("UNREFERENCED_RESEARCH",p)
+          print("===END-P6-REFERENCE-INVENTORY===")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p6-d2-exact-reference-inventory
+          path: ${{ runner.temp }}/p6-ref/
+          retention-days: 3
+
+  candidate-full-and-j1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact PR candidate with full history and consumer gitlink
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - name: Checkout external exact RepoGuard 6.0.1
+        uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: repoguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Assert identity and install pinned dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C candidate rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C candidate rev-parse HEAD^{tree})" != ''
+          test "$(git -C candidate/vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+          npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check candidate FULL / docs / browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix candidate/ts run check:full
+          git -C candidate diff --exit-code
+      - name: Measure candidate J1 external compiler, accept measured RED
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p6-d2-candidate"
+          candidate="$(git -C candidate rev-parse HEAD)"
+          printf 'candidate_commit=%s\n' "$candidate" > "$RUNNER_TEMP/p6-d2-candidate/identity.txt"
+          set +e
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "$candidate" --head "$candidate" --format json \
+            > "$RUNNER_TEMP/p6-d2-candidate/j1.json" 2> "$RUNNER_TEMP/p6-d2-candidate/error.txt"
+          rc=$?
+          set -e
+          printf '%s\n' "$rc" > "$RUNNER_TEMP/p6-d2-candidate/exit.txt"
+          jq -e '.j1 | (.tracked | type == "number") and (.justified | type == "number")' "$RUNNER_TEMP/p6-d2-candidate/j1.json" >/dev/null
+          jq -r '"HEAD_J1 tracked=\(.j1.tracked) justified=\(.j1.justified) unjustified=\(.j1.tracked - .j1.justified)"' "$RUNNER_TEMP/p6-d2-candidate/j1.json"
+          test "$rc" -le 1
+      - name: Save exact candidate J1 receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p6-d2-candidate-exact-j1
+          path: ${{ runner.temp }}/p6-d2-candidate/
+          if-no-files-found: warn
+          retention-days: 3
