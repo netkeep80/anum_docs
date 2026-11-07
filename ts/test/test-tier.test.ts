@@ -135,13 +135,9 @@ const RETIRED_P6_D2_RESEARCH_PATHS = Object.freeze([
   "ts/test/research-v013-self-admission-local-index-a73i.test.ts",
   "ts/test/research-v013-source-occurrence-authority-a71q.test.ts",
   "ts/test/research-v013-universal-aspect-dataflow-a71o.test.ts",
-  // Second bounded historical retirement after present-tense observer scan.
+  // Second bounded retirement: only two research tests with zero observed references.
   "ts/test/research-historical-coq-self-context.test.ts",
   "ts/test/research-post-v013-amemory-recurrence-e5-w6.test.ts",
-  "ts/test/research-v013-formal-duality-a75c.test.ts",
-  "ts/test/research-v013-full-duality-audit-a75f.test.ts",
-  "ts/test/research-v013-grounded-execution-dualization-a75e.test.ts",
-  "ts/test/research-v013-theory-authority-dualization-a75d.test.ts",
 ]);
 for (const path of RETIRED_P6_D2_RESEARCH_PATHS) {
   assert.equal(
