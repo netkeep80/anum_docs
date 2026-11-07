@@ -138,6 +138,9 @@ const RETIRED_P6_D2_RESEARCH_PATHS = Object.freeze([
   // Second bounded retirement: only two research tests with zero observed references.
   "ts/test/research-historical-coq-self-context.test.ts",
   "ts/test/research-post-v013-amemory-recurrence-e5-w6.test.ts",
+  // Historical v0.11 executable witnesses; no current v0.15 or theorem routing.
+  "ts/test/research-minimal-sign-basis-c2.test.ts",
+  "ts/test/research-zero-context-genesis.test.ts",
 ]);
 for (const path of RETIRED_P6_D2_RESEARCH_PATHS) {
   assert.equal(
