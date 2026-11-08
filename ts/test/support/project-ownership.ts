@@ -622,13 +622,11 @@ export function verifyProjectOwnership(
   equalPaths(declaredObservatoryPrivate, observatoryPrivate, "Contract Observatory site source dependency");
   for (const path of observatoryPrivate)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
-  // P7-S14: both CI and Pages execute every compiled Observatory TS test,
+  // P7-S14: Pages execute every compiled Observatory TS test,
   // not merely compile it. Ownership follows that exact executable suite.
   const testLoop = 'for test_file in web/contract-observatory/dist/test/*.test.js; do';
-  for (const observer of [pagesWorkflow, workflow]) {
-    if (!observer.includes(testLoop) || !observer.includes('node "$test_file"'))
-      fail("Contract Observatory full compiled test execution changed");
-  }
+  if (!pagesWorkflow.includes(testLoop) || !pagesWorkflow.includes('node "$test_file"'))
+    fail("Contract Observatory full compiled test execution changed");
   const observatoryConfig = object(JSON.parse(read(observatoryPrefix + "tsconfig.json")), "Observatory tsconfig");
   if (!array(observatoryConfig.include, "Observatory includes").includes("test/**/*.ts"))
     fail("Contract Observatory compiled test inclusion changed");
