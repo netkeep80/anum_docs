@@ -309,3 +309,87 @@ relations:
     target:
       kind: artifact
       path: ts/test/native-fnd07-root-truth-aspect.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-and.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-and.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-and.formal
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-and.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-and.recursive
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-not.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-not.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-not.formal
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-not.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-or.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-or.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-or.formal
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-or.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-xor.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-xor.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-xor.formal
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-xor.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/grounded-zero-role.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/grounded-zero-role.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/two-role-meta-rule.amemory-evidence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/two-role-meta-rule.amemory-package.json
