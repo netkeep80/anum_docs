@@ -129,3 +129,75 @@ relations:
     target:
       kind: artifact
       path: ts/src/tooling/v015-markdown-prose-audit.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-conformance-v0.11.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-conformance-v0.12.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-conformance-v0.13.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-contract-v0.11.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-contract-v0.12.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: contracts/mts-contract-v0.13.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.1.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.2.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.3.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.5.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.6.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: cutover/typescript-c1-acceptance-v0.7.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.11.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.12.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.13-self-proof-authority-profile.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.13-semantic-dependency-projection.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.13.json
