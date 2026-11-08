@@ -1,6 +1,7 @@
 // Project-scoped ownership witnesses. This is a consumer of native RepoGuard
 // Requirements, not a second Requirement authority or a new semantic MTS model.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join, relative, resolve } from "node:path";
 import * as ts from "typescript";
 import { parseDocument } from "yaml";
@@ -461,6 +462,24 @@ export function verifyProjectOwnership(
   equalPaths(declaredPreviewPaths, exactPreviewPaths, "Reader W6 directly invoked YAML inputs");
   for (const path of exactPreviewPaths)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+
+  // S11-A: restore only the exact secondary M06-B transcription whose
+  // absence caused an actual Reader W6 ENOENT. Verify the present-tense
+  // caller and its exact Git-blob pin rather than historical interest.
+  const m06ReaderSource = read("ts/src/tooling/mts-reader-review-m06.ts");
+  const m06BPath = "reviews/m06/reviewer-b-97-indexed-extraction.txt";
+  const m06BlobSource = /const originalBlob\s*=\s*{([\s\S]*?)}\s*as const;/.exec(m06ReaderSource)?.[1];
+  const m06BPin = m06BlobSource &&
+    /\bB:\s*"([0-9a-f]{40})"/.exec(m06BlobSource)?.[1];
+  if (!m06ReaderSource.includes('B:"' + m06BPath + '"') || !m06BPin)
+    fail("M06-B current runtime consumer/path/Git blob pin is absent");
+  const m06BText = read(m06BPath);
+  const m06BDigest = createHash("sha1").update("blob " + Buffer.byteLength(m06BText) + "\0")
+    .update(m06BText).digest("hex");
+  if (m06BDigest !== m06BPin || !m06BText.includes("NOT ORIGINAL PDF BYTES") ||
+      !m06BText.includes("no claim of PDF-byte identity"))
+    fail("M06-B secondary transcription byte identity or source status drift");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", m06BPath, "requires");
 
   // GitHub Pages actually compiles the Contract Observatory and runs only
   // two explicit tests. Derive ownership from the deployed build-site AST and
