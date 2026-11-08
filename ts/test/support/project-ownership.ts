@@ -245,18 +245,32 @@ export function verifyProjectOwnership(
     return expected.length;
   };
 
-  // S10: the accepted publication obligation executes exactly two tooling
-  // entrypoints: current Markdown coverage and the non-authoritative W6 CLI.
-  // The transitive implementation dependency set is computed by the existing
-  // TypeScript AST graph above, not by a directory prefix or hardcoded list.
+  // S12: Pages explicitly runs docs:coverage, in addition to the two
+  // executable Reader publication roots. Never equate a test's mere existence
+  // or a directory prefix with a present-tense project obligation.
+  const coverageWorkflow = read(".github/workflows/pages.yml");
+  const publicationScripts = object(
+    object(JSON.parse(read("ts/package.json")), "TS package").scripts,
+    "TS package scripts");
+  const coverageScript = publicationScripts["docs:coverage"];
+  if (!coverageWorkflow.includes("npm --prefix ts run docs:coverage") ||
+      coverageScript !== "npm run build --silent && node dist/src/tooling/docs-coverage.js")
+    fail("S12 Pages current docs-coverage executable binding changed");
+  const docsCoverageEntrypoint = "ts/src/tooling/docs-coverage.ts";
+  const docsCoverageSource = read(docsCoverageEntrypoint);
+  if (!docsCoverageSource.includes('from "./docs-sync.js"') ||
+      !docsCoverageSource.includes('from "./markdown-coverage-audit.js"') ||
+      !docsCoverageSource.includes("buildMarkdownCoverageAudit(findRepositoryRoot())"))
+    fail("S12 Pages docs-coverage lost its actual Markdown audit consumer");
   const previewPublishedRoots = sorted([...get("MTS-PROJECT-PUBLICATION-01").entries()]
     .filter(([path, predicate]) =>
       path.startsWith("ts/src/tooling/") && predicate === "implemented_by")
     .map(([path]) => path));
-  equalPaths(previewPublishedRoots, [
+  equalPaths(previewPublishedRoots, sorted([
+    docsCoverageEntrypoint,
     "ts/src/tooling/mts-reader-coverage.ts",
     "ts/src/tooling/mts-reader-r44-w6-cli.ts",
-  ], "current publication tooling entrypoints");
+  ]), "current publication tooling entrypoints");
 
   const lineageToolingDependencies = verifyToolingClosure("MTS-PROJECT-ACCEPTED-LINEAGE-01");
   const publicationToolingDependencies = verifyToolingClosure("MTS-PROJECT-PUBLICATION-01");
@@ -376,6 +390,26 @@ export function verifyProjectOwnership(
   for (const path of currentDocuments)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "documents");
 
+
+  // S12: generated theorem catalog is a current deterministic docs-sync
+  // input/output, not an independently authored semantic Requirement or
+  // a hand-authored 'documents' resource.
+  const catalogGenerator = read("ts/src/tooling/theorem-catalog-markdown.ts");
+  const docsSyncConsumer = read("ts/src/tooling/docs-sync.ts");
+  const catalogSourceMarker = 'export const THEOREM_CATALOG_PATH = "' +
+    THEOREM_CATALOG_PATH + '";';
+  if (!catalogGenerator.includes(catalogSourceMarker) ||
+      !docsSyncConsumer.includes('from "./theorem-catalog-markdown.js"') ||
+      !docsSyncConsumer.includes("readFileSync(resolve(root, THEOREM_CATALOG_PATH)") ||
+      !docsSyncConsumer.includes("readFileSync(theoremCatalogFullPath") ||
+      !docsSyncConsumer.includes("writeFileSync(theoremCatalogFullPath") ||
+      !coverageWorkflow.includes("npm --prefix ts run docs:sync") ||
+      publicationScripts["docs:sync"] !==
+        "npm run build --silent && node dist/src/tooling/docs-sync.js --write" ||
+      publicationScripts["docs:check"] !==
+        "npm run build --silent && node dist/src/tooling/docs-sync.js --check")
+    fail("S12 generated theorem catalog current docs-sync source/observer changed");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", THEOREM_CATALOG_PATH, "requires");
 
   // S9: bounded non-authoritative Reader W6 preview inputs. Ownership is
   // reconstructed from the real workflow/CLI, the renderer's directly invoked
