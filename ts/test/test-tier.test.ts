@@ -60,7 +60,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 370);
+assert.equal(p7CandidateWitness.exactRelations, 388);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -69,6 +69,26 @@ assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 11);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
+
+// P7-S16: protected historical lineage is an actual policy obligation, not
+// a discretionary bulk J1 relation. Test both missing typed ownership and
+// silent policy removal independently from exact real source files.
+const s16LineageFile = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.rg.yaml";
+const s16LineageText = readFileSync(resolve("..", s16LineageFile), "utf8");
+const s16LineageRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: contracts/mts-conformance-v0.11.json\\n".replaceAll("\\n", "\n");
+assert.ok(s16LineageText.includes(s16LineageRelation));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s16LineageFile]: s16LineageText.replace(s16LineageRelation, ""),
+}), /accepted historical immutable lineage relation coverage mismatches/,
+  "S16: exact immutable historic contract cannot lose requires");
+const s16PolicyFile = "repo-policy.json";
+const s16PolicyText = readFileSync(resolve("..", s16PolicyFile), "utf8");
+const s16ProtectedPath = '    "cutover/typescript-c1-acceptance-v0.1.json",\\n'.replaceAll("\\n", "\n");
+assert.ok(s16PolicyText.includes(s16ProtectedPath));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s16PolicyFile]: s16PolicyText.replace(s16ProtectedPath, ""),
+}), /accepted historical immutable lineage inventory changed/,
+  "S16: removing an accepted immutable legacy path from policy must fail");
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");

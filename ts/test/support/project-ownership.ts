@@ -125,6 +125,30 @@ export function verifyProjectOwnership(
     if (get(id).get(path) !== predicate)
       fail(id + " missing " + predicate + " witness for " + path);
   };
+  // P7-S16: exact accepted historical lineage files are already protected by the
+  // current repo-policy.json pr_immutable contract. This verifies actual retained
+  // files against the sole existing project Requirement without granting historic
+  // contracts any competing semantic authority.
+  const repoPolicy = object(JSON.parse(read("repo-policy.json")), "repository policy");
+  const immutable = array(object(repoPolicy.paths, "policy paths").pr_immutable,
+    "repository pr_immutable").map((item) => {
+    if (typeof item !== "string") fail("immutable policy path must be a string");
+    return item;
+  });
+  const acceptedLegacyPath = (path: string): boolean =>
+    /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13)\.json$/.test(path) ||
+    /^cutover\/typescript-c1-acceptance-v0\.[1-7]\.json$/.test(path) ||
+    /^traceability\/mts-v0\.(?:11|12|13)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
+  const liveImmutableLineage = sorted(new Set(immutable.filter(acceptedLegacyPath)));
+  if (liveImmutableLineage.length !== 18)
+    fail("accepted historical immutable lineage inventory changed");
+  const declaredImmutableLineage = sorted([...get("MTS-PROJECT-ACCEPTED-LINEAGE-01").entries()]
+    .filter(([path]) => acceptedLegacyPath(path)).map(([path]) => path));
+  equalPaths(declaredImmutableLineage, liveImmutableLineage,
+    "accepted historical immutable lineage");
+  for (const path of liveImmutableLineage)
+    assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
+
   const exportedSource = read("ts/src/public.ts");
   const exportedPaths = sorted(new Set(
     [...exportedSource.matchAll(/\bfrom\s+["'](\.\/[^"']+\.js)["']/g)]
