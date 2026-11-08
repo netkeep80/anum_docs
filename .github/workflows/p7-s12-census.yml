@@ -1,0 +1,48 @@
+name: P7-S12 exact merged main J1 residual census (temporary)
+on:
+  push:
+    branches: [chore/p7-s12-exact-census-20261108]
+permissions: {contents: read}
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Derive exact external J1 residual paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate checkout --detach 295ed9d2bfe0ff76e1a664e053bd453c478b023d
+          test "$(git -C candidate rev-parse HEAD)" = 295ed9d2bfe0ff76e1a664e053bd453c478b023d
+          test "$(git -C candidate rev-parse HEAD^{tree})" = da961903372a4c9e33c248d47a0cb345ef46e889
+          test "$(git -C guard rev-parse HEAD)" = 74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 295ed9d2bfe0ff76e1a664e053bd453c478b023d --head 295ed9d2bfe0ff76e1a664e053bd453c478b023d --format json > "$RUNNER_TEMP/report.json" 2>"$RUNNER_TEMP/err.txt"
+          exit_code=$?
+          set -e
+          echo "J1_COMPILER_EXIT=$exit_code"
+          test "$exit_code" -eq 1
+          python3 - <<'PY'
+          import json,os
+          o=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'report.json')))
+          paths=sorted(x["subject"].split(":",1)[1] for x in o.get("diagnostics",[]) if x.get("code")=="unjustified_resource")
+          print("J1",o.get("j1"),"J2",o.get("j2"),"RESIDUAL_COUNT",len(paths))
+          for p in paths:
+            print("UNJUSTIFIED_PATH",p)
+          PY
