@@ -1,4 +1,4 @@
-name: P7-S10 exact external v6 CURRENT FULL diagnostic temporary
+name: P7-S10 exact postmerge J1 diagnostic temporary
 on:
   push:
     branches: [chore/p7-s10-exact-diagnostic-20261108]
@@ -28,17 +28,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin refs/heads/feat/p7-s10-reader-preview-tooling-20261108
-          git -C candidate checkout --detach c33e213e9f77e11692b9f56c49db146d369a9a1a
-          test "$(git -C candidate rev-parse HEAD)" = "c33e213e9f77e11692b9f56c49db146d369a9a1a"
+          git -C candidate fetch origin main
+          git -C candidate checkout --detach d58c140b3f9b40fdc52507b6080a41863f1d9a66
+          test "$(git -C candidate rev-parse HEAD)" = "d58c140b3f9b40fdc52507b6080a41863f1d9a66"
           test "$(git -C candidate rev-parse HEAD^{tree})" = "a2b8206b666769c0156e6c13cb240cc4897415c7"
           test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
           npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base c33e213e9f77e11692b9f56c49db146d369a9a1a --head c33e213e9f77e11692b9f56c49db146d369a9a1a --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base d58c140b3f9b40fdc52507b6080a41863f1d9a66 --head d58c140b3f9b40fdc52507b6080a41863f1d9a66 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
-          echo "EXACT_HEAD=c33e213e9f77e11692b9f56c49db146d369a9a1a"
+          echo "EXACT_HEAD=d58c140b3f9b40fdc52507b6080a41863f1d9a66"
           echo "EXACT_TREE=a2b8206b666769c0156e6c13cb240cc4897415c7"
           echo "COMPILER_EXIT=$rc"
           python3 - <<'PY'
@@ -51,7 +51,3 @@ jobs:
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(x.split('/')[0] for x in unjustified)))
           PY
           test "$rc" -eq 1
-          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
-          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
-          (cd candidate/ts && npm run check:current)
-          (cd candidate/ts && npm run check:full)
