@@ -1,0 +1,431 @@
+{
+  "id": "mts-v015-generalized-reaction-candidate",
+  "version": "0.1.0-development",
+  "status": "AUTHOR_APPROVED_DESIGN_PROOF_GREEN",
+  "integrationBoundary": {
+    "classification": "ARCHITECTURE_DESIGN_EVIDENCE",
+    "soleAcceptanceAuthority": false,
+    "unresolvedSectionsRemainExplicit": true,
+    "note": "This profile records the selected Gamma design and proof closure. It does not promote unresolved research subsections; sequenceCarrierBoundary remains AUTHOR_REVIEW_REQUIRED until separately resolved."
+  },
+  "owners": {
+    "architectureIssue": 1987,
+    "mpNecessityIssue": 1988,
+    "historicalAuditIssue": 1913
+  },
+  "acceptedBase": {
+    "mtsVersion": "v0.14",
+    "acceptedExecutionSemantics": "preserved-from-v0.13",
+    "acceptedProfile": "profiles/amemory-execution-profile.json"
+  },
+  "decision": {
+    "scalarPositiveLaw": "MP0_RETAINED",
+    "minimalCompleteLocalReaction": "STRUCTURAL_UNARY_J0_SELECTED",
+    "scopeLift": "POINTWISE_N_CURRENT_DERIVED_REFINEMENT",
+    "packedStructuralAntecedent": "MP1_ON_EXPLICIT_COMPOSITE_LINK",
+    "trueCrossMemberJoin": "J1_NOT_REQUIRED",
+    "strongerHyperReaction": "NOT_INTRODUCED"
+  },
+  "mp0": {
+    "form": [
+      "K->A",
+      "A->B",
+      "=> K->B"
+    ],
+    "supplies": [
+      "positive-detachment"
+    ],
+    "doesNotSupply": [
+      "selected-Theory-admission",
+      "match-occurrence",
+      "no-match-preservation",
+      "matched-empty-image",
+      "ordered-multi-image",
+      "whole-successor-publication"
+    ]
+  },
+  "mp1": {
+    "current": "K->A",
+    "selectedAdmission": "Theory->(A->ExactSequence(B...))",
+    "result": "for each emitted B: K->B",
+    "imageCardinality": "0|1|N",
+    "relationDiscovery": "exhaustive-over-selected-theory-snapshot",
+    "noMatch": "preserve-current-truth",
+    "matchedEmpty": "zero-successor-contribution-with-reaction-occurrence",
+    "multipleMatches": "union-all-ordered-images-before-successor-projection",
+    "duplicateSuccessors": "canonical-Link-identity-convergence"
+  },
+  "mp2": {
+    "candidateClassification": "DERIVED_LIFT_NOT_SEPARATE_PRIMITIVE",
+    "domain": "N current members, each independently consumed by MP1",
+    "premises": [
+      "one-reaction-start-selected-Theory-snapshot",
+      "same-snapshot-for-all-current-members",
+      "pointwise-exhaustive-MP1",
+      "no-match-preservation",
+      "matched-empty-local-zero",
+      "canonical-union-of-pointwise-contributions",
+      "complete-successor-before-publication",
+      "one-atomic-current-root-handoff-iff-reaction-occurs"
+    ]
+  },
+  "packedAntecedent": {
+    "example": "K->Pair(A,C) + Pair(A,C)->[D] => K->D",
+    "executionArity": "unary",
+    "separateMembersDoNotImplicitlyPack": true
+  },
+  "crossMemberJoin": {
+    "example": "K->A + K->C + joint{A,C}->D",
+    "implicitPackingForbidden": true,
+    "requiredForV015": false,
+    "acceptanceCondition": "only if a required v0.15 artifact cannot be expressed by explicit Link packing, generic pre-grounding, or repeated ordinary reactions without changing required observable semantics",
+    "status": "NOT_PROVEN_NECESSARY"
+  },
+  "dimensionSeparation": [
+    "N arguments in one carrier",
+    "N outputs in one image",
+    "N current Scope members",
+    "N jointly required antecedents"
+  ],
+  "frozenExecutionBackend": {
+    "repository": "netkeep80/amemory",
+    "main": "832daa89f15fd0f3b7b40819b6d3670c7fd57e7d",
+    "version": "0.175.0",
+    "semanticAuthority": false,
+    "role": "external compatibility/conformance backend only"
+  },
+  "compatibilityLowering": {
+    "allowed": true,
+    "target": "legacy OptimizedStructuralEngine",
+    "semanticAuthority": false,
+    "mustBeGeneric": true,
+    "canonicalProgramSourceContainsGeneratedLegacyScaffold": false
+  },
+  "requiredVectors": [
+    "NO_MATCH",
+    "ACTIVE_IDENTITY",
+    "MATCHED_EMPTY_1_TO_0",
+    "1_TO_1",
+    "1_TO_N",
+    "MULTIPLE_MATCHES",
+    "N_TO_1",
+    "N_TO_M",
+    "ORDERED_IMAGE_WITH_REPETITION",
+    "FOREIGN_THEORY",
+    "PACKED_ANTECEDENT",
+    "UNPACKED_CROSS_MEMBER_NON_MATCH"
+  ],
+  "candidateFamily": "STRUCTURAL_UNARY_J0_REACTION",
+  "capabilityAxes": {
+    "matchPower": "STRUCTURAL_TEMPLATE_WITH_SEMANTIC_ROLE_MEMBERSHIP",
+    "jointAntecedentArity": "ONE_CURRENT_ENDPOINT",
+    "imageArity": "ZERO_ONE_MANY",
+    "scopeLift": "POINTWISE_N_CURRENT_MEMBERS",
+    "eventPublication": "SNAPSHOT_COMPLETE_SUCCESSOR_ATOMIC_PUBLICATION"
+  },
+  "competingCandidate": {
+    "id": "STRUCTURAL_UNARY_TEMPLATE_REACTION",
+    "status": "AUTHOR_APPROVED_PROOF_GREEN",
+    "matchPower": "STRUCTURAL_TEMPLATE_WITH_ROLES",
+    "jointAntecedentArity": "ONE_CURRENT_MEMBER",
+    "imageArity": "ZERO_ONE_MANY",
+    "scopeLift": "POINTWISE_N_CURRENT_MEMBERS",
+    "eventPublication": "MATCH_AWARE_ATOMIC_SUCCESSOR",
+    "evidence": [
+      "A72r",
+      "v015-multirole-grounding-m4",
+      "v015-variadic-grounding-m5",
+      "v015-structural-aset-one-command-a9"
+    ],
+    "question": "RESOLVED: structural-unary repeated Γ is selected for v0.15; exact grounded MP is its zero-role refinement; J1 is not required.",
+    "researchEvidenceStatus": "GREEN_FOR_A9_TESTED_ONE_COMMAND_VECTOR",
+    "authorDecision": "APPROVED_STRUCTURAL_UNARY_REPEATED_REACTION",
+    "proofClosureOwner": "#2001",
+    "necessityEvidence": [
+      "M6B exact-S0 freshness opacity",
+      "A10 finite exact support lower-bound pressure",
+      "A10 exact-observation opacity"
+    ],
+    "selectedForV015": true,
+    "proofClosure": "#2001 GPR-01..09"
+  },
+  "notEquivalentDimensions": [
+    "argument arity",
+    "image cardinality",
+    "current Scope cardinality",
+    "structural template role count",
+    "joint current-member antecedent arity"
+  ],
+  "metaGroundingBoundary": {
+    "status": "RESOLVED_STRUCTURAL_UNARY_GAMMA",
+    "s0ExactMpSelfHostsFreshStructuralGrounding": false,
+    "evidence": [
+      "v015-matchpower-falsifier-m6",
+      "v015-meta-selfhost-s0-opacity-m6b"
+    ],
+    "reason": [
+      "exact antecedent identity does not bind roles inside a fresh structured Link",
+      "pointwise Scope lift does not correlate an independent control member with a payload member",
+      "packing alone does not convert exact identity into structural matching",
+      "K preservation transports an opaque Link identity but does not expose its poles",
+      "fresh substituted output construction requires authority beyond S0 exact reaction"
+    ],
+    "acceptedV013RelatedCapabilities": {
+      "relativePoleNavigationExists": true,
+      "relativeFormMaterializationExists": true,
+      "currentImplementationUses": [
+        "memory.poles",
+        "memory.ensure / ensureStartSelfClosed / ensureEndSelfClosed",
+        "explicit source/Rule/Theory/context authority replay"
+      ],
+      "provesS0AsetSelfHosting": false,
+      "note": "These accepted Link-native capabilities show that decomposition/construction are legitimate MTS operations, but their current authority-gated host implementation is not evidence that an Aset executed only by S0 exact MP can realize them."
+    },
+    "metaBCriterion": "META-B is proven only if reflection/decomposition/binding/construction needed for generic grounding are themselves realized as ordinary approved Aset data executed by the selected single generalized-reaction command, without hidden host poles/ensure semantics.",
+    "trueCrossMemberJoinRequired": false,
+    "structuralCapabilityDecomposition": {
+      "S1": {
+        "role": "read-only structural decomposition/matching/binding",
+        "witness": "unifyStructuralRuleTemplate(template, freshActual, roles)",
+        "readsStructure": true,
+        "writesSemanticLinks": false,
+        "freshBindingExample": [
+          "X=A",
+          "Y=C"
+        ],
+        "sufficientAlone": false
+      },
+      "S2": {
+        "role": "recursive substitution/instantiation + canonical Link construction",
+        "witness": "instantiateV013StructuralTemplate(outputTemplate, bindings)",
+        "consumesBindings": true,
+        "infersBindings": false,
+        "mayConstructSemanticLinks": true,
+        "sufficientAlone": false
+      },
+      "composition": {
+        "S1PlusS2SolvesFreshStructuralSubstitution": true,
+        "requiresCrossMemberJoinJ1": false,
+        "note": "If v0.15 rejects bootstrap META-A but requires generic fresh structural grounding inside the one-command machine, the missing capability is specifically S1+S2 over one explicit current structured endpoint; J1 is still not implicated."
+      }
+    },
+    "structuralAsetOneCommand": {
+      "status": "AUTHOR_APPROVED_PROOF_GREEN",
+      "result": "Selected v0.15 profile: S1+S2 are internal phases of the single structural-unary generalized reaction over semantic ANet membership; there is no separate pre-grounder command.",
+      "causalBoundary": "S1 complete read-only plan precedes S2 construction/publication; new Theory admissions are visible next reaction only.",
+      "evidence": "ts/test/v015-structural-aset-gamma-core-a9a.test.ts",
+      "cleanMainEvidence": [
+        "ts/test/v015-structural-aset-role-bundle-a9b.test.ts",
+        "ts/test/v015-structural-aset-gamma-antidrift-a9c.test.ts"
+      ],
+      "doesNotProve": [
+        "that this stronger command is necessary rather than merely sufficient",
+        "that cross-member join is needed",
+        "final accepted FORMAL/JSON representation",
+        "hardware refinement proof"
+      ],
+      "proofClosure": "#2001 GPR-01..09"
+    },
+    "finiteExactSupportNecessity": {
+      "status": "GREEN_RESEARCH",
+      "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+      "result": "A fixed finite exact-identity Theory has finite support and cannot generically transform arbitrarily fresh structured identities. Per-instance exact enumeration grows with observed identities and fails again on fresh N+1.",
+      "implication": "Strong one-command self-contained execution needs internal structure-sensitive reflection/matching+construction power or an equivalent mechanism; otherwise an external grounder is required.",
+      "uniqueStructuralApiRequired": false,
+      "crossMemberJoinRequired": false
+    },
+    "exactObservationLowerBound": {
+      "status": "GREEN_RESEARCH",
+      "evidence": "ts/test/v015-exact-finite-support-necessity-a10.test.ts",
+      "finiteSupport": "A fixed finite exact Theory can distinguish only the whole-Link identities explicitly present as antecedents.",
+      "freshObservationClass": "Every fresh Link outside support yields the same all-false antecedent-equality signature.",
+      "structuralDemand": "A generic fresh transformation may require different outputs determined by the hidden poles of those indistinguishable whole Links.",
+      "lowerBound": "Some structure-sensitive observation/binding and corresponding construction capability must exist somewhere in a self-contained generic system.",
+      "notProven": [
+        "that the capability must be exposed as the exact S1/S2 API used by the TypeScript oracle",
+        "that the capability must be primitive rather than derivable by a lower-level Link-native meta-Aset",
+        "that cross-current-member join is required"
+      ]
+    },
+    "selectedArchitecture": "S1_STRUCTURAL_MATCH_BIND_PLUS_S2_CANONICAL_CONSTRUCTION_INTERNAL_TO_ONE_GAMMA",
+    "runtimeExternalGrounderCommandAllowed": false,
+    "bootstrapCompilerBoundary": "The bootstrap FORMAL/JSON metacompiler owned by anum_docs#2006 may remain host-implemented for source compilation. It is not runtime semantic grounding authority and is not an A-memory command.",
+    "historicalAlternatives": [
+      "META-A external semantic runtime grounder: rejected for normative v0.15 execution",
+      "ordinary meta-Aset on exact S0 alone: falsified for fresh structural substitution under the tested finite exact boundary",
+      "selected: stronger structural-unary J0 Γ with S1/S2 internal phases"
+    ]
+  },
+  "sequenceCarrierBoundary": {
+    "status": "AUTHOR_REVIEW_REQUIRED",
+    "evidence": "ts/test/v015-json-array-rooted-fold-a4.test.ts",
+    "layerNotation": {
+      "jsonSource": "J[...]",
+      "rootedDenotation": "F_R(...)",
+      "exactPositionalCarrier": "Exact(...)",
+      "anumQInterpretation": "Q⟦...⟧",
+      "recursiveLinkCodec": "Enc8961(Link)"
+    },
+    "approvedSourceCandidate": {
+      "empty": "R",
+      "recurrence": "F_R(xs,x)=F_R(xs)->x",
+      "meaning": "R-rooted denotation candidate; not an assertion of exact source/carrier identity"
+    },
+    "rootedFoldFindings": {
+      "exactPositionalIdentity": false,
+      "denotationalEquivalences": [
+        "F_R([])=F_R([R])=F_R([R,R])=R",
+        "F_R([R,C])=F_R([C])=C",
+        "F_R([[]])=F_R([[[]]])=R",
+        "F_R([[],C])=C"
+      ],
+      "classification": "These are denotational equalities of the rooted fold. They are not by themselves source-identity failures."
+    },
+    "acceptedV014Constraint": "ExactSequence preserves exact positional sequence identity distinct from fold denotation; Anum/Q source/carrier identity is also distinct from interpreted denotation.",
+    "historicalExactSequence": {
+      "empty": "R",
+      "cell": "START(prev->value)",
+      "permitsRootAsOrdinaryValue": true,
+      "preservesRepeatedPositions": true,
+      "distinguishesSequenceCarrierFromScalarValue": true,
+      "nestedEmptyLaw": "Exact([])=R by definition of the empty sequence; therefore Exact([[]])=Exact([R]) is expected after element denotation and is not a carrier defect. ExactSequence preserves positions of denoted Link values, not provenance of the source expression that produced each value."
+    },
+    "anumQPrecedent": {
+      "sameGlyphWarning": "Square brackets in Q/Anum are abits OPEN/CLOSE, not JSON array syntax.",
+      "nestedEmptyInterpretation": "Q⟦[]⟧ = Q⟦[[]]⟧ = Q⟦[[[]]]⟧ = R is allowed at denotation level.",
+      "sourceCarrier": "The rooted abit carrier over O/C/L/U preserves the exact bracket stream and therefore distinguishes nested-empty sources even when their interpreted Link denotation is R."
+    },
+    "recursive8961Boundary": "8/9/6/1 serializes the selected Link structure only. If two sources already denote the same Link R, both serialize as 8; it does not recover JSON or Q source identity.",
+    "deepNestedEmptyResult": {
+      "testedDepth": 32,
+      "rootedDenotation": "all R",
+      "recursiveExactCarrierDepths": "distinct along the nested-depth chain after denotation",
+      "expectedEquality": "Exact([[]])=Exact([R]) because [] denotes R by definition",
+      "qAbitCarrierDepths": "distinct source/carrier spellings remain possible at the Anum/Q layer even when denotation is R"
+    },
+    "unresolvedDecision": [
+      "decide which JSON-array distinctions belong only to source/model identity and which must survive into executable Link structure",
+      "treat nested-array provenance as source/model information unless an independently justified semantic observer requires it",
+      "decide whether rooted fold is the semantic denotation while ExactSequence preserves the positional sequence of already-denoted Link values",
+      "do not require Link->original-JSON inversion unless an executable semantic role actually needs that distinction"
+    ],
+    "forbiddenShortcut": "Do not identify JSON source syntax with rooted denotation, ExactSequence, Anum/Q bracket source, or recursive 8/9/6/1 encoding. ExactSequence preserves positional identity of denoted Link values; it need not preserve source-expression provenance."
+  },
+  "parallelReactionReduction": {
+    "status": "GREEN_RESEARCH",
+    "evidence": "ts/test/v015-parallel-reaction-reduction-a11.test.ts",
+    "algebra": "(match OR, mathematical extensional output union)",
+    "unionSemantics": "Proof/reduction notation only: canonical Link identity plus extensional Aset membership already converges duplicate derived Links; there is no separate semantic dedup/UNION machine phase.",
+    "laws": [
+      "associative",
+      "commutative",
+      "idempotent",
+      "neutral=(false,empty)"
+    ],
+    "partitionInvariance": [
+      "rules",
+      "rule scheduling order",
+      "current members",
+      "two-dimensional current/rule partition"
+    ],
+    "requiredPremises": [
+      "one reaction-start snapshot",
+      "global match reduction before NO_MATCH preservation",
+      "no same-generation read-your-own-writes",
+      "complete successor before atomic publication"
+    ],
+    "counterexamples": [
+      "shard-local NO_MATCH publication leaks stale current truth beside a real successor",
+      "same-generation cascading collapses A->B->C into one generation"
+    ],
+    "boundary": "Extensional successor equivalence only; provenance and semantically significant per-image order remain separate obligations."
+  },
+  "finiteMaterializedReaction": {
+    "status": "GREEN_RESEARCH",
+    "evidence": "ts/test/v015-finite-materialized-reaction-a12.test.ts",
+    "acceptedAmbientCarrier": "INFINITE_REQUIRED",
+    "executionPremises": [
+      "FINITE_MATERIALIZED_ASET",
+      "FINITE_ACTIVE_CURRENT_SET",
+      "FINITE_SELECTED_ADMISSION_SET",
+      "FINITE_MATCHED_IMAGES",
+      "TERMINATING_LOCAL_MATCH"
+    ],
+    "derived": [
+      "FINITE_CURRENT_X_RULE_WORK",
+      "FINITE_STAGED_SUCCESSOR_BOUND"
+    ],
+    "classification": "EXECUTION_REFINEMENT_BOUNDARY_NOT_ONTOLOGY_CARDINALITY_AXIOM",
+    "atomicPublication": "PREMISE_NOT_DERIVED_FROM_FINITE_WORK",
+    "infiniteDenotationalReaction": "NOT_RULED_OUT"
+  },
+  "theoremPremiseSplit": {
+    "status": "PROVED_RESEARCH",
+    "localReactionPower": {
+      "classification": "AUTHOR_APPROVED_STRUCTURAL_UNARY_GAMMA_PROOF_GREEN",
+      "evidence": [
+        "M6B",
+        "A9",
+        "A10"
+      ],
+      "notClaimed": "A10 does not prove one unique primitive API.",
+      "selected": "structural-unary local reaction with S1+S2 inside the one repeated Γ",
+      "proofClosure": "#2001 GPR-01..09",
+      "historicalAlternatives": [
+        "exact grounded local reaction plus internally derivable/self-hosted meta-grounding",
+        "structural-unary local reaction with S1+S2 inside the one command"
+      ]
+    },
+    "derivedTheoremCandidates": {
+      "BUNDLE_LIFT": {
+        "classification": "DERIVED_GIVEN_LOCAL_REACTION_AND_EXHAUSTIVE_SELECTED_RELATIONS",
+        "statement": "All applicable local contributions for one current member reduce to one match occurrence plus canonical union of their outputs.",
+        "evidence": [
+          "A11"
+        ]
+      },
+      "POINTWISE_CURRENT_LIFT": {
+        "classification": "DERIVED_GIVEN_MEMBER_INDEPENDENCE_AND_ONE_REACTION_START_SNAPSHOT",
+        "statement": "N independent current members may be reacted pointwise and their successors canonically unioned; this does not imply cross-member join.",
+        "evidence": [
+          "A7",
+          "A11"
+        ]
+      },
+      "PARTITION_ORDER_INVARIANCE": {
+        "classification": "PROVED_RESEARCH",
+        "statement": "Finite Rule/current partitioning and worker order are nonsemantic under the A11 reduction algebra.",
+        "evidence": [
+          "A11"
+        ]
+      },
+      "FINITE_ONE_GENERATION_COMPLETION": {
+        "classification": "PROVED_RESEARCH_GIVEN_EXPLICIT_FINITE_EXECUTION_PREMISES",
+        "statement": "Finite materialized current/admission/image slices with terminating local match have finite complete one-generation work and staged successor.",
+        "evidence": [
+          "A12"
+        ]
+      }
+    },
+    "executionPremises": {
+      "SELECTED_THEORY_AUTHORITY": "PREMISE_OR_ARCHITECTURE_RULE_NOT_DERIVED_FROM_MP",
+      "REACTION_START_SNAPSHOT": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "EXHAUSTIVE_DISCOVERY": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "NO_MATCH_PRESERVATION": "REACTION_SEMANTICS_RULE_NOT_POSITIVE_DETACHMENT_THEOREM",
+      "MATCHED_EMPTY_ZERO": "REACTION_SEMANTICS_RULE_NOT_POSITIVE_DETACHMENT_THEOREM",
+      "GENERATION_ISOLATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "COMPLETE_SUCCESSOR_BEFORE_PUBLICATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "ATOMIC_PUBLICATION": "PREMISE_NOT_DERIVED_FROM_LOCAL_MP",
+      "FINITE_MATERIALIZED_EXECUTION_SLICE": "PHYSICAL_EXECUTION_REFINEMENT_PREMISE"
+    },
+    "explicitNonClaims": [
+      "scalar positive detachment alone does not derive NO_MATCH semantics",
+      "scalar positive detachment alone does not derive matched-empty semantics",
+      "scalar positive detachment alone does not derive Theory snapshotting",
+      "scalar positive detachment alone does not derive generation isolation",
+      "scalar positive detachment alone does not derive atomic publication",
+      "parallel partition invariance does not prove provenance/order equivalence",
+      "finite executable completion does not make the ambient Link ontology finite"
+    ]
+  }
+}
