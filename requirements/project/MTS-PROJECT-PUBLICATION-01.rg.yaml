@@ -349,3 +349,83 @@ relations:
     target:
       kind: artifact
       path: ts/src/tooling/mts-reader-review-r03-r04.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-FND-V14-L1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-BOOTSTRAP-G15.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-EARLY-CONCEPTS-G19.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-FOUNDATION-OPENING-G16.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-INDEPENDENT-MATH-AUDIT-R44-W1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-INDIVIDUAL-MATH-REVIEW-R44-W2.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W2.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-PROSE-AUDIT-R40-W3.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-SCIENTIFIC-SECOND-PASS-R42.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V14-G10.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V14-G7.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V14-G8.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V15-G11-W1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V15-G11-W2.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V15-G11-W3.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V15-G11-W4.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: reviews/m06/reviewer-b-97-indexed-extraction.txt
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: reviews/m06/reviewer-c-43-indexed-extraction.txt
