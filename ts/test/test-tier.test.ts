@@ -5,7 +5,7 @@ import { renderReaderW6 } from "../src/tooling/mts-reader-r44-w6.js";
 import assert from "node:assert/strict";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import {
   buildTestTierPlan,
