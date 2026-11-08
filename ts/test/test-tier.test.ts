@@ -20,9 +20,9 @@ assert.equal(p7CandidateWitness.formalReplayResources, 21);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
 assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
-assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
+assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 300);
+assert.equal(p7CandidateWitness.exactRelations, 328);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
 assert.equal(p7CandidateWitness.readerPreviewYamlInputs, 25);
 assert.equal(p7CandidateWitness.observatorySources, 9);
@@ -213,6 +213,46 @@ assert.throws(
   /MTS-PROJECT-ACCEPTED-LINEAGE-01 tooling requires relation coverage mismatches/,
   "current accepted-lineage compiler depends on docs-sync via exact imports",
 );
+
+const previewCliRelation =
+  "  - predicates: [implemented_by]\n    target:\n      kind: artifact\n      path: ts/src/tooling/mts-reader-r44-w6-cli.ts\n";
+const previewModuleRelation =
+  "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: ts/src/tooling/mts-reader-r44-w6.ts\n";
+assert.ok(publicationOwnerText.includes(previewCliRelation) &&
+  publicationOwnerText.includes(previewModuleRelation),
+  "S10: CLI and renderer relations must exist before negative mutations");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(previewCliRelation, ""),
+  }),
+  /current publication tooling entrypoints relation coverage mismatches/,
+  "S10: current Reader preview CLI must retain implemented_by relationship",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(previewModuleRelation, ""),
+  }),
+  /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
+  "S10: a real reader renderer dependency cannot silently lose its exact link",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      previewModuleRelation,
+      previewModuleRelation.replace("mts-reader-r44-w6.ts", "test-runner.ts")),
+  }),
+  /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
+  "S10: an unrelated but existing tooling source does not satisfy the import graph",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      previewCliRelation, previewCliRelation.replace("[implemented_by]", "[requires]")),
+  }),
+  /current publication tooling entrypoints relation coverage mismatches/,
+  "S10: current executable Reader entrypoint cannot masquerade as private dependency",
+);
+
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [publicationOwnerFile]: publicationOwnerText.replace(
