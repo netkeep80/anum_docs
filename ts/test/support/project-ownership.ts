@@ -56,6 +56,7 @@ export interface ProjectOwnershipReport {
   readonly publicationToolingDependencies: number;
   readonly transitiveSourceDependencies: number;
   readonly proofEvidenceRecords: number;
+  readonly formalReplayResources: number;
   readonly compiledProofSourceUnits: number;
   readonly protectedHistoricalImages: number;
   readonly currentDocumentationSurfaces: number;
@@ -243,6 +244,40 @@ export function verifyProjectOwnership(
 
 
   const proofOwner = get("MTS-PROJECT-PROOF-PROVENANCE-01");
+  // S8: retain only current replay inputs named by actual CURRENT tests.
+  // The frozen integrity test reads the six exact package/evidence pairs;
+  // the parameterized Boolean replay reads four FORMAL/JSON source pairs and
+  // the exact AND recursive wire witness. No directory-wide FORMAL ownership.
+  const frozenReplay = read("ts/test/v015-frozen-replay-artifact-integrity.test.ts");
+  const frozenPaths = sorted([...frozenReplay.matchAll(
+    /\b(?:packagePath|evidencePath): "(formal\/v0\.15\/regression\/[^"]+)"/g,
+  )].map(match => match[1]!));
+  if (frozenPaths.length !== 12 || new Set(frozenPaths).size !== 12)
+    fail("frozen replay verifier must read six distinct package/evidence pairs");
+  const booleanReplay = read("ts/test/v015-boolean-package-replay-a2.test.ts");
+  if (!booleanReplay.includes('const requested = process.env.V015_BOOLEAN_OPERATOR ?? "AND"') ||
+      !["AND", "NOT", "OR", "XOR"].every(id => booleanReplay.includes('requested === "' + id + '"')) ||
+      !booleanReplay.includes('resolve(repoRoot, "formal/v0.15/regression/compact-" + lower + ".formal")') ||
+      !booleanReplay.includes('resolve(repoRoot, "formal/v0.15/regression/compact-" + lower + ".json")') ||
+      !booleanReplay.includes('"formal/v0.15/regression/compact-and.formal"') ||
+      !booleanReplay.includes('"formal/v0.15/regression/compact-and.json"') ||
+      !booleanReplay.includes('"formal/v0.15/regression/compact-and.recursive"'))
+    fail("bounded Boolean replay source/selector consumer contract changed");
+  const booleanPaths = ["and", "not", "or", "xor"].flatMap(id => [
+    "formal/v0.15/regression/compact-" + id + ".formal",
+    "formal/v0.15/regression/compact-" + id + ".json",
+  ]);
+  const exactReplayPaths = sorted([...frozenPaths, ...booleanPaths,
+    "formal/v0.15/regression/compact-and.recursive"]);
+  if (new Set(exactReplayPaths).size !== 21)
+    fail("current FORMAL replay witnesses unexpectedly overlap");
+  const declaredReplayPaths = sorted([...proofOwner.entries()]
+    .filter(([path]) => path.startsWith("formal/v0.15/regression/"))
+    .map(([path]) => path));
+  equalPaths(declaredReplayPaths, exactReplayPaths, "current frozen FORMAL replay input");
+  for (const path of exactReplayPaths)
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
+
   const evidencePaths = collectEvidence(root, "proofs/evidence");
   const declaredEvidence = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("proofs/evidence/")).map(([path]) => path));
@@ -388,6 +423,7 @@ export function verifyProjectOwnership(
     publicationToolingDependencies,
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
+    formalReplayResources: exactReplayPaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
