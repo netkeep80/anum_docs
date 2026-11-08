@@ -200,7 +200,6 @@ const v015FormalGrammarResearchFunctions = new Set<string>([
 const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/native-syntax-grammar.ts",
   "ts/src/source-namespace.ts",
-  "ts/src/v015-formal-evaluation.ts",
   "ts/src/v015-root-bootstrap.ts",
   "ts/src/v015-link-definition.ts",
   "ts/src/v015-formal-decoder.ts",
@@ -212,8 +211,6 @@ const postV013WholeFileDeltaPaths = new Set<string>([
   "ts/src/v015-direct-source.ts",
   // A1-1a-U: transport-only v0.15 snapshot, independently audited by its own tests.
   "ts/src/v015-semantic-snapshot.ts",
-  // Separate post-v0.13 candidate; independent closed writer inventory below.
-  "ts/src/v016-functional-formal.ts",
   // Post-v0.13 documentation verifier builds an isolated, temporary B20 Memory.
   // Its writes are not part of immutable historical v0.13 package evidence.
   "ts/src/tooling/v015-native-evidence-verifier.ts",
@@ -789,15 +786,6 @@ setEqual(
     "ts/src/tooling/v015-native-evidence-verifier.ts#fresh",
     "ts/src/tooling/v015-native-evidence-verifier.ts#rootFixture",
     "ts/src/v013-hierarchical-carrier.ts#build",
-    "ts/src/v015-formal-evaluation.ts#admitTriggeredRule",
-    "ts/src/v015-formal-evaluation.ts#defineV015GroundedUnaryEvaluationRule",
-    "ts/src/v015-formal-evaluation.ts#defineV015UnaryEvaluationLifecycle",
-    "ts/src/v015-formal-evaluation.ts#materializeRoles",
-    "ts/src/v015-formal-evaluation.ts#materializeV015ApplicationTerm",
-    "ts/src/v015-formal-evaluation.ts#materializeV015CompletedValue",
-    "ts/src/v015-formal-evaluation.ts#materializeV015ContinuationFrame",
-    "ts/src/v015-formal-evaluation.ts#materializeV015EvaluationRequest",
-    "ts/src/v015-formal-evaluation.ts#materializeV015RootEvaluationBoundary",
     "ts/src/v015-link-definition.ts#materializeExpression",
     "ts/src/v015-link-definition.ts#materializeV015ContextualNameCoordinate",
     "ts/src/v015-link-definition.ts#resolveEqualityOperand",
