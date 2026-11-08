@@ -215,8 +215,8 @@ assert.throws(
     [publicationOwnerFile]: publicationOwnerText +
       "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W1.yaml\n",
   }),
-  /Reader W6 full observed runtime input closure relation coverage mismatches/,
-  "S9/S11: an existing but unread editorial model is not automatically a W6 input",
+  /missing tracked target: requirements\\/mts-source\\/MTS-READER-EDGE-REVIEW-R39-W1\\.yaml/,
+  "S13: a deleted unused Reader draft cannot be reintroduced as a dangling ownership claim",
 );
 // S11-A: only the actual current M06-B read, not a historical directory.
 const m06BRelation =
