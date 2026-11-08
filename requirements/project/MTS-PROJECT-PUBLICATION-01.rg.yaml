@@ -429,3 +429,11 @@ relations:
     target:
       kind: artifact
       path: reviews/m06/reviewer-c-43-indexed-extraction.txt
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/docs-coverage.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: docs/theory/Теоремы МТС.md
