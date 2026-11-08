@@ -1,0 +1,81 @@
+{
+  "schema": "typescript-c1-acceptance/v0.7",
+  "issue": 1586,
+  "cutoverIssue": 1684,
+  "decision": "ACCEPT_MTS_V0_14",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.13",
+    "acceptedVersion": "mts-contract/v0.14",
+    "semanticBase": "mts-contract/v0.13",
+    "observableSemanticDelta": true,
+    "reason": "MTS v0.14 completed the 14-law post-N20c scope, 70 mandatory executable gates, context-relative A4′ Z2 gauge orientation, explicit Anum and representation-layer boundaries, generalized-MP inherited evidence binding, documentation-owner projection, independent N21 readiness, exact freeze #1683, and Roman then explicitly accepted the frozen candidate in #1586 comment 5858021017."
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.14.json",
+    "conformance": "contracts/mts-conformance-v0.14.json",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.13.json",
+    "conformance": "contracts/mts-conformance-v0.13.json",
+    "acceptance": "cutover/typescript-c1-acceptance-v0.6.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "candidateLifecycleIssue": 1586,
+    "readinessIssue": 1679,
+    "freezeIssue": 1683,
+    "authorDecisionIssue": 1586,
+    "authorDecisionComment": 5858021017,
+    "cutoverIssue": 1684,
+    "preAcceptanceReadyMainSha": "05c4bf3362b559d67dafd2892b937f14c2b89f18",
+    "frozenContractBlob": "a035653835038098f7abed3f6af1b312226f2fa4",
+    "frozenConformanceBlob": "f8deedf995d88ec7b6a2a39e292a1b954b43dd6b",
+    "frozenTraceabilityBlob": "1e1c33d7461ed56888491bca11df92d4bb3e2678",
+    "frozenRequirementsBlob": "665f716e2294ba2f0842ac499baff856bbd8d3b0",
+    "mandatoryExecutableGateCount": 70,
+    "previousAcceptedV013GateCount": 39,
+    "migrationHistoryInGitOnly": true
+  },
+  "acceptance": {
+    "typeScriptAccepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "pythonOraclePresent": false,
+    "compatibilityRuntimeAllowed": false,
+    "acceptanceReadyWasProvenBeforeCutover": true,
+    "explicitAuthorDecisionRecordedBeforeCutover": true,
+    "documentationOwnerProjectionComplete": true,
+    "proseDocumentationReconstructionPendingIssue": 1585
+  },
+  "acceptedSemanticHighlights": [
+    "one Link ontology and one abstract Link-forming primitive",
+    "four emergent self-incidence structural cases 11/10/01/00",
+    "context-relative A4′ orientation over objective Z2 chiral orbit",
+    "relative transport g_AB in {Id,J} with Z2 composition",
+    "Anum as rooted sequence representation distinct from fold denotation",
+    "explicit non-ontological representation layers above Link",
+    "generalized modus ponens preserved through A14 -> A16 -> A17 -> A72w",
+    "Nat starts at U; multiplication/full semiring remains deferred"
+  ],
+  "postAcceptanceWork": [
+    "reconstruct current human documentation from accepted v0.14 owner registry in #1585",
+    "downstream A-memory integration/repin after accepted kernel contract",
+    "multiplication/full semiring derived research remains outside v0.14 acceptance"
+  ],
+  "veto": {
+    "runtimeOrStorageIdAsSemanticIdentity": false,
+    "readOrReplayMayMaterialize": false,
+    "secondLiveRuntime": false,
+    "pythonCompatibilityRuntime": false,
+    "hiddenAbsoluteStartEndBeforeContext": false,
+    "foundationGlobalSelectedWitnessAsFinalAuthority": false,
+    "exactSequenceAsOrientationAuthority": false,
+    "fourRecursiveFormsAsFourPrimitiveOpcodes": false,
+    "secondOntologyEntityAboveLink": false
+  }
+}
