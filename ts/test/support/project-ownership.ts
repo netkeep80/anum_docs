@@ -5,9 +5,12 @@ import { join, relative, resolve } from "node:path";
 import { parseDocument } from "yaml";
 
 const OWNER_IDS = [
+  "MTS-PROJECT-ACCEPTED-LINEAGE-01",
+  "MTS-PROJECT-CHANGE-GOVERNANCE-01",
   "MTS-PROJECT-CI-01",
   "MTS-PROJECT-PACKAGE-01",
   "MTS-PROJECT-PROOF-PROVENANCE-01",
+  "MTS-PROJECT-PUBLICATION-01",
 ] as const;
 type Owner = (typeof OWNER_IDS)[number];
 type RelationPredicate = "requires" | "implemented_by" | "verified_by" | "documents";
@@ -160,6 +163,9 @@ export function verifyProjectOwnership(
 
   assertRelation("MTS-PROJECT-CI-01", "ts/src/tooling/test-tier.ts", "implemented_by");
   assertRelation("MTS-PROJECT-CI-01", "ts/test/test-tier.test.ts", "verified_by");
+  assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", "ts/src/tooling/mts-compiler.ts", "implemented_by");
+  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", ".github/workflows/repo-guard.yml", "implemented_by");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", "tools/reader-preview/render.mjs", "implemented_by");
   return Object.freeze({
     candidates: OWNER_IDS.length,
     exactRelations,

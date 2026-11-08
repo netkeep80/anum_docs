@@ -13,13 +13,13 @@ import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js
 
 // P7 project-ownership bridge: verify the artifact claims against present-tense consumers.
 const p7CandidateWitness = verifyProjectOwnership(resolve(".."));
-assert.equal(p7CandidateWitness.candidates, 3);
+assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
-assert.equal(p7CandidateWitness.exactRelations, 134);
+assert.equal(p7CandidateWitness.exactRelations, 168);
 
-const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CI-01.rg.yaml";
+const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
