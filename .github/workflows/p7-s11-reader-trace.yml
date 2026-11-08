@@ -1,0 +1,50 @@
+name: P7-S11 runtime Reader W6 YAML trace temporary
+on:
+  push:
+    branches: [chore/p7-s11-observe-reader-yaml-20261108]
+permissions:
+  contents: read
+jobs:
+  reader-observation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          submodules: true
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Trace exact unmodified merged main CLI file reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout --detach d58c140b3f9b40fdc52507b6080a41863f1d9a66
+          test "$(git rev-parse HEAD)" = d58c140b3f9b40fdc52507b6080a41863f1d9a66
+          test "$(git rev-parse HEAD^{tree})" = a2b8206b666769c0156e6c13cb240cc4897415c7
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts run build --silent
+          cat > "$RUNNER_TEMP/reader-trace.mjs" <<'JS'
+          import fs from "node:fs";
+          import { syncBuiltinESMExports } from "node:module";
+          const prior = fs.readFileSync;
+          const observed = new Map();
+          fs.readFileSync = function(path, ...args) {
+            if (typeof path === "string" && path.includes("/requirements/mts-source/") && path.endsWith(".yaml")) {
+              const relative = "requirements/mts-source/" + path.split("/requirements/mts-source/").at(-1);
+              observed.set(relative, (observed.get(relative) || 0) + 1);
+            }
+            return prior.call(this, path, ...args);
+          };
+          syncBuiltinESMExports();
+          process.on("exit", () => {
+            const entries = [...observed].sort((a,b)=>a[0].localeCompare(b[0]));
+            console.error("READER_W6_RUNTIME_INPUT_COUNT=" + entries.length);
+            for (const [p,n] of entries) console.error("READER_W6_RUNTIME_INPUT=" + p + " READS=" + n);
+          });
+          JS
+          (cd ts && node --import "$RUNNER_TEMP/reader-trace.mjs" dist/src/tooling/mts-reader-r44-w6-cli.js > "$RUNNER_TEMP/reader.md")
+          test -s "$RUNNER_TEMP/reader.md"
+          echo "READER_W6_CLI_COMPLETED=TRUE"
