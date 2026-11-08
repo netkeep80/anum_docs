@@ -16,12 +16,13 @@ const p7CandidateWitness = verifyProjectOwnership(resolve(".."));
 assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
+assert.equal(p7CandidateWitness.formalReplayResources, 21);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
 assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 254);
+assert.equal(p7CandidateWitness.exactRelations, 275);
 assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 2);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
@@ -42,6 +43,42 @@ assert.throws(
   }),
   /Author-accepted project lifecycle must remain accepted\/current/,
   "accepted but non-current Requirement cannot justify present-tense project Resources",
+);
+
+
+const replayPair = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-and.amemory-package.json\n";
+assert.ok(proofOwnerText.includes(replayPair), "S8 fixture relation must exist");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [proofOwnerFile]: proofOwnerText.replace(replayPair, ""),
+  }),
+  /current frozen FORMAL replay input relation coverage mismatches/,
+  "S8: loss of a current exact frozen package must fail",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [proofOwnerFile]: proofOwnerText.replace(replayPair,
+      replayPair.replace("[requires]", "[documents]")),
+  }),
+  /missing requires witness for formal\/v0\.15\/regression\/compact-and\.amemory-package\.json/,
+  "S8: wrong typed predicate must not justify a real replay package",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [proofOwnerFile]: proofOwnerText +
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-not.recursive\n",
+  }),
+  /current frozen FORMAL replay input relation coverage mismatches/,
+  "S8: existing but unread optional recursive file must not become current ownership",
+);
+const frozenTestPath = "ts/test/v015-frozen-replay-artifact-integrity.test.ts";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [frozenTestPath]: readFileSync(resolve("..", frozenTestPath), "utf8")
+      .replace("compact-and.amemory-package.json", "compact-not.amemory-package.json"),
+  }),
+  /current frozen FORMAL replay input relation coverage mismatches/,
+  "S8: changed consumer's exact frozen evidence set invalidates stale ownership",
 );
 
 const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
