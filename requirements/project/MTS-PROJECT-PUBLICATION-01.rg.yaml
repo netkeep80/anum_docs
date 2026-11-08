@@ -49,3 +49,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/docs-sync.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-source-requirement.ts
