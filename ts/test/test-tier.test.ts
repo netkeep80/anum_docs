@@ -21,7 +21,9 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 242);
+assert.equal(p7CandidateWitness.exactRelations, 254);
+assert.equal(p7CandidateWitness.observatorySources, 9);
+assert.equal(p7CandidateWitness.observatoryExecutedTests, 2);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
 
@@ -165,6 +167,33 @@ assert.throws(
   }),
   /current Markdown publication surface relation coverage mismatches/,
   "historical picture README is not the current MTS public document surface",
+);
+
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: web/contract-observatory/src/site.ts\n", ""),
+  }),
+  /Contract Observatory site source dependency relation coverage mismatches/,
+  "compiled deployed site dependency must retain its exact ownership",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      "path: web/contract-observatory/src/site.ts",
+      "path: web/contract-observatory/src/visual-host.mjs",
+    ),
+  }),
+  /Contract Observatory site source dependency relation coverage mismatches/,
+  "a different existing visual host is not part of the deployed site source graph",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      "  - predicates: [verified_by]\n    target:\n      kind: artifact\n      path: web/contract-observatory/test/site.test.ts\n", ""),
+  }),
+  /Contract Observatory executed tests relation coverage mismatches/,
+  "a test actually invoked by Pages cannot silently lose its verifier relation",
 );
 
 // RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
