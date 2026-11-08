@@ -141,6 +141,17 @@ const lineageOwnerText = readFileSync(resolve("..", lineageOwnerFile), "utf8");
 const publicationOwnerFile = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
 const publicationOwnerText = readFileSync(resolve("..", publicationOwnerFile), "utf8");
 
+
+const previewDraftPath = "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [previewDraftPath]: readFileSync(resolve("..", previewDraftPath), "utf8")
+      .replace("author_approval: not-recorded", "author_approval: approved"),
+  }),
+  /Reader W6 draft model cannot gain unrecorded approval or semantic authority/,
+  "S9: source ownership cannot be confused with Author acceptance",
+);
+
 const previewSourceRelation =
   "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml\n";
 assert.ok(publicationOwnerText.includes(previewSourceRelation), "S9: preview-root source relation must exist");
