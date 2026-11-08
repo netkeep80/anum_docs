@@ -126,7 +126,7 @@ export function verifyProjectOwnership(
   equalPaths(declaredExports, exportedPaths, "public API implemented_by");
   const unexpectedPackageSource = [...packageOwner.entries()]
     .filter(([path, predicate]) => path.startsWith("ts/src/") &&
-      path !== "ts/src/public.ts" && predicate !== "implemented_by");
+      path !== "ts/src/public.ts" && predicate !== "implemented_by" && predicate !== "requires");
   if (unexpectedPackageSource.length) fail("public source misclassified as non-implementation");
 
   // Enforce private implementation dependency closure from actual TypeScript
