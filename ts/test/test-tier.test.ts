@@ -81,7 +81,7 @@ assert.throws(
     [frozenTestPath]: readFileSync(resolve("..", frozenTestPath), "utf8")
       .replace("compact-and.amemory-package.json", "compact-not.amemory-package.json"),
   }),
-  /current frozen FORMAL replay input relation coverage mismatches/,
+  /frozen replay verifier must read six distinct package\/evidence pairs/,
   "S8: changed consumer's exact frozen evidence set invalidates stale ownership",
 );
 
