@@ -237,3 +237,115 @@ relations:
     target:
       kind: artifact
       path: requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w6-cli.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-g20.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-g42.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r42.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r43.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w2.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w3.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w4.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w5.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44-w6.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-r44.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-f01-f02-p01.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-f03-f04-f05.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-f06-f07.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-g01-g02-g03.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-l01-l02-l03.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m01.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m02.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m03.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m04.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m05.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m06-w1.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m06-w2.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m06-w3.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-m06.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-p02-p03.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-r01-r02.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/mts-reader-review-r03-r04.ts
