@@ -101,6 +101,17 @@ assert.throws(
   /current theorem projection evidence relation coverage mismatches/,
   "S14: current theorem evidence cannot lose exact required relation",
 );
+const theoremProjectionFile = "ts/src/tooling/theorem-projection-contract.ts";
+const theoremProjectionText = readFileSync(resolve("..", theoremProjectionFile), "utf8");
+const evidenceConsumerExpression = "...THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(";
+assert.ok(theoremProjectionText.includes(evidenceConsumerExpression), "S14 theorem evidence consumer exists");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [theoremProjectionFile]: theoremProjectionText.replace(evidenceConsumerExpression, "...[].flatMap("),
+  }),
+  /current theorem projection evidence source consumption changed/,
+  "S14: textual evidence inventory without active projection input is not enough",
+);
 const replayPair = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-and.amemory-package.json\n";
 assert.ok(proofOwnerText.includes(replayPair), "S8 fixture relation must exist");
 assert.throws(
@@ -203,10 +214,20 @@ assert.throws(
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [".github/workflows/pages.yml"]: readFileSync(resolve("..", ".github/workflows/pages.yml"), "utf8")
-      .replace('node "$test_file"', 'echo no-test-execution'),
+      .replace("node web/contract-observatory/dist/test/contract-index.test.js", "echo no-test-execution"),
   }),
-  /Contract Observatory full compiled test execution changed/,
-  "S14: compile-only or disabled web tests cannot justify verified_by",
+  /Contract Observatory Pages suite entrypoint changed/,
+  "S14: compile-only Pages cannot justify verified_by",
+);
+const observatorySuiteFile = "web/contract-observatory/test/contract-index.test.ts";
+const observatorySuiteText = readFileSync(resolve("..", observatorySuiteFile), "utf8");
+assert.ok(observatorySuiteText.includes("execFileSync(process.execPath,"), "S14 runner must execute tests");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [observatorySuiteFile]: observatorySuiteText.replace("execFileSync(process.execPath,", "console.log(process.execPath,"),
+  }),
+  /Contract Observatory suite runner no longer executes full compiled test set/,
+  "S14: dropping transitive test execution must lose verified_by authority",
 );
 const previewDraftPath = "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 assert.throws(
