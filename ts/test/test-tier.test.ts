@@ -22,7 +22,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 328);
+assert.equal(p7CandidateWitness.exactRelations, 329);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
 assert.equal(p7CandidateWitness.readerPreviewYamlInputs, 25);
 assert.equal(p7CandidateWitness.observatorySources, 9);
@@ -178,6 +178,26 @@ assert.throws(
   /Reader W6 directly invoked YAML inputs relation coverage mismatches/,
   "S9: another existing editorial model is not automatically a direct W6 input",
 );
+// S11-A: only the actual current M06-B read, not a historical directory.
+const m06BRelation =
+  "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: reviews/m06/reviewer-b-97-indexed-extraction.txt\n";
+assert.ok(publicationOwnerText.includes(m06BRelation), "S11-A M06-B causal relation must exist");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(m06BRelation, ""),
+  }),
+  /missing requires witness for reviews\/m06\/reviewer-b-97-indexed-extraction.txt/,
+  "S11-A: a presently read source cannot lose ownership",
+);
+const m06BPath = "reviews/m06/reviewer-b-97-indexed-extraction.txt";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [m06BPath]: readFileSync(resolve("..", m06BPath), "utf8") + "\nTAMPERED\n",
+  }),
+  /M06-B secondary transcription byte identity or source status drift/,
+  "S11-A: source bytes must be checked against the current exact consumer SHA",
+);
+
 const readerW6ToolPath = "ts/src/tooling/mts-reader-r44-w6.ts";
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
