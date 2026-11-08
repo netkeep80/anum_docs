@@ -2,8 +2,8 @@ format: repo-guard/requirement-v1
 id: MTS-PROJECT-PUBLICATION-01
 normative: "The repository's public project documentation and GitHub Pages publication must remain synchronized with accepted generated documentation and preserve navigable reader-facing surfaces. Reader-preview output is non-authoritative draft material and must not replace the canonical MTS projection or silently modify authored Markdown."
 lifecycle:
-  accepted: false
-  current: false
+  accepted: true
+  current: true
 relations:
   - predicates: [documents]
     target:

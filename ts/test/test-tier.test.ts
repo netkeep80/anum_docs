@@ -19,6 +19,23 @@ assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
 assert.equal(p7CandidateWitness.exactRelations, 168);
 
+const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
+const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [acceptedOwnerFile]: acceptedOwnerSource.replace("  accepted: true", "  accepted: false"),
+  }),
+  /Author-accepted project lifecycle must remain accepted\/current/,
+  "silent reversion of an accepted project Requirement must fail closed",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [acceptedOwnerFile]: acceptedOwnerSource.replace("  current: true", "  current: false"),
+  }),
+  /Author-accepted project lifecycle must remain accepted\/current/,
+  "accepted but non-current Requirement cannot justify present-tense project Resources",
+);
+
 const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
 const packageOwnerText = readFileSync(resolve("..", packageOwnerFile), "utf8");
 const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";

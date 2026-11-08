@@ -77,8 +77,8 @@ export function verifyProjectOwnership(
       typeof raw.normative !== "string" || !raw.normative.trim())
       fail(id + " invalid native Requirement identity/normative");
     const lifecycle = object(raw.lifecycle, id + ".lifecycle");
-    if (typeof lifecycle.accepted !== "boolean" || typeof lifecycle.current !== "boolean")
-      fail(id + " lifecycle must be explicit booleans; consumer cannot grant acceptance");
+    if (lifecycle.accepted !== true || lifecycle.current !== true)
+      fail(id + " Author-accepted project lifecycle must remain accepted/current; a pending proposal is not current authority");
     const byPath: RelationIndex = new Map();
     for (const rawRelation of array(raw.relations, id + ".relations")) {
       const relation = object(rawRelation, id + ".relation");

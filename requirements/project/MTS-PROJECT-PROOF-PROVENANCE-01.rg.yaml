@@ -2,8 +2,8 @@ format: repo-guard/requirement-v1
 id: MTS-PROJECT-PROOF-PROVENANCE-01
 normative: "Current proof and theorem publication must preserve the independently classified external-versus-native evidence authority, exact external toolchain identity and machine-verifiable evidence record schema. Historical proof registries and accepted evidence are provenance, not new MTS semantic authority; the verification infrastructure must reject absent or contradictory evidence records."
 lifecycle:
-  accepted: false
-  current: false
+  accepted: true
+  current: true
 relations:
   - predicates: [requires]
     target:

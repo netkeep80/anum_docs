@@ -2,8 +2,8 @@ format: repo-guard/requirement-v1
 id: MTS-PROJECT-ACCEPTED-LINEAGE-01
 normative: "The accepted v0.15 release/currentization record must remain verifiable against the exact versioned contract, conformance, traceability, migration acceptance and theorem/proof-history inputs. Native v0.15 .rg Requirements remain the sole normative semantic Requirement authority; older accepted and legacy aggregate snapshots retained here are evidence, current compatibility inputs or historical lineage, never rival authority. Release-currentness must fail closed if exact current-version pointers or historical evidence boundaries contradict the accepted state."
 lifecycle:
-  accepted: false
-  current: false
+  accepted: true
+  current: true
 relations:
   - predicates: [requires]
     target:

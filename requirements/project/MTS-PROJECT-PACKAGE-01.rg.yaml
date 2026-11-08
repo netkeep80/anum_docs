@@ -2,8 +2,8 @@ format: repo-guard/requirement-v1
 id: MTS-PROJECT-PACKAGE-01
 normative: "The @mts/core package must expose an explicitly bounded public TypeScript API and reproducible dependency/consumer configuration. Public and internal API boundaries must be checked by the ordinary TypeScript package consumer and negative export tests; no private implementation entry may silently become a public contract."
 lifecycle:
-  accepted: false
-  current: false
+  accepted: true
+  current: true
 relations:
   - predicates: [requires]
     target:
