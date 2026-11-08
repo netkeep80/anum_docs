@@ -1,0 +1,56 @@
+{
+  "schema": "typescript-c1-acceptance/v0.3",
+  "issue": 701,
+  "parentIssue": 657,
+  "decision": "ACCEPT_MTS_V0_10",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.9",
+    "acceptedVersion": "mts-contract/v0.10",
+    "semanticBase": "mts-contract/v0.9",
+    "observableSemanticDelta": true,
+    "reason": "the 11-sign foundation, contextual dot binding, generic fixed-point laws, inversion boundary and negative corpus have complete executable evidence plus a separately merged acceptanceReady state"
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.10.json",
+    "conformance": "contracts/mts-conformance-v0.10.json",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.9.json",
+    "conformance": "contracts/mts-conformance-v0.9.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "candidateLifecycleIssue": 663,
+    "foundationEvidenceIssue": 682,
+    "contextualDotEvidenceIssue": 683,
+    "negativeBoundaryIssue": 684,
+    "fixedPointEvidenceIssue": 690,
+    "readinessIssue": 697,
+    "cutoverIssue": 701,
+    "atomicCutoverAuthorizationIssue": 701,
+    "preAcceptanceReadyMainSha": "c3abd1d3b65040ec7307af507ac777f638c3ed54",
+    "migrationHistoryInGitOnly": true
+  },
+  "acceptance": {
+    "typeScriptAccepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "pythonOraclePresent": false,
+    "compatibilityRuntimeAllowed": false,
+    "acceptanceReadyWasProvenBeforeCutover": true
+  },
+  "veto": {
+    "runtimeOrStorageIdAsSemanticIdentity": false,
+    "sourcePositionOccurrenceOrPathAsSemanticIdentity": false,
+    "readOrReplayMayMaterialize": false,
+    "secondLiveRuntime": false,
+    "pythonCompatibilityRuntime": false,
+    "hiddenClassicalEqualityAsFoundation": false,
+    "hostParserOrCallbackAsSemanticAuthority": false
+  }
+}

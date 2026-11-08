@@ -1,0 +1,57 @@
+{
+  "schema": "typescript-c1-acceptance/v0.4",
+  "issue": 804,
+  "parentIssue": 657,
+  "decision": "ACCEPT_MTS_V0_11",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.10",
+    "acceptedVersion": "mts-contract/v0.11",
+    "semanticBase": "mts-contract/v0.10",
+    "observableSemanticDelta": true,
+    "reason": "the v0.11 TopBind/genesis source-interpretation delta and C1-C5 compatibility corpus have complete executable evidence plus a separately merged acceptanceReady state and accepted-flip governance bridge"
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.11.json",
+    "conformance": "contracts/mts-conformance-v0.11.json",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.10.json",
+    "conformance": "contracts/mts-conformance-v0.10.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "candidateLifecycleIssue": 755,
+    "readinessIssue": 800,
+    "readinessPullRequest": 801,
+    "acceptedFlipBridgeIssue": 802,
+    "acceptedFlipBridgePullRequest": 803,
+    "cutoverIssue": 804,
+    "atomicCutoverAuthorizationIssue": 804,
+    "preAcceptanceReadyMainSha": "43d5958223a2284d6255161fe7710fac20c686df",
+    "preCutoverMainSha": "8ce74c81d253003662ecd4b915fea76f2e0edff8",
+    "migrationHistoryInGitOnly": true
+  },
+  "acceptance": {
+    "typeScriptAccepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "pythonOraclePresent": false,
+    "compatibilityRuntimeAllowed": false,
+    "acceptanceReadyWasProvenBeforeCutover": true,
+    "acceptedFlipGovernanceBridgeWasMergedBeforeCutover": true
+  },
+  "veto": {
+    "runtimeOrStorageIdAsSemanticIdentity": false,
+    "sourcePositionOccurrenceOrPathAsSemanticIdentity": false,
+    "readOrReplayMayMaterialize": false,
+    "secondLiveRuntime": false,
+    "pythonCompatibilityRuntime": false,
+    "hiddenClassicalEqualityAsFoundation": false,
+    "hostParserOrCallbackAsSemanticAuthority": false
+  }
+}

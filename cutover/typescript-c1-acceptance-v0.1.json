@@ -1,0 +1,52 @@
+{
+  "schema": "typescript-c1-acceptance/v0.1",
+  "issue": 567,
+  "parentIssue": 430,
+  "decision": "ACCEPT_TYPESCRIPT_MTS_V0_8",
+  "versionDecision": {
+    "previousAcceptedVersion": "mts-contract/v0.7",
+    "acceptedVersion": "mts-contract/v0.8",
+    "semanticBase": "mts-contract/v0.7",
+    "observableSemanticDelta": false,
+    "reason": "current implementation ownership/composition moves from frozen Python Foundation-v2 to the differential-proven TypeScript core without changing accepted portable MTS semantics"
+  },
+  "current": {
+    "contract": "contracts/mts-contract-v0.8.json",
+    "conformance": "contracts/mts-conformance-v0.8.json",
+    "publicFacade": "ts/src/public.ts",
+    "packageManifest": "ts/package.json"
+  },
+  "previousReleaseEvidence": {
+    "contract": "contracts/mts-contract-v0.7.json",
+    "conformance": "contracts/mts-conformance-v0.7.json",
+    "immutable": true,
+    "liveRuntimeSelectable": false
+  },
+  "evidence": {
+    "preCutoverAuditIssue": 561,
+    "executableGateAuditIssue": 562,
+    "consumerAuditIssue": 563,
+    "ownershipDecisionIssue": 564,
+    "toolingMigrationIssue": 565,
+    "cutoverIssue": 567,
+    "frozenPythonOracleSha": "ef42d91a868bbc5b7004acc325006ad27db3bb68",
+    "migrationHistoryInGitOnly": true
+  },
+  "acceptance": {
+    "typeScriptAccepted": true,
+    "cutoverPerformed": true,
+    "downstreamRepinAllowed": true,
+    "singleLiveSemanticRuntime": true,
+    "pythonRuntimePresent": false,
+    "pythonOraclePresent": false,
+    "compatibilityRuntimeAllowed": false
+  },
+  "veto": {
+    "runtimeOrStorageIdAsSemanticIdentity": false,
+    "sourcePositionOrPathAsSemanticIdentity": false,
+    "readOrReplayMayMaterialize": false,
+    "secondLiveRuntime": false,
+    "pythonCompatibilityRuntime": false,
+    "observableSemanticDeltaFromV07": false
+  }
+}
