@@ -349,3 +349,7 @@ relations:
     target:
       kind: artifact
       path: ts/src/tooling/mts-reader-review-r03-r04.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: reviews/m06/reviewer-b-97-indexed-extraction.txt
