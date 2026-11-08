@@ -4,6 +4,8 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import * as ts from "typescript";
 import { parseDocument } from "yaml";
+import { listRepositoryMarkdownSurface } from "../../src/tooling/markdown-section-adapter.js";
+import { THEOREM_CATALOG_PATH } from "../../src/tooling/theorem-catalog-markdown.js";
 
 const OWNER_IDS = [
   "MTS-PROJECT-ACCEPTED-LINEAGE-01",
@@ -55,6 +57,8 @@ export interface ProjectOwnershipReport {
   readonly transitiveSourceDependencies: number;
   readonly proofEvidenceRecords: number;
   readonly compiledProofSourceUnits: number;
+  readonly protectedHistoricalImages: number;
+  readonly currentDocumentationSurfaces: number;
 }
 
 // Overrides exist only to construct negative falsifiers without changing Git or
@@ -270,6 +274,51 @@ export function verifyProjectOwnership(
     "ts/test/native-fnd07-root-truth-aspect.test.ts",
   ]) assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "verified_by");
 
+  // Historical pictures are Author-designated permanent source evidence.
+  // The accepted manifest is separately immutable-byte-verified by
+  // historical-images-protection.test.ts. This verifier guards causal ownership.
+  const historicalOwner = get("MTS-PROJECT-CHANGE-GOVERNANCE-01");
+  const historicalManifestPath = "profiles/mts-historical-images.json";
+  const historicalManifest = object(JSON.parse(read(historicalManifestPath)), "historical image manifest");
+  if (historicalManifest.status !== "PERMANENT_HISTORICAL_RESEARCH_ASSETS_DO_NOT_DELETE" ||
+      historicalManifest.origin !== "AUTHOR_DESIGNATED_HISTORICAL" ||
+      historicalManifest.ownerIssue !== 2080)
+    fail("historical image retention manifest lost Author-designated immutable authority");
+  const protectedAssets = array(historicalManifest.assets, "historical image assets")
+    .map(raw => object(raw, "historical image asset").path)
+    .map(raw => {
+      if (typeof raw !== "string" || !/^pics\/[^/]+\.(?:jpe?g|png|svg)$/i.test(raw))
+        fail("historical image manifest contains invalid path");
+      return raw;
+    });
+  if (historicalManifest.assetCount !== protectedAssets.length ||
+      new Set(protectedAssets).size !== protectedAssets.length ||
+      protectedAssets.length === 0)
+    fail("historical image manifest has invalid exact inventory");
+  const expectedHistoricalPaths = sorted([...protectedAssets, "pics/README.md"]);
+  const declaredHistoricalPaths = sorted([...historicalOwner.entries()]
+    .filter(([path]) => path.startsWith("pics/")).map(([path]) => path));
+  equalPaths(declaredHistoricalPaths, expectedHistoricalPaths, "permanent historical picture corpus");
+  for (const path of expectedHistoricalPaths)
+    assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", path, "requires");
+  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", historicalManifestPath, "requires");
+  const currentPictureFiles = sorted(readdirSync(resolve(root, "pics"))
+    .filter(name => /\.(?:jpe?g|png|svg)$/i.test(name))
+    .map(name => "pics/" + name));
+  equalPaths(currentPictureFiles, sorted(protectedAssets), "actual historical picture files");
+
+  // Same source-surface projection used by the MTS compiler: the separately
+  // generated theorem catalog is not a hand-authored project document.
+  const publicationOwner = get("MTS-PROJECT-PUBLICATION-01");
+  const currentDocuments = sorted(listRepositoryMarkdownSurface(root)
+    .filter(path => path !== THEOREM_CATALOG_PATH));
+  if (currentDocuments.length === 0) fail("current documentation surface is empty");
+  const declaredDocuments = sorted([...publicationOwner.entries()]
+    .filter(([, predicate]) => predicate === "documents").map(([path]) => path));
+  equalPaths(declaredDocuments, currentDocuments, "current Markdown publication surface");
+  for (const path of currentDocuments)
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "documents");
+
   assertRelation("MTS-PROJECT-CI-01", "ts/src/tooling/test-tier.ts", "implemented_by");
   assertRelation("MTS-PROJECT-CI-01", "ts/test/test-tier.test.ts", "verified_by");
   assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", "ts/src/tooling/mts-compiler.ts", "implemented_by");
@@ -285,5 +334,7 @@ export function verifyProjectOwnership(
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
+    protectedHistoricalImages: protectedAssets.length,
+    currentDocumentationSurfaces: currentDocuments.length,
   });
 }

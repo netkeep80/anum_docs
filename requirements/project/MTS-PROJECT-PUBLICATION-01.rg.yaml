@@ -53,3 +53,39 @@ relations:
     target:
       kind: artifact
       path: ts/src/tooling/mts-source-requirement.ts
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/research/Исходные мысли МТС.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/research/Новое осмысление МТС.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/specs/Апамять и управление сетью связей.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/specs/Ачисла и сериализация.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/specs/Пучки связей.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/specs/Формальная нотация МТС.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/theory/Основания МТС.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/theory/Система аксиом МТС.md
+  - predicates: [documents]
+    target:
+      kind: artifact
+      path: docs/Словарь терминов МТС.md

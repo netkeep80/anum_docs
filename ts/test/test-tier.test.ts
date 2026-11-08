@@ -21,7 +21,9 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 202);
+assert.equal(p7CandidateWitness.exactRelations, 242);
+assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
+assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
@@ -130,6 +132,39 @@ assert.throws(
   }),
   /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
   "an unrelated but existing tooling source does not justify publication ownership",
+);
+
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [acceptedOwnerFile]: acceptedOwnerSource.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: pics/64ачисла.jpg\n", ""),
+  }),
+  /permanent historical picture corpus relation coverage mismatches/,
+  "an immutable Author-designated historical image cannot lose its causal owner",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    ["profiles/mts-historical-images.json"]: readFileSync(resolve("..", "profiles/mts-historical-images.json"), "utf8")
+      .replace("PERMANENT_HISTORICAL_RESEARCH_ASSETS_DO_NOT_DELETE", "UNPROTECTED"),
+  }),
+  /historical image retention manifest lost Author-designated immutable authority/,
+  "manifest status cannot be silently downgraded",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      "  - predicates: [documents]\n    target:\n      kind: artifact\n      path: docs/research/Исходные мысли МТС.md\n", ""),
+  }),
+  /current Markdown publication surface relation coverage mismatches/,
+  "current authored Markdown cannot disappear from project publication ownership",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText +
+      "  - predicates: [documents]\n    target:\n      kind: artifact\n      path: pics/README.md\n",
+  }),
+  /current Markdown publication surface relation coverage mismatches/,
+  "historical picture README is not the current MTS public document surface",
 );
 
 // RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
