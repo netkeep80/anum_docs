@@ -1,0 +1,112 @@
+name: P7-S3 exact accepted-main causal inventory (temporary)
+on:
+  push:
+    branches: [feat/p7-resource-closure-s3-20261108]
+permissions:
+  contents: read
+jobs:
+  exact-causal-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: repoguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Verify exact accepted main and install pinned dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate checkout --detach 0f2b4649df0e1de3ded15d240f9b14354c2c0748
+          test "$(git -C candidate rev-parse HEAD)" = "0f2b4649df0e1de3ded15d240f9b14354c2c0748"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "12c4d9be989a81271a55c7a267b139a77c924648"
+          test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+      - name: Exact external RepoGuard 6.0.1 J1/J2 and unowned details
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p7-s3"
+          set +e
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "0f2b4649df0e1de3ded15d240f9b14354c2c0748" --head "0f2b4649df0e1de3ded15d240f9b14354c2c0748" --format json > "$RUNNER_TEMP/p7-s3/rg.json" 2> "$RUNNER_TEMP/p7-s3/rg.err"
+          rc=$?
+          set -e
+          echo "EXACT_MAIN=0f2b4649df0e1de3ded15d240f9b14354c2c0748"
+          echo "EXTERNAL_RG_EXIT=$rc"
+          test "$rc" -le 1
+          jq -e '.j1 | (.tracked|type=="number") and (.justified|type=="number")' "$RUNNER_TEMP/p7-s3/rg.json" >/dev/null
+          jq -r '"ACTUAL_J1=\(.j1.tracked)/\(.j1.justified)/\(.j1.tracked-.j1.justified) ACTUAL_J2=\(.j2.rooted) DIAGNOSTICS=\(.diagnostics|length)"' "$RUNNER_TEMP/p7-s3/rg.json"
+          python3 - <<'PY'
+          import json,os
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"p7-s3","rg.json")))
+          j=o["j1"]
+          print("J1_SCHEMA",json.dumps({k:{"type":type(v).__name__,"len":len(v) if hasattr(v,"__len__") else None} for k,v in j.items()},sort_keys=True))
+          for k,v in j.items():
+              if isinstance(v,list):
+                  print("J1_LIST",k,"COUNT",len(v),"EXAMPLE",json.dumps(v[:6],ensure_ascii=False)[:1500])
+          PY
+      - name: Extract actual transitive public TypeScript imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import fs from "node:fs";
+          import path from "node:path";
+          import { createRequire } from "node:module";
+          const root=path.resolve("candidate");
+          const require=createRequire(path.resolve(root,"ts/package.json"));
+          const ts=require("typescript");
+          const base=path.resolve(root,"ts/src");
+          const start=path.resolve(base,"public.ts");
+          const visited=new Set(), edges=new Map(), direct=new Set();
+          const rel=p=>path.relative(root,p).replaceAll("\\","/");
+          const pending=[start];
+          while(pending.length){
+            const file=pending.pop();
+            if(visited.has(file))continue;
+            visited.add(file);
+            const s=ts.createSourceFile(file,fs.readFileSync(file,"utf8"),ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+            const local=[];
+            const add=spec=>{
+              if(!spec.startsWith("./")&&!spec.startsWith("../"))return;
+              const next=path.resolve(path.dirname(file),spec.endsWith(".js")?spec.slice(0,-3)+".ts":spec);
+              if(!next.startsWith(base+path.sep)||!fs.existsSync(next))return;
+              local.push(next);pending.push(next);
+            };
+            const visit=node=>{
+              if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier&&ts.isStringLiteral(node.moduleSpecifier))add(node.moduleSpecifier.text);
+              if(ts.isImportTypeNode(node)&&ts.isLiteralTypeNode(node.argument)&&ts.isStringLiteral(node.argument.literal))add(node.argument.literal.text);
+              if(ts.isCallExpression(node)&&node.expression.kind===ts.SyntaxKind.ImportKeyword&&node.arguments[0]&&ts.isStringLiteral(node.arguments[0]))add(node.arguments[0].text);
+              ts.forEachChild(node,visit);
+            };
+            visit(s);
+            edges.set(file,[...new Set(local)]);
+            if(file===start){for(const x of local)direct.add(x);}
+          }
+          const trans=[...visited].filter(x=>x!==start&&!direct.has(x)).sort();
+          console.log("PUBLIC_STATIC_IMPORT_DIRECT="+direct.size);
+          console.log("PUBLIC_STATIC_IMPORT_TOTAL="+(visited.size-1));
+          console.log("PUBLIC_STATIC_IMPORT_TRANSITIVE_ONLY="+trans.length);
+          for(const file of trans){
+            const parents=[...edges.entries()].filter(([p,cs])=>cs.includes(file)).map(([p])=>rel(p)).sort();
+            console.log("TRANSITIVE_REQUIRED",rel(file),"VIA",parents.join(","));
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-s3-exact-main-j1
+          path: ${{ runner.temp }}/p7-s3/
+          retention-days: 3
