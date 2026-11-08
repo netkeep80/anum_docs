@@ -245,3 +245,23 @@ relations:
     target:
       kind: artifact
       path: ts/src/v013-relative-pole-context.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/payload.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/notation.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/syntax-aset.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/cli.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/syntax-aset-contract.ts

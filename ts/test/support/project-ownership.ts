@@ -49,6 +49,9 @@ export interface ProjectOwnershipReport {
   readonly candidates: number;
   readonly exactRelations: number;
   readonly publicExportModules: number;
+  readonly packageToolingEntrypoints: number;
+  readonly lineageToolingDependencies: number;
+  readonly publicationToolingDependencies: number;
   readonly transitiveSourceDependencies: number;
   readonly proofEvidenceRecords: number;
   readonly compiledProofSourceUnits: number;
@@ -119,11 +122,35 @@ export function verifyProjectOwnership(
   assertRelation("MTS-PROJECT-PACKAGE-01", "ts/src/public.ts", "implemented_by");
   assertRelation("MTS-PROJECT-PACKAGE-01", "ts/test/public-api.test.ts", "verified_by");
   assertRelation("MTS-PROJECT-PACKAGE-01", "ts/consumer/package-consumer.ts", "verified_by");
+  const packageMeta = object(JSON.parse(read("ts/package.json")), "package metadata");
+  const packageExports = object(packageMeta.exports, "package exports");
+  const packageBin = object(packageMeta.bin, "package bin");
+  const toToolingSource = (path: unknown, label: string): string => {
+    if (typeof path !== "string" ||
+        !path.startsWith("./dist/src/tooling/") || !path.endsWith(".js")) {
+      fail(label + " must resolve to exact compiled TypeScript tooling entrypoint");
+    }
+    const source = "ts/src/" + path.slice("./dist/src/".length, -3) + ".ts";
+    if (!existsSync(resolve(root, source))) fail(label + " source missing: " + source);
+    return source;
+  };
+  const entrypoints: string[] = [];
+  for (const [name, value] of Object.entries(packageExports)) {
+    if (name === ".") continue;
+    const fields = object(value, "package export " + name);
+    entrypoints.push(toToolingSource(fields.default, "package export " + name));
+  }
+  for (const [name, target] of Object.entries(packageBin)) {
+    entrypoints.push(toToolingSource(target, "package bin " + name));
+  }
+  const toolingEntrypoints = sorted(new Set(entrypoints));
+  if (toolingEntrypoints.length === 0 || toolingEntrypoints.length !== entrypoints.length)
+    fail("package tooling entrypoints missing or duplicated");
   const declaredExports = sorted([...packageOwner.entries()]
     .filter(([path, predicate]) => path.startsWith("ts/src/") &&
       path !== "ts/src/public.ts" && predicate === "implemented_by")
     .map(([path]) => path));
-  equalPaths(declaredExports, exportedPaths, "public API implemented_by");
+  equalPaths(declaredExports, sorted([...exportedPaths, ...toolingEntrypoints]), "public API implemented_by");
   const unexpectedPackageSource = [...packageOwner.entries()]
     .filter(([path, predicate]) => path.startsWith("ts/src/") &&
       path !== "ts/src/public.ts" && predicate !== "implemented_by" && predicate !== "requires");
@@ -158,7 +185,7 @@ export function verifyProjectOwnership(
     return sorted(local);
   };
   const reached = new Set<string>();
-  const stack: string[] = ["ts/src/public.ts"];
+  const stack: string[] = ["ts/src/public.ts", ...toolingEntrypoints];
   while (stack.length > 0) {
     const file = stack.pop()!;
     if (reached.has(file)) continue;
@@ -166,11 +193,47 @@ export function verifyProjectOwnership(
     stack.push(...staticSourceDependencies(file));
   }
   const transitiveRequired = sorted([...reached].filter(path =>
-    path !== "ts/src/public.ts" && !exportedPaths.includes(path)));
+    path !== "ts/src/public.ts" && !exportedPaths.includes(path) && !toolingEntrypoints.includes(path)));
   const declaredRequired = sorted([...packageOwner.entries()]
     .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "requires")
     .map(([path]) => path));
   equalPaths(declaredRequired, transitiveRequired, "public package transitive requires");
+
+  // The already accepted compiler and reader tooling are independently owned
+  // by their project obligations, not by whichever CI executable imports them.
+  // Require exactly the source-reachable, unclaimed private implementation
+  // dependencies of each owner. Other owners' files cannot be claimed twice.
+  const verifyToolingClosure = (id: Owner): number => {
+    const owner = get(id);
+    const roots = sorted([...owner.entries()]
+      .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "implemented_by")
+      .map(([path]) => path));
+    if (roots.length === 0) fail(id + " has no executable tooling root");
+    const claimedByOther = new Set<string>();
+    for (const [otherId, other] of relations) {
+      if (otherId === id) continue;
+      for (const path of other.keys()) claimedByOther.add(path);
+    }
+    const visited = new Set<string>();
+    const pending = [...roots];
+    while (pending.length) {
+      const path = pending.pop()!;
+      if (visited.has(path)) continue;
+      visited.add(path);
+      pending.push(...staticSourceDependencies(path));
+    }
+    const expected = sorted([...visited].filter(path =>
+      path.startsWith("ts/src/") && !roots.includes(path) &&
+      !claimedByOther.has(path)));
+    const actual = sorted([...owner.entries()]
+      .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "requires")
+      .map(([path]) => path));
+    equalPaths(actual, expected, id + " tooling requires");
+    return expected.length;
+  };
+  const lineageToolingDependencies = verifyToolingClosure("MTS-PROJECT-ACCEPTED-LINEAGE-01");
+  const publicationToolingDependencies = verifyToolingClosure("MTS-PROJECT-PUBLICATION-01");
+
 
 
   const proofOwner = get("MTS-PROJECT-PROOF-PROVENANCE-01");
@@ -216,6 +279,9 @@ export function verifyProjectOwnership(
     candidates: OWNER_IDS.length,
     exactRelations,
     publicExportModules: exportedPaths.length,
+    packageToolingEntrypoints: toolingEntrypoints.length,
+    lineageToolingDependencies,
+    publicationToolingDependencies,
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,

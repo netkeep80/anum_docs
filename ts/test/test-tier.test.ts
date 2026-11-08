@@ -17,8 +17,11 @@ assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
-assert.equal(p7CandidateWitness.transitiveSourceDependencies, 15);
-assert.equal(p7CandidateWitness.exactRelations, 183);
+assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
+assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
+assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
+assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
+assert.equal(p7CandidateWitness.exactRelations, 202);
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
@@ -88,6 +91,45 @@ assert.throws(
   }),
   /public package transitive requires relation coverage mismatches/,
   "an existing unrelated source is not a valid package transitive dependency",
+);
+
+const lineageOwnerFile = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.rg.yaml";
+const lineageOwnerText = readFileSync(resolve("..", lineageOwnerFile), "utf8");
+const publicationOwnerFile = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
+const publicationOwnerText = readFileSync(resolve("..", publicationOwnerFile), "utf8");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace(
+      "  - predicates: [implemented_by]\n    target:\n      kind: artifact\n      path: ts/src/tooling/notation.ts\n", ""),
+  }),
+  /public API implemented_by relation coverage mismatches/,
+  "declared package tooling export cannot lose its exact entrypoint link",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: ts/src/syntax-aset-contract.ts\n", ""),
+  }),
+  /public package transitive requires relation coverage mismatches/,
+  "tooling subpath import must retain its exact private dependency",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [lineageOwnerFile]: lineageOwnerText.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: ts/src/tooling/docs-sync.ts\n", ""),
+  }),
+  /MTS-PROJECT-ACCEPTED-LINEAGE-01 tooling requires relation coverage mismatches/,
+  "current accepted-lineage compiler depends on docs-sync via exact imports",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      "path: ts/src/tooling/mts-source-requirement.ts",
+      "path: ts/src/tooling/test-runner.ts",
+    ),
+  }),
+  /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
+  "an unrelated but existing tooling source does not justify publication ownership",
 );
 
 // RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
