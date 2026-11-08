@@ -185,3 +185,63 @@ relations:
     target:
       kind: artifact
       path: ts/src/value-bundle.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/byte-carrier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/canonical-topology.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/dictionary.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/exact-sequence.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/persistence-topology.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/proof-support-topology.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/quaternary-state.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/recursive-link-identity-proof.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/replay-support-topology.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/rooted-sequence.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/state.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/structural-readers.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/structural-role-morphism.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/structural-substitution.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v013-relative-pole-context.ts

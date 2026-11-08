@@ -17,7 +17,8 @@ assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
-assert.equal(p7CandidateWitness.exactRelations, 168);
+assert.equal(p7CandidateWitness.transitiveSourceDependencies, 15);
+assert.equal(p7CandidateWitness.exactRelations, 183);
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
@@ -42,7 +43,7 @@ const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.
 const proofOwnerText = readFileSync(resolve("..", proofOwnerFile), "utf8");
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
-    [packageOwnerFile]: packageOwnerText.replace("path: ts/src/anum.ts", "path: ts/src/byte-carrier.ts"),
+    [packageOwnerFile]: packageOwnerText.replace("path: ts/src/anum.ts", "path: ts/src/tooling/mts-compiler.ts"),
   }),
   /public API implemented_by relation coverage mismatches/,
   "an existing but nonexported file must not justify public API ownership",
@@ -66,6 +67,27 @@ assert.throws(
   }),
   /proof evidence record relation coverage mismatches/,
   "a currently consumed proof record cannot silently lose its exact owner relation",
+);
+
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: ts/src/byte-carrier.ts\n",
+      "",
+    ),
+  }),
+  /public package transitive requires relation coverage mismatches/,
+  "a real transitive import must keep its exact Resource relationship",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace(
+      "path: ts/src/byte-carrier.ts",
+      "path: ts/src/tooling/mts-compiler.ts",
+    ),
+  }),
+  /public package transitive requires relation coverage mismatches/,
+  "an existing unrelated source is not a valid package transitive dependency",
 );
 
 // RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
