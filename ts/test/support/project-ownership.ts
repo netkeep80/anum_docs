@@ -60,6 +60,8 @@ export interface ProjectOwnershipReport {
   readonly compiledProofSourceUnits: number;
   readonly protectedHistoricalImages: number;
   readonly currentDocumentationSurfaces: number;
+  readonly readerPreviewLoaderModules: number;
+  readonly readerPreviewYamlInputs: number;
   readonly observatorySources: number;
   readonly observatoryExecutedTests: number;
 }
@@ -356,6 +358,85 @@ export function verifyProjectOwnership(
   for (const path of currentDocuments)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "documents");
 
+
+  // S9: bounded non-authoritative Reader W6 preview inputs. Ownership is
+  // reconstructed from the real workflow/CLI, the renderer's directly invoked
+  // loader imports, and their exact source-owner constants. This does not
+  // grant editorial approval or own the rest of requirements/mts-source.
+  const readerWorkflow = read(".github/workflows/reader-preview.yml");
+  const readerCli = read("ts/src/tooling/mts-reader-r44-w6-cli.ts");
+  if (!readerWorkflow.includes("node dist/src/tooling/mts-reader-r44-w6-cli.js") ||
+      !readerCli.includes('from "./mts-reader-r44-w6.js"') ||
+      !readerCli.includes('renderReaderW6(resolve(".."))'))
+    fail("Reader W6 preview no longer has the bounded executable workflow/CLI consumer");
+  const previewRoot = "ts/src/tooling/mts-reader-r44-w6.ts";
+  const previewSource = read(previewRoot);
+  const previewAst = ts.createSourceFile(previewRoot, previewSource, ts.ScriptTarget.Latest, true);
+  const directlyInvoked = new Map<string, string[]>();
+  for (const statement of previewAst.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier))
+      continue;
+    const module = statement.moduleSpecifier.text;
+    if (!module.startsWith("./mts-reader-") || !module.endsWith(".js")) continue;
+    const binding = statement.importClause?.namedBindings;
+    if (!binding || !ts.isNamedImports(binding)) fail("Reader W6 loader import must be named");
+    const path = "ts/src/tooling/" + module.slice(2, -3) + ".ts";
+    if (directlyInvoked.has(path)) fail("Reader W6 loader imported twice: " + path);
+    const names = binding.elements.map(element => element.name.text);
+    if (!names.length || names.some(name => !name.startsWith("loadReader") ||
+        !previewSource.includes(name + "(root)")))
+      fail("Reader W6 module imported without direct loader execution: " + path);
+    directlyInvoked.set(path, names);
+  }
+  if (directlyInvoked.size !== 23)
+    fail("Reader W6 directly invoked loader module count changed");
+  const readCalls = new Set(["read", "get", "load", "file", "local", "readFileSync"]);
+  const modelPaths = new Set<string>();
+  for (const path of [previewRoot, ...directlyInvoked.keys()]) {
+    const text = read(path);
+    const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true);
+    let modelCount = 0;
+    const visit = (node: ts.Node): void => {
+      if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) &&
+          node.name.text.endsWith("_PATH") && node.initializer &&
+          ts.isStringLiteral(node.initializer) &&
+          node.initializer.text.startsWith("requirements/mts-source/") &&
+          node.initializer.text.endsWith(".yaml")) {
+        const name = node.name.text;
+        const target = node.initializer.text;
+        if (!existsSync(resolve(root, target)))
+          fail("Reader W6 loader model path missing: " + target);
+        let readConsumer = false;
+        const findReadCall = (call: ts.Node): void => {
+          if (ts.isCallExpression(call) && ts.isIdentifier(call.expression) &&
+              readCalls.has(call.expression.text) &&
+              call.arguments.some(arg => new RegExp("\\b" + name + "\\b")
+                .test(arg.getText(source))))
+            readConsumer = true;
+          ts.forEachChild(call, findReadCall);
+        };
+        findReadCall(source);
+        if (!readConsumer)
+          fail("Reader W6 model constant lacks direct file-reader consumer: " + name);
+        if (modelPaths.has(target)) fail("duplicate Reader W6 direct model input: " + target);
+        modelPaths.add(target);
+        modelCount++;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    if (!modelCount) fail("Reader W6 loader has no exact YAML input: " + path);
+  }
+  const exactPreviewPaths = sorted(modelPaths);
+  if (exactPreviewPaths.length !== 25)
+    fail("Reader W6 direct YAML input count changed");
+  const declaredPreviewPaths = sorted([...publicationOwner.entries()]
+    .filter(([path]) => path.startsWith("requirements/mts-source/"))
+    .map(([path]) => path));
+  equalPaths(declaredPreviewPaths, exactPreviewPaths, "Reader W6 directly invoked YAML inputs");
+  for (const path of exactPreviewPaths)
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+
   // GitHub Pages actually compiles the Contract Observatory and runs only
   // two explicit tests. Derive ownership from the deployed build-site AST and
   // the executable workflow commands, not from every file in web/**.
@@ -427,6 +508,8 @@ export function verifyProjectOwnership(
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
+    readerPreviewLoaderModules: directlyInvoked.size,
+    readerPreviewYamlInputs: exactPreviewPaths.length,
     observatorySources: observedSources.size,
     observatoryExecutedTests: executedObservatoryTests.length,
   });
