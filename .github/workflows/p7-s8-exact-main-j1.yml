@@ -1,4 +1,4 @@
-name: P7-S8 exact main J1 diagnostic (temporary)
+name: P7-S8 exact candidate J1 and CURRENT (temporary)
 on:
   push:
     branches: [chore/p7-s8-exact-j1-diagnostic-20261108]
@@ -28,18 +28,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate checkout --detach a8115f4161f33b83b77a41acb6e2caf973aa57d3
-          test "$(git -C candidate rev-parse HEAD)" = "a8115f4161f33b83b77a41acb6e2caf973aa57d3"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "121119de9ae3a5583babefb34b3588dc25b98ee8"
+          git -C candidate fetch origin refs/heads/feat/p7-s8-frozen-formal-evidence-20261108
+          git -C candidate checkout --detach 1174e34d7dc1f089e6d7f276614d7616b18fcc87
+          test "$(git -C candidate rev-parse HEAD)" = "1174e34d7dc1f089e6d7f276614d7616b18fcc87"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "a3d311bcdf41b78723e3c07dfbd3aa7e6e3fb3d8"
           test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
           npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base a8115f4161f33b83b77a41acb6e2caf973aa57d3 --head a8115f4161f33b83b77a41acb6e2caf973aa57d3 --format json > "$RUNNER_TEMP/j1.json" 2> "$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 1174e34d7dc1f089e6d7f276614d7616b18fcc87 --head 1174e34d7dc1f089e6d7f276614d7616b18fcc87 --format json > "$RUNNER_TEMP/j1.json" 2> "$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo "EXTERNAL_REPOGUARD=74db97791e6da8a75287164f0d0b41579108f114"
-          echo "EXACT_MAIN=a8115f4161f33b83b77a41acb6e2caf973aa57d3"
-          echo "EXACT_TREE=121119de9ae3a5583babefb34b3588dc25b98ee8"
+          echo "EXACT_MAIN=1174e34d7dc1f089e6d7f276614d7616b18fcc87"
+          echo "EXACT_TREE=a3d311bcdf41b78723e3c07dfbd3aa7e6e3fb3d8"
           echo "COMPILER_EXIT=$rc"
           python3 - <<'PY'
           import json,collections,os
@@ -54,3 +55,6 @@ jobs:
           print("UNJUSTIFIED_GROUPS",json.dumps(dict(groups),sort_keys=True))
           PY
           test "$rc" -eq 1
+          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+          (cd candidate/ts && npm run check:current)
