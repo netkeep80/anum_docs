@@ -1,7 +1,8 @@
 // Project-scoped ownership witnesses. This is a consumer of native RepoGuard
 // Requirements, not a second Requirement authority or a new semantic MTS model.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
+import * as ts from "typescript";
 import { parseDocument } from "yaml";
 
 const OWNER_IDS = [
@@ -48,6 +49,7 @@ export interface ProjectOwnershipReport {
   readonly candidates: number;
   readonly exactRelations: number;
   readonly publicExportModules: number;
+  readonly transitiveSourceDependencies: number;
   readonly proofEvidenceRecords: number;
   readonly compiledProofSourceUnits: number;
 }
@@ -124,8 +126,52 @@ export function verifyProjectOwnership(
   equalPaths(declaredExports, exportedPaths, "public API implemented_by");
   const unexpectedPackageSource = [...packageOwner.entries()]
     .filter(([path, predicate]) => path.startsWith("ts/src/") &&
-      path !== "ts/src/public.ts" && predicate !== "implemented_by");
+      path !== "ts/src/public.ts" && predicate !== "implemented_by" && predicate !== "requires");
   if (unexpectedPackageSource.length) fail("public source misclassified as non-implementation");
+
+  // Enforce private implementation dependency closure from actual TypeScript
+  // import/export edges. Direct public exports are implemented_by; recursively
+  // imported modules are requires, not new public entrypoints.
+  const staticSourceDependencies = (owner: string): string[] => {
+    const source = ts.createSourceFile(owner, read(owner), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const local = new Set<string>();
+    const add = (module: string): void => {
+      if (!module.startsWith(".") || !module.endsWith(".js")) return;
+      const absolute = resolve(dirname(resolve(root, owner)), module.slice(0, -3) + ".ts");
+      const relativePath = relative(root, absolute).replaceAll("\\", "/");
+      if (!relativePath.startsWith("ts/src/")) return;
+      if (!existsSync(absolute)) fail("missing static TypeScript dependency: " + owner + " -> " + relativePath);
+      local.add(relativePath);
+    };
+    const visit = (node: ts.Node): void => {
+      if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+          node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier))
+        add(node.moduleSpecifier.text);
+      if (ts.isImportTypeNode(node) && ts.isLiteralTypeNode(node.argument) &&
+          ts.isStringLiteral(node.argument.literal)) add(node.argument.literal.text);
+      if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+          node.arguments[0] && ts.isStringLiteral(node.arguments[0]))
+        add(node.arguments[0].text);
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    return sorted(local);
+  };
+  const reached = new Set<string>();
+  const stack: string[] = ["ts/src/public.ts"];
+  while (stack.length > 0) {
+    const file = stack.pop()!;
+    if (reached.has(file)) continue;
+    reached.add(file);
+    stack.push(...staticSourceDependencies(file));
+  }
+  const transitiveRequired = sorted([...reached].filter(path =>
+    path !== "ts/src/public.ts" && !exportedPaths.includes(path)));
+  const declaredRequired = sorted([...packageOwner.entries()]
+    .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "requires")
+    .map(([path]) => path));
+  equalPaths(declaredRequired, transitiveRequired, "public package transitive requires");
+
 
   const proofOwner = get("MTS-PROJECT-PROOF-PROVENANCE-01");
   const evidencePaths = collectEvidence(root, "proofs/evidence");
@@ -170,6 +216,7 @@ export function verifyProjectOwnership(
     candidates: OWNER_IDS.length,
     exactRelations,
     publicExportModules: exportedPaths.length,
+    transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
   });
