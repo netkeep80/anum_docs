@@ -63,6 +63,8 @@ export interface ProjectOwnershipReport {
   readonly currentDocumentationSurfaces: number;
   readonly readerPreviewLoaderModules: number;
   readonly readerPreviewYamlInputs: number;
+  readonly readerPreviewRuntimeYamlInputs: number;
+  readonly readerPreviewPinnedTranscriptions: number;
   readonly observatorySources: number;
   readonly observatoryExecutedTests: number;
 }
@@ -71,6 +73,7 @@ export interface ProjectOwnershipReport {
 // changing the project Requirement authorizations in the repository.
 export function verifyProjectOwnership(
   root: string,
+  readerRuntimeInputs: readonly string[],
   overrides: Readonly<Record<string, string>> = {},
 ): ProjectOwnershipReport {
   const read = (path: string): string =>
@@ -459,9 +462,56 @@ export function verifyProjectOwnership(
   const declaredPreviewPaths = sorted([...publicationOwner.entries()]
     .filter(([path]) => path.startsWith("requirements/mts-source/"))
     .map(([path]) => path));
-  equalPaths(declaredPreviewPaths, exactPreviewPaths, "Reader W6 directly invoked YAML inputs");
+  const declaredDirectPreviewPaths = declaredPreviewPaths.filter(path =>
+    exactPreviewPaths.includes(path));
+  equalPaths(declaredDirectPreviewPaths, exactPreviewPaths, "Reader W6 directly invoked YAML inputs");
   for (const path of exactPreviewPaths)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+
+  // S11: the actual W6 renderer was instrumented with node:fs
+  // syncBuiltinESMExports and exercised against the exact candidate tree.
+  // Unlike textual path enumeration, this is the full observed read closure.
+  // The two M06 transcriptions are immutable, runtime-consumed byte-pinned
+  // *secondary* sources, never PDF original bytes or semantic approval.
+  const runtimePaths = sorted(readerRuntimeInputs);
+  if (runtimePaths.length !== new Set(runtimePaths).size)
+    fail("Reader W6 runtime file-read witness contains duplicates");
+  const runtimeYamlPaths = runtimePaths.filter(path =>
+    path.startsWith("requirements/mts-source/") && path.endsWith(".yaml"));
+  const runtimeM06Paths = runtimePaths.filter(path =>
+    path.startsWith("reviews/m06/") && path.endsWith(".txt"));
+  if (runtimeYamlPaths.length !== 43 || runtimeM06Paths.length !== 2 ||
+      runtimePaths.length !== 45)
+    fail("Reader W6 complete runtime provenance input count changed");
+  const expectedReviewPaths = sorted([
+    "reviews/m06/reviewer-b-97-indexed-extraction.txt",
+    "reviews/m06/reviewer-c-43-indexed-extraction.txt",
+  ]);
+  equalPaths(runtimeM06Paths, expectedReviewPaths, "Reader W6 exact M06 runtime transcript paths");
+  const declaredRuntimePaths = sorted([...publicationOwner.entries()]
+    .filter(([path]) => path.startsWith("requirements/mts-source/") ||
+      path.startsWith("reviews/m06/"))
+    .map(([path]) => path));
+  equalPaths(declaredRuntimePaths, runtimePaths, "Reader W6 full observed runtime input closure");
+  for (const path of runtimePaths)
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+  const m06Source = read("ts/src/tooling/mts-reader-review-m06.ts");
+  const blobSource = /const originalBlob\s*=\s*{([\s\S]*?)}\s*as const;/.exec(m06Source)?.[1];
+  if (!blobSource) fail("M06 original Git blob pins disappeared from current consumer");
+  for (const [tag, path] of [["B", expectedReviewPaths[0]!], ["C", expectedReviewPaths[1]!]] as const) {
+    if (!m06Source.includes(tag + ':"' + path + '"'))
+      fail("Reader W6 M06 current consumer path changed: " + tag);
+    const pin = new RegExp("\\b" + tag + ':\\s*"([0-9a-f]{40})"').exec(blobSource)?.[1];
+    if (!pin) fail("Reader W6 M06 source SHA pin missing: " + tag);
+    const value = read(path);
+    const digest = createHash("sha1").update("blob " + Buffer.byteLength(value) + "\0")
+      .update(value).digest("hex");
+    if (digest !== pin) fail("Reader W6 pinned M06 transcription bytes changed: " + path);
+    if (!value.includes("NOT ORIGINAL PDF BYTES") ||
+        !value.includes("no claim of PDF-byte identity"))
+      fail("Reader W6 M06 transcription must not misrepresent original PDF bytes");
+  }
+
 
   // S11-A: restore only the exact secondary M06-B transcription whose
   // absence caused an actual Reader W6 ENOENT. Verify the present-tense
@@ -554,6 +604,8 @@ export function verifyProjectOwnership(
     currentDocumentationSurfaces: currentDocuments.length,
     readerPreviewLoaderModules: directlyInvoked.size,
     readerPreviewYamlInputs: exactPreviewPaths.length,
+    readerPreviewRuntimeYamlInputs: runtimeYamlPaths.length,
+    readerPreviewPinnedTranscriptions: runtimeM06Paths.length,
     observatorySources: observedSources.size,
     observatoryExecutedTests: executedObservatoryTests.length,
   });
