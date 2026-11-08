@@ -60,7 +60,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 348);
+assert.equal(p7CandidateWitness.exactRelations, 350);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -274,6 +274,62 @@ assert.throws(
   }),
   /Reader W6 pinned M06 transcription bytes changed/,
   "S11-B: exact original C Git blob must remain unchanged",
+);
+
+// S12: exact Pages/docs:coverage and generated-theorem current observers.
+const s12CoverageRelation =
+  "  - predicates: [implemented_by]\\n    target:\\n      kind: artifact\\n      path: ts/src/tooling/docs-coverage.ts\\n".replaceAll("\\n", "\n");
+const s12CatalogRelation =
+  "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: docs/theory/Теоремы МТС.md\\n".replaceAll("\\n", "\n");
+assert.ok(publicationOwnerText.includes(s12CoverageRelation) &&
+  publicationOwnerText.includes(s12CatalogRelation), "S12 current Pages resources claimed");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(s12CoverageRelation, ""),
+  }),
+  /current publication tooling entrypoints relation coverage mismatches/,
+  "S12 missing docs-coverage implementation must fail closed",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      s12CoverageRelation, s12CoverageRelation.replace("[implemented_by]", "[requires]")),
+  }),
+  /current publication tooling entrypoints relation coverage mismatches/,
+  "S12 docs-coverage cannot be misclassified as non-executable input",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(s12CatalogRelation, ""),
+  }),
+  /missing requires witness for docs\/theory\/Теоремы МТС\.md/,
+  "S12 current generated theorem catalog requires a path-exact resource relation",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      s12CatalogRelation, s12CatalogRelation.replace("[requires]", "[documents]")),
+  }),
+  /current Markdown publication surface relation coverage mismatches/,
+  "S12 generated theorem projection must not become hand-authored Markdown ownership",
+);
+const s12PagesPath = ".github/workflows/pages.yml";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [s12PagesPath]: readFileSync(resolve("..", s12PagesPath), "utf8")
+      .replace("npm --prefix ts run docs:coverage", "echo fake-coverage"),
+  }),
+  /S12 Pages current docs-coverage executable binding changed/,
+  "S12 a stale coverage source must not survive a workflow execution change",
+);
+const s12DocsSyncPath = "ts/src/tooling/docs-sync.ts";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [s12DocsSyncPath]: readFileSync(resolve("..", s12DocsSyncPath), "utf8")
+      .replace("writeFileSync(theoremCatalogFullPath", "void(theoremCatalogFullPath"),
+  }),
+  /S12 generated theorem catalog current docs-sync source\/observer changed/,
+  "S12 a previously generated but no longer written catalog cannot remain owned as current",
 );
 
 const readerW6ToolPath = "ts/src/tooling/mts-reader-r44-w6.ts";
