@@ -58,3 +58,4 @@ jobs:
           npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
           npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
           (cd candidate/ts && npm run check:current)
+          (cd candidate/ts && npm run check:full)
