@@ -167,7 +167,7 @@ assert.throws(
     [publicationOwnerFile]: publicationOwnerText.replace(
       previewSourceRelation, previewSourceRelation.replace("[requires]", "[documents]")),
   }),
-  /missing requires witness for requirements\/mts-source\/MTS-READER-HUMAN-EDITION-R44-W6.yaml/,
+  /current Markdown publication surface relation coverage mismatches/,
   "S9: a document projection is not the causal input used by Reader preview",
 );
 assert.throws(
