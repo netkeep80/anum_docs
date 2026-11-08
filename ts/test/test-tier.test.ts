@@ -22,7 +22,9 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 1);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 275);
+assert.equal(p7CandidateWitness.exactRelations, 300);
+assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
+assert.equal(p7CandidateWitness.readerPreviewYamlInputs, 25);
 assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 2);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
@@ -138,6 +140,55 @@ const lineageOwnerFile = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.r
 const lineageOwnerText = readFileSync(resolve("..", lineageOwnerFile), "utf8");
 const publicationOwnerFile = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
 const publicationOwnerText = readFileSync(resolve("..", publicationOwnerFile), "utf8");
+
+
+const previewDraftPath = "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [previewDraftPath]: readFileSync(resolve("..", previewDraftPath), "utf8")
+      .replace("author_approval: not-recorded", "author_approval: approved"),
+  }),
+  /Reader W6 draft model cannot gain unrecorded approval or semantic authority/,
+  "S9: source ownership cannot be confused with Author acceptance",
+);
+
+const previewSourceRelation =
+  "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml\n";
+assert.ok(publicationOwnerText.includes(previewSourceRelation), "S9: preview-root source relation must exist");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(previewSourceRelation, ""),
+  }),
+  /Reader W6 directly invoked YAML inputs relation coverage mismatches/,
+  "S9: removing a currently read Reader preview source must fail closed",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      previewSourceRelation, previewSourceRelation.replace("[requires]", "[documents]")),
+  }),
+  /current Markdown publication surface relation coverage mismatches/,
+  "S9: a document projection is not the causal input used by Reader preview",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText +
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml\n",
+  }),
+  /Reader W6 directly invoked YAML inputs relation coverage mismatches/,
+  "S9: another existing editorial model is not automatically a direct W6 input",
+);
+const readerW6ToolPath = "ts/src/tooling/mts-reader-r44-w6.ts";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [readerW6ToolPath]: readFileSync(resolve("..", readerW6ToolPath), "utf8")
+      .replace('from "./mts-reader-review-m06-w3.js"',
+        'from "./mts-reader-review-m06-w2.js"'),
+  }),
+  /Reader W6 loader imported twice|Reader W6 directly invoked loader module count changed/,
+  "S9: a changed actual loader graph invalidates stale source ownership",
+);
+
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [packageOwnerFile]: packageOwnerText.replace(

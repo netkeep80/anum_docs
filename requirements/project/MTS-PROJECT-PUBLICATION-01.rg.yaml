@@ -137,3 +137,103 @@ relations:
     target:
       kind: artifact
       path: web/contract-observatory/test/site.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-ANET-EXACTSEQUENCE-R01-R02.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-BASIS-GROUNDED-IDENTITY-F03-F04-F05.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-EPISTEMIC-CLAIMS-M04.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-FIRST-USE-G20.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-FIRST-USE-REPAIR-G41.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-FORMAL-DAS-GAMMA-L01-L02-L03.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-FOUNDATION-MODEL-PROOF-F01-F02-P01.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-GAMMA-AND-G01-G02-G03.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-HISTORICAL-IMAGES-M05.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-INVERSION-ORIENTATION-F06-F07.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-MATHEMATICAL-POSITION-M01.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-NOTATION-SEMANTICS-M03.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W2.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-QUESTION-RESPONSES-M06-W3.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-QUESTIONS-M06-INDEX.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-REFINEMENT-REPRODUCIBILITY-P02-P03.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-REPRESENTATION-ARITHMETIC-R03-R04.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-SCIENTIFIC-CONTINUITY-R44-W4.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-SCIENTIFIC-FINAL-REVIEW-R44-W5.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-SOURCE-ATTRIBUTION-R43.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-V015-INDIVIDUAL-AUDIT-R44-W3.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/mts-source/MTS-READER-WORKED-FOUNDATION-GAMMA-M02.yaml
