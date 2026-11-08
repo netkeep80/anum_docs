@@ -89,3 +89,51 @@ relations:
     target:
       kind: artifact
       path: docs/Словарь терминов МТС.md
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/build-site.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/tsconfig.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/browser-controller.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/contract-index.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/interaction.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/markdown-coverage-bridge.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/methodology-projection.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/requirement-navigation.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/semantic-ir-bridge.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: web/contract-observatory/src/site.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/contract-index.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/site.test.ts

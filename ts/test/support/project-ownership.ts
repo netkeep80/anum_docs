@@ -59,6 +59,8 @@ export interface ProjectOwnershipReport {
   readonly compiledProofSourceUnits: number;
   readonly protectedHistoricalImages: number;
   readonly currentDocumentationSurfaces: number;
+  readonly observatorySources: number;
+  readonly observatoryExecutedTests: number;
 }
 
 // Overrides exist only to construct negative falsifiers without changing Git or
@@ -319,6 +321,59 @@ export function verifyProjectOwnership(
   for (const path of currentDocuments)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "documents");
 
+  // GitHub Pages actually compiles the Contract Observatory and runs only
+  // two explicit tests. Derive ownership from the deployed build-site AST and
+  // the executable workflow commands, not from every file in web/**.
+  const observatoryPrefix = "web/contract-observatory/";
+  const buildSiteSource = observatoryPrefix + "src/build-site.ts";
+  const pagesWorkflow = read(".github/workflows/pages.yml");
+  if (!pagesWorkflow.includes("tsc -p web/contract-observatory/tsconfig.json") ||
+      !pagesWorkflow.includes("node web/contract-observatory/dist/src/build-site.js"))
+    fail("Contract Observatory workflow no longer compiles and materializes accepted Pages");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", buildSiteSource, "implemented_by");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", observatoryPrefix + "tsconfig.json", "requires");
+  const observedSources = new Set<string>(), pendingObservatory = [buildSiteSource];
+  while (pendingObservatory.length) {
+    const file = pendingObservatory.pop()!;
+    if (observedSources.has(file)) continue;
+    observedSources.add(file);
+    const script = ts.createSourceFile(file, read(file), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const visit = (node: ts.Node): void => {
+      if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+          node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier) &&
+          node.moduleSpecifier.text.startsWith(".") && node.moduleSpecifier.text.endsWith(".js")) {
+        const absolute = resolve(dirname(resolve(root, file)),
+          node.moduleSpecifier.text.slice(0, -3) + ".ts");
+        const dep = relative(root, absolute).replaceAll("\\", "/");
+        if (!dep.startsWith(observatoryPrefix + "src/") || !existsSync(absolute))
+          fail("Contract Observatory has unresolved local source dependency: " + file + " -> " + dep);
+        pendingObservatory.push(dep);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(script);
+  }
+  const observatoryPrivate = sorted([...observedSources].filter(path => path !== buildSiteSource));
+  const declaredObservatoryPrivate = sorted([...publicationOwner.entries()]
+    .filter(([path, predicate]) => path.startsWith(observatoryPrefix + "src/") &&
+      path !== buildSiteSource && predicate === "requires")
+    .map(([path]) => path));
+  equalPaths(declaredObservatoryPrivate, observatoryPrivate, "Contract Observatory site source dependency");
+  for (const path of observatoryPrivate)
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+  const executedObservatoryTests = sorted(new Set(
+    [...pagesWorkflow.matchAll(/\bnode web\/contract-observatory\/dist\/test\/([A-Za-z0-9.-]+)\.js/g)]
+      .map(match => observatoryPrefix + "test/" + match[1]! + ".ts"),
+  ));
+  if (executedObservatoryTests.length === 0) fail("Contract Observatory has no executed site verification");
+  const declaredObservatoryTests = sorted([...publicationOwner.entries()]
+    .filter(([path, predicate]) => path.startsWith(observatoryPrefix + "test/") &&
+      predicate === "verified_by")
+    .map(([path]) => path));
+  equalPaths(declaredObservatoryTests, executedObservatoryTests, "Contract Observatory executed tests");
+  for (const path of executedObservatoryTests)
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "verified_by");
+
   assertRelation("MTS-PROJECT-CI-01", "ts/src/tooling/test-tier.ts", "implemented_by");
   assertRelation("MTS-PROJECT-CI-01", "ts/test/test-tier.test.ts", "verified_by");
   assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", "ts/src/tooling/mts-compiler.ts", "implemented_by");
@@ -336,5 +391,7 @@ export function verifyProjectOwnership(
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
+    observatorySources: observedSources.size,
+    observatoryExecutedTests: executedObservatoryTests.length,
   });
 }
