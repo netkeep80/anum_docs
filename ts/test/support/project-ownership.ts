@@ -240,6 +240,20 @@ export function verifyProjectOwnership(
     equalPaths(actual, expected, id + " tooling requires");
     return expected.length;
   };
+
+  // S10: the accepted publication obligation executes exactly two tooling
+  // entrypoints: current Markdown coverage and the non-authoritative W6 CLI.
+  // The transitive implementation dependency set is computed by the existing
+  // TypeScript AST graph above, not by a directory prefix or hardcoded list.
+  const previewPublishedRoots = sorted([...get("MTS-PROJECT-PUBLICATION-01").entries()]
+    .filter(([path, predicate]) =>
+      path.startsWith("ts/src/tooling/") && predicate === "implemented_by")
+    .map(([path]) => path));
+  equalPaths(previewPublishedRoots, [
+    "ts/src/tooling/mts-reader-coverage.ts",
+    "ts/src/tooling/mts-reader-r44-w6-cli.ts",
+  ], "current publication tooling entrypoints");
+
   const lineageToolingDependencies = verifyToolingClosure("MTS-PROJECT-ACCEPTED-LINEAGE-01");
   const publicationToolingDependencies = verifyToolingClosure("MTS-PROJECT-PUBLICATION-01");
 
