@@ -46,6 +46,10 @@ assert.throws(
 );
 
 
+const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
+const packageOwnerText = readFileSync(resolve("..", packageOwnerFile), "utf8");
+const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const proofOwnerText = readFileSync(resolve("..", proofOwnerFile), "utf8");
 const replayPair = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-and.amemory-package.json\n";
 assert.ok(proofOwnerText.includes(replayPair), "S8 fixture relation must exist");
 assert.throws(
@@ -81,10 +85,6 @@ assert.throws(
   "S8: changed consumer's exact frozen evidence set invalidates stale ownership",
 );
 
-const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
-const packageOwnerText = readFileSync(resolve("..", packageOwnerFile), "utf8");
-const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
-const proofOwnerText = readFileSync(resolve("..", proofOwnerFile), "utf8");
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [packageOwnerFile]: packageOwnerText.replace("path: ts/src/anum.ts", "path: ts/src/tooling/mts-compiler.ts"),
