@@ -28,17 +28,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate checkout --detach 082b75e6bbe84326fc94a56f66dd4ffe617a88d7
-          test "$(git -C candidate rev-parse HEAD)" = "082b75e6bbe84326fc94a56f66dd4ffe617a88d7"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "e665467be15020139503a30eb429fb944a9ccffc"
+          git -C candidate fetch origin refs/heads/feat/p7-s10-reader-preview-tooling-20261108
+          git -C candidate checkout --detach c33e213e9f77e11692b9f56c49db146d369a9a1a
+          test "$(git -C candidate rev-parse HEAD)" = "c33e213e9f77e11692b9f56c49db146d369a9a1a"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "a2b8206b666769c0156e6c13cb240cc4897415c7"
           test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
           npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 082b75e6bbe84326fc94a56f66dd4ffe617a88d7 --head 082b75e6bbe84326fc94a56f66dd4ffe617a88d7 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base c33e213e9f77e11692b9f56c49db146d369a9a1a --head c33e213e9f77e11692b9f56c49db146d369a9a1a --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
-          echo "EXACT_HEAD=082b75e6bbe84326fc94a56f66dd4ffe617a88d7"
-          echo "EXACT_TREE=e665467be15020139503a30eb429fb944a9ccffc"
+          echo "EXACT_HEAD=c33e213e9f77e11692b9f56c49db146d369a9a1a"
+          echo "EXACT_TREE=a2b8206b666769c0156e6c13cb240cc4897415c7"
           echo "COMPILER_EXIT=$rc"
           python3 - <<'PY'
           import json,os,collections
