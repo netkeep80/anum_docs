@@ -1,0 +1,54 @@
+name: P7 temporary legacy policy exact diagnostics
+on:
+  push:
+    branches: [feat/p7-bounded-project-ownership-20261108]
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: false
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: c19f29da366c985e2cf162ef7e75f5594f60c3a2
+          persist-credentials: false
+          path: repoguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Check exact RepoGuard and print bounded failing diagnostics
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git -C repoguard rev-parse HEAD)" = c19f29da366c985e2cf162ef7e75f5594f60c3a2
+          npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
+          curl --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/netkeep80/anum_docs/pulls/2347 > "$RUNNER_TEMP/pr.json"
+          jq -n --slurpfile pr "$RUNNER_TEMP/pr.json" '{action:"synchronize", number:2347, pull_request:$pr[0],repository:{full_name:"netkeep80/anum_docs"}}' > "$RUNNER_TEMP/pr-event.json"
+          cd candidate
+          set +e
+          GITHUB_EVENT_NAME=pull_request GITHUB_EVENT_PATH="$RUNNER_TEMP/pr-event.json" GITHUB_REPOSITORY=netkeep80/anum_docs             node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$PWD" --enforcement blocking check-pr --format json > "$RUNNER_TEMP/report.json" 2> "$RUNNER_TEMP/stderr.txt"
+          rc=$?
+          set -e
+          echo "DIAGNOSTIC_CHECK_PR_EXIT=$rc"
+          jq -r 'keys|join(",")' "$RUNNER_TEMP/report.json"
+          jq -r '(.violations // .diagnostics // [])[] | {rule:(.ruleId // .rule // .id // ""),reason:(.reasonCode // .code // ""),subject:(.path // .subject // ""),message:(.message // .reason // "")}|tojson' "$RUNNER_TEMP/report.json" | head -25
+          jq -r '{result,violationCount,warnings,reasonCode,message}|tojson' "$RUNNER_TEMP/report.json"
+          test "$rc" -le 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p7-temporary-legacy-policy-diagnostics
+          path: ${{ runner.temp }}/report.json
+          retention-days: 2
