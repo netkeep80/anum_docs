@@ -1,8 +1,11 @@
-import { verifyProjectOwnership } from "./support/project-ownership.js";
+import { verifyProjectOwnership as verifyProjectOwnershipImpl } from "./support/project-ownership.js";
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
+import { renderReaderW6 } from "../src/tooling/mts-reader-r44-w6.js";
 import assert from "node:assert/strict";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import {
   buildTestTierPlan,
@@ -10,6 +13,41 @@ import {
   selectTestTier,
 } from "../src/tooling/test-tier.js";
 import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
+
+// S11: witness the actual Reader W6 runtime file-read graph exactly once.
+// This runs on the same tree as CURRENT and FULL; no precomputed claimed paths
+// and no publication/semantic approval are inferred from draft material.
+const readerRuntimeInputs = new Set<string>();
+const realReadFileSync = fs.readFileSync;
+const readerRepoRoot = resolve("..");
+Object.defineProperty(fs, "readFileSync", {
+  configurable: true,
+  writable: true,
+  value: (path: unknown, ...args: unknown[]) => {
+    if (typeof path === "string") {
+      const normalized = relative(readerRepoRoot, path).replaceAll("\\", "/");
+      if ((normalized.startsWith("requirements/mts-source/") && normalized.endsWith(".yaml")) ||
+          (normalized.startsWith("reviews/m06/") && normalized.endsWith(".txt")))
+        readerRuntimeInputs.add(normalized);
+    }
+    return Reflect.apply(realReadFileSync, fs, [path, ...args]);
+  },
+});
+syncBuiltinESMExports();
+try {
+  const renderedReader = renderReaderW6(readerRepoRoot);
+  assert.equal(renderedReader.publication, "blocked");
+  assert.ok(renderedReader.markdown.length > 1000);
+} finally {
+  Object.defineProperty(fs, "readFileSync", {
+    configurable: true, writable: true, value: realReadFileSync,
+  });
+  syncBuiltinESMExports();
+}
+const verifiedReaderRuntimeInputs = [...readerRuntimeInputs];
+const verifyProjectOwnership = (
+  root: string, overrides: Readonly<Record<string, string>> = {},
+) => verifyProjectOwnershipImpl(root, verifiedReaderRuntimeInputs, overrides);
 
 // P7 project-ownership bridge: verify the artifact claims against present-tense consumers.
 const p7CandidateWitness = verifyProjectOwnership(resolve(".."));
@@ -22,7 +60,9 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 329);
+assert.equal(p7CandidateWitness.exactRelations, 348);
+assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
+assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
 assert.equal(p7CandidateWitness.readerPreviewYamlInputs, 25);
 assert.equal(p7CandidateWitness.observatorySources, 9);
@@ -173,10 +213,10 @@ assert.throws(
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [publicationOwnerFile]: publicationOwnerText +
-      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml\n",
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-EDGE-REVIEW-R39-W1.yaml\n",
   }),
-  /Reader W6 directly invoked YAML inputs relation coverage mismatches/,
-  "S9: another existing editorial model is not automatically a direct W6 input",
+  /Reader W6 full observed runtime input closure relation coverage mismatches/,
+  "S9/S11: an existing but unread editorial model is not automatically a W6 input",
 );
 // S11-A: only the actual current M06-B read, not a historical directory.
 const m06BRelation =
@@ -186,7 +226,7 @@ assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [publicationOwnerFile]: publicationOwnerText.replace(m06BRelation, ""),
   }),
-  /missing requires witness for reviews\/m06\/reviewer-b-97-indexed-extraction.txt/,
+  /Reader W6 full observed runtime input closure relation coverage mismatches/,
   "S11-A: a presently read source cannot lose ownership",
 );
 const m06BPath = "reviews/m06/reviewer-b-97-indexed-extraction.txt";
@@ -194,8 +234,46 @@ assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [m06BPath]: readFileSync(resolve("..", m06BPath), "utf8") + "\nTAMPERED\n",
   }),
-  /M06-B secondary transcription byte identity or source status drift/,
+  /Reader W6 pinned M06 transcription bytes changed/,
   "S11-A: source bytes must be checked against the current exact consumer SHA",
+);
+
+// S11-B: assert exact transitive YAML and C sources, never a broad source folder.
+const runtimeRouteRelation =
+  "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: requirements/mts-source/MTS-READER-ROUTE-PROPOSAL.yaml\n";
+const m06CRelation =
+  "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: reviews/m06/reviewer-c-43-indexed-extraction.txt\n";
+assert.ok(publicationOwnerText.includes(runtimeRouteRelation) &&
+  publicationOwnerText.includes(m06CRelation), "S11-B restored current runtime paths");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(runtimeRouteRelation, ""),
+  }),
+  /Reader W6 full observed runtime input closure relation coverage mismatches/,
+  "S11-B: a real transitive Reader YAML input cannot disappear",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(m06CRelation, ""),
+  }),
+  /Reader W6 full observed runtime input closure relation coverage mismatches/,
+  "S11-B: the pinned secondary M06-C source cannot disappear",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(
+      runtimeRouteRelation, runtimeRouteRelation.replace("[requires]", "[documents]")),
+  }),
+  /current Markdown publication surface relation coverage mismatches/,
+  "S11-B: a runtime input cannot be represented as a Markdown publication",
+);
+const m06CPath = "reviews/m06/reviewer-c-43-indexed-extraction.txt";
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [m06CPath]: readFileSync(resolve("..", m06CPath), "utf8") + "\nMUTATED\n",
+  }),
+  /Reader W6 pinned M06 transcription bytes changed/,
+  "S11-B: exact original C Git blob must remain unchanged",
 );
 
 const readerW6ToolPath = "ts/src/tooling/mts-reader-r44-w6.ts";
