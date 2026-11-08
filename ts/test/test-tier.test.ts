@@ -244,6 +244,16 @@ assert.throws(
   /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
   "S10: an unrelated but existing tooling source does not satisfy the import graph",
 );
+
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [readerW6ToolPath]: 'import "./docs-coverage.js";\n' +
+      readFileSync(resolve("..", readerW6ToolPath), "utf8"),
+  }),
+  /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
+  "S10: a newly imported real private implementation requires an explicit exact relation",
+);
+
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [publicationOwnerFile]: publicationOwnerText.replace(
