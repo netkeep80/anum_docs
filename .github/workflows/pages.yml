@@ -89,8 +89,9 @@ jobs:
 
       - name: Verify Contract Observatory evidence and static site
         run: |
-          node web/contract-observatory/dist/test/contract-index.test.js
-          node web/contract-observatory/dist/test/site.test.js
+          for test_file in web/contract-observatory/dist/test/*.test.js; do
+            node "$test_file"
+          done
 
       - name: Materialize Pages artifact
         run: |

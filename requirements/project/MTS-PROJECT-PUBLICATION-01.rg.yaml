@@ -437,3 +437,39 @@ relations:
     target:
       kind: artifact
       path: docs/theory/Теоремы МТС.md
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/browser-controller-nodelist.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/browser-controller.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/evidence-anatomy.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/interaction.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/invariant-traceability.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/localization.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/methodology-projection.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/requirement-navigation.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: web/contract-observatory/test/semantic-ir-bridge.test.ts

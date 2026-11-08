@@ -312,6 +312,23 @@ export function verifyProjectOwnership(
   for (const path of exactReplayPaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
 
+  // P7-S14: current theorem projection contract names exact evidence inputs.
+  // No blanket proofs/** claim; removal or mutation of the consumer changes the expected set.
+  const theoremProjectionSource = read("ts/src/tooling/theorem-projection-contract.ts");
+  if (!theoremProjectionSource.includes("evidencePaths: Object.freeze"))
+    fail("current theorem projection evidence consumer missing");
+  const theoremEvidencePaths = sorted(new Set(
+    [...theoremProjectionSource.matchAll(/\\bproofs\\/v015-evidence\\/[a-z0-9-]+\\.json\\b/g)]
+      .map(match => match[0]),
+  ));
+  if (theoremEvidencePaths.length !== 11)
+    fail("current theorem projection evidence inventory changed");
+  const declaredTheoremEvidence = sorted([...proofOwner.entries()]
+    .filter(([path]) => path.startsWith("proofs/v015-evidence/")).map(([path]) => path));
+  equalPaths(declaredTheoremEvidence, theoremEvidencePaths, "current theorem projection evidence");
+  for (const path of theoremEvidencePaths)
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
+
   const evidencePaths = collectEvidence(root, "proofs/evidence");
   const declaredEvidence = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("proofs/evidence/")).map(([path]) => path));
@@ -605,10 +622,19 @@ export function verifyProjectOwnership(
   equalPaths(declaredObservatoryPrivate, observatoryPrivate, "Contract Observatory site source dependency");
   for (const path of observatoryPrivate)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
-  const executedObservatoryTests = sorted(new Set(
-    [...pagesWorkflow.matchAll(/\bnode web\/contract-observatory\/dist\/test\/([A-Za-z0-9.-]+)\.js/g)]
-      .map(match => observatoryPrefix + "test/" + match[1]! + ".ts"),
-  ));
+  // P7-S14: both CI and Pages execute every compiled Observatory TS test,
+  // not merely compile it. Ownership follows that exact executable suite.
+  const testLoop = 'for test_file in web/contract-observatory/dist/test/*.test.js; do';
+  for (const observer of [pagesWorkflow, workflow]) {
+    if (!observer.includes(testLoop) || !observer.includes('node "$test_file"'))
+      fail("Contract Observatory full compiled test execution changed");
+  }
+  const observatoryConfig = object(JSON.parse(read(observatoryPrefix + "tsconfig.json")), "Observatory tsconfig");
+  if (!array(observatoryConfig.include, "Observatory includes").includes("test/**/*.ts"))
+    fail("Contract Observatory compiled test inclusion changed");
+  const executedObservatoryTests = sorted(readdirSync(resolve(root, observatoryPrefix + "test"))
+    .filter(name => name.endsWith(".test.ts"))
+    .map(name => observatoryPrefix + "test/" + name));
   if (executedObservatoryTests.length === 0) fail("Contract Observatory has no executed site verification");
   const declaredObservatoryTests = sorted([...publicationOwner.entries()]
     .filter(([path, predicate]) => path.startsWith(observatoryPrefix + "test/") &&
