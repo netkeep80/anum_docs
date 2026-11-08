@@ -185,7 +185,7 @@ assert.throws(
       .replace('from "./mts-reader-review-m06-w3.js"',
         'from "./mts-reader-review-m06-w2.js"'),
   }),
-  /Reader W6 loader imported twice|Reader W6 directly invoked loader module count changed/,
+  /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
   "S9: a changed actual loader graph invalidates stale source ownership",
 );
 
