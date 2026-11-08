@@ -1,4 +1,4 @@
-name: P7-S12 exact candidate v6 J1 CURRENT FULL (temporary)
+name: P7-S12 merged main external v6 J1 J2 (temporary)
 on:
   push:
     branches: [chore/p7-s12-exact-census-20261108]
@@ -27,17 +27,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin refs/heads/feat/p7-s12-publication-current-observers-20261108
-          git -C candidate checkout --detach 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1
-          test "$(git -C candidate rev-parse HEAD)" = 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1
+          git -C candidate fetch origin main
+          git -C candidate checkout --detach 851ce137abc3c92cfb0a72d700a74164bc89e111
+          test "$(git -C candidate rev-parse HEAD)" = 851ce137abc3c92cfb0a72d700a74164bc89e111
           test "$(git -C candidate rev-parse HEAD^{tree})" = d74e9f3be956e9cd98a4a50f3996922318a8067d
           test "$(git -C guard rev-parse HEAD)" = 74db97791e6da8a75287164f0d0b41579108f114
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1 --head 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 851ce137abc3c92cfb0a72d700a74164bc89e111 --head 851ce137abc3c92cfb0a72d700a74164bc89e111 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
-          echo "EXACT_HEAD=84710293af3323b8e5725e4d4ba1c6c2f9dac4c1"
+          echo "EXACT_HEAD=851ce137abc3c92cfb0a72d700a74164bc89e111"
           echo "EXACT_TREE=d74e9f3be956e9cd98a4a50f3996922318a8067d"
           echo "COMPILER_EXIT=$rc"
           python3 - <<'PY'
@@ -50,7 +50,3 @@ jobs:
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           PY
           test "$rc" -eq 1
-          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
-          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
-          (cd candidate/ts && npm run check:current)
-          (cd candidate/ts && npm run check:full)
