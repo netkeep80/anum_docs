@@ -25,3 +25,127 @@ relations:
     target:
       kind: artifact
       path: ts/test/historical-images-protection.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/64ачисла.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/абиты и формы связей.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/асеть2 в памяти.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/ачисла.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/ачисла2.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/ачисло3.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/Безымянный.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/верёвки.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/вложенная асеть2.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/десериализация.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/Количество и протяженность.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/мтс1.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/Новый точечный рисунок (2).jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/описание асети2.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/пример_ачисла.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/различие.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/Роли связи.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/роли.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/роли2.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/связь-ачисло.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/сосед-начальник.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/ссылка.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/Формализация нотации ачисел.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/IMG_1736.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/mts_link_primitives.png
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/mts_link_primitives.svg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/mts_root_aset.png
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/mts_root_aset.svg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/pic1.jpg
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: pics/README.md
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: profiles/mts-historical-images.json
