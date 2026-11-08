@@ -473,3 +473,27 @@ relations:
     target:
       kind: artifact
       path: web/contract-observatory/test/semantic-ir-bridge.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: audits/v015-current-documentation-migration.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: audits/v015-formal-aware-markdown-census.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: audits/v015-formula-candidate-inventory.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: audits/v015-markdown-prose-lexical-inventory.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: profiles/mts-v015-meta-interpreter-kernel.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: profiles/mts-v015-generalized-reaction-candidate.json

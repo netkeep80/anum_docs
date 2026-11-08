@@ -149,6 +149,57 @@ export function verifyProjectOwnership(
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
 
+  // P7-S17: attest only the actual current docs/FORMAL and theorem verifier
+  // source readers. No global audits/** or profiles/** directory whitelist.
+  // Using TypeScript AST call expressions rejects path mentions in comments or
+  // audit metadata that are not actual read(root, path) invocations.
+  const staticLiteralReads = (sourcePath: string, method: string, prefix: string): string[] => {
+    const sourceText = read(sourcePath);
+    const source = ts.createSourceFile(sourcePath, sourceText,
+      ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const found = new Set<string>();
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === method && node.arguments.length === 2 &&
+          ts.isIdentifier(node.arguments[0]) && node.arguments[0].text === "root" &&
+          ts.isStringLiteral(node.arguments[1]) &&
+          node.arguments[1].text.startsWith(prefix))
+        found.add(node.arguments[1].text);
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    return sorted(found);
+  };
+  const documentationAuditInputs = staticLiteralReads(
+    "ts/src/tooling/v015-documentation-acceptance.ts", "read", "audits/v015-");
+  if (documentationAuditInputs.length !== 4)
+    fail("S17 current documentation audit reader count changed");
+  const rendererProfileInputs = staticLiteralReads(
+    "ts/src/tooling/formal-notation-v015-markdown.ts", "readJson", "profiles/mts-v015-");
+  if (rendererProfileInputs.length !== 2)
+    fail("S17 FORMAL notation renderer profile input count changed");
+  const publication = get("MTS-PROJECT-PUBLICATION-01");
+  const declaredDocAudits = sorted([...publication.keys()]
+    .filter(path => path.startsWith("audits/v015-")));
+  equalPaths(declaredDocAudits, documentationAuditInputs,
+    "S17 current documentation audit input");
+  const declaredRendererProfiles = sorted([...publication.keys()]
+    .filter(path => /^profiles\/mts-v015-(?:meta-interpreter-kernel|generalized-reaction-candidate)\.json$/.test(path)));
+  equalPaths(declaredRendererProfiles, rendererProfileInputs,
+    "S17 current FORMAL notation renderer input");
+  for (const path of [...documentationAuditInputs, ...rendererProfileInputs])
+    assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+  const theoremCaseSource = read("ts/src/tooling/v015-theorem-statement-evidence-verifier.ts");
+  const casePath = /const CASE_MANIFEST_PATH = "(audits\/v015-[^"]+\.json)";/
+    .exec(theoremCaseSource)?.[1];
+  if (!casePath || !theoremCaseSource.includes(
+      "readFileSync(resolve(findRepositoryRoot(), CASE_MANIFEST_PATH)"))
+    fail("S17 theorem case manifest lacks actual current reader");
+  const declaredTheoremCaseInputs = sorted([...get("MTS-PROJECT-PROOF-PROVENANCE-01").keys()]
+    .filter(path => path.startsWith("audits/v015-")));
+  equalPaths(declaredTheoremCaseInputs, [casePath], "S17 theorem case manifest input");
+  assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", casePath, "requires");
+
   const exportedSource = read("ts/src/public.ts");
   const exportedPaths = sorted(new Set(
     [...exportedSource.matchAll(/\bfrom\s+["'](\.\/[^"']+\.js)["']/g)]

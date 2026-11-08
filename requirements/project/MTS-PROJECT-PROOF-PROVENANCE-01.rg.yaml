@@ -437,3 +437,7 @@ relations:
     target:
       kind: artifact
       path: proofs/v015-evidence/gpr09-c-boundary-chirality.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: audits/v015-theorem-statement-evidence-cases.json
