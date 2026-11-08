@@ -369,6 +369,17 @@ export function verifyProjectOwnership(
       !readerCli.includes('from "./mts-reader-r44-w6.js"') ||
       !readerCli.includes('renderReaderW6(resolve(".."))'))
     fail("Reader W6 preview no longer has the bounded executable workflow/CLI consumer");
+  const readerW6ModelPath = "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
+  const readerW6Doc = parseDocument(read(readerW6ModelPath),
+    { strict: true, uniqueKeys: true, merge: false });
+  if (readerW6Doc.errors.length || readerW6Doc.warnings.length)
+    fail("Reader W6 model must be strict YAML without parse warnings");
+  const readerW6Model = object(readerW6Doc.toJS({ maxAliasCount: 0 }), "Reader W6 model");
+  if (readerW6Model.status !== "proposed" ||
+      readerW6Model.author_approval !== "not-recorded" ||
+      readerW6Model.publication !== "blocked" ||
+      readerW6Model.semantic_change !== false)
+    fail("Reader W6 draft model cannot gain unrecorded approval or semantic authority");
   const previewRoot = "ts/src/tooling/mts-reader-r44-w6.ts";
   const previewSource = read(previewRoot);
   const previewAst = ts.createSourceFile(previewRoot, previewSource, ts.ScriptTarget.Latest, true);
