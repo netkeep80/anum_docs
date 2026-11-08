@@ -401,7 +401,7 @@ assert.throws(
 
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
-    [readerW6ToolPath]: 'import "./docs-coverage.js";\n' +
+    [readerW6ToolPath]: 'import "./v015-native-evidence-verifier.js";\n' +
       readFileSync(resolve("..", readerW6ToolPath), "utf8"),
   }),
   /MTS-PROJECT-PUBLICATION-01 tooling requires relation coverage mismatches/,
