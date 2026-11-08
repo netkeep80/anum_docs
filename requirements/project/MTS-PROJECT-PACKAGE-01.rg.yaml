@@ -1,0 +1,187 @@
+format: repo-guard/requirement-v1
+id: MTS-PROJECT-PACKAGE-01
+normative: "The @mts/core package must expose an explicitly bounded public TypeScript API and reproducible dependency/consumer configuration. Public and internal API boundaries must be checked by the ordinary TypeScript package consumer and negative export tests; no private implementation entry may silently become a public contract."
+lifecycle:
+  accepted: true
+  current: true
+relations:
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/package-lock.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/tsconfig.consumer.json
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/public.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/consumer/package-consumer.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/public-api.test.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/anum.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/checker.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derivation.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-heterogeneous-discharge-materialize.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-heterogeneous-discharge.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-heterogeneous-expansion.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-heterogeneous-instance.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-heterogeneous.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/direct-deixis.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/interpreter.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/memory.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/persistent-sequence.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/persistent-store.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-closed-rooted-proof.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-derivation-digest.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-derivation-provenance.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-derivation.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-proof-anet-digest.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-proof-replay.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-proof-subanet-projection.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-theory-digest.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/portable-theory.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/proof-producer.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/proof-subanet-projection.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/proof.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/quaternary-anum.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/rooted-proof-aset.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/run.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/scoped-derivation.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/sequence.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/source.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/structural-rule.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v012-source.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v012-string-anum.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v013-formal-aspect-evaluator.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v013-hierarchical-carrier.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v013-relative-form-materialization.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v013-relative-pole-execution.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/value-bundle.ts

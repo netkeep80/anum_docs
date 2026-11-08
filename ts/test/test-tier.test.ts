@@ -1,3 +1,4 @@
+import { verifyProjectOwnership } from "./support/project-ownership.js";
 import assert from "node:assert/strict";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -9,6 +10,63 @@ import {
   selectTestTier,
 } from "../src/tooling/test-tier.js";
 import { THEOREM_CATALOG_PATH } from "../src/tooling/theorem-catalog-markdown.js";
+
+// P7 project-ownership bridge: verify the artifact claims against present-tense consumers.
+const p7CandidateWitness = verifyProjectOwnership(resolve(".."));
+assert.equal(p7CandidateWitness.candidates, 3);
+assert.equal(p7CandidateWitness.publicExportModules, 39);
+assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
+assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
+assert.equal(p7CandidateWitness.exactRelations, 134);
+
+const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CI-01.rg.yaml";
+const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [acceptedOwnerFile]: acceptedOwnerSource.replace("  accepted: true", "  accepted: false"),
+  }),
+  /Author-accepted project lifecycle must remain accepted\/current/,
+  "silent reversion of an accepted project Requirement must fail closed",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [acceptedOwnerFile]: acceptedOwnerSource.replace("  current: true", "  current: false"),
+  }),
+  /Author-accepted project lifecycle must remain accepted\/current/,
+  "accepted but non-current Requirement cannot justify present-tense project Resources",
+);
+
+const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
+const packageOwnerText = readFileSync(resolve("..", packageOwnerFile), "utf8");
+const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const proofOwnerText = readFileSync(resolve("..", proofOwnerFile), "utf8");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace("path: ts/src/anum.ts", "path: ts/src/byte-carrier.ts"),
+  }),
+  /public API implemented_by relation coverage mismatches/,
+  "an existing but nonexported file must not justify public API ownership",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [packageOwnerFile]: packageOwnerText.replace(
+      "  - predicates: [implemented_by]\n    target:\n      kind: artifact\n      path: ts/src/anum.ts",
+      "  - predicates: [verified_by]\n    target:\n      kind: artifact\n      path: ts/src/anum.ts",
+    ),
+  }),
+  /public API implemented_by relation coverage mismatches/,
+  "a true export with wrong relation predicate does not satisfy implemented_by",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [proofOwnerFile]: proofOwnerText.replace(
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: proofs/evidence/FND-01/coq.json",
+      "",
+    ),
+  }),
+  /proof evidence record relation coverage mismatches/,
+  "a currently consumed proof record cannot silently lose its exact owner relation",
+);
 
 // RED receipt synchronize: keep this commit test-only until behavioral failure is observed.
 const repositoryRoot = resolve("..");

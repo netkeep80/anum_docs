@@ -1,0 +1,311 @@
+format: repo-guard/requirement-v1
+id: MTS-PROJECT-PROOF-PROVENANCE-01
+normative: "Current proof and theorem publication must preserve the independently classified external-versus-native evidence authority, exact external toolchain identity and machine-verifiable evidence record schema. Historical proof registries and accepted evidence are provenance, not new MTS semantic authority; the verification infrastructure must reject absent or contradictory evidence records."
+lifecycle:
+  accepted: true
+  current: true
+relations:
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/provers.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence-record.schema.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/external-toolchains.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/external-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-external-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-formal-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/native-proof-assurance.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: theorems/registry.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: theorems/current-v0.15.json
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: theorems/generate-current-index.mjs
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: theorems/validate-registry.mjs
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/proof-infrastructure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-proof-assurance-f0.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/CTX-03/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/CTX-03/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/EXE-02/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/EXE-02/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-01/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-01/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-02/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-02/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-03/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-03/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-04/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-04/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-05/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-05/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-06/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-06/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-07/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-07/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-07/mtsNative.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-08/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-08/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-09/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-09/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-11/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-11/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-12/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-12/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-13/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/FND-13/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-01/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-01/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-02/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-02/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-03/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-03/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-04/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-04/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-05/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-05/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-06/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-06/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-07/coq.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/evidence/INV-07/lean4.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsBasisFiveDistinct.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsExplicitModel.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsFoundation.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsM06W2External.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsV015Formal.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsV015GeneralizedReaction.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsV015GeneralizedReactionCore.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/coq/MtsV015GeneralizedReactionRefinement.v
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsBasisFiveDistinct.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsExplicitModel.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsFoundation.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsM06W2External.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsV015Formal.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsV015GeneralizedReaction.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsV015GeneralizedReactionCore.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/lean4/MtsV015GeneralizedReactionRefinement.lean
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/native/FND-07/a16-truth-role.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/native/FND-07/contextual-detachment.anum
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/native-fnd07-contextual-detachment.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/native-fnd07-root-truth-aspect.test.ts

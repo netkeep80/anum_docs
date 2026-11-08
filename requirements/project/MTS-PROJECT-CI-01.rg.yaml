@@ -1,0 +1,59 @@
+format: repo-guard/requirement-v1
+id: MTS-PROJECT-CI-01
+normative: "Current and merged repository revisions must execute distinct reproducible current/FULL checks with pinned tools, exact test-tier membership and browser smoke verification. The CI workflow must reject missing current tests, non-deterministic documentation, and unintended widening of the externally consumable package surface; the obsolete RepoGuard 3.2.4 blocking check is retained until a separately verified migration."
+lifecycle:
+  accepted: true
+  current: true
+relations:
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: .github/workflows/ci.yml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/tsconfig.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/tsconfig.browser.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: .gitmodules
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: vendor/repo-guard
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/test-tier.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/tooling/test-runner.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/test-tier.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/release-cutover.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/browser/core-smoke.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/browser/indexeddb-dataset-repository.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/browser/indexeddb-dataset-repository.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/support/project-ownership.ts
