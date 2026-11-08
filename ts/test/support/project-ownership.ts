@@ -160,11 +160,14 @@ export function verifyProjectOwnership(
     const found = new Set<string>();
     const visit = (node: ts.Node): void => {
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
-          node.expression.text === method && node.arguments.length === 2 &&
-          ts.isIdentifier(node.arguments[0]) && node.arguments[0].text === "root" &&
-          ts.isStringLiteral(node.arguments[1]) &&
-          node.arguments[1].text.startsWith(prefix))
-        found.add(node.arguments[1].text);
+          node.expression.text === method && node.arguments.length === 2) {
+        const rootArg = node.arguments[0];
+        const pathArg = node.arguments[1];
+        if (rootArg !== undefined && pathArg !== undefined &&
+            ts.isIdentifier(rootArg) && rootArg.text === "root" &&
+            ts.isStringLiteral(pathArg) && pathArg.text.startsWith(prefix))
+          found.add(pathArg.text);
+      }
       ts.forEachChild(node, visit);
     };
     visit(source);
