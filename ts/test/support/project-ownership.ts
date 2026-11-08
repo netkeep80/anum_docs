@@ -312,6 +312,36 @@ export function verifyProjectOwnership(
   for (const path of exactReplayPaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
 
+  // P7-S14: current theorem projection contract names exact evidence inputs.
+  // No blanket proofs/** claim; removal or mutation of the consumer changes the expected set.
+  const theoremProjectionSource = read("ts/src/tooling/theorem-projection-contract.ts");
+  if (!theoremProjectionSource.includes("evidencePaths: Object.freeze"))
+    fail("current theorem projection evidence consumer missing");
+  const theoremEvidencePaths = sorted(new Set(
+    [...theoremProjectionSource.matchAll(/\bproofs\/v015-evidence\/[a-z0-9-]+\.json\b/g)]
+      .map(match => match[0]),
+  ));
+  if (theoremEvidencePaths.length !== 11)
+    fail("current theorem projection evidence inventory changed");
+  // Evidence strings alone are not a causal witness: the actual builder must
+  // include candidateProofFamilies in the returned source declaration.
+  const theoremProjectionAst = ts.createSourceFile(
+    "theorem-projection-contract.ts", theoremProjectionSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS,
+  );
+  const theoremProjectionBuilder = theoremProjectionAst.statements.find(statement =>
+    ts.isFunctionDeclaration(statement) && statement.name?.text === "buildTheoremCatalogProjectionDeclaration");
+  const theoremBuilderBody = theoremProjectionBuilder && ts.isFunctionDeclaration(theoremProjectionBuilder)
+    ? theoremProjectionBuilder.body?.getText(theoremProjectionAst) ?? "" : "";
+  if (!theoremBuilderBody.includes("THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(") ||
+      !theoremBuilderBody.includes("...family.evidencePaths") ||
+      !theoremBuilderBody.includes("sources: Object.freeze(paths.map(projectionSource))"))
+    fail("current theorem projection evidence source consumption changed");
+  const declaredTheoremEvidence = sorted([...proofOwner.entries()]
+    .filter(([path]) => path.startsWith("proofs/v015-evidence/")).map(([path]) => path));
+  equalPaths(declaredTheoremEvidence, theoremEvidencePaths, "current theorem projection evidence");
+  for (const path of theoremEvidencePaths)
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
+
   const evidencePaths = collectEvidence(root, "proofs/evidence");
   const declaredEvidence = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("proofs/evidence/")).map(([path]) => path));
@@ -605,10 +635,39 @@ export function verifyProjectOwnership(
   equalPaths(declaredObservatoryPrivate, observatoryPrivate, "Contract Observatory site source dependency");
   for (const path of observatoryPrivate)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
-  const executedObservatoryTests = sorted(new Set(
-    [...pagesWorkflow.matchAll(/\bnode web\/contract-observatory\/dist\/test\/([A-Za-z0-9.-]+)\.js/g)]
-      .map(match => observatoryPrefix + "test/" + match[1]! + ".ts"),
-  ));
+  // Pages invokes contract-index.test.js, which itself executes every other
+  // compiled test. Do not re-run the same suite in a second shell loop.
+  if (!pagesWorkflow.includes("node web/contract-observatory/dist/test/contract-index.test.js"))
+    fail("Contract Observatory Pages suite entrypoint changed");
+  const suiteSource = read(observatoryPrefix + "test/contract-index.test.ts");
+  const suiteAst = ts.createSourceFile("contract-index.test.ts", suiteSource,
+    ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const suiteLoop = suiteAst.statements.find(node =>
+    ts.isForOfStatement(node) && node.expression.getText(suiteAst) === "compiledTests");
+  let executesCompiledTests = false;
+  if (suiteLoop && ts.isForOfStatement(suiteLoop)) {
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) &&
+          node.expression.getText(suiteAst) === "execFileSync" &&
+          node.arguments[0]?.getText(suiteAst) === "process.execPath" &&
+          node.arguments[1]?.getText(suiteAst) === "[join(compiledTestDirectory, testName)]")
+        executesCompiledTests = true;
+      ts.forEachChild(node, visit);
+    };
+    visit(suiteLoop.statement);
+  }
+  if (!executesCompiledTests ||
+      !suiteSource.includes('if (testName === "contract-index.test.js") continue;') ||
+      !suiteSource.includes("readdirSync(compiledTestDirectory)") ||
+      !suiteSource.includes("sourceTests.join(") ||
+      !suiteSource.includes("compiledTests.join("))
+    fail("Contract Observatory suite runner no longer executes full compiled test set");
+  const observatoryConfig = object(JSON.parse(read(observatoryPrefix + "tsconfig.json")), "Observatory tsconfig");
+  if (!array(observatoryConfig.include, "Observatory includes").includes("test/**/*.ts"))
+    fail("Contract Observatory compiled test inclusion changed");
+  const executedObservatoryTests = sorted(readdirSync(resolve(root, observatoryPrefix + "test"))
+    .filter(name => name.endsWith(".test.ts"))
+    .map(name => observatoryPrefix + "test/" + name));
   if (executedObservatoryTests.length === 0) fail("Contract Observatory has no executed site verification");
   const declaredObservatoryTests = sorted([...publicationOwner.entries()]
     .filter(([path, predicate]) => path.startsWith(observatoryPrefix + "test/") &&

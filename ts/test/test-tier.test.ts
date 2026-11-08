@@ -60,13 +60,13 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 350);
+assert.equal(p7CandidateWitness.exactRelations, 370);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
 assert.equal(p7CandidateWitness.readerPreviewYamlInputs, 25);
 assert.equal(p7CandidateWitness.observatorySources, 9);
-assert.equal(p7CandidateWitness.observatoryExecutedTests, 2);
+assert.equal(p7CandidateWitness.observatoryExecutedTests, 11);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
 
@@ -92,6 +92,26 @@ const packageOwnerFile = "requirements/project/MTS-PROJECT-PACKAGE-01.rg.yaml";
 const packageOwnerText = readFileSync(resolve("..", packageOwnerFile), "utf8");
 const proofOwnerFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
 const proofOwnerText = readFileSync(resolve("..", proofOwnerFile), "utf8");
+const s14ProofRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: proofs/v015-evidence/gpr01-single-state-transformer.json\\n".replaceAll("\\n", "\n");
+assert.ok(proofOwnerText.includes(s14ProofRelation));
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [proofOwnerFile]: proofOwnerText.replace(s14ProofRelation, ""),
+  }),
+  /current theorem projection evidence relation coverage mismatches/,
+  "S14: current theorem evidence cannot lose exact required relation",
+);
+const theoremProjectionFile = "ts/src/tooling/theorem-projection-contract.ts";
+const theoremProjectionText = readFileSync(resolve("..", theoremProjectionFile), "utf8");
+const evidenceConsumerExpression = "...THEOREM_CATALOG_INTEGRATION_CONTRACT.candidateProofFamilies.flatMap(";
+assert.ok(theoremProjectionText.includes(evidenceConsumerExpression), "S14 theorem evidence consumer exists");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [theoremProjectionFile]: theoremProjectionText.replace(evidenceConsumerExpression, "...[].flatMap("),
+  }),
+  /current theorem projection evidence source consumption changed/,
+  "S14: textual evidence inventory without active projection input is not enough",
+);
 const replayPair = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-and.amemory-package.json\n";
 assert.ok(proofOwnerText.includes(replayPair), "S8 fixture relation must exist");
 assert.throws(
@@ -182,6 +202,33 @@ const publicationOwnerFile = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg
 const publicationOwnerText = readFileSync(resolve("..", publicationOwnerFile), "utf8");
 
 
+const s14WebRelation = "  - predicates: [verified_by]\\n    target:\\n      kind: artifact\\n      path: web/contract-observatory/test/interaction.test.ts\\n".replaceAll("\\n", "\n");
+assert.ok(publicationOwnerText.includes(s14WebRelation));
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [publicationOwnerFile]: publicationOwnerText.replace(s14WebRelation, ""),
+  }),
+  /Contract Observatory executed tests relation coverage mismatches/,
+  "S14: an executed web test cannot lose its exact verified_by relation",
+);
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [".github/workflows/pages.yml"]: readFileSync(resolve("..", ".github/workflows/pages.yml"), "utf8")
+      .replace("node web/contract-observatory/dist/test/contract-index.test.js", "echo no-test-execution"),
+  }),
+  /Contract Observatory Pages suite entrypoint changed/,
+  "S14: compile-only Pages cannot justify verified_by",
+);
+const observatorySuiteFile = "web/contract-observatory/test/contract-index.test.ts";
+const observatorySuiteText = readFileSync(resolve("..", observatorySuiteFile), "utf8");
+assert.ok(observatorySuiteText.includes("execFileSync(process.execPath,"), "S14 runner must execute tests");
+assert.throws(
+  () => verifyProjectOwnership(resolve(".."), {
+    [observatorySuiteFile]: observatorySuiteText.replace("execFileSync(process.execPath,", "console.log(process.execPath,"),
+  }),
+  /Contract Observatory suite runner no longer executes full compiled test set/,
+  "S14: dropping transitive test execution must lose verified_by authority",
+);
 const previewDraftPath = "requirements/mts-source/MTS-READER-HUMAN-EDITION-R44-W6.yaml";
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {

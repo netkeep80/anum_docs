@@ -393,3 +393,47 @@ relations:
     target:
       kind: artifact
       path: formal/v0.15/regression/two-role-meta-rule.amemory-package.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/formal-bootstrap-frm01-06.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/formal-refinement-frm07-08.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr01-single-state-transformer.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr02-canonical-anet-convergence.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr03-generation-isolation.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr04-partition-schedule-refinement.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr05-finite-completion-boundary.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr06-exact-s0-opacity.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr07-zero-role-refinement.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr08-j0-boundary.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: proofs/v015-evidence/gpr09-c-boundary-chirality.json
