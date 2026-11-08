@@ -24,6 +24,7 @@ jobs:
           git checkout --detach d58c140b3f9b40fdc52507b6080a41863f1d9a66
           test "$(git rev-parse HEAD)" = d58c140b3f9b40fdc52507b6080a41863f1d9a66
           test "$(git rev-parse HEAD^{tree})" = a2b8206b666769c0156e6c13cb240cc4897415c7
+          npm ci --prefix vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
           npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           npm --prefix ts run build --silent
           cat > "$RUNNER_TEMP/reader-trace.mjs" <<'JS'
