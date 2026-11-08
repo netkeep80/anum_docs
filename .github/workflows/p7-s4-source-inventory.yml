@@ -127,6 +127,23 @@ jobs:
               publicTooling.push({key:"bin:"+bin,path:js.replace("./dist/src/","ts/src/").replace(/\.js$/,".ts")});
           }
           console.log("PUBLIC_TOOLING_ENTRYPOINTS",JSON.stringify(publicTooling));
+          const entryPaths=new Set(publicTooling.map(x=>x.path));
+          const entryVisited=new Set(),entryTodo=[...entryPaths];
+          while(entryTodo.length){
+            const file=entryTodo.pop();
+            if(entryVisited.has(file))continue;
+            entryVisited.add(file);
+            entryTodo.push(...edges(file));
+          }
+          const unownedEntrypointDependencies=[...entryVisited]
+            .filter(x=>!owned.has(x)&&!entryPaths.has(x)).sort();
+          console.log("PACKAGE_TOOLING_SOURCE_TOTAL",entryVisited.size);
+          console.log("PACKAGE_TOOLING_ENTRYPOINT_COUNT",entryPaths.size);
+          console.log("PACKAGE_TOOLING_UNOWNED_TRANSITIVE",unownedEntrypointDependencies.length);
+          for(const file of unownedEntrypointDependencies){
+            const from=[...graph.entries()].filter(([p,deps])=>deps.includes(file)).map(([p])=>p).sort();
+            console.log("PACKAGE_TOOLING_REQUIRES",file,"VIA",from.join(","));
+          }
           console.log("TOOLING_UNOWNED_IMPORTS",candidates.size);
           for(const [file,{owner,from}] of [...candidates.entries()].sort((a,b)=>a[0].localeCompare(b[0])))console.log("TOOLING_REQUIRES",owner,file,"VIA",from);
           JS
