@@ -318,7 +318,7 @@ export function verifyProjectOwnership(
   if (!theoremProjectionSource.includes("evidencePaths: Object.freeze"))
     fail("current theorem projection evidence consumer missing");
   const theoremEvidencePaths = sorted(new Set(
-    [...theoremProjectionSource.matchAll(/\\bproofs\\/v015-evidence\\/[a-z0-9-]+\\.json\\b/g)]
+    [...theoremProjectionSource.matchAll(/\bproofs\/v015-evidence\/[a-z0-9-]+\.json\b/g)]
       .map(match => match[0]),
   ));
   if (theoremEvidencePaths.length !== 11)
