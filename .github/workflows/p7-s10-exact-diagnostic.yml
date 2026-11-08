@@ -1,0 +1,56 @@
+name: P7-S10 exact external v6 CURRENT FULL diagnostic temporary
+on:
+  push:
+    branches: [chore/p7-s10-exact-diagnostic-20261108]
+permissions:
+  contents: read
+jobs:
+  exact-s10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: repoguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Exact accepted candidate J1 and current/full
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate checkout --detach 082b75e6bbe84326fc94a56f66dd4ffe617a88d7
+          test "$(git -C candidate rev-parse HEAD)" = "082b75e6bbe84326fc94a56f66dd4ffe617a88d7"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "e665467be15020139503a30eb429fb944a9ccffc"
+          test "$(git -C repoguard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          npm ci --prefix repoguard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/repoguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 082b75e6bbe84326fc94a56f66dd4ffe617a88d7 --head 082b75e6bbe84326fc94a56f66dd4ffe617a88d7 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo "EXACT_HEAD=082b75e6bbe84326fc94a56f66dd4ffe617a88d7"
+          echo "EXACT_TREE=e665467be15020139503a30eb429fb944a9ccffc"
+          echo "COMPILER_EXIT=$rc"
+          python3 - <<'PY'
+          import json,os,collections
+          o=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'j1.json')))
+          unjustified=sorted(x['subject'].split(':',1)[1] for x in o.get('diagnostics',[]) if x.get('code')=='unjustified_resource')
+          print("J1_ACTUAL",o.get('j1'))
+          print("J2_ACTUAL",o.get('j2'))
+          print("UNJUSTIFIED_COUNT",len(unjustified))
+          print("UNJUSTIFIED_GROUPS",dict(collections.Counter(x.split('/')[0] for x in unjustified)))
+          PY
+          test "$rc" -eq 1
+          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+          (cd candidate/ts && npm run check:current)
+          (cd candidate/ts && npm run check:full)
