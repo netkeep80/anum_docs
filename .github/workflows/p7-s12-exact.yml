@@ -1,0 +1,56 @@
+name: P7-S12 exact candidate v6 J1 CURRENT FULL (temporary)
+on:
+  push:
+    branches: [chore/p7-s12-exact-census-20261108]
+permissions: {contents: read}
+jobs:
+  exact-s12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact candidate v6.0.1 J1/J2 and full test tiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin refs/heads/feat/p7-s12-publication-current-observers-20261108
+          git -C candidate checkout --detach 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1
+          test "$(git -C candidate rev-parse HEAD)" = 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1
+          test "$(git -C candidate rev-parse HEAD^{tree})" = d74e9f3be956e9cd98a4a50f3996922318a8067d
+          test "$(git -C guard rev-parse HEAD)" = 74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1 --head 84710293af3323b8e5725e4d4ba1c6c2f9dac4c1 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo "EXACT_HEAD=84710293af3323b8e5725e4d4ba1c6c2f9dac4c1"
+          echo "EXACT_TREE=d74e9f3be956e9cd98a4a50f3996922318a8067d"
+          echo "COMPILER_EXIT=$rc"
+          python3 - <<'PY'
+          import os,json,collections
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          paths=sorted(x["subject"].split(":",1)[1] for x in o.get("diagnostics",[]) if x.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(paths))
+          print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
+          PY
+          test "$rc" -eq 1
+          npm ci --prefix candidate/vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix candidate/ts --ignore-scripts --no-audit --no-fund
+          (cd candidate/ts && npm run check:current)
+          (cd candidate/ts && npm run check:full)
