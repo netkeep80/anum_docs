@@ -140,18 +140,6 @@ relations:
   - predicates: [requires]
     target:
       kind: artifact
-      path: web/contract-observatory/mts-visual-consumer-lock.json
-  - predicates: [requires]
-    target:
-      kind: artifact
-      path: web/contract-observatory/src/visual-host.mjs
-  - predicates: [verified_by]
-    target:
-      kind: artifact
-      path: web/contract-observatory/test/visual-consumer.test.mjs
-  - predicates: [requires]
-    target:
-      kind: artifact
       path: requirements/mts-source/MTS-READER-ACADEMIC-COMPOSITION-G42.yaml
   - predicates: [requires]
     target:
