@@ -298,6 +298,18 @@ export function verifyProjectOwnership(
     if (fixtureBindings.length !== 1 || loops.length !== 1 ||
         bindingPosition >= loopPosition)
       fail("S18 hierarchical fixture collection/loop topology changed");
+    const binding = fixtureBindings[0];
+    const loop = loops[0];
+    if (binding === undefined || loop === undefined ||
+        binding.initializer === undefined ||
+        !ts.isCallExpression(binding.initializer) ||
+        !ts.isPropertyAccessExpression(binding.initializer.expression) ||
+        !ts.isIdentifier(binding.initializer.expression.expression) ||
+        binding.initializer.expression.expression.text !== "Object" ||
+        binding.initializer.expression.name.text !== "freeze" ||
+        binding.initializer.arguments.length !== 1 ||
+        !ts.isArrayLiteralExpression(binding.initializer.arguments[0]!))
+      fail("S18 hierarchical fixture collection must directly freeze the used literal array");
     // AUD-003: the declaration must not be preceded by executable code.
     // Extra imports may also mutate built-ins during module evaluation.
     const approvedImports = [
@@ -316,18 +328,6 @@ export function verifyProjectOwnership(
       fail("S18 hierarchical fixture preamble must not execute statements");
     if (loopPosition !== bindingPosition + 1)
       fail("S18 hierarchical fixture loop must immediately follow literal initializer");
-    const binding = fixtureBindings[0];
-    const loop = loops[0];
-    if (binding === undefined || loop === undefined ||
-        binding.initializer === undefined ||
-        !ts.isCallExpression(binding.initializer) ||
-        !ts.isPropertyAccessExpression(binding.initializer.expression) ||
-        !ts.isIdentifier(binding.initializer.expression.expression) ||
-        binding.initializer.expression.expression.text !== "Object" ||
-        binding.initializer.expression.name.text !== "freeze" ||
-        binding.initializer.arguments.length !== 1 ||
-        !ts.isArrayLiteralExpression(binding.initializer.arguments[0]!))
-      fail("S18 hierarchical fixture collection must directly freeze the used literal array");
     const literal = binding.initializer.arguments[0];
     if (literal === undefined || !ts.isArrayLiteralExpression(literal) ||
         literal.elements.length !== 4)
