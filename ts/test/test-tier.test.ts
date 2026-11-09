@@ -60,7 +60,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 388);
+assert.equal(p7CandidateWitness.exactRelations, 395);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -89,6 +89,33 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s16PolicyFile]: s16PolicyText.replace(s16ProtectedPath, ""),
 }), /accepted historical immutable lineage inventory changed/,
   "S16: removing an accepted immutable legacy path from policy must fail");
+
+// P7-S17: an actual documentation/source consumer must causally own each
+// current audit/profile input, not just cite the path as historical metadata.
+const s17PubOwnerFile = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
+const s17PubOwnerSource = readFileSync(resolve("..", s17PubOwnerFile), "utf8");
+const s17AuditRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: audits/v015-current-documentation-migration.json\\n".replaceAll("\\n", "\n");
+assert.ok(s17PubOwnerSource.includes(s17AuditRelation));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s17PubOwnerFile]: s17PubOwnerSource.replace(s17AuditRelation, ""),
+}), /S17 current documentation audit input relation coverage mismatches/,
+  "S17: removal of an actual documentation audit input must fail");
+const s17DocsCodePath = "ts/src/tooling/v015-documentation-acceptance.ts";
+const s17DocsCode = readFileSync(resolve("..", s17DocsCodePath), "utf8");
+const s17RealRead = 'read(root, "audits/v015-formula-candidate-inventory.json")';
+assert.ok(s17DocsCode.includes(s17RealRead));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s17DocsCodePath]: s17DocsCode.replace(s17RealRead, 'read(root, "audits/v015-other.json")'),
+}), /S17 current documentation audit input relation coverage mismatches/,
+  "S17: a changed actual reader cannot be hidden by stale Relations");
+const s17ProofFile = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const s17ProofSource = readFileSync(resolve("..", s17ProofFile), "utf8");
+const s17CaseRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: audits/v015-theorem-statement-evidence-cases.json\\n".replaceAll("\\n", "\n");
+assert.ok(s17ProofSource.includes(s17CaseRelation));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s17ProofFile]: s17ProofSource.replace(s17CaseRelation, ""),
+}), /S17 theorem case manifest input relation coverage mismatches/,
+  "S17: theorem case evidence must retain exact current provenance");
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
