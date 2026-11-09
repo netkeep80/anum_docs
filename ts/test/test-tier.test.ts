@@ -206,6 +206,72 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /S18 fixture primitive shadowed by local binding/,
   "S18-AUD-002: shadowed node:fs readFileSync must not support current fixture ownership");
 
+// P7-S18-AUD-003: descriptor mutation of the actual global Object.freeze
+// used to truncate the loop while retaining its original lexical AST shape.
+const s18GlobalDescriptorMutation = s18IndexedSource.replace(
+  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
+  'const savedFreeze = Object.freeze;\n' +
+  'Object.defineProperty(Object, "freeze", { configurable: true, writable: true, ' +
+  'value: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
+  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
+).replace(
+  "]);\n\nfor (const fixture of fixtures) {",
+  ']);\nObject.defineProperty(Object, "freeze", ' +
+  '{ configurable: true, writable: true, value: savedFreeze });\n\n' +
+  'for (const fixture of fixtures) {',
+);
+assert.notEqual(s18GlobalDescriptorMutation, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18GlobalDescriptorMutation,
+}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
+  "S18-AUD-003: global freeze descriptor mutation must fail closed");
+
+const s18GlobalAssignMutation = s18IndexedSource.replace(
+  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
+  'const savedFreeze = Object.freeze;\n' +
+  'Object.assign(Object, { freeze: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
+  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
+);
+assert.notEqual(s18GlobalAssignMutation, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18GlobalAssignMutation,
+}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
+  "S18-AUD-003: Object.assign mutation cannot silently skip a fixture");
+
+const s18GlobalAliasMutation = s18IndexedSource.replace(
+  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
+  'const objectAlias = Object;\n' +
+  'Object.defineProperty(objectAlias, "freeze", { configurable: true, writable: true, ' +
+  'value: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
+  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
+);
+assert.notEqual(s18GlobalAliasMutation, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18GlobalAliasMutation,
+}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
+  "S18-AUD-003: alias-based global mutation cannot count four reads");
+
+const s18PreambleMutation = s18IndexedSource.replace(
+  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
+  'console.log("injected prelude");\n' +
+  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
+);
+assert.notEqual(s18PreambleMutation, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18PreambleMutation,
+}), /S18 hierarchical fixture preamble must not execute statements/,
+  "S18-AUD-003: unrecognized executable prelude must fail closed");
+
+const s18ComputedPropertyMutation = s18IndexedSource.replace(
+  'path: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",',
+  '[("path")]: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",',
+);
+assert.notEqual(s18ComputedPropertyMutation, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18ComputedPropertyMutation,
+}), /S18 hierarchical fixture object has executable or unknown property/,
+  "S18-AUD-003: computed fixture property cannot hide initialization effects");
+
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
 assert.throws(

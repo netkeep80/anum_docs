@@ -298,6 +298,24 @@ export function verifyProjectOwnership(
     if (fixtureBindings.length !== 1 || loops.length !== 1 ||
         bindingPosition >= loopPosition)
       fail("S18 hierarchical fixture collection/loop topology changed");
+    // AUD-003: the declaration must not be preceded by executable code.
+    // Extra imports may also mutate built-ins during module evaluation.
+    const approvedImports = [
+      "node:fs", "../src/anum.js", "../src/memory.js",
+      "../src/quaternary-anum.js",
+    ];
+    const actualImports = source.statements
+      .filter(ts.isImportDeclaration)
+      .map(statement => ts.isStringLiteral(statement.moduleSpecifier)
+        ? statement.moduleSpecifier.text : "");
+    equalPaths(sorted(actualImports), sorted(approvedImports),
+      "S18 hierarchical fixture exact import modules");
+    if (source.statements.slice(0, bindingPosition).some(statement =>
+      !(ts.isImportDeclaration(statement) || ts.isFunctionDeclaration(statement) ||
+        ts.isInterfaceDeclaration(statement) || ts.isTypeAliasDeclaration(statement))))
+      fail("S18 hierarchical fixture preamble must not execute statements");
+    if (loopPosition !== bindingPosition + 1)
+      fail("S18 hierarchical fixture loop must immediately follow literal initializer");
     const binding = fixtureBindings[0];
     const loop = loops[0];
     if (binding === undefined || loop === undefined ||
@@ -318,6 +336,20 @@ export function verifyProjectOwnership(
     for (const element of literal.elements) {
       if (!ts.isObjectLiteralExpression(element))
         fail("S18 hierarchical fixture array contains a non-literal entry");
+      // Literal array members must have precisely the inert data fields
+      // and deferred verifyA method, never computed keys/spreads/getters.
+      const properties = element.properties.map(property => {
+        if (ts.isPropertyAssignment(property) && ts.isIdentifier(property.name) &&
+            (property.name.text === "path" || property.name.text === "canonical") &&
+            ts.isStringLiteral(property.initializer))
+          return property.name.text;
+        if (ts.isMethodDeclaration(property) && ts.isIdentifier(property.name) &&
+            property.name.text === "verifyA")
+          return property.name.text;
+        fail("S18 hierarchical fixture object has executable or unknown property");
+      });
+      if (sorted(properties).join(",") !== "canonical,path,verifyA")
+        fail("S18 hierarchical fixture object must have exact path/canonical/verifyA fields");
       const pathProperties = element.properties.filter(property =>
         ts.isPropertyAssignment(property) &&
         ((ts.isIdentifier(property.name) && property.name.text === "path") ||
@@ -418,6 +450,20 @@ export function verifyProjectOwnership(
           node.left.expression.text === "Object" &&
           node.left.name.text === "freeze")
         fail("S18 built-in Object.freeze must not be reassigned: " + testPath);
+      // Do not treat spelling Object.freeze/readFileSync as proof of the
+      // primitive's runtime identity: reject first-class/mutable aliases,
+      // reflective access and dynamic global primitive lookup.
+      if (ts.isIdentifier(node) && node.text === "Object" &&
+          !(ts.isPropertyAccessExpression(node.parent) && node.parent.expression === node &&
+            (node.parent.name.text === "freeze" || node.parent.name.text === "is")))
+        fail("S18 fixture global Object must only be a direct freeze/is receiver: " + testPath);
+      if (ts.isIdentifier(node) && node.text === "readFileSync" &&
+          !(ts.isImportSpecifier(node.parent) && node.parent.name === node) &&
+          !(ts.isCallExpression(node.parent) && node.parent.expression === node))
+        fail("S18 fixture readFileSync must only be imported or directly called: " + testPath);
+      if (ts.isIdentifier(node) &&
+          (node.text === "globalThis" || node.text === "eval" || node.text === "Reflect"))
+        fail("S18 fixture unsafe global/reflective access: " + testPath);
       ts.forEachChild(node, visit);
     };
     visit(source);
