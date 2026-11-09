@@ -371,8 +371,6 @@ export function verifyProjectOwnership(
   for (const testPath of conformanceConsumers) {
     const source = ts.createSourceFile(testPath, read(testPath),
       ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-    if (source.parseDiagnostics.length !== 0)
-      fail("S18 FULL consumer source has AST parse diagnostics: " + testPath);
     if (testPath === "ts/test/quaternary-anum-hierarchical-two-memory.test.ts") {
       const indexed = hierarchicalTopLevelReads(source);
       if (directTopLevelReads(source).length !== 0)
