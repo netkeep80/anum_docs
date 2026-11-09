@@ -48,7 +48,7 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/test/research-physical-dot-bootstrap.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts',''ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
+          expected={'ts/test/research-physical-dot-bootstrap.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts','ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
           assert o['j1']['tracked']==649 and o['j1']['justified']==514, "unexpected J1 counts"
           assert len(paths)==135 and not expected.intersection(paths), "unexpected six-resource trial"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
