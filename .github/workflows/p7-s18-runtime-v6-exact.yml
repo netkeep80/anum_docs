@@ -1,4 +1,4 @@
-name: P7-S24 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S25 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S24 candidate J1 and J2
+      - name: Exact P7-S25 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s24-formal-statement-witness-ownership-20261109
-          git -C candidate checkout --detach cafae1d88ceec6569a3b0b0eb735505a43d77301
-          test "$(git -C candidate rev-parse HEAD)" = "cafae1d88ceec6569a3b0b0eb735505a43d77301"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "6b0c045b59576577bb1d5429f31bd1f77c1f3f3f"
+          git -C candidate fetch origin cleanup/p7-s25-observed-evidence-witness-closure-20261110
+          git -C candidate checkout --detach f21365ae1936809e0d0503ff4bf2602f5139b7ef
+          test "$(git -C candidate rev-parse HEAD)" = "f21365ae1936809e0d0503ff4bf2602f5139b7ef"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "f01d460ba3f5c9e13885ba6d32586cc9649bed7e"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=cafae1d88ceec6569a3b0b0eb735505a43d77301
-          echo EXACT_TREE=6b0c045b59576577bb1d5429f31bd1f77c1f3f3f
+          echo EXACT_HEAD=f21365ae1936809e0d0503ff4bf2602f5139b7ef
+          echo EXACT_TREE=f01d460ba3f5c9e13885ba6d32586cc9649bed7e
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base cafae1d88ceec6569a3b0b0eb735505a43d77301 --head cafae1d88ceec6569a3b0b0eb735505a43d77301 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base f21365ae1936809e0d0503ff4bf2602f5139b7ef --head f21365ae1936809e0d0503ff4bf2602f5139b7ef --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,11 +48,12 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts','ts/test/v015-exe02-formal-statement-b17.test.ts','ts/test/v015-fnd01-formal-statement-b18.test.ts','ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts','ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts','ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts','ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts','ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts','ts/test/v015-fnd08-open-formal-b14b1.test.ts','ts/test/v015-fnd09-open-formal-b14b2.test.ts','ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts','ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts','ts/test/v015-formal-bound-link-role-b12.test.ts','ts/test/v015-inv01-formal-statement-candidate-b23.test.ts','ts/test/v015-inv02-formal-statement-candidate-b26.test.ts','ts/test/v015-inv03-formal-statement-candidate-b25.test.ts','ts/test/v015-inv04-formal-statement-candidate-b27.test.ts','ts/test/v015-inv05-formal-statement-candidate-b30.test.ts','ts/test/v015-inv06-formal-statement-candidate-b32.test.ts','ts/test/v015-inv07-formal-statement-candidate-b33.test.ts'}
-          assert o['j1']['tracked']==651 and o['j1']['justified']==534, "unexpected J1 counts"
-          assert len(paths)==117 and not expected.intersection(paths), "unexpected twenty-witness ownership"
+          print("EXPECTED_S25_OWNED_SOURCES",sorted(expected))
+          expected={'ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts','ts/test/research-v013-context-dualization-a75b.test.ts','ts/test/research-v013-static-fixity-a7.test.ts','ts/test/research-v013-finite-recursive-description-boundary.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-physical-dot-bootstrap.test.ts'}
+          assert o['j1']['tracked']==651 and o['j1']['justified']==540, "unexpected J1 counts"
+          assert len(paths)==111 and not expected.intersection(paths), "unexpected six restored witness ownership"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S24_TWENTY_PROOF_WITNESSES=PASS")
+          print("P7_S25_SIX_OBSERVED_WITNESSES=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
