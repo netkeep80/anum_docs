@@ -1,9 +1,9 @@
-name: P7-S22 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S23 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
     paths: [".github/workflows/p7-s18-runtime-v6-exact.yml"]
-permissions: {contents: read}
+permissions: {contents: read, pull-requests: read, issues: read}
 jobs:
   exact:
     runs-on: ubuntu-latest
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S22 candidate J1 and J2
+      - name: Exact P7-S23 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s22-proof-evidence-bounded-ownership-20261109
-          git -C candidate checkout --detach c9a481c2afe8cba1c908449f87950d934d0b71e8
-          test "$(git -C candidate rev-parse HEAD)" = "c9a481c2afe8cba1c908449f87950d934d0b71e8"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "f6a2fba816579a94195d45614069dfea38d09936"
+          git -C candidate fetch origin cleanup/p7-s23-retire-unreferenced-research-by-falsification-20261109
+          git -C candidate checkout --detach 0b1d4569c39792b458c2f7f9e0b20f0528b2d059
+          test "$(git -C candidate rev-parse HEAD)" = "0b1d4569c39792b458c2f7f9e0b20f0528b2d059"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "de5eb67b20b3f436a2cdc94550c0bb4a402d5d86"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=c9a481c2afe8cba1c908449f87950d934d0b71e8
-          echo EXACT_TREE=f6a2fba816579a94195d45614069dfea38d09936
+          echo EXACT_HEAD=0b1d4569c39792b458c2f7f9e0b20f0528b2d059
+          echo EXACT_TREE=de5eb67b20b3f436a2cdc94550c0bb4a402d5d86
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base c9a481c2afe8cba1c908449f87950d934d0b71e8 --head c9a481c2afe8cba1c908449f87950d934d0b71e8 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 0b1d4569c39792b458c2f7f9e0b20f0528b2d059 --head 0b1d4569c39792b458c2f7f9e0b20f0528b2d059 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,12 +48,102 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/src/tooling/v015-native-evidence-verifier.ts','ts/src/tooling/v015-root-basis-evidence-verifier.ts','ts/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.ts','ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts','ts/src/tooling/v015-theorem-statement-evidence-verifier.ts','ts/src/v015-proof-source.ts','ts/test/v015-native-evidence-verifier.test.ts','ts/test/v015-root-basis-evidence-verifier.test.ts','ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts','ts/test/v015-theorem-statement-evidence-verifier.test.ts'}
-          assert o['j1']['tracked']==655 and o['j1']['justified']==514, "unexpected J1 counts"
-          assert len(paths)==141 and not expected.intersection(paths), "unexpected ten-resource closure"
+          expected={'ts/test/research-physical-dot-bootstrap.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts','ts/test/research-v013-static-fixity-a7.test.ts','ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
+          assert o['j1']['tracked']==648 and o['j1']['justified']==514, "unexpected J1 counts"
+          assert len(paths)==134 and not expected.intersection(paths), "unexpected seven-resource trial"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S22_TEN_PROOF_EVIDENCE_CLOSURE=PASS")
+          print("P7_S23_SEVEN_TRIAL_DELETIONS=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
+          PY
+          test "$rc" -eq 1
+
+  full:
+    name: S23 exact candidate FULL behavior
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 0b1d4569c39792b458c2f7f9e0b20f0528b2d059
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Run exact candidate check FULL and Observatory
+        shell: bash
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "0b1d4569c39792b458c2f7f9e0b20f0528b2d059"
+          test "$(git rev-parse HEAD^{tree})" = "de5eb67b20b3f436a2cdc94550c0bb4a402d5d86"
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts run check:full
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+          echo S23_EXACT_FULL_SUCCESS=1
+  legacy-diag:
+    name: S23 legacy RG 3.2.4 exact violation diagnostics
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 0b1d4569c39792b458c2f7f9e0b20f0528b2d059
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: c19f29da366c985e2cf162ef7e75f5594f60c3a2
+          persist-credentials: false
+          path: oldguard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Probe legacy exact violations without hiding machine report
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin main
+          test "$(git -C candidate rev-parse HEAD)" = "0b1d4569c39792b458c2f7f9e0b20f0528b2d059"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "de5eb67b20b3f436a2cdc94550c0bb4a402d5d86"
+          npm ci --prefix oldguard --omit=dev --ignore-scripts --no-audit --no-fund
+          curl --fail --silent --show-error -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/netkeep80/anum_docs/pulls/2400" > "$RUNNER_TEMP/pr.json"
+          python3 - <<'PY'
+          import json,os
+          tmp=os.environ['RUNNER_TEMP']; p=json.load(open(tmp+'/pr.json'))
+          obj={'repository':{'full_name':'netkeep80/anum_docs'},'pull_request':{'number':2400,'base':{'sha':'ace1aa51a3baaa0a7dd551a6914bc9c8362ec32d','ref':'main'},'head':{'sha':'0b1d4569c39792b458c2f7f9e0b20f0528b2d059'},'body':p.get('body') or ''}}
+          json.dump(obj,open(tmp+'/event.json','w'))
+          PY
+          export RG_EVENT_PATH="$RUNNER_TEMP/event.json"
+          set +e
+          node "$GITHUB_WORKSPACE/oldguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" --enforcement blocking check-pr --format json > "$RUNNER_TEMP/rg32.json" 2> "$RUNNER_TEMP/rg32.err"
+          rc=$?
+          set -e
+          echo S23_LEGACY_EXIT="$rc"
+          python3 - <<'PY'
+          import os,json
+          tmp=os.environ['RUNNER_TEMP']
+          try:
+            o=json.load(open(tmp+'/rg32.json'))
+            print('LEGACY_RESULT',o.get('result'))
+            print('LEGACY_VIOLATION_COUNT',o.get('violationCount'))
+            for k in ['violations','checks','results','rules','diagnostics']:
+              v=o.get(k)
+              if v is not None: print('LEGACY_FIELD_'+k.upper(),json.dumps(v,ensure_ascii=False)[:21000])
+            print('LEGACY_KEYS',list(o.keys()))
+          except Exception as e:
+            print('LEGACY_JSON_PARSE_ERROR',str(e)); print(open(tmp+'/rg32.json').read()[:5000])
+          print('LEGACY_STDERR',open(tmp+'/rg32.err').read()[:2500])
           PY
           test "$rc" -eq 1
