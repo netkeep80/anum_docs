@@ -1,4 +1,4 @@
-name: P7-S23 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S24 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S23 candidate J1 and J2
+      - name: Exact P7-S24 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s23-retire-unreferenced-research-by-falsification-20261109
-          git -C candidate checkout --detach ba85d95fd86bd1f4353115d5d965e010403c0308
-          test "$(git -C candidate rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
+          git -C candidate fetch origin cleanup/p7-s24-formal-statement-witness-ownership-20261109
+          git -C candidate checkout --detach cafae1d88ceec6569a3b0b0eb735505a43d77301
+          test "$(git -C candidate rev-parse HEAD)" = "cafae1d88ceec6569a3b0b0eb735505a43d77301"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "6b0c045b59576577bb1d5429f31bd1f77c1f3f3f"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=ba85d95fd86bd1f4353115d5d965e010403c0308
-          echo EXACT_TREE=3ae09a7df6c196cd56290a979d02b4aefcbe3f6f
+          echo EXACT_HEAD=cafae1d88ceec6569a3b0b0eb735505a43d77301
+          echo EXACT_TREE=6b0c045b59576577bb1d5429f31bd1f77c1f3f3f
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base ba85d95fd86bd1f4353115d5d965e010403c0308 --head ba85d95fd86bd1f4353115d5d965e010403c0308 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base cafae1d88ceec6569a3b0b0eb735505a43d77301 --head cafae1d88ceec6569a3b0b0eb735505a43d77301 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,102 +48,12 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts','ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
-          assert o['j1']['tracked']==651 and o['j1']['justified']==514, "unexpected J1 counts"
-          assert len(paths)==137 and not expected.intersection(paths), "unexpected four-resource trial"
+          expected={'ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts','ts/test/v015-exe02-formal-statement-b17.test.ts','ts/test/v015-fnd01-formal-statement-b18.test.ts','ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts','ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts','ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts','ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts','ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts','ts/test/v015-fnd08-open-formal-b14b1.test.ts','ts/test/v015-fnd09-open-formal-b14b2.test.ts','ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts','ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts','ts/test/v015-formal-bound-link-role-b12.test.ts','ts/test/v015-inv01-formal-statement-candidate-b23.test.ts','ts/test/v015-inv02-formal-statement-candidate-b26.test.ts','ts/test/v015-inv03-formal-statement-candidate-b25.test.ts','ts/test/v015-inv04-formal-statement-candidate-b27.test.ts','ts/test/v015-inv05-formal-statement-candidate-b30.test.ts','ts/test/v015-inv06-formal-statement-candidate-b32.test.ts','ts/test/v015-inv07-formal-statement-candidate-b33.test.ts'}
+          assert o['j1']['tracked']==651 and o['j1']['justified']==534, "unexpected J1 counts"
+          assert len(paths)==117 and not expected.intersection(paths), "unexpected twenty-witness ownership"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S23_FOUR_TRIAL_DELETIONS=PASS")
+          print("P7_S24_TWENTY_PROOF_WITNESSES=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
-
-  full:
-    name: S23 exact candidate FULL behavior
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ba85d95fd86bd1f4353115d5d965e010403c0308
-          fetch-depth: 0
-          submodules: true
-          persist-credentials: false
-          path: candidate
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-      - name: Run exact candidate check FULL and Observatory
-        shell: bash
-        working-directory: candidate
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
-          test "$(git rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
-          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
-          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
-          npm --prefix ts run check:full
-          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
-          node web/contract-observatory/dist/test/contract-index.test.js
-          node web/contract-observatory/dist/test/site.test.js
-          echo S23_EXACT_FULL_SUCCESS=1
-  legacy-diag:
-    name: S23 legacy RG 3.2.4 exact violation diagnostics
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ba85d95fd86bd1f4353115d5d965e010403c0308
-          fetch-depth: 0
-          submodules: true
-          persist-credentials: false
-          path: candidate
-      - uses: actions/checkout@v6
-        with:
-          repository: netkeep80/repo-guard
-          ref: c19f29da366c985e2cf162ef7e75f5594f60c3a2
-          persist-credentials: false
-          path: oldguard
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-      - name: Probe legacy exact violations without hiding machine report
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          git -C candidate fetch origin main
-          test "$(git -C candidate rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
-          npm ci --prefix oldguard --omit=dev --ignore-scripts --no-audit --no-fund
-          curl --fail --silent --show-error -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/netkeep80/anum_docs/pulls/2400" > "$RUNNER_TEMP/pr.json"
-          python3 - <<'PY'
-          import json,os
-          tmp=os.environ['RUNNER_TEMP']; p=json.load(open(tmp+'/pr.json'))
-          obj={'repository':{'full_name':'netkeep80/anum_docs'},'pull_request':{'number':2400,'base':{'sha':'ace1aa51a3baaa0a7dd551a6914bc9c8362ec32d','ref':'main'},'head':{'sha':'ba85d95fd86bd1f4353115d5d965e010403c0308'},'body':p.get('body') or ''}}
-          json.dump(obj,open(tmp+'/event.json','w'))
-          PY
-          export RG_EVENT_PATH="$RUNNER_TEMP/event.json"
-          set +e
-          node "$GITHUB_WORKSPACE/oldguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" --enforcement blocking check-pr --format json > "$RUNNER_TEMP/rg32.json" 2> "$RUNNER_TEMP/rg32.err"
-          rc=$?
-          set -e
-          echo S23_LEGACY_EXIT="$rc"
-          python3 - <<'PY'
-          import os,json
-          tmp=os.environ['RUNNER_TEMP']
-          try:
-            o=json.load(open(tmp+'/rg32.json'))
-            print('LEGACY_RESULT',o.get('result'))
-            print('LEGACY_VIOLATION_COUNT',o.get('violationCount'))
-            for k in ['violations','checks','results','rules','diagnostics']:
-              v=o.get(k)
-              if v is not None: print('LEGACY_FIELD_'+k.upper(),json.dumps(v,ensure_ascii=False)[:21000])
-            print('LEGACY_KEYS',list(o.keys()))
-          except Exception as e:
-            print('LEGACY_JSON_PARSE_ERROR',str(e)); print(open(tmp+'/rg32.json').read()[:5000])
-          print('LEGACY_STDERR',open(tmp+'/rg32.err').read()[:2500])
-          PY
-          test "$rc" -eq 0
