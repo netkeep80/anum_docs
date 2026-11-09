@@ -21,7 +21,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "99276773606fe460ad00f75a7bcc45cfa7f06b0c"
+          git merge-base --is-ancestor "99276773606fe460ad00f75a7bcc45cfa7f06b0c" HEAD
+          git diff --exit-code "99276773606fe460ad00f75a7bcc45cfa7f06b0c" HEAD -- ts/test/quaternary-anum-hierarchical-two-memory.test.ts
           echo "MUTANT_SOURCE_COMMIT=99276773606fe460ad00f75a7bcc45cfa7f06b0c"
       - name: Build the mutated FULL test
         shell: bash
