@@ -1,4 +1,6 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   loadCurrentNativeVerificationProjection,
@@ -311,6 +313,82 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
       currentTheoremIndexPath,
     ]),
   });
+}
+
+// S18: a passing process exit is insufficient unless the five FULL consumers
+// physically read their owned fixtures and complete without process.exit().
+export function runS18FixtureWitness(
+  executableTest: string,
+  expectedPaths: readonly string[],
+  repositoryRoot: string,
+): void {
+  const preload = [
+    'import fs from "node:fs";',
+    'import { syncBuiltinESMExports } from "node:module";',
+    'import { relative, resolve } from "node:path";',
+    'const observed = [];',
+    'let explicitExit = false;',
+    'const originalRead = fs.readFileSync;',
+    'fs.readFileSync = (...args) => {',
+    '  const bytes = Reflect.apply(originalRead, fs, args);',
+    '  if (typeof args[0] === "string") {',
+    '    const path = relative(process.env.MTS_S18_REPO_ROOT, resolve(args[0]))',
+    '      .split(String.fromCharCode(92)).join("/");',
+    '    if (path.startsWith("examples/anum/conformance/")) observed.push(path);',
+    '  }',
+    '  return bytes;',
+    '};',
+    'syncBuiltinESMExports();',
+    'const originalExit = process.exit;',
+    'process.exit = (...args) => {',
+    '  explicitExit = true;',
+    '  return Reflect.apply(originalExit, process, args);',
+    '};',
+    'process.on("exit", () => {',
+    '  fs.writeFileSync(process.env.MTS_S18_TRACE, JSON.stringify({ observed, explicitExit }));',
+    '});',
+  ].join("\n");
+  const temporary = mkdtempSync(join(tmpdir(), "mts-s18-reads-"));
+  const traceFile = join(temporary, "reads.json");
+  try {
+    const child = spawnSync(process.execPath, [
+      "--import", "data:text/javascript;base64," + Buffer.from(preload).toString("base64"),
+      executableTest,
+    ], {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        MTS_S18_REPO_ROOT: repositoryRoot,
+        MTS_S18_TRACE: traceFile,
+      },
+    });
+    if (child.error !== undefined) throw child.error;
+    if (child.signal !== null || child.status !== 0)
+      fail("S18 conformance consumer terminated abnormally: " + executableTest +
+        " status=" + child.status + " signal=" + child.signal);
+    let trace: { observed?: unknown; explicitExit?: unknown };
+    try {
+      trace = JSON.parse(readFileSync(traceFile, "utf8")) as typeof trace;
+    } catch {
+      fail("S18 conformance consumer did not produce a physical read trace: " +
+        executableTest);
+    }
+    if (!Array.isArray(trace.observed) ||
+        !trace.observed.every((path: unknown) => typeof path === "string") ||
+        typeof trace.explicitExit !== "boolean")
+      fail("S18 conformance consumer produced an invalid physical read trace");
+    const actual = [...trace.observed].sort();
+    const expected = [...expectedPaths].sort();
+    if (JSON.stringify(actual) !== JSON.stringify(expected))
+      fail("S18 physical fixture read mismatch for " + executableTest +
+        "\nexpected: " + expected.join(", ") +
+        "\nobserved: " + actual.join(", "));
+    if (trace.explicitExit)
+      fail("S18 explicit process.exit is not normal completion: " + executableTest);
+    console.log("S18 physical reads PASS: " + actual.length + " / " + executableTest);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
 }
 
 export function selectTestTier(plan: TestTierPlan, tier: TestTier): readonly string[] {

@@ -203,6 +203,75 @@ export function verifyProjectOwnership(
   equalPaths(declaredTheoremCaseInputs, [casePath], "S17 theorem case manifest input");
   assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", casePath, "requires");
 
+  // P7-S18: conformance fixtures are present-tense FULL test file inputs.
+  // AST inventories references, not executed reads. The FULL runner proves
+  // exact physical inputs separately. Never claim arbitrary examples/**.
+  const conformanceConsumers = [
+    "ts/test/anum-two-memory-conformance.test.ts",
+    "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
+    "ts/test/string-anum-two-memory-conformance.test.ts",
+    "ts/test/v012-string-utf8-boundary.test.ts",
+    "ts/test/v013-file-wire-conformance.test.ts",
+  ] as const;
+  const fixturePrefix = "../examples/anum/conformance/";
+  const observedConformancePaths = new Set<string>();
+  for (const testPath of conformanceConsumers) {
+    const source = ts.createSourceFile(testPath, read(testPath),
+      ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const literalReads = new Set<string>();
+    const fixtureDeclarations = new Set<string>();
+    let indexedRead = false, indexedLoop = false;
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === "readFileSync") {
+        const arg = node.arguments[0];
+        if (arg !== undefined && ts.isStringLiteral(arg) &&
+            arg.text.startsWith(fixturePrefix))
+          literalReads.add(arg.text.slice(3));
+        if (arg !== undefined && ts.isPropertyAccessExpression(arg) &&
+            ts.isIdentifier(arg.expression) && arg.expression.text === "fixture" &&
+            arg.name.text === "path")
+          indexedRead = true;
+      }
+      if (ts.isPropertyAssignment(node) &&
+          ((ts.isIdentifier(node.name) && node.name.text === "path") ||
+            (ts.isStringLiteral(node.name) && node.name.text === "path")) &&
+          ts.isStringLiteral(node.initializer) &&
+          node.initializer.text.startsWith(fixturePrefix))
+        fixtureDeclarations.add(node.initializer.text.slice(3));
+      if (ts.isForOfStatement(node) &&
+          ts.isIdentifier(node.expression) && node.expression.text === "fixtures" &&
+          node.initializer.getText(source) === "const fixture")
+        indexedLoop = true;
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    if (testPath === "ts/test/quaternary-anum-hierarchical-two-memory.test.ts") {
+      if (!indexedRead || !indexedLoop || fixtureDeclarations.size !== 4 ||
+          literalReads.size !== 0)
+        fail("S18 hierarchical fixture loop/source reader changed");
+      for (const path of fixtureDeclarations) observedConformancePaths.add(path);
+    } else {
+      if (literalReads.size !== 1 || indexedRead || fixtureDeclarations.size !== 0)
+        fail("S18 direct conformance test fixture reader changed: " + testPath);
+      for (const path of literalReads) observedConformancePaths.add(path);
+    }
+  }
+  const observedConformance = sorted(observedConformancePaths);
+  if (observedConformance.length !== 8)
+    fail("S18 expected eight exact current FULL conformance inputs");
+  const diskConformance = sorted(readdirSync(resolve(root, "examples/anum/conformance"))
+    .map(name => "examples/anum/conformance/" + name));
+  equalPaths(diskConformance, observedConformance,
+    "S18 conformance fixture executable FULL coverage");
+  const declaredConformance = sorted([...get("MTS-PROJECT-CI-01").entries()]
+    .filter(([path]) => path.startsWith("examples/anum/conformance/"))
+    .map(([path]) => path));
+  equalPaths(declaredConformance, observedConformance,
+    "S18 exact current FULL conformance fixture ownership");
+  for (const path of observedConformance)
+    assertRelation("MTS-PROJECT-CI-01", path, "requires");
+
   const exportedSource = read("ts/src/public.ts");
   const exportedPaths = sorted(new Set(
     [...exportedSource.matchAll(/\bfrom\s+["'](\.\/[^"']+\.js)["']/g)]

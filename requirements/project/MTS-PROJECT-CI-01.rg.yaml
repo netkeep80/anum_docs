@@ -57,3 +57,35 @@ relations:
     target:
       kind: artifact
       path: ts/test/support/project-ownership.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/q-flat-110.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/q-hierarchical-adjacent-bytes.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/q-hierarchical-byte-4d.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/q-hierarchical-nested-byte-pair.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/q-hierarchical-relative-indirect.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/string-flat-ab.string.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/string-utf8-mixed.string.anum
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: examples/anum/conformance/v013-structural-1968698.anum

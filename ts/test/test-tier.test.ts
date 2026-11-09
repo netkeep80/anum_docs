@@ -9,6 +9,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import {
   buildTestTierPlan,
+  runS18FixtureWitness,
   classifyTestPaths,
   selectTestTier,
 } from "../src/tooling/test-tier.js";
@@ -60,7 +61,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 395);
+assert.equal(p7CandidateWitness.exactRelations, 403);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -116,6 +117,70 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s17ProofFile]: s17ProofSource.replace(s17CaseRelation, ""),
 }), /S17 theorem case manifest input relation coverage mismatches/,
   "S17: theorem case evidence must retain exact current provenance");
+
+// P7-S18: FULL fixture inputs must be preserved under the existing CI owner.
+const s18CiOwnerPath = "requirements/project/MTS-PROJECT-CI-01.rg.yaml";
+const s18CiOwnerSource = readFileSync(resolve("..", s18CiOwnerPath), "utf8");
+const s18FixtureRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: examples/anum/conformance/q-flat-110.anum\\n".replaceAll("\\n", "\n");
+assert.ok(s18CiOwnerSource.includes(s18FixtureRelation));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18CiOwnerPath]: s18CiOwnerSource.replace(s18FixtureRelation, ""),
+}), /S18 exact current FULL conformance fixture ownership relation coverage mismatches/,
+  "S18: a consumed fixture with removed ownership must fail closed");
+const s18TestPath = "ts/test/anum-two-memory-conformance.test.ts";
+const s18TestSource = readFileSync(resolve("..", s18TestPath), "utf8");
+assert.ok(s18TestSource.includes("../examples/anum/conformance/q-flat-110.anum"));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18TestPath]: s18TestSource.replace("../examples/anum/conformance/q-flat-110.anum",
+    "../examples/anum/conformance/q-flat-111.anum"),
+}), /S18 conformance fixture executable FULL coverage relation coverage mismatches/,
+  "S18: a drifted executable fixture reader cannot be hidden by stale Relations");
+const s18IndexedTest = "ts/test/quaternary-anum-hierarchical-two-memory.test.ts";
+const s18IndexedSource = readFileSync(resolve("..", s18IndexedTest), "utf8");
+assert.ok(s18IndexedSource.includes("q-hierarchical-byte-4d.anum"));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18IndexedSource.replace("q-hierarchical-byte-4d.anum",
+    "q-hierarchical-byte-4e.anum"),
+}), /S18 conformance fixture executable FULL coverage relation coverage mismatches/,
+  "S18: changes to parameterized fixtures must fail closed");
+
+// S18: observe physical reads from child processes, not AST spelling.
+const s18WitnessDir = mkdtempSync(join(tmpdir(), "mts-s18-witness-"));
+const s18WitnessRoot = resolve("..");
+const s18A = "examples/anum/conformance/q-flat-110.anum";
+const s18B = "examples/anum/conformance/q-hierarchical-byte-4d.anum";
+const s18ReadA = 'import { readFileSync } from "node:fs";\n' +
+  'readFileSync(' + JSON.stringify(resolve(s18WitnessRoot, s18A)) + ');\n';
+const s18ReadB = 'readFileSync(' + JSON.stringify(resolve(s18WitnessRoot, s18B)) + ');\n';
+try {
+  const healthy = join(s18WitnessDir, "healthy.mjs");
+  writeFileSync(healthy, s18ReadA + s18ReadB);
+  assert.doesNotThrow(() => runS18FixtureWitness(
+    healthy, [s18A, s18B], s18WitnessRoot));
+
+  const before = join(s18WitnessDir, "exit-before.mjs");
+  writeFileSync(before, 'process.exit(0);\n' + s18ReadA + s18ReadB);
+  assert.throws(() => runS18FixtureWitness(
+    before, [s18A, s18B], s18WitnessRoot),
+  /S18 physical fixture read mismatch/,
+  "S18-AUD-004: exit(0) before fixture read must fail");
+
+  const afterOne = join(s18WitnessDir, "exit-after-one.mjs");
+  writeFileSync(afterOne, s18ReadA + 'process.exit(0);\n' + s18ReadB);
+  assert.throws(() => runS18FixtureWitness(
+    afterOne, [s18A, s18B], s18WitnessRoot),
+  /S18 physical fixture read mismatch/,
+  "S18-AUD-004: exit(0) inside first fixture's verification must fail");
+
+  const afterAll = join(s18WitnessDir, "exit-after-all.mjs");
+  writeFileSync(afterAll, s18ReadA + s18ReadB + 'process.exit(0);\n');
+  assert.throws(() => runS18FixtureWitness(
+    afterAll, [s18A, s18B], s18WitnessRoot),
+  /S18 explicit process.exit/,
+  "S18-AUD-004: even after reads, explicit exit is not normal completion");
+} finally {
+  rmSync(s18WitnessDir, { recursive: true, force: true });
+}
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
