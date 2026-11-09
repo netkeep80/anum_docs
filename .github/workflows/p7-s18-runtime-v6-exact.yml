@@ -1,4 +1,4 @@
-name: P7-S21 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S22 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S21 candidate J1 and J2
+      - name: Exact P7-S22 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s21-native-formal-source-ownership-20261109
-          git -C candidate checkout --detach b259cafda725c23501406b32fec2aa848ce60f2b
-          test "$(git -C candidate rev-parse HEAD)" = "b259cafda725c23501406b32fec2aa848ce60f2b"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "9231c206f3fbbdeb0b2867b2caedde65b7cf983f"
+          git -C candidate fetch origin cleanup/p7-s22-proof-evidence-bounded-ownership-20261109
+          git -C candidate checkout --detach c9a481c2afe8cba1c908449f87950d934d0b71e8
+          test "$(git -C candidate rev-parse HEAD)" = "c9a481c2afe8cba1c908449f87950d934d0b71e8"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "f6a2fba816579a94195d45614069dfea38d09936"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=b259cafda725c23501406b32fec2aa848ce60f2b
-          echo EXACT_TREE=9231c206f3fbbdeb0b2867b2caedde65b7cf983f
+          echo EXACT_HEAD=c9a481c2afe8cba1c908449f87950d934d0b71e8
+          echo EXACT_TREE=f6a2fba816579a94195d45614069dfea38d09936
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base b259cafda725c23501406b32fec2aa848ce60f2b --head b259cafda725c23501406b32fec2aa848ce60f2b --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base c9a481c2afe8cba1c908449f87950d934d0b71e8 --head c9a481c2afe8cba1c908449f87950d934d0b71e8 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,11 +48,11 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/src/v015-direct-json-source.ts','ts/src/v015-direct-formal-source.ts','ts/src/v015-source-anet.ts','ts/src/v015-formal-decoder.ts','ts/src/v015-link-definition.ts','ts/src/source-namespace.ts','ts/src/v015-direct-source.ts','ts/src/v015-formal-recursive-compiler.ts','ts/src/native-syntax-grammar.ts','ts/src/structural-unification.ts','ts/src/v013-structural-execution.ts'}
-          assert o['j1']['tracked']==655 and o['j1']['justified']==504, "unexpected J1 counts"
-          assert len(paths)==151 and not expected.intersection(paths), "unexpected eleven-resource closure"
+          expected={'ts/src/tooling/v015-native-evidence-verifier.ts','ts/src/tooling/v015-root-basis-evidence-verifier.ts','ts/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.ts','ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts','ts/src/tooling/v015-theorem-statement-evidence-verifier.ts','ts/src/v015-proof-source.ts','ts/test/v015-native-evidence-verifier.test.ts','ts/test/v015-root-basis-evidence-verifier.test.ts','ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts','ts/test/v015-theorem-statement-evidence-verifier.test.ts'}
+          assert o['j1']['tracked']==655 and o['j1']['justified']==514, "unexpected J1 counts"
+          assert len(paths)==141 and not expected.intersection(paths), "unexpected ten-resource closure"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S21_ELEVEN_NATIVE_SOURCE_CLOSURE=PASS")
+          print("P7_S22_TEN_PROOF_EVIDENCE_CLOSURE=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
