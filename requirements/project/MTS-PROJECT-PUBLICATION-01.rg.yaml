@@ -497,3 +497,11 @@ relations:
     target:
       kind: artifact
       path: profiles/mts-v015-generalized-reaction-candidate.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/markdown-stable-anchor-baseline.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: requirements/publication/MTS-EA-v1.yaml
