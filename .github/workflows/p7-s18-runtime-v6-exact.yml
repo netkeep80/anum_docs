@@ -1,4 +1,4 @@
-name: P7-S19 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S20 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S19 candidate J1 and J2
+      - name: Exact P7-S20 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s19-observatory-visual-consumer-j1-20261109
-          git -C candidate checkout --detach d38bcec8c917d5e73dc446811b7cc51e1b8220b1
-          test "$(git -C candidate rev-parse HEAD)" = "d38bcec8c917d5e73dc446811b7cc51e1b8220b1"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "d2a996c3af5e37841893229ea2a2ce368ffc4834"
+          git -C candidate fetch origin cleanup/p7-s20-current-docs-check-inputs-20261109
+          git -C candidate checkout --detach a110a9034e19b51702acf1d423bd6998ecb6351e
+          test "$(git -C candidate rev-parse HEAD)" = "a110a9034e19b51702acf1d423bd6998ecb6351e"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "f3f50082e8a7925085496f2615cbcc76da07c3cf"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=d38bcec8c917d5e73dc446811b7cc51e1b8220b1
-          echo EXACT_TREE=d2a996c3af5e37841893229ea2a2ce368ffc4834
+          echo EXACT_HEAD=a110a9034e19b51702acf1d423bd6998ecb6351e
+          echo EXACT_TREE=f3f50082e8a7925085496f2615cbcc76da07c3cf
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base d38bcec8c917d5e73dc446811b7cc51e1b8220b1 --head d38bcec8c917d5e73dc446811b7cc51e1b8220b1 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base a110a9034e19b51702acf1d423bd6998ecb6351e --head a110a9034e19b51702acf1d423bd6998ecb6351e --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,88 +48,12 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'web/contract-observatory/mts-visual-consumer-lock.json','web/contract-observatory/src/visual-host.mjs','web/contract-observatory/test/visual-consumer.test.mjs'}
-          assert o['j1']['tracked']==655 and o['j1']['justified']==490, "unexpected J1 counts"
-          assert len(paths)==165 and not expected.intersection(paths), "unexpected three-resource closure"
+          expected={'requirements/mts-v0.13.json','traceability/markdown-stable-anchor-baseline.json','requirements/publication/MTS-EA-v1.yaml'}
+          assert o['j1']['tracked']==655 and o['j1']['justified']==493, "unexpected J1 counts"
+          assert len(paths)==162 and not expected.intersection(paths), "unexpected three-resource closure"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
           print("P7_S19_THREE_EXACT_RESOURCE_OWNERSHIPS=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
-
-  postmerge-ci-replay:
-    if: ${{ false }}
-    name: exact-main CI check:full and docs
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: b29f00ac4d5156cab2905448622579c41f7e0ddf
-          fetch-depth: 0
-          submodules: true
-          persist-credentials: false
-          path: candidate
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-      - name: Repeat exact main CI full
-        working-directory: candidate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
-          test "$(git rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
-          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
-          echo POSTMERGE_EXACT_MAIN=b29f00ac4d5156cab2905448622579c41f7e0ddf
-          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
-          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
-          npm --prefix ts run check:full
-          npm --prefix ts run docs:sync
-          git diff --exit-code -- README.md PORTFOLIO.md docs
-          npm --prefix ts run docs:sync
-          git diff --exit-code -- README.md PORTFOLIO.md docs
-          npm --prefix ts run docs:coverage
-          echo POSTMERGE_EXACT_MAIN_CI_REPLAY=SUCCESS
-  postmerge-pages-replay:
-    if: ${{ false }}
-    name: exact-main FULL and Pages verification
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: b29f00ac4d5156cab2905448622579c41f7e0ddf
-          fetch-depth: 0
-          submodules: true
-          persist-credentials: false
-          path: candidate
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-      - name: Repeat exact main Pages verify
-        working-directory: candidate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
-          test "$(git rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
-          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
-          echo POSTMERGE_EXACT_MAIN=b29f00ac4d5156cab2905448622579c41f7e0ddf
-          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
-          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
-          npm --prefix ts test
-          npm --prefix ts run docs:check
-          npm --prefix ts run docs:sync
-          git diff --exit-code -- README.md PORTFOLIO.md docs
-          npm --prefix ts run docs:sync
-          git diff --exit-code -- README.md PORTFOLIO.md docs
-          npm --prefix ts run docs:coverage
-          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
-          node web/contract-observatory/dist/test/contract-index.test.js
-          node web/contract-observatory/dist/test/site.test.js
-          node web/contract-observatory/dist/src/build-site.js . _site
-          test -s _site/index.html
-          test -f _site/.nojekyll
-          echo POSTMERGE_EXACT_MAIN_PAGES_VERIFY=SUCCESS
