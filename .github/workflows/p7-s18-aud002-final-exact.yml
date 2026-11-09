@@ -1,0 +1,53 @@
+name: P7-S18-AUD002-FINAL exact external v6 J1 J2 (TEMPORARY)
+on:
+  push:
+    branches: [chore/p7-s18-aud002-final-v6-20261109]
+    paths: [".github/workflows/p7-s18-aud002-final-exact.yml"]
+permissions: {contents: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact S18-AUD002-FINAL candidate J1 and J2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s18-full-conformance-fixture-ownership-20261109
+          git -C candidate checkout --detach 5841d35d968c06116c2eba39c24af5f185b9e50c
+          test "$(git -C candidate rev-parse HEAD)" = "5841d35d968c06116c2eba39c24af5f185b9e50c"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "9c55c4c08cdb6abdc5a1cde05c3ff422e9943c41"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=5841d35d968c06116c2eba39c24af5f185b9e50c
+          echo EXACT_TREE=9c55c4c08cdb6abdc5a1cde05c3ff422e9943c41
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 5841d35d968c06116c2eba39c24af5f185b9e50c --head 5841d35d968c06116c2eba39c24af5f185b9e50c --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import os,json,collections
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          paths=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(paths))
+          print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
+          PY
+          test "$rc" -eq 1
