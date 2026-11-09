@@ -17,3 +17,7 @@ relations:
     target:
       kind: requirement
       id: V15-ONTO-01
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/native-syntax-grammar.ts

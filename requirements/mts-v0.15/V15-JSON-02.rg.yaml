@@ -33,3 +33,11 @@ relations:
     target:
       kind: requirement
       id: V15-NAME-01
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-direct-formal-source.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-source-anet.ts
