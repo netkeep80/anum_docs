@@ -313,7 +313,7 @@ assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [proofOwnerFile]: proofOwnerText.replace(replayPair, ""),
   }),
-  /current frozen FORMAL replay input relation coverage mismatches/,
+  /exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
   "S8: loss of a current exact frozen package must fail",
 );
 assert.throws(
@@ -329,7 +329,7 @@ assert.throws(
     [proofOwnerFile]: proofOwnerText +
       "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-not.recursive\n",
   }),
-  /current frozen FORMAL replay input relation coverage mismatches/,
+  /exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
   "S8: existing but unread optional recursive file must not become current ownership",
 );
 const frozenTestPath = "ts/test/v015-frozen-replay-artifact-integrity.test.ts";
