@@ -52,3 +52,77 @@ jobs:
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
+
+  postmerge-ci-replay:
+    name: exact-main CI check:full and docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: b29f00ac4d5156cab2905448622579c41f7e0ddf
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Repeat exact main CI full
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
+          test "$(git rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          echo POSTMERGE_EXACT_MAIN=b29f00ac4d5156cab2905448622579c41f7e0ddf
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts run check:full
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          echo POSTMERGE_EXACT_MAIN_CI_REPLAY=SUCCESS
+  postmerge-pages-replay:
+    name: exact-main FULL and Pages verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: b29f00ac4d5156cab2905448622579c41f7e0ddf
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Repeat exact main Pages verify
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
+          test "$(git rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          echo POSTMERGE_EXACT_MAIN=b29f00ac4d5156cab2905448622579c41f7e0ddf
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts test
+          npm --prefix ts run docs:check
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+          node web/contract-observatory/dist/src/build-site.js . _site
+          test -s _site/index.html
+          test -f _site/.nojekyll
+          echo POSTMERGE_EXACT_MAIN_PAGES_VERIFY=SUCCESS
