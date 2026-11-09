@@ -108,10 +108,10 @@ for (const [observer, target] of [
 // repeating its filename in the S25 observer inventory or negative tests.
 const s25TierSource = readFileSync(resolve("..", "ts/test/test-tier.test.ts"), "utf8");
 const s25TierProbe = 'const evidenceOnly = "ts/test/research-v013-context-dualization-a75b.test.ts";';
-assert.ok(s25TierSource.split(/\\r?\\n/).some(line => line.trim() === s25TierProbe));
+assert.ok(s25TierSource.split(/\r?\n/).some(line => line.trim() === s25TierProbe));
 assert.throws(() => verifyProjectOwnership(resolve(".."), {
   "ts/test/test-tier.test.ts": s25TierSource.replace(
-    /^  const evidenceOnly = "ts\\/test\\/research-v013-context-dualization-a75b\\.test\\.ts";$/m,
+    /^  const evidenceOnly = "ts\/test\/research-v013-context-dualization-a75b\.test\.ts";$/m,
     '  const evidenceOnly = "ts/test/s25-missing-context-dualization.test.ts";'),
 }), /S25 tier synthetic evidence source probe was removed/,
 "S25 no self-referential CURRENT evidence source witness");
