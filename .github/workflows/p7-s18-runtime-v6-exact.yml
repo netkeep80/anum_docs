@@ -52,7 +52,7 @@ jobs:
           assert o['j1']['tracked']==655 and o['j1']['justified']==493, "unexpected J1 counts"
           assert len(paths)==162 and not expected.intersection(paths), "unexpected three-resource closure"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S19_THREE_EXACT_RESOURCE_OWNERSHIPS=PASS")
+          print("P7_S20_THREE_EXACT_DOCS_CHECK_INPUTS=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
