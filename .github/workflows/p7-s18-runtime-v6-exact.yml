@@ -1,4 +1,4 @@
-name: P7 postmerge exact main external v6 J1 J2 (TEMPORARY)
+name: P7-S19 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact merged main J1 and J2
+      - name: Exact P7-S19 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin main
-          git -C candidate checkout --detach b29f00ac4d5156cab2905448622579c41f7e0ddf
-          test "$(git -C candidate rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
+          git -C candidate fetch origin cleanup/p7-s19-observatory-visual-consumer-j1-20261109
+          git -C candidate checkout --detach 2a802b46948977128a7f9992b41ba089a8ce4b34
+          test "$(git -C candidate rev-parse HEAD)" = "2a802b46948977128a7f9992b41ba089a8ce4b34"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "b744f3574f1d8ef4045ec7058ea5700ba7e98b09"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=b29f00ac4d5156cab2905448622579c41f7e0ddf
-          echo EXACT_TREE=e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a
+          echo EXACT_HEAD=2a802b46948977128a7f9992b41ba089a8ce4b34
+          echo EXACT_TREE=b744f3574f1d8ef4045ec7058ea5700ba7e98b09
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base b29f00ac4d5156cab2905448622579c41f7e0ddf --head b29f00ac4d5156cab2905448622579c41f7e0ddf --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 2a802b46948977128a7f9992b41ba089a8ce4b34 --head 2a802b46948977128a7f9992b41ba089a8ce4b34 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,12 +48,18 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
+          expected={'web/contract-observatory/mts-visual-consumer-lock.json','web/contract-observatory/src/visual-host.mjs','web/contract-observatory/test/visual-consumer.test.mjs'}
+          assert o['j1']['tracked']==655 and o['j1']['justified']==490, "unexpected J1 counts"
+          assert len(paths)==165 and not expected.intersection(paths), "unexpected three-resource closure"
+          assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
+          print("P7_S19_THREE_EXACT_RESOURCE_OWNERSHIPS=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
 
   postmerge-ci-replay:
+    if: ${{ false }}
     name: exact-main CI check:full and docs
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -87,6 +93,7 @@ jobs:
           npm --prefix ts run docs:coverage
           echo POSTMERGE_EXACT_MAIN_CI_REPLAY=SUCCESS
   postmerge-pages-replay:
+    if: ${{ false }}
     name: exact-main FULL and Pages verification
     runs-on: ubuntu-latest
     timeout-minutes: 35
