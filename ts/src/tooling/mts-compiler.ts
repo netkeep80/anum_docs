@@ -431,7 +431,7 @@ function validateDependencyGraph(requirements: readonly MtsRequirementProjection
 
 const NATIVE_V015_REQUIREMENT_DIRECTORY = "requirements/mts-v0.15";
 const NATIVE_V015_REQUIREMENT_COUNT = 48;
-const NATIVE_V015_RELATION_COUNT = 189;
+const NATIVE_V015_RELATION_COUNT = 200;
 const NATIVE_V015_DEPENDS_ON_COUNT = 33;
 const NATIVE_V015_RELATION_PREDICATES = new Set([
   "verified_by",

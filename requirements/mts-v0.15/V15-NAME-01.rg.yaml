@@ -21,3 +21,15 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-direct-formal-source-b20.test.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-formal-decoder.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-link-definition.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/source-namespace.ts

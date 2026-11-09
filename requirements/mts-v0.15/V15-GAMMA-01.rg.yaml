@@ -29,3 +29,7 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-finite-materialized-reaction-a12.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/structural-unification.ts

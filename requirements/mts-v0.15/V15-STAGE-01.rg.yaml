@@ -21,3 +21,11 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-formal-production-refinement-f1.test.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-direct-source.ts
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: ts/src/v015-formal-recursive-compiler.ts
