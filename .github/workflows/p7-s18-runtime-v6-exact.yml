@@ -1,4 +1,4 @@
-name: P7-S20 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S21 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S20 candidate J1 and J2
+      - name: Exact P7-S21 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s20-current-docs-check-inputs-20261109
-          git -C candidate checkout --detach a110a9034e19b51702acf1d423bd6998ecb6351e
-          test "$(git -C candidate rev-parse HEAD)" = "a110a9034e19b51702acf1d423bd6998ecb6351e"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "f3f50082e8a7925085496f2615cbcc76da07c3cf"
+          git -C candidate fetch origin cleanup/p7-s21-native-formal-source-ownership-20261109
+          git -C candidate checkout --detach c608b78f4a72f77474a1e80aacc2a4b5c532bcf9
+          test "$(git -C candidate rev-parse HEAD)" = "c608b78f4a72f77474a1e80aacc2a4b5c532bcf9"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "c5a8980b938881788f03e0ab514329cd74a6c465"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=a110a9034e19b51702acf1d423bd6998ecb6351e
-          echo EXACT_TREE=f3f50082e8a7925085496f2615cbcc76da07c3cf
+          echo EXACT_HEAD=c608b78f4a72f77474a1e80aacc2a4b5c532bcf9
+          echo EXACT_TREE=c5a8980b938881788f03e0ab514329cd74a6c465
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base a110a9034e19b51702acf1d423bd6998ecb6351e --head a110a9034e19b51702acf1d423bd6998ecb6351e --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base c608b78f4a72f77474a1e80aacc2a4b5c532bcf9 --head c608b78f4a72f77474a1e80aacc2a4b5c532bcf9 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,11 +48,11 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'requirements/mts-v0.13.json','traceability/markdown-stable-anchor-baseline.json','requirements/publication/MTS-EA-v1.yaml'}
-          assert o['j1']['tracked']==655 and o['j1']['justified']==493, "unexpected J1 counts"
-          assert len(paths)==162 and not expected.intersection(paths), "unexpected three-resource closure"
+          expected={'ts/src/v015-direct-json-source.ts','ts/src/v015-direct-formal-source.ts','ts/src/v015-source-anet.ts','ts/src/v015-formal-decoder.ts','ts/src/v015-link-definition.ts','ts/src/source-namespace.ts','ts/src/v015-direct-source.ts','ts/src/v015-formal-recursive-compiler.ts','ts/src/native-syntax-grammar.ts','ts/src/structural-unification.ts','ts/src/v013-structural-execution.ts'}
+          assert o['j1']['tracked']==655 and o['j1']['justified']==504, "unexpected J1 counts"
+          assert len(paths)==151 and not expected.intersection(paths), "unexpected eleven-resource closure"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S20_THREE_EXACT_DOCS_CHECK_INPUTS=PASS")
+          print("P7_S21_ELEVEN_NATIVE_SOURCE_CLOSURE=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
