@@ -89,6 +89,21 @@ for (const [id, target] of [
   }), /missing requires witness/, "S25 restored executable source needs typed causal ownership: " + target);
 }
 
+// S25: removing a real observer-to-source reference must also fail even if
+// the Requirement relation still exists. One negative probe per owner class.
+for (const [observer, target] of [
+  ["ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts", "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"],
+  ["ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts", "ts/test/research-v013-finite-recursive-description-boundary.test.ts"],
+  ["web/contract-observatory/test/invariant-traceability.test.ts", "ts/test/research-physical-dot-bootstrap.test.ts"],
+] as const) {
+  const original = readFileSync(resolve("..", observer), "utf8");
+  assert.ok(original.includes(target), "S25 observer still reads exact witness: " + target);
+  assert.throws(() => verifyProjectOwnership(resolve(".."), {
+    [observer]: original.replace(target, "ts/test/s25-deleted-exact-witness.test.ts"),
+  }), /S25 restored witness lost live consumer/,
+  "S25 orphaned evidence cannot be hidden by retaining an unused requires: " + target);
+}
+
 // P7-S16: protected historical lineage is an actual policy obligation, not
 // a discretionary bulk J1 relation. Test both missing typed ownership and
 // silent policy removal independently from exact real source files.
