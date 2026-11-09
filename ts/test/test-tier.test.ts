@@ -56,12 +56,13 @@ assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.formalReplayResources, 21);
+assert.equal(p7CandidateWitness.approvedSourceIntegrityResources, 6);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
 assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 445);
+assert.equal(p7CandidateWitness.exactRelations, 451);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -70,6 +71,33 @@ assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 11);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
+
+// P7-S26: approved physical inputs require both an exact rooted Resource
+// relation and an active integrity consumer with byte-exact SHA-256 evidence.
+const s26Root = resolve("..");
+const s26OwnerPath = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const s26Owner = readFileSync(resolve(s26Root, s26OwnerPath), "utf8");
+const s26Input = "formal/v0.15/regression/grounded-zero-role.formal";
+const s26Clause = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + s26Input + "\n";
+assert.ok(s26Owner.includes(s26Clause), "S26 exact approved source relation exists");
+assert.throws(() => verifyProjectOwnership(s26Root, {
+  [s26OwnerPath]: s26Owner.replace(s26Clause, ""),
+}), /exact current FORMAL replay and approved SHA-256 source inputs/,
+"S26 missing approved source relation rejected");
+
+const s26ConsumerPath = "ts/test/v015-grounded-approved-source-integrity.test.ts";
+const s26Consumer = readFileSync(resolve(s26Root, s26ConsumerPath), "utf8");
+const s26Digest = "b0e5760786c900ab125f775f9f30d897336220ee2393f3c0e3fd5cff2296d51a";
+assert.ok(s26Consumer.includes(s26Digest), "S26 approved SHA-256 pinned");
+assert.throws(() => verifyProjectOwnership(s26Root, {
+  [s26ConsumerPath]: s26Consumer.replace(s26Digest, "0".repeat(64)),
+}), /S26 approved source SHA-256 drift/,
+"S26 forged approved source hash rejected");
+assert.throws(() => verifyProjectOwnership(s26Root, {
+  [s26ConsumerPath]: s26Consumer.replace("readFileSync(resolve(repo, path))",
+    'readFileSync(resolve(repo, path + ".missing"))'),
+}), /S26 approved source hash-verifying consumer changed/,
+"S26 disconnected approved source consumer rejected");
 
 // P7-S25: each exact restored witness must have project ownership in addition
 // to being visible through its present-tense consumer. Dropping a single typed
