@@ -481,3 +481,83 @@ relations:
     target:
       kind: artifact
       path: ts/test/v015-theorem-statement-evidence-verifier.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-ctx03-formal-statement-candidate-b34.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-exe02-formal-statement-b17.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd01-formal-statement-b18.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd03-formal-statement-candidate-b21.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd04-formal-statement-candidate-b24.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd06-formal-statement-candidate-b28.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd07-ordinary-formal-proof-p2.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd08-open-formal-b14b1.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd09-open-formal-b14b2.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd11-formal-statement-candidate-b29.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-fnd12-formal-statement-candidate-b31.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-formal-bound-link-role-b12.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv01-formal-statement-candidate-b23.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv02-formal-statement-candidate-b26.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv03-formal-statement-candidate-b25.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv04-formal-statement-candidate-b27.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv05-formal-statement-candidate-b30.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv06-formal-statement-candidate-b32.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v015-inv07-formal-statement-candidate-b33.test.ts
