@@ -1,4 +1,4 @@
-name: P7-S18-RUNTIME exact external v6 J1 J2 (TEMPORARY)
+name: P7 postmerge exact main external v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact S18-runtime candidate J1 and J2
+      - name: Exact merged main J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s18-full-conformance-fixture-ownership-20261109
-          git -C candidate checkout --detach 5cdfe9048a09e01cfc1dbe586933191bc857e903
-          test "$(git -C candidate rev-parse HEAD)" = "5cdfe9048a09e01cfc1dbe586933191bc857e903"
+          git -C candidate fetch origin main
+          git -C candidate checkout --detach b29f00ac4d5156cab2905448622579c41f7e0ddf
+          test "$(git -C candidate rev-parse HEAD)" = "b29f00ac4d5156cab2905448622579c41f7e0ddf"
           test "$(git -C candidate rev-parse HEAD^{tree})" = "e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=5cdfe9048a09e01cfc1dbe586933191bc857e903
+          echo EXACT_HEAD=b29f00ac4d5156cab2905448622579c41f7e0ddf
           echo EXACT_TREE=e1a0b393767dca95e64dd7d7c08f9e346f8c0f5a
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 5cdfe9048a09e01cfc1dbe586933191bc857e903 --head 5cdfe9048a09e01cfc1dbe586933191bc857e903 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base b29f00ac4d5156cab2905448622579c41f7e0ddf --head b29f00ac4d5156cab2905448622579c41f7e0ddf --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
