@@ -99,6 +99,16 @@ assert.throws(() => verifyProjectOwnership(s26Root, {
 }), /S26 approved source hash-verifying consumer changed/,
 "S26 disconnected approved source consumer rejected");
 
+// S26 second independent approved source cohort: negative digest mutation.
+const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
+const s26TwoRole = readFileSync(resolve(s26Root, s26TwoRolePath), "utf8");
+const s26TwoRoleDigest = "f68e8629b5d476f49366f3f59e65ef64d523d5b5f8964dcf918283144ba292f9";
+assert.ok(s26TwoRole.includes(s26TwoRoleDigest), "S26 two-role Author-approved hash pinned");
+assert.throws(() => verifyProjectOwnership(s26Root, {
+  [s26TwoRolePath]: s26TwoRole.replace(s26TwoRoleDigest, "0".repeat(64)),
+}), /S26 approved source SHA-256 drift/,
+"S26 tampered two-role source rejected");
+
 // P7-S25: each exact restored witness must have project ownership in addition
 // to being visible through its present-tense consumer. Dropping a single typed
 // edge must fail without changing the accepted CURRENT/FULL selector.
