@@ -101,3 +101,15 @@ relations:
     target:
       kind: artifact
       path: web/contract-observatory/test/visual-consumer.test.mjs
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-context-dualization-a75b.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-static-fixity-a7.test.ts
