@@ -104,6 +104,17 @@ for (const [observer, target] of [
   "S25 orphaned evidence cannot be hidden by retaining an unused requires: " + target);
 }
 
+// S25: the synthetic CURRENT-tier reference must not be satisfied merely by
+// repeating its filename in the S25 observer inventory or negative tests.
+const s25TierSource = readFileSync(resolve("..", "ts/test/test-tier.test.ts"), "utf8");
+const s25TierProbe = 'const evidenceOnly = "ts/test/research-v013-context-dualization-a75b.test.ts";';
+assert.ok(s25TierSource.includes(s25TierProbe));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  "ts/test/test-tier.test.ts": s25TierSource.replace(s25TierProbe,
+    'const evidenceOnly = "ts/test/s25-missing-context-dualization.test.ts";'),
+}), /S25 tier synthetic evidence source probe was removed/,
+"S25 no self-referential CURRENT evidence source witness");
+
 // P7-S16: protected historical lineage is an actual policy obligation, not
 // a discretionary bulk J1 relation. Test both missing typed ownership and
 // silent policy removal independently from exact real source files.
