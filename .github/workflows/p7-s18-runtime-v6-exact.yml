@@ -48,8 +48,8 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          print("EXPECTED_S25_OWNED_SOURCES",sorted(expected))
           expected={'ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts','ts/test/research-v013-context-dualization-a75b.test.ts','ts/test/research-v013-static-fixity-a7.test.ts','ts/test/research-v013-finite-recursive-description-boundary.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-physical-dot-bootstrap.test.ts'}
+          print("EXPECTED_S25_OWNED_SOURCES",sorted(expected))
           assert o['j1']['tracked']==651 and o['j1']['justified']==540, "unexpected J1 counts"
           assert len(paths)==111 and not expected.intersection(paths), "unexpected six restored witness ownership"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
