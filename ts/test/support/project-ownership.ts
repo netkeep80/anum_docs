@@ -444,6 +444,11 @@ export function verifyProjectOwnership(
       fail("S25 restored witness lost live consumer: " + observer + " -> " + target);
     if (observer.endsWith(".test.ts") && !observedSource.includes("readFileSync"))
       fail("S25 executable observer lost source-reading capability: " + observer);
+    // This CURRENT tier mutation must be an actually executed source probe,
+    // not merely an occurrence of the path inside S25's own test metadata.
+    if (target === "ts/test/research-v013-context-dualization-a75b.test.ts" &&
+        !observedSource.includes('const evidenceOnly = "' + target + '";'))
+      fail("S25 tier synthetic evidence source probe was removed");
     if (observer === "proofs/v015-evidence/gpr09-c-boundary-chirality.json") {
       const record = object(JSON.parse(observedSource), "S25 GPR09 evidence");
       if (!array(record.executableWitnesses, "S25 GPR09 executableWitnesses").includes(target))
