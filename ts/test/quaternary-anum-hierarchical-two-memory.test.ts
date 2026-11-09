@@ -108,6 +108,12 @@ interface FixtureExpectation {
   ) => void;
 }
 
+// ADVERSARIAL MUTANT ONLY: shadow the apparent built-in freeze with a skip.
+const Object = {
+  is: globalThis.Object.is,
+  freeze<T>(items: readonly T[]): readonly T[] { return items.slice(1); },
+};
+
 const fixtures: readonly FixtureExpectation[] = Object.freeze([
   {
     path: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",
