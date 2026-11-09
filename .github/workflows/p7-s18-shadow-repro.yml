@@ -27,6 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
           npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           npm --prefix ts run build
       - name: Show original project-ownership checker false-green
