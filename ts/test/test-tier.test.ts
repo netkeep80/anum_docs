@@ -61,7 +61,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 439);
+assert.equal(p7CandidateWitness.exactRelations, 445);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -70,6 +70,51 @@ assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 11);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
+
+// P7-S25: each exact restored witness must have project ownership in addition
+// to being visible through its present-tense consumer. Dropping a single typed
+// edge must fail without changing the accepted CURRENT/FULL selector.
+for (const [id, target] of [
+  ["MTS-PROJECT-CI-01", "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"],
+  ["MTS-PROJECT-PROOF-PROVENANCE-01", "ts/test/research-v013-finite-recursive-description-boundary.test.ts"],
+  ["MTS-PROJECT-PUBLICATION-01", "ts/test/research-physical-dot-bootstrap.test.ts"],
+] as const) {
+  const ownerPath = "requirements/project/" + id + ".rg.yaml";
+  const original = readFileSync(resolve("..", ownerPath), "utf8");
+  const clause = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: " + target + "\\n";
+  const exactClause = clause.replaceAll("\\n", "\n");
+  assert.ok(original.includes(exactClause), "S25 exact ownership edge retained: " + target);
+  assert.throws(() => verifyProjectOwnership(resolve(".."), {
+    [ownerPath]: original.replace(exactClause, ""),
+  }), /missing requires witness/, "S25 restored executable source needs typed causal ownership: " + target);
+}
+
+// S25: removing a real observer-to-source reference must also fail even if
+// the Requirement relation still exists. One negative probe per owner class.
+for (const [observer, target] of [
+  ["ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts", "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts"],
+  ["ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts", "ts/test/research-v013-finite-recursive-description-boundary.test.ts"],
+  ["web/contract-observatory/test/invariant-traceability.test.ts", "ts/test/research-physical-dot-bootstrap.test.ts"],
+] as const) {
+  const original = readFileSync(resolve("..", observer), "utf8");
+  assert.ok(original.includes(target), "S25 observer still reads exact witness: " + target);
+  assert.throws(() => verifyProjectOwnership(resolve(".."), {
+    [observer]: original.replace(target, "ts/test/s25-deleted-exact-witness.test.ts"),
+  }), /S25 restored witness lost live consumer/,
+  "S25 orphaned evidence cannot be hidden by retaining an unused requires: " + target);
+}
+
+// S25: the synthetic CURRENT-tier reference must not be satisfied merely by
+// repeating its filename in the S25 observer inventory or negative tests.
+const s25TierSource = readFileSync(resolve("..", "ts/test/test-tier.test.ts"), "utf8");
+const s25TierProbe = 'const evidenceOnly = "ts/test/research-v013-context-dualization-a75b.test.ts";';
+assert.ok(s25TierSource.split(/\r?\n/).some(line => line.trim() === s25TierProbe));
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  "ts/test/test-tier.test.ts": s25TierSource.replace(
+    /^  const evidenceOnly = "ts\/test\/research-v013-context-dualization-a75b\.test\.ts";$/m,
+    '  const evidenceOnly = "ts/test/s25-missing-context-dualization.test.ts";'),
+}), /S25 tier synthetic evidence source probe was removed/,
+"S25 no self-referential CURRENT evidence source witness");
 
 // P7-S16: protected historical lineage is an actual policy obligation, not
 // a discretionary bulk J1 relation. Test both missing typed ownership and

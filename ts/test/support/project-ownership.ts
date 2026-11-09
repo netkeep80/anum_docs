@@ -425,6 +425,39 @@ export function verifyProjectOwnership(
 
 
   const proofOwner = get("MTS-PROJECT-PROOF-PROVENANCE-01");
+  // P7-S25: six S23-restored sources have exact current observers; unlike
+  // unreferenced historical tests, these cannot disappear from HEAD without
+  // breaking current FULL/Observatory or proof-evidence functions.
+  // Consumers and target paths are deliberately enumerated, not inferred from
+  // a test filename prefix or the broad FULL tier.
+  const restoredWitnesses = [
+    ["MTS-PROJECT-CI-01", "ts/test/research-v013-append-only-currentness-falsifier-a72n.test.ts", "ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts"],
+    ["MTS-PROJECT-CI-01", "ts/test/research-v013-context-dualization-a75b.test.ts", "ts/test/test-tier.test.ts"],
+    ["MTS-PROJECT-CI-01", "ts/test/research-v013-static-fixity-a7.test.ts", "ts/test/codec-capability-model.test.ts"],
+    ["MTS-PROJECT-PROOF-PROVENANCE-01", "ts/test/research-v013-finite-recursive-description-boundary.test.ts", "ts/test/v015-fnd05-formal-statement-candidate-b22.test.ts"],
+    ["MTS-PROJECT-PROOF-PROVENANCE-01", "ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts", "proofs/v015-evidence/gpr09-c-boundary-chirality.json"],
+    ["MTS-PROJECT-PUBLICATION-01", "ts/test/research-physical-dot-bootstrap.test.ts", "web/contract-observatory/test/invariant-traceability.test.ts"],
+  ] as const;
+  for (const [owner, target, observer] of restoredWitnesses) {
+    const observedSource = read(observer);
+    if (!observedSource.includes(target))
+      fail("S25 restored witness lost live consumer: " + observer + " -> " + target);
+    if (observer.endsWith(".test.ts") && !observedSource.includes("readFileSync"))
+      fail("S25 executable observer lost source-reading capability: " + observer);
+    // This CURRENT tier mutation must be an actually executed source probe,
+    // not merely an occurrence of the path inside S25's own test metadata.
+    if (target === "ts/test/research-v013-context-dualization-a75b.test.ts" &&
+        !observedSource.split(/\r?\n/).some(line => line.trim() ===
+          'const evidenceOnly = "' + target + '";'))
+      fail("S25 tier synthetic evidence source probe was removed");
+    if (observer === "proofs/v015-evidence/gpr09-c-boundary-chirality.json") {
+      const record = object(JSON.parse(observedSource), "S25 GPR09 evidence");
+      if (!array(record.executableWitnesses, "S25 GPR09 executableWitnesses").includes(target))
+        fail("S25 GPR09 current executable evidence witness was removed");
+    }
+    assertRelation(owner, target, "requires");
+  }
+
   // S8: retain only current replay inputs named by actual CURRENT tests.
   // The frozen integrity test reads the six exact package/evidence pairs;
   // the parameterized Boolean replay reads four FORMAL/JSON source pairs and

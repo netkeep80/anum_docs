@@ -505,3 +505,7 @@ relations:
     target:
       kind: artifact
       path: requirements/publication/MTS-EA-v1.yaml
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/research-physical-dot-bootstrap.test.ts
