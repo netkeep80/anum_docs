@@ -447,7 +447,7 @@ export function verifyProjectOwnership(
     // This CURRENT tier mutation must be an actually executed source probe,
     // not merely an occurrence of the path inside S25's own test metadata.
     if (target === "ts/test/research-v013-context-dualization-a75b.test.ts" &&
-        !observedSource.split(/\\r?\\n/).some(line => line.trim() ===
+        !observedSource.split(/\r?\n/).some(line => line.trim() ===
           'const evidenceOnly = "' + target + '";'))
       fail("S25 tier synthetic evidence source probe was removed");
     if (observer === "proofs/v015-evidence/gpr09-c-boundary-chirality.json") {
