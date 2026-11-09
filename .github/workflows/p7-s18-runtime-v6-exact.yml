@@ -49,5 +49,6 @@ jobs:
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
+          for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
