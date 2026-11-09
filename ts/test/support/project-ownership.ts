@@ -368,9 +368,65 @@ export function verifyProjectOwnership(
     return paths;
   };
 
+  // P7-S18-AUD-002: a spelling match to Object.freeze or readFileSync is
+  // insufficient unless those names actually denote the built-in Object
+  // and the node:fs reader. A shadow can leave all literal paths intact
+  // while running fewer (or zero) physical reads. Accept only the exact
+  // current import and reject any rebind in the consumer source.
+  const assertUnshadowedFixturePrimitives = (source: ts.SourceFile, testPath: string): void => {
+    let nodeFsImportCount = 0;
+    for (const statement of source.statements) {
+      if (!ts.isImportDeclaration(statement) ||
+          !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+      const moduleName = statement.moduleSpecifier.text;
+      const clause = statement.importClause;
+      if (clause?.name !== undefined &&
+          (clause.name.text === "Object" || clause.name.text === "readFileSync"))
+        fail("S18 fixture primitive import must not alias a built-in: " + testPath);
+      const named = clause?.namedBindings;
+      if (named !== undefined && ts.isNamespaceImport(named) &&
+          (named.name.text === "Object" || named.name.text === "readFileSync"))
+        fail("S18 fixture primitive namespace import must not shadow: " + testPath);
+      if (named === undefined || !ts.isNamedImports(named)) continue;
+      for (const element of named.elements) {
+        if (element.name.text === "Object")
+          fail("S18 built-in Object must not be imported/shadowed: " + testPath);
+        if (element.name.text === "readFileSync") {
+          if (moduleName !== "node:fs" || element.propertyName !== undefined ||
+              element.isTypeOnly)
+            fail("S18 readFileSync must come directly from node:fs: " + testPath);
+          nodeFsImportCount++;
+        }
+      }
+    }
+    if (nodeFsImportCount !== 1)
+      fail("S18 readFileSync must have one direct node:fs import: " + testPath);
+    const forbidden = (name: ts.Identifier | undefined): void => {
+      if (name !== undefined && (name.text === "Object" || name.text === "readFileSync"))
+        fail("S18 fixture primitive shadowed by local binding: " + testPath);
+    };
+    const visit = (node: ts.Node): void => {
+      if ((ts.isVariableDeclaration(node) || ts.isParameter(node) ||
+           ts.isBindingElement(node)) && ts.isIdentifier(node.name))
+        forbidden(node.name);
+      if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) ||
+           ts.isClassDeclaration(node)) && node.name !== undefined)
+        forbidden(node.name);
+      if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+          ts.isPropertyAccessExpression(node.left) &&
+          ts.isIdentifier(node.left.expression) &&
+          node.left.expression.text === "Object" &&
+          node.left.name.text === "freeze")
+        fail("S18 built-in Object.freeze must not be reassigned: " + testPath);
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+  };
+
   for (const testPath of conformanceConsumers) {
     const source = ts.createSourceFile(testPath, read(testPath),
       ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    assertUnshadowedFixturePrimitives(source, testPath);
     if (testPath === "ts/test/quaternary-anum-hierarchical-two-memory.test.ts") {
       const indexed = hierarchicalTopLevelReads(source);
       if (directTopLevelReads(source).length !== 0)

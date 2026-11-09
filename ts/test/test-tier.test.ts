@@ -178,6 +178,34 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /S18 direct conformance test fixture reader changed/,
   "S18-AUD-001: uninvoked arrow reader cannot support an actual FULL dependency");
 
+// P7-S18-AUD-002: a local Object.freeze can silently truncate the actual
+// loop while retaining the literal source array, the for-of and its first
+// read. This counterexample was reproduced independently on Actions #42589007515:
+// typecheck PASS, test-tier PASS, consumer GREEN, only 3 of 4 reads occurred.
+const s18ObjectShadow = s18IndexedSource.replace(
+  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
+  'const Object = {\n  is: globalThis.Object.is,\n  freeze<T>(items: readonly T[]): readonly T[] { return items.slice(1); },\n};\nconst fixtures: readonly FixtureExpectation[] = Object.freeze([',
+);
+assert.notEqual(s18ObjectShadow, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18ObjectShadow,
+}), /S18 fixture primitive shadowed by local binding/,
+  "S18-AUD-002: a local freeze implementation must never masquerade as global Object.freeze");
+
+const s18ByteConsumerPath = "ts/test/v012-string-utf8-boundary.test.ts";
+const s18ByteConsumerSource = readFileSync(resolve("..", s18ByteConsumerPath), "utf8");
+const s18ActualBlock = '{\n  const fixture = new Uint8Array(\n    readFileSync("../examples/anum/conformance/string-utf8-mixed.string.anum"),';
+assert.ok(s18ByteConsumerSource.includes(s18ActualBlock));
+const s18FakeReader = s18ByteConsumerSource.replace(s18ActualBlock,
+  '{\n  const readFileSync = (_unusedPath: string) => new TextEncoder().encode("A∞[");\n' +
+  '  const fixture = new Uint8Array(\n' +
+  '    readFileSync("../examples/anum/conformance/string-utf8-mixed.string.anum"),');
+assert.notEqual(s18FakeReader, s18ByteConsumerSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18ByteConsumerPath]: s18FakeReader,
+}), /S18 fixture primitive shadowed by local binding/,
+  "S18-AUD-002: shadowed node:fs readFileSync must not support current fixture ownership");
+
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
 assert.throws(
