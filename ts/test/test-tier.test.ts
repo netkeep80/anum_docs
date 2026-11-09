@@ -9,6 +9,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { listRepositoryMarkdownSurface } from "../src/tooling/markdown-section-adapter.js";
 import {
   buildTestTierPlan,
+  runS18FixtureWitness,
   classifyTestPaths,
   selectTestTier,
 } from "../src/tooling/test-tier.js";
@@ -143,134 +144,43 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /S18 conformance fixture executable FULL coverage relation coverage mismatches/,
   "S18: changes to parameterized fixtures must fail closed");
 
-// P7-S18-AUD-001: these three independent audit mutants originally passed
-// the AST path census despite losing actual readFileSync execution.
-const s18FilteredFixtureList = s18IndexedSource
-  .replace("const fixtures: readonly FixtureExpectation[]",
-    "const declaredFixtures: readonly FixtureExpectation[]")
-  .replace("for (const fixture of fixtures) {",
-    "const fixtures = declaredFixtures.slice(1);\nfor (const fixture of fixtures) {");
-assert.notEqual(s18FilteredFixtureList, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18FilteredFixtureList,
-}), /S18 hierarchical fixture collection must directly freeze the used literal array/,
-  "S18-AUD-001: sliced intermediate binding must not claim the skipped fixture");
+// S18: observe physical reads from child processes, not AST spelling.
+const s18WitnessDir = mkdtempSync(join(tmpdir(), "mts-s18-witness-"));
+const s18WitnessRoot = resolve("..");
+const s18A = "examples/anum/conformance/q-flat-110.anum";
+const s18B = "examples/anum/conformance/q-hierarchical-byte-4d.anum";
+const s18ReadA = 'import { readFileSync } from "node:fs";\n' +
+  'readFileSync(' + JSON.stringify(resolve(s18WitnessRoot, s18A)) + ');\n';
+const s18ReadB = 'readFileSync(' + JSON.stringify(resolve(s18WitnessRoot, s18B)) + ');\n';
+try {
+  const healthy = join(s18WitnessDir, "healthy.mjs");
+  writeFileSync(healthy, s18ReadA + s18ReadB);
+  assert.doesNotThrow(() => runS18FixtureWitness(
+    healthy, [s18A, s18B], s18WitnessRoot));
 
-const s18SkippedRead = s18IndexedSource.replace(
-  "for (const fixture of fixtures) {",
-  'for (const fixture of fixtures) {\n  if (fixture.path.endsWith("q-hierarchical-byte-4d.anum")) continue;',
-);
-assert.notEqual(s18SkippedRead, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18SkippedRead,
-}), /S18 hierarchical fixture first read is no longer unconditional/,
-  "S18-AUD-001: continue before actual read must reject a dropped fixture");
+  const before = join(s18WitnessDir, "exit-before.mjs");
+  writeFileSync(before, 'process.exit(0);\n' + s18ReadA + s18ReadB);
+  assert.throws(() => runS18FixtureWitness(
+    before, [s18A, s18B], s18WitnessRoot),
+  /S18 physical fixture read mismatch/,
+  "S18-AUD-004: exit(0) before fixture read must fail");
 
-const s18ReadCall = 'readFileSync("../examples/anum/conformance/q-flat-110.anum", "utf8")';
-assert.ok(s18TestSource.includes(s18ReadCall));
-const s18InlinedFixture = JSON.stringify(
-  readFileSync(resolve("..", "examples/anum/conformance/q-flat-110.anum"), "utf8"));
-const s18DetachedRead = s18TestSource.replace(s18ReadCall, s18InlinedFixture) +
-  "\nconst unusedFixtureReader = () => " + s18ReadCall + ";\n";
-assert.notEqual(s18DetachedRead, s18TestSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18TestPath]: s18DetachedRead,
-}), /S18 direct conformance test fixture reader changed/,
-  "S18-AUD-001: uninvoked arrow reader cannot support an actual FULL dependency");
+  const afterOne = join(s18WitnessDir, "exit-after-one.mjs");
+  writeFileSync(afterOne, s18ReadA + 'process.exit(0);\n' + s18ReadB);
+  assert.throws(() => runS18FixtureWitness(
+    afterOne, [s18A, s18B], s18WitnessRoot),
+  /S18 physical fixture read mismatch/,
+  "S18-AUD-004: exit(0) inside first fixture's verification must fail");
 
-// P7-S18-AUD-002: a local Object.freeze can silently truncate the actual
-// loop while retaining the literal source array, the for-of and its first
-// read. This counterexample was reproduced independently on Actions #42589007515:
-// typecheck PASS, test-tier PASS, consumer GREEN, only 3 of 4 reads occurred.
-const s18ObjectShadow = s18IndexedSource.replace(
-  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
-  'const Object = {\n  is: globalThis.Object.is,\n  freeze<T>(items: readonly T[]): readonly T[] { return items.slice(1); },\n};\nconst fixtures: readonly FixtureExpectation[] = Object.freeze([',
-);
-assert.notEqual(s18ObjectShadow, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18ObjectShadow,
-}), /S18 fixture primitive shadowed by local binding/,
-  "S18-AUD-002: a local freeze implementation must never masquerade as global Object.freeze");
-
-const s18ByteConsumerPath = "ts/test/v012-string-utf8-boundary.test.ts";
-const s18ByteConsumerSource = readFileSync(resolve("..", s18ByteConsumerPath), "utf8");
-const s18ActualBlock = '{\n  const fixture = new Uint8Array(\n    readFileSync("../examples/anum/conformance/string-utf8-mixed.string.anum"),';
-assert.ok(s18ByteConsumerSource.includes(s18ActualBlock));
-const s18FakeReader = s18ByteConsumerSource.replace(s18ActualBlock,
-  '{\n  const readFileSync = (_unusedPath: string) => new TextEncoder().encode("A∞[");\n' +
-  '  const fixture = new Uint8Array(\n' +
-  '    readFileSync("../examples/anum/conformance/string-utf8-mixed.string.anum"),');
-assert.notEqual(s18FakeReader, s18ByteConsumerSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18ByteConsumerPath]: s18FakeReader,
-}), /S18 fixture primitive shadowed by local binding/,
-  "S18-AUD-002: shadowed node:fs readFileSync must not support current fixture ownership");
-
-// P7-S18-AUD-003: descriptor mutation of the actual global Object.freeze
-// used to truncate the loop while retaining its original lexical AST shape.
-const s18GlobalDescriptorMutation = s18IndexedSource.replace(
-  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
-  'const savedFreeze = Object.freeze;\n' +
-  'Object.defineProperty(Object, "freeze", { configurable: true, writable: true, ' +
-  'value: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
-  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
-).replace(
-  "]);\n\nfor (const fixture of fixtures) {",
-  ']);\nObject.defineProperty(Object, "freeze", ' +
-  '{ configurable: true, writable: true, value: savedFreeze });\n\n' +
-  'for (const fixture of fixtures) {',
-);
-assert.notEqual(s18GlobalDescriptorMutation, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18GlobalDescriptorMutation,
-}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
-  "S18-AUD-003: global freeze descriptor mutation must fail closed");
-
-const s18GlobalAssignMutation = s18IndexedSource.replace(
-  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
-  'const savedFreeze = Object.freeze;\n' +
-  'Object.assign(Object, { freeze: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
-  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
-);
-assert.notEqual(s18GlobalAssignMutation, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18GlobalAssignMutation,
-}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
-  "S18-AUD-003: Object.assign mutation cannot silently skip a fixture");
-
-const s18GlobalAliasMutation = s18IndexedSource.replace(
-  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
-  'const objectAlias = Object;\n' +
-  'Object.defineProperty(objectAlias, "freeze", { configurable: true, writable: true, ' +
-  'value: <T>(items: readonly T[]): readonly T[] => items.slice(1) });\n' +
-  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
-);
-assert.notEqual(s18GlobalAliasMutation, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18GlobalAliasMutation,
-}), /S18 fixture global Object must only be a direct freeze\/is receiver/,
-  "S18-AUD-003: alias-based global mutation cannot count four reads");
-
-const s18PreambleMutation = s18IndexedSource.replace(
-  "const fixtures: readonly FixtureExpectation[] = Object.freeze([",
-  'console.log("injected prelude");\n' +
-  'const fixtures: readonly FixtureExpectation[] = Object.freeze([',
-);
-assert.notEqual(s18PreambleMutation, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18PreambleMutation,
-}), /S18 hierarchical fixture preamble must not execute statements/,
-  "S18-AUD-003: unrecognized executable prelude must fail closed");
-
-const s18ComputedPropertyMutation = s18IndexedSource.replace(
-  'path: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",',
-  '[("path")]: "../examples/anum/conformance/q-hierarchical-byte-4d.anum",',
-);
-assert.notEqual(s18ComputedPropertyMutation, s18IndexedSource);
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s18IndexedTest]: s18ComputedPropertyMutation,
-}), /S18 hierarchical fixture object has executable or unknown property/,
-  "S18-AUD-003: computed fixture property cannot hide initialization effects");
+  const afterAll = join(s18WitnessDir, "exit-after-all.mjs");
+  writeFileSync(afterAll, s18ReadA + s18ReadB + 'process.exit(0);\n');
+  assert.throws(() => runS18FixtureWitness(
+    afterAll, [s18A, s18B], s18WitnessRoot),
+  /S18 explicit process.exit/,
+  "S18-AUD-004: even after reads, explicit exit is not normal completion");
+} finally {
+  rmSync(s18WitnessDir, { recursive: true, force: true });
+}
 
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");

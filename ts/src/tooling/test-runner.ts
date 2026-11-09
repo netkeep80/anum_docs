@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { buildTestTierPlan, selectTestTier, type TestTier } from "./test-tier.js";
+import {
+  buildTestTierPlan, runS18FixtureWitness, selectTestTier, type TestTier,
+} from "./test-tier.js";
 
 function fail(message: string): never {
   throw new Error(`test-runner: ${message}`);
@@ -55,10 +57,42 @@ console.log(
   ].join(" "),
 );
 
+// S18: five existing FULL-only conformance consumers and their eight inputs.
+const s18FullFixtures: Readonly<Record<string, readonly string[]>> = {
+  "anum-two-memory-conformance.test.js": [
+    "examples/anum/conformance/q-flat-110.anum",
+  ],
+  "quaternary-anum-hierarchical-two-memory.test.js": [
+    "examples/anum/conformance/q-hierarchical-byte-4d.anum",
+    "examples/anum/conformance/q-hierarchical-relative-indirect.anum",
+    "examples/anum/conformance/q-hierarchical-adjacent-bytes.anum",
+    "examples/anum/conformance/q-hierarchical-nested-byte-pair.anum",
+  ],
+  "string-anum-two-memory-conformance.test.js": [
+    "examples/anum/conformance/string-flat-ab.string.anum",
+  ],
+  "v012-string-utf8-boundary.test.js": [
+    "examples/anum/conformance/string-utf8-mixed.string.anum",
+  ],
+  "v013-file-wire-conformance.test.js": [
+    "examples/anum/conformance/v013-structural-1968698.anum",
+  ],
+};
+if (tier === "full") {
+  for (const name of Object.keys(s18FullFixtures)) {
+    if (!selectedBuiltTests.includes(name))
+      fail("S18 mandatory FULL conformance consumer is absent: " + name);
+  }
+}
 const selectedBuiltSet = new Set(selectedBuiltTests);
 for (const test of builtTests) {
   if (!selectedBuiltSet.has(test)) continue;
   console.log(`\n[test] ${test}`);
+  const requiredS18Inputs = tier === "full" ? s18FullFixtures[test] : undefined;
+  if (requiredS18Inputs !== undefined) {
+    runS18FixtureWitness(join(builtDirectory, test), requiredS18Inputs, repositoryRoot);
+    continue;
+  }
   const result = spawnSync(process.execPath, [join(builtDirectory, test)], {
     stdio: "inherit",
   });

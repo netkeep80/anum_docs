@@ -204,9 +204,8 @@ export function verifyProjectOwnership(
   assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", casePath, "requires");
 
   // P7-S18: conformance fixtures are present-tense FULL test file inputs.
-  // Derive the set from actual readFileSync calls in the five FULL tests,
-  // including the parameterized hierarchical fixture loop. Do not blanket
-  // claim all examples or count comments as executable readers.
+  // AST inventories references, not executed reads. The FULL runner proves
+  // exact physical inputs separately. Never claim arbitrary examples/**.
   const conformanceConsumers = [
     "ts/test/anum-two-memory-conformance.test.ts",
     "ts/test/quaternary-anum-hierarchical-two-memory.test.ts",
@@ -216,273 +215,46 @@ export function verifyProjectOwnership(
   ] as const;
   const fixturePrefix = "../examples/anum/conformance/";
   const observedConformancePaths = new Set<string>();
-
-  // A reader nested in an uncalled function/arrow, conditional or callback
-  // does not witness an executed FULL test dependency. Only the existing
-  // immediate, top-level const initializers are admitted, with two explicit
-  // synchronous byte-wrapper forms; anything else fails closed.
-  const immediateFixtureRead = (initializer: ts.Expression): string | undefined => {
-    let readExpression: ts.Expression = initializer;
-    if (ts.isNewExpression(initializer)) {
-      if (!ts.isIdentifier(initializer.expression) ||
-          initializer.expression.text !== "Uint8Array" ||
-          initializer.arguments?.length !== 1 || initializer.arguments[0] === undefined)
-        return undefined;
-      readExpression = initializer.arguments[0];
-    } else if (ts.isCallExpression(initializer) &&
-               ts.isPropertyAccessExpression(initializer.expression) &&
-               ts.isIdentifier(initializer.expression.expression) &&
-               initializer.expression.expression.text === "Uint8Array" &&
-               initializer.expression.name.text === "from") {
-      const wrapperArg = initializer.arguments[0];
-      if (initializer.arguments.length !== 1 || wrapperArg === undefined)
-        return undefined;
-      readExpression = wrapperArg;
-    }
-    if (!ts.isCallExpression(readExpression) ||
-        !ts.isIdentifier(readExpression.expression) ||
-        readExpression.expression.text !== "readFileSync" ||
-        (readExpression.arguments.length !== 1 && readExpression.arguments.length !== 2))
-      return undefined;
-    const path = readExpression.arguments[0];
-    if (path === undefined || !ts.isStringLiteral(path) ||
-        !path.text.startsWith(fixturePrefix))
-      return undefined;
-    return path.text.slice(3);
-  };
-  const directTopLevelReads = (source: ts.SourceFile): string[] => {
-    const observed: string[] = [];
-    const examine = (statement: ts.Statement): void => {
-      if (!ts.isVariableStatement(statement) ||
-          !(statement.declarationList.flags & ts.NodeFlags.Const) ||
-          statement.declarationList.declarations.length !== 1)
-        return;
-      const initializer = statement.declarationList.declarations[0]?.initializer;
-      if (initializer === undefined) return;
-      const path = immediateFixtureRead(initializer);
-      if (path !== undefined) observed.push(path);
-    };
-    for (const statement of source.statements) {
-      if (ts.isBlock(statement)) {
-        // A bare module-level block is executed when the test is imported.
-        // Never recurse into an if/loop/function that might be unreachable.
-        for (const nested of statement.statements) examine(nested);
-      } else examine(statement);
-    }
-    return observed;
-  };
-
-  const hierarchicalTopLevelReads = (source: ts.SourceFile): string[] => {
-    // Derive the data exclusively from the exact top-level binding used by
-    // the top-level for-of. Do not sweep arbitrary path properties in the AST.
-    const fixtureBindings: ts.VariableDeclaration[] = [];
-    const loops: ts.ForOfStatement[] = [];
-    let bindingPosition = -1, loopPosition = -1;
-    for (const [index, statement] of source.statements.entries()) {
-      if (ts.isVariableStatement(statement)) {
-        for (const declaration of statement.declarationList.declarations) {
-          if (ts.isIdentifier(declaration.name) && declaration.name.text === "fixtures") {
-            if (!(statement.declarationList.flags & ts.NodeFlags.Const))
-              fail("S18 hierarchical fixture binding is not const");
-            fixtureBindings.push(declaration);
-            bindingPosition = index;
-          }
-        }
-      }
-      if (ts.isForOfStatement(statement) && ts.isIdentifier(statement.expression) &&
-          statement.expression.text === "fixtures") {
-        loops.push(statement);
-        loopPosition = index;
-      }
-    }
-    if (fixtureBindings.length !== 1 || loops.length !== 1 ||
-        bindingPosition >= loopPosition)
-      fail("S18 hierarchical fixture collection/loop topology changed");
-    const binding = fixtureBindings[0];
-    const loop = loops[0];
-    if (binding === undefined || loop === undefined ||
-        binding.initializer === undefined ||
-        !ts.isCallExpression(binding.initializer) ||
-        !ts.isPropertyAccessExpression(binding.initializer.expression) ||
-        !ts.isIdentifier(binding.initializer.expression.expression) ||
-        binding.initializer.expression.expression.text !== "Object" ||
-        binding.initializer.expression.name.text !== "freeze" ||
-        binding.initializer.arguments.length !== 1 ||
-        !ts.isArrayLiteralExpression(binding.initializer.arguments[0]!))
-      fail("S18 hierarchical fixture collection must directly freeze the used literal array");
-    // AUD-003: the declaration must not be preceded by executable code.
-    // Extra imports may also mutate built-ins during module evaluation.
-    const approvedImports = [
-      "node:fs", "../src/anum.js", "../src/memory.js",
-      "../src/quaternary-anum.js",
-    ];
-    const actualImports = source.statements
-      .filter(ts.isImportDeclaration)
-      .map(statement => ts.isStringLiteral(statement.moduleSpecifier)
-        ? statement.moduleSpecifier.text : "");
-    equalPaths(sorted(actualImports), sorted(approvedImports),
-      "S18 hierarchical fixture exact import modules");
-    if (source.statements.slice(0, bindingPosition).some(statement =>
-      !(ts.isImportDeclaration(statement) || ts.isFunctionDeclaration(statement) ||
-        ts.isInterfaceDeclaration(statement) || ts.isTypeAliasDeclaration(statement))))
-      fail("S18 hierarchical fixture preamble must not execute statements");
-    if (loopPosition !== bindingPosition + 1)
-      fail("S18 hierarchical fixture loop must immediately follow literal initializer");
-    const literal = binding.initializer.arguments[0];
-    if (literal === undefined || !ts.isArrayLiteralExpression(literal) ||
-        literal.elements.length !== 4)
-      fail("S18 hierarchical fixture collection must contain exactly four objects");
-    const paths: string[] = [];
-    for (const element of literal.elements) {
-      if (!ts.isObjectLiteralExpression(element))
-        fail("S18 hierarchical fixture array contains a non-literal entry");
-      // Literal array members must have precisely the inert data fields
-      // and deferred verifyA method, never computed keys/spreads/getters.
-      const properties = element.properties.map(property => {
-        if (ts.isPropertyAssignment(property) && ts.isIdentifier(property.name) &&
-            (property.name.text === "path" || property.name.text === "canonical") &&
-            ts.isStringLiteral(property.initializer))
-          return property.name.text;
-        if (ts.isMethodDeclaration(property) && ts.isIdentifier(property.name) &&
-            property.name.text === "verifyA")
-          return property.name.text;
-        fail("S18 hierarchical fixture object has executable or unknown property");
-      });
-      if (sorted(properties).join(",") !== "canonical,path,verifyA")
-        fail("S18 hierarchical fixture object must have exact path/canonical/verifyA fields");
-      const pathProperties = element.properties.filter(property =>
-        ts.isPropertyAssignment(property) &&
-        ((ts.isIdentifier(property.name) && property.name.text === "path") ||
-         (ts.isStringLiteral(property.name) && property.name.text === "path")));
-      const pathProperty = pathProperties[0];
-      if (pathProperties.length !== 1 || pathProperty === undefined ||
-          !ts.isPropertyAssignment(pathProperty) ||
-          !ts.isStringLiteral(pathProperty.initializer) ||
-          !pathProperty.initializer.text.startsWith(fixturePrefix))
-        fail("S18 hierarchical fixture object lacks a single literal conformance path");
-      paths.push(pathProperty.initializer.text.slice(3));
-    }
-    const init = loop.initializer;
-    if (!ts.isVariableDeclarationList(init) ||
-        !(init.flags & ts.NodeFlags.Const) || init.declarations.length !== 1 ||
-        !ts.isIdentifier(init.declarations[0]!.name) ||
-        init.declarations[0]!.name.text !== "fixture" ||
-        init.declarations[0]!.initializer !== undefined ||
-        !ts.isBlock(loop.statement))
-      fail("S18 hierarchical fixture for-of must bind exactly const fixture");
-    // The first statement must read the current loop element unconditionally.
-    // Thus an early continue, return, guard or other skip cannot silently
-    // drop a dependency while leaving unrelated reads elsewhere in the file.
-    const first = loop.statement.statements[0];
-    if (first === undefined || !ts.isVariableStatement(first) ||
-        !(first.declarationList.flags & ts.NodeFlags.Const) ||
-        first.declarationList.declarations.length !== 1)
-      fail("S18 hierarchical fixture first read is no longer unconditional");
-    const readBinding = first.declarationList.declarations[0];
-    const readCall = readBinding?.initializer;
-    if (readBinding === undefined || !ts.isIdentifier(readBinding.name) ||
-        readBinding.name.text !== "source" ||
-        readCall === undefined || !ts.isCallExpression(readCall) ||
-        !ts.isIdentifier(readCall.expression) ||
-        readCall.expression.text !== "readFileSync" ||
-        readCall.arguments.length !== 2)
-      fail("S18 hierarchical fixture first read is not the actual source loader");
-    const pathArg = readCall.arguments[0];
-    const encodingArg = readCall.arguments[1];
-    if (pathArg === undefined || !ts.isPropertyAccessExpression(pathArg) ||
-        !ts.isIdentifier(pathArg.expression) || pathArg.expression.text !== "fixture" ||
-        pathArg.name.text !== "path" ||
-        encodingArg === undefined || !ts.isStringLiteral(encodingArg) ||
-        encodingArg.text !== "utf8")
-      fail("S18 hierarchical fixture read must use the bound loop element");
-    if (new Set(paths).size !== 4)
-      fail("S18 hierarchical fixture paths must be distinct");
-    return paths;
-  };
-
-  // P7-S18-AUD-002: a spelling match to Object.freeze or readFileSync is
-  // insufficient unless those names actually denote the built-in Object
-  // and the node:fs reader. A shadow can leave all literal paths intact
-  // while running fewer (or zero) physical reads. Accept only the exact
-  // current import and reject any rebind in the consumer source.
-  const assertUnshadowedFixturePrimitives = (source: ts.SourceFile, testPath: string): void => {
-    let nodeFsImportCount = 0;
-    for (const statement of source.statements) {
-      if (!ts.isImportDeclaration(statement) ||
-          !ts.isStringLiteral(statement.moduleSpecifier)) continue;
-      const moduleName = statement.moduleSpecifier.text;
-      const clause = statement.importClause;
-      if (clause?.name !== undefined &&
-          (clause.name.text === "Object" || clause.name.text === "readFileSync"))
-        fail("S18 fixture primitive import must not alias a built-in: " + testPath);
-      const named = clause?.namedBindings;
-      if (named !== undefined && ts.isNamespaceImport(named) &&
-          (named.name.text === "Object" || named.name.text === "readFileSync"))
-        fail("S18 fixture primitive namespace import must not shadow: " + testPath);
-      if (named === undefined || !ts.isNamedImports(named)) continue;
-      for (const element of named.elements) {
-        if (element.name.text === "Object")
-          fail("S18 built-in Object must not be imported/shadowed: " + testPath);
-        if (element.name.text === "readFileSync") {
-          if (moduleName !== "node:fs" || element.propertyName !== undefined ||
-              element.isTypeOnly)
-            fail("S18 readFileSync must come directly from node:fs: " + testPath);
-          nodeFsImportCount++;
-        }
-      }
-    }
-    if (nodeFsImportCount !== 1)
-      fail("S18 readFileSync must have one direct node:fs import: " + testPath);
-    const forbidden = (name: ts.Identifier | undefined): void => {
-      if (name !== undefined && (name.text === "Object" || name.text === "readFileSync"))
-        fail("S18 fixture primitive shadowed by local binding: " + testPath);
-    };
-    const visit = (node: ts.Node): void => {
-      if ((ts.isVariableDeclaration(node) || ts.isParameter(node) ||
-           ts.isBindingElement(node)) && ts.isIdentifier(node.name))
-        forbidden(node.name);
-      if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) ||
-           ts.isClassDeclaration(node)) && node.name !== undefined)
-        forbidden(node.name);
-      if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-          ts.isPropertyAccessExpression(node.left) &&
-          ts.isIdentifier(node.left.expression) &&
-          node.left.expression.text === "Object" &&
-          node.left.name.text === "freeze")
-        fail("S18 built-in Object.freeze must not be reassigned: " + testPath);
-      // Do not treat spelling Object.freeze/readFileSync as proof of the
-      // primitive's runtime identity: reject first-class/mutable aliases,
-      // reflective access and dynamic global primitive lookup.
-      if (ts.isIdentifier(node) && node.text === "Object" &&
-          !(ts.isPropertyAccessExpression(node.parent) && node.parent.expression === node &&
-            (node.parent.name.text === "freeze" || node.parent.name.text === "is")))
-        fail("S18 fixture global Object must only be a direct freeze/is receiver: " + testPath);
-      if (ts.isIdentifier(node) && node.text === "readFileSync" &&
-          !(ts.isImportSpecifier(node.parent) && node.parent.name === node) &&
-          !(ts.isCallExpression(node.parent) && node.parent.expression === node))
-        fail("S18 fixture readFileSync must only be imported or directly called: " + testPath);
-      if (ts.isIdentifier(node) &&
-          (node.text === "globalThis" || node.text === "eval" || node.text === "Reflect"))
-        fail("S18 fixture unsafe global/reflective access: " + testPath);
-      ts.forEachChild(node, visit);
-    };
-    visit(source);
-  };
-
   for (const testPath of conformanceConsumers) {
     const source = ts.createSourceFile(testPath, read(testPath),
       ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-    assertUnshadowedFixturePrimitives(source, testPath);
+    const literalReads = new Set<string>();
+    const fixtureDeclarations = new Set<string>();
+    let indexedRead = false, indexedLoop = false;
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === "readFileSync") {
+        const arg = node.arguments[0];
+        if (arg !== undefined && ts.isStringLiteral(arg) &&
+            arg.text.startsWith(fixturePrefix))
+          literalReads.add(arg.text.slice(3));
+        if (arg !== undefined && ts.isPropertyAccessExpression(arg) &&
+            ts.isIdentifier(arg.expression) && arg.expression.text === "fixture" &&
+            arg.name.text === "path")
+          indexedRead = true;
+      }
+      if (ts.isPropertyAssignment(node) &&
+          ((ts.isIdentifier(node.name) && node.name.text === "path") ||
+            (ts.isStringLiteral(node.name) && node.name.text === "path")) &&
+          ts.isStringLiteral(node.initializer) &&
+          node.initializer.text.startsWith(fixturePrefix))
+        fixtureDeclarations.add(node.initializer.text.slice(3));
+      if (ts.isForOfStatement(node) &&
+          ts.isIdentifier(node.expression) && node.expression.text === "fixtures" &&
+          node.initializer.getText(source) === "const fixture")
+        indexedLoop = true;
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
     if (testPath === "ts/test/quaternary-anum-hierarchical-two-memory.test.ts") {
-      const indexed = hierarchicalTopLevelReads(source);
-      if (directTopLevelReads(source).length !== 0)
-        fail("S18 hierarchical consumer contains unexpected direct fixture readers");
-      for (const path of indexed) observedConformancePaths.add(path);
+      if (!indexedRead || !indexedLoop || fixtureDeclarations.size !== 4 ||
+          literalReads.size !== 0)
+        fail("S18 hierarchical fixture loop/source reader changed");
+      for (const path of fixtureDeclarations) observedConformancePaths.add(path);
     } else {
-      const reads = directTopLevelReads(source);
-      if (reads.length !== 1)
+      if (literalReads.size !== 1 || indexedRead || fixtureDeclarations.size !== 0)
         fail("S18 direct conformance test fixture reader changed: " + testPath);
-      observedConformancePaths.add(reads[0]!);
+      for (const path of literalReads) observedConformancePaths.add(path);
     }
   }
   const observedConformance = sorted(observedConformancePaths);
