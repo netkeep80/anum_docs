@@ -216,46 +216,173 @@ export function verifyProjectOwnership(
   ] as const;
   const fixturePrefix = "../examples/anum/conformance/";
   const observedConformancePaths = new Set<string>();
+
+  // A reader nested in an uncalled function/arrow, conditional or callback
+  // does not witness an executed FULL test dependency. Only the existing
+  // immediate, top-level const initializers are admitted, with two explicit
+  // synchronous byte-wrapper forms; anything else fails closed.
+  const immediateFixtureRead = (initializer: ts.Expression): string | undefined => {
+    let readExpression: ts.Expression = initializer;
+    if (ts.isNewExpression(initializer)) {
+      if (!ts.isIdentifier(initializer.expression) ||
+          initializer.expression.text !== "Uint8Array" ||
+          initializer.arguments?.length !== 1 || initializer.arguments[0] === undefined)
+        return undefined;
+      readExpression = initializer.arguments[0];
+    } else if (ts.isCallExpression(initializer) &&
+               ts.isPropertyAccessExpression(initializer.expression) &&
+               ts.isIdentifier(initializer.expression.expression) &&
+               initializer.expression.expression.text === "Uint8Array" &&
+               initializer.expression.name.text === "from") {
+      const wrapperArg = initializer.arguments[0];
+      if (initializer.arguments.length !== 1 || wrapperArg === undefined)
+        return undefined;
+      readExpression = wrapperArg;
+    }
+    if (!ts.isCallExpression(readExpression) ||
+        !ts.isIdentifier(readExpression.expression) ||
+        readExpression.expression.text !== "readFileSync" ||
+        (readExpression.arguments.length !== 1 && readExpression.arguments.length !== 2))
+      return undefined;
+    const path = readExpression.arguments[0];
+    if (path === undefined || !ts.isStringLiteral(path) ||
+        !path.text.startsWith(fixturePrefix))
+      return undefined;
+    return path.text.slice(3);
+  };
+  const directTopLevelReads = (source: ts.SourceFile): string[] => {
+    const observed: string[] = [];
+    const examine = (statement: ts.Statement): void => {
+      if (!ts.isVariableStatement(statement) ||
+          !(statement.declarationList.flags & ts.NodeFlags.Const) ||
+          statement.declarationList.declarations.length !== 1)
+        return;
+      const initializer = statement.declarationList.declarations[0]?.initializer;
+      if (initializer === undefined) return;
+      const path = immediateFixtureRead(initializer);
+      if (path !== undefined) observed.push(path);
+    };
+    for (const statement of source.statements) {
+      if (ts.isBlock(statement)) {
+        // A bare module-level block is executed when the test is imported.
+        // Never recurse into an if/loop/function that might be unreachable.
+        for (const nested of statement.statements) examine(nested);
+      } else examine(statement);
+    }
+    return observed;
+  };
+
+  const hierarchicalTopLevelReads = (source: ts.SourceFile): string[] => {
+    // Derive the data exclusively from the exact top-level binding used by
+    // the top-level for-of. Do not sweep arbitrary path properties in the AST.
+    const fixtureBindings: ts.VariableDeclaration[] = [];
+    const loops: ts.ForOfStatement[] = [];
+    let bindingPosition = -1, loopPosition = -1;
+    for (const [index, statement] of source.statements.entries()) {
+      if (ts.isVariableStatement(statement)) {
+        for (const declaration of statement.declarationList.declarations) {
+          if (ts.isIdentifier(declaration.name) && declaration.name.text === "fixtures") {
+            if (!(statement.declarationList.flags & ts.NodeFlags.Const))
+              fail("S18 hierarchical fixture binding is not const");
+            fixtureBindings.push(declaration);
+            bindingPosition = index;
+          }
+        }
+      }
+      if (ts.isForOfStatement(statement) && ts.isIdentifier(statement.expression) &&
+          statement.expression.text === "fixtures") {
+        loops.push(statement);
+        loopPosition = index;
+      }
+    }
+    if (fixtureBindings.length !== 1 || loops.length !== 1 ||
+        bindingPosition >= loopPosition)
+      fail("S18 hierarchical fixture collection/loop topology changed");
+    const binding = fixtureBindings[0];
+    const loop = loops[0];
+    if (binding === undefined || loop === undefined ||
+        binding.initializer === undefined ||
+        !ts.isCallExpression(binding.initializer) ||
+        !ts.isPropertyAccessExpression(binding.initializer.expression) ||
+        !ts.isIdentifier(binding.initializer.expression.expression) ||
+        binding.initializer.expression.expression.text !== "Object" ||
+        binding.initializer.expression.name.text !== "freeze" ||
+        binding.initializer.arguments.length !== 1 ||
+        !ts.isArrayLiteralExpression(binding.initializer.arguments[0]!))
+      fail("S18 hierarchical fixture collection must directly freeze the used literal array");
+    const literal = binding.initializer.arguments[0];
+    if (literal === undefined || !ts.isArrayLiteralExpression(literal) ||
+        literal.elements.length !== 4)
+      fail("S18 hierarchical fixture collection must contain exactly four objects");
+    const paths: string[] = [];
+    for (const element of literal.elements) {
+      if (!ts.isObjectLiteralExpression(element))
+        fail("S18 hierarchical fixture array contains a non-literal entry");
+      const pathProperties = element.properties.filter(property =>
+        ts.isPropertyAssignment(property) &&
+        ((ts.isIdentifier(property.name) && property.name.text === "path") ||
+         (ts.isStringLiteral(property.name) && property.name.text === "path")));
+      const pathProperty = pathProperties[0];
+      if (pathProperties.length !== 1 || pathProperty === undefined ||
+          !ts.isPropertyAssignment(pathProperty) ||
+          !ts.isStringLiteral(pathProperty.initializer) ||
+          !pathProperty.initializer.text.startsWith(fixturePrefix))
+        fail("S18 hierarchical fixture object lacks a single literal conformance path");
+      paths.push(pathProperty.initializer.text.slice(3));
+    }
+    const init = loop.initializer;
+    if (!ts.isVariableDeclarationList(init) ||
+        !(init.flags & ts.NodeFlags.Const) || init.declarations.length !== 1 ||
+        !ts.isIdentifier(init.declarations[0]!.name) ||
+        init.declarations[0]!.name.text !== "fixture" ||
+        init.declarations[0]!.initializer !== undefined ||
+        !ts.isBlock(loop.statement))
+      fail("S18 hierarchical fixture for-of must bind exactly const fixture");
+    // The first statement must read the current loop element unconditionally.
+    // Thus an early continue, return, guard or other skip cannot silently
+    // drop a dependency while leaving unrelated reads elsewhere in the file.
+    const first = loop.statement.statements[0];
+    if (first === undefined || !ts.isVariableStatement(first) ||
+        !(first.declarationList.flags & ts.NodeFlags.Const) ||
+        first.declarationList.declarations.length !== 1)
+      fail("S18 hierarchical fixture first read is no longer unconditional");
+    const readBinding = first.declarationList.declarations[0];
+    const readCall = readBinding?.initializer;
+    if (readBinding === undefined || !ts.isIdentifier(readBinding.name) ||
+        readBinding.name.text !== "source" ||
+        readCall === undefined || !ts.isCallExpression(readCall) ||
+        !ts.isIdentifier(readCall.expression) ||
+        readCall.expression.text !== "readFileSync" ||
+        readCall.arguments.length !== 2)
+      fail("S18 hierarchical fixture first read is not the actual source loader");
+    const pathArg = readCall.arguments[0];
+    const encodingArg = readCall.arguments[1];
+    if (pathArg === undefined || !ts.isPropertyAccessExpression(pathArg) ||
+        !ts.isIdentifier(pathArg.expression) || pathArg.expression.text !== "fixture" ||
+        pathArg.name.text !== "path" ||
+        encodingArg === undefined || !ts.isStringLiteral(encodingArg) ||
+        encodingArg.text !== "utf8")
+      fail("S18 hierarchical fixture read must use the bound loop element");
+    if (new Set(paths).size !== 4)
+      fail("S18 hierarchical fixture paths must be distinct");
+    return paths;
+  };
+
   for (const testPath of conformanceConsumers) {
     const source = ts.createSourceFile(testPath, read(testPath),
       ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-    const literalReads = new Set<string>();
-    const fixtureDeclarations = new Set<string>();
-    let indexedRead = false, indexedLoop = false;
-    const visit = (node: ts.Node): void => {
-      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
-          node.expression.text === "readFileSync") {
-        const arg = node.arguments[0];
-        if (arg !== undefined && ts.isStringLiteral(arg) &&
-            arg.text.startsWith(fixturePrefix))
-          literalReads.add(arg.text.slice(3));
-        if (arg !== undefined && ts.isPropertyAccessExpression(arg) &&
-            ts.isIdentifier(arg.expression) && arg.expression.text === "fixture" &&
-            arg.name.text === "path")
-          indexedRead = true;
-      }
-      if (ts.isPropertyAssignment(node) &&
-          ((ts.isIdentifier(node.name) && node.name.text === "path") ||
-            (ts.isStringLiteral(node.name) && node.name.text === "path")) &&
-          ts.isStringLiteral(node.initializer) &&
-          node.initializer.text.startsWith(fixturePrefix))
-        fixtureDeclarations.add(node.initializer.text.slice(3));
-      if (ts.isForOfStatement(node) &&
-          ts.isIdentifier(node.expression) && node.expression.text === "fixtures" &&
-          node.initializer.getText(source) === "const fixture")
-        indexedLoop = true;
-      ts.forEachChild(node, visit);
-    };
-    visit(source);
+    if (source.parseDiagnostics.length !== 0)
+      fail("S18 FULL consumer source has AST parse diagnostics: " + testPath);
     if (testPath === "ts/test/quaternary-anum-hierarchical-two-memory.test.ts") {
-      if (!indexedRead || !indexedLoop || fixtureDeclarations.size !== 4 ||
-          literalReads.size !== 0)
-        fail("S18 hierarchical fixture loop/source reader changed");
-      for (const path of fixtureDeclarations) observedConformancePaths.add(path);
+      const indexed = hierarchicalTopLevelReads(source);
+      if (directTopLevelReads(source).length !== 0)
+        fail("S18 hierarchical consumer contains unexpected direct fixture readers");
+      for (const path of indexed) observedConformancePaths.add(path);
     } else {
-      if (literalReads.size !== 1 || indexedRead || fixtureDeclarations.size !== 0)
+      const reads = directTopLevelReads(source);
+      if (reads.length !== 1)
         fail("S18 direct conformance test fixture reader changed: " + testPath);
-      for (const path of literalReads) observedConformancePaths.add(path);
+      observedConformancePaths.add(reads[0]!);
     }
   }
   const observedConformance = sorted(observedConformancePaths);

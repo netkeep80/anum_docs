@@ -143,6 +143,41 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /S18 conformance fixture executable FULL coverage relation coverage mismatches/,
   "S18: changes to parameterized fixtures must fail closed");
 
+// P7-S18-AUD-001: these three independent audit mutants originally passed
+// the AST path census despite losing actual readFileSync execution.
+const s18FilteredFixtureList = s18IndexedSource
+  .replace("const fixtures: readonly FixtureExpectation[]",
+    "const declaredFixtures: readonly FixtureExpectation[]")
+  .replace("for (const fixture of fixtures) {",
+    "const fixtures = declaredFixtures.slice(1);\nfor (const fixture of fixtures) {");
+assert.notEqual(s18FilteredFixtureList, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18FilteredFixtureList,
+}), /S18 hierarchical fixture collection must directly freeze the used literal array/,
+  "S18-AUD-001: sliced intermediate binding must not claim the skipped fixture");
+
+const s18SkippedRead = s18IndexedSource.replace(
+  "for (const fixture of fixtures) {",
+  'for (const fixture of fixtures) {\n  if (fixture.path.endsWith("q-hierarchical-byte-4d.anum")) continue;',
+);
+assert.notEqual(s18SkippedRead, s18IndexedSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18IndexedTest]: s18SkippedRead,
+}), /S18 hierarchical fixture first read is no longer unconditional/,
+  "S18-AUD-001: continue before actual read must reject a dropped fixture");
+
+const s18ReadCall = 'readFileSync("../examples/anum/conformance/q-flat-110.anum", "utf8")';
+assert.ok(s18TestSource.includes(s18ReadCall));
+const s18InlinedFixture = JSON.stringify(
+  readFileSync(resolve("..", "examples/anum/conformance/q-flat-110.anum"), "utf8"));
+const s18DetachedRead = s18TestSource.replace(s18ReadCall, s18InlinedFixture) +
+  "\nconst unusedFixtureReader = () => " + s18ReadCall + ";\n";
+assert.notEqual(s18DetachedRead, s18TestSource);
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s18TestPath]: s18DetachedRead,
+}), /S18 direct conformance test fixture reader changed/,
+  "S18-AUD-001: uninvoked arrow reader cannot support an actual FULL dependency");
+
 const acceptedOwnerFile = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const acceptedOwnerSource = readFileSync(resolve("..", acceptedOwnerFile), "utf8");
 assert.throws(
