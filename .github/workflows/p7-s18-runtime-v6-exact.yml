@@ -29,15 +29,15 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s23-retire-unreferenced-research-by-falsification-20261109
-          git -C candidate checkout --detach aadbbc742b188d76c2961949398fa97fc7a627a7
-          test "$(git -C candidate rev-parse HEAD)" = "aadbbc742b188d76c2961949398fa97fc7a627a7"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "1a3087144008bf4c3e63929070ce894c37a04055"
+          git -C candidate checkout --detach ba85d95fd86bd1f4353115d5d965e010403c0308
+          test "$(git -C candidate rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=aadbbc742b188d76c2961949398fa97fc7a627a7
-          echo EXACT_TREE=1a3087144008bf4c3e63929070ce894c37a04055
+          echo EXACT_HEAD=ba85d95fd86bd1f4353115d5d965e010403c0308
+          echo EXACT_TREE=3ae09a7df6c196cd56290a979d02b4aefcbe3f6f
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base aadbbc742b188d76c2961949398fa97fc7a627a7 --head aadbbc742b188d76c2961949398fa97fc7a627a7 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base ba85d95fd86bd1f4353115d5d965e010403c0308 --head ba85d95fd86bd1f4353115d5d965e010403c0308 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,11 +48,11 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/test/research-physical-dot-bootstrap.test.ts','ts/test/research-v013-execution-entry-root-chirality-a68c.test.ts','ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts','ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
-          assert o['j1']['tracked']==649 and o['j1']['justified']==514, "unexpected J1 counts"
-          assert len(paths)==135 and not expected.intersection(paths), "unexpected six-resource trial"
+          expected={'ts/test/research-v013-formal-duality-a75c.test.ts','ts/test/research-v013-full-duality-audit-a75f.test.ts','ts/test/research-v013-grounded-execution-dualization-a75e.test.ts','ts/test/research-v013-theory-authority-dualization-a75d.test.ts'}
+          assert o['j1']['tracked']==651 and o['j1']['justified']==514, "unexpected J1 counts"
+          assert len(paths)==137 and not expected.intersection(paths), "unexpected four-resource trial"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S23_SIX_TRIAL_DELETIONS=PASS")
+          print("P7_S23_FOUR_TRIAL_DELETIONS=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: aadbbc742b188d76c2961949398fa97fc7a627a7
+          ref: ba85d95fd86bd1f4353115d5d965e010403c0308
           fetch-depth: 0
           submodules: true
           persist-credentials: false
@@ -78,8 +78,8 @@ jobs:
         working-directory: candidate
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "aadbbc742b188d76c2961949398fa97fc7a627a7"
-          test "$(git rev-parse HEAD^{tree})" = "1a3087144008bf4c3e63929070ce894c37a04055"
+          test "$(git rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
+          test "$(git rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
           npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
           npm ci --prefix ts --ignore-scripts --no-audit --no-fund
           npm --prefix ts run check:full
@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: aadbbc742b188d76c2961949398fa97fc7a627a7
+          ref: ba85d95fd86bd1f4353115d5d965e010403c0308
           fetch-depth: 0
           submodules: true
           persist-credentials: false
@@ -115,14 +115,14 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin main
-          test "$(git -C candidate rev-parse HEAD)" = "aadbbc742b188d76c2961949398fa97fc7a627a7"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "1a3087144008bf4c3e63929070ce894c37a04055"
+          test "$(git -C candidate rev-parse HEAD)" = "ba85d95fd86bd1f4353115d5d965e010403c0308"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "3ae09a7df6c196cd56290a979d02b4aefcbe3f6f"
           npm ci --prefix oldguard --omit=dev --ignore-scripts --no-audit --no-fund
           curl --fail --silent --show-error -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/netkeep80/anum_docs/pulls/2400" > "$RUNNER_TEMP/pr.json"
           python3 - <<'PY'
           import json,os
           tmp=os.environ['RUNNER_TEMP']; p=json.load(open(tmp+'/pr.json'))
-          obj={'repository':{'full_name':'netkeep80/anum_docs'},'pull_request':{'number':2400,'base':{'sha':'ace1aa51a3baaa0a7dd551a6914bc9c8362ec32d','ref':'main'},'head':{'sha':'aadbbc742b188d76c2961949398fa97fc7a627a7'},'body':p.get('body') or ''}}
+          obj={'repository':{'full_name':'netkeep80/anum_docs'},'pull_request':{'number':2400,'base':{'sha':'ace1aa51a3baaa0a7dd551a6914bc9c8362ec32d','ref':'main'},'head':{'sha':'ba85d95fd86bd1f4353115d5d965e010403c0308'},'body':p.get('body') or ''}}
           json.dump(obj,open(tmp+'/event.json','w'))
           PY
           export RG_EVENT_PATH="$RUNNER_TEMP/event.json"
@@ -146,4 +146,4 @@ jobs:
             print('LEGACY_JSON_PARSE_ERROR',str(e)); print(open(tmp+'/rg32.json').read()[:5000])
           print('LEGACY_STDERR',open(tmp+'/rg32.err').read()[:2500])
           PY
-          test "$rc" -eq 1
+          test "$rc" -eq 0
