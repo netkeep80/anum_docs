@@ -441,3 +441,43 @@ relations:
     target:
       kind: artifact
       path: audits/v015-theorem-statement-evidence-cases.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/v015-native-evidence-verifier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/v015-root-basis-evidence-verifier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/v015-semantic-metamodel-evidence-verifier-v02.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/v015-semantic-metamodel-evidence-verifier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/tooling/v015-theorem-statement-evidence-verifier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v015-proof-source.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-native-evidence-verifier.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-root-basis-evidence-verifier.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-theorem-statement-evidence-verifier.test.ts
