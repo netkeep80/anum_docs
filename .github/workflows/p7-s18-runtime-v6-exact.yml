@@ -1,12 +1,11 @@
-name: P7-S28 exact legacy RG3.2.4 violation diagnostics (TEMPORARY)
+name: P7-S28 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
     paths: [".github/workflows/p7-s18-runtime-v6-exact.yml"]
 permissions: {contents: read, pull-requests: read, issues: read}
 jobs:
-  legacy:
-    name: Exact S28 candidate legacy RepoGuard 3.2.4 diagnostic
+  exact:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -19,55 +18,43 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: netkeep80/repo-guard
-          ref: c19f29da366c985e2cf162ef7e75f5594f60c3a2
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
           persist-credentials: false
-          path: oldguard
+          path: guard
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact candidate / oldguard and real PR body
+      - name: Exact P7-S28 candidate J1 and J2
         shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s28-retire-orphan-a9-research-test-20261110
           git -C candidate checkout --detach db1ed6b77a74b43d08b464d8bd6cef548a8834c7
           test "$(git -C candidate rev-parse HEAD)" = "db1ed6b77a74b43d08b464d8bd6cef548a8834c7"
           test "$(git -C candidate rev-parse HEAD^{tree})" = "1db9a079aa9a5b76f61b85fc84ded6e5942435a4"
-          test "$(git -C oldguard rev-parse HEAD)" = "c19f29da366c985e2cf162ef7e75f5594f60c3a2"
-          npm ci --prefix oldguard --omit=dev --ignore-scripts --no-audit --no-fund
-          curl --fail --silent --show-error -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/netkeep80/anum_docs/pulls/2410" > "$RUNNER_TEMP/pr.json"
-          python3 - <<'PY'
-          import os,json
-          d=os.environ["RUNNER_TEMP"]
-          p=json.load(open(d+"/pr.json"))
-          assert p["number"]==2410
-          assert p["base"]["sha"]=="fd399ce7c0fb1a77c15a3b5d290bc610fe871022"
-          assert p["head"]["sha"]=="db1ed6b77a74b43d08b464d8bd6cef548a8834c7"
-          assert p["state"]=="open"
-          event={"repository":{"full_name":"netkeep80/anum_docs"},"pull_request":{"number":2410,"base":{"sha":p["base"]["sha"],"ref":"main"},"head":{"sha":p["head"]["sha"]},"body":p.get("body") or ""}}
-          json.dump(event,open(d+"/event.json","w"))
-          print("S28_EXACT_LEGACY_PR_EVENT=PASS")
-          PY
-          export RG_EVENT_PATH="$RUNNER_TEMP/event.json"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=db1ed6b77a74b43d08b464d8bd6cef548a8834c7
+          echo EXACT_TREE=1db9a079aa9a5b76f61b85fc84ded6e5942435a4
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/oldguard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" --enforcement blocking check-pr --format json > "$RUNNER_TEMP/rg32.json" 2> "$RUNNER_TEMP/rg32.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base db1ed6b77a74b43d08b464d8bd6cef548a8834c7 --head db1ed6b77a74b43d08b464d8bd6cef548a8834c7 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
-          echo "S28_LEGACY_EXIT=$rc"
+          echo RG_V6_EXIT=$rc
           python3 - <<'PY'
-          import os,json
-          d=os.environ["RUNNER_TEMP"]; file=d+"/rg32.json"
-          try:
-            o=json.load(open(file))
-            print("LEGACY_KEYS", list(o.keys()))
-            for key in ["result","reasonCode","passed","warningCount","violationCount","warnings","violations","diagnostics","checks","rules","changeIntent","policy"]:
-              v=o.get(key)
-              if v is not None: print("LEGACY_"+key.upper(),json.dumps(v,ensure_ascii=False)[:25000])
-          except Exception as e:
-            print("S28_LEGACY_PARSE_ERROR",repr(e),open(file).read()[:10000])
-          print("LEGACY_STDERR",open(d+"/rg32.err").read()[:3000])
+          import os,json,collections
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          paths=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(paths))
+          expected={'ts/test/research-v013-semantic-dependency-projection-a9.test.ts'}
+          print("RETIRED_S28_RESOURCE",sorted(expected))
+          assert o['j1']['tracked']==650 and o['j1']['justified']==549, "unexpected J1 counts"
+          assert len(paths)==101 and not expected.intersection(paths), "unexpected A9 historical source retirement"
+          assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
+          print("P7_S28_ONE_A9_RESOURCE_RETIREMENT=PASS")
+          print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
+          for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
-          echo S28_LEGACY_DIAGNOSTIC_COLLECTED=1
-          # A negative report is an expected outcome for a diagnostic investigation.
+          test "$rc" -eq 1
