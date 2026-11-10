@@ -625,12 +625,61 @@ assert.ok(s32Workflow.includes("base: ${{ github.event.pull_request.base.sha }}"
 assert.ok(s32Workflow.includes("head: ${{ github.event.pull_request.head.sha }}"));
 assert.ok(!s32Workflow.includes("mode: check-pr"));
 assert.ok(!s32Workflow.includes("enforcement: blocking"));
+
+const s36WrongBaseWithComment = s32Workflow.replace(
+  "          base: ${{ github.event.pull_request.base.sha }}",
+  "          base: ${{ github.event.pull_request.head.sha }}\n" +
+    "          # base: ${{ github.event.pull_request.base.sha }}",
+);
 assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32WorkflowPath]: s32Workflow.replace(
-    "base: ${{ github.event.pull_request.base.sha }}",
-    "base: ${{ github.event.pull_request.head.sha }}",
-  ),
-}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/, "S36 weakened actual exact BASE rejected");
+  [s32WorkflowPath]: s36WrongBaseWithComment,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 wrong active BASE cannot be masked by a correct YAML comment");
+
+const s36WrongHeadWithComment = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}",
+  "          head: ${{ github.event.pull_request.base.sha }}\n" +
+    "          # head: ${{ github.event.pull_request.head.sha }}",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36WrongHeadWithComment,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 wrong active HEAD cannot be masked by a correct YAML comment");
+
+const s36WrongHeadWithDecoyStep = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}",
+  "          head: ${{ github.event.pull_request.base.sha }}\n" +
+    "      - name: Decoy exact HEAD text\n" +
+    "        run: 'echo \"head: ${{ github.event.pull_request.head.sha }}\"'",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36WrongHeadWithDecoyStep,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 correct HEAD text in another step cannot mask wrong repo_guard input");
+
+const s36MissingHead = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}\n",
+  "",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36MissingHead,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 missing active repo_guard HEAD input rejected");
+
+const s36DuplicateRepoGuard = s32Workflow.replace(
+  "      - name: Publish repo-guard summary",
+  "      - name: Duplicate repo-guard step\n" +
+    "        id: repo_guard\n" +
+    "        uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114\n" +
+    "        with:\n" +
+    "          base: ${{ github.event.pull_request.base.sha }}\n" +
+    "          head: ${{ github.event.pull_request.head.sha }}\n\n" +
+    "      - name: Publish repo-guard summary",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36DuplicateRepoGuard,
+}), /S36 requires exactly one repo_guard workflow step/,
+"S36 ambiguous duplicate repo_guard step rejected");
 
 // P7-S17: an actual documentation/source consumer must causally own each
 // current audit/profile input, not just cite the path as historical metadata.
