@@ -1,0 +1,51 @@
+name: P7-S32 exact CURRENT FULL and Observatory (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s32-exact-v6-20261110]
+    paths: [".github/workflows/p7-s32-full-diagnostic.yml"]
+permissions: {contents: read}
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact S32 CURRENT FULL docs and observatory
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s32-current-policy-ownership-20261110
+          git -C candidate checkout --detach 38104f4ba8ae47ed10096d875760bcea3cbff98f
+          test "$(git -C candidate rev-parse HEAD)" = "38104f4ba8ae47ed10096d875760bcea3cbff98f"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "d25f08bcf46ca7cf02984c5a694fd34386d0479e"
+          echo EXACT_HEAD=38104f4ba8ae47ed10096d875760bcea3cbff98f
+          echo EXACT_TREE=d25f08bcf46ca7cf02984c5a694fd34386d0479e
+          cd candidate
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts run check:current
+          echo P7_S32_EXACT_CURRENT_43=PASS
+          npm --prefix ts test
+          echo P7_S32_EXACT_FULL_155=PASS
+          npm --prefix ts run docs:check
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+          node web/contract-observatory/dist/src/build-site.js . _site
+          test -s _site/index.html
+          test -f _site/.nojekyll
+          echo P7_S32_EXACT_CURRENT_FULL_OBSERVATORY=PASS
