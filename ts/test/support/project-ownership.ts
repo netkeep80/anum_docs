@@ -438,6 +438,17 @@ export function verifyProjectOwnership(
   // by their project obligations, not by whichever CI executable imports them.
   // Require exactly the source-reachable, unclaimed private implementation
   // dependencies of each owner. Other owners' files cannot be claimed twice.
+  // S31: unlike private imported modules, these two source-file inputs are
+  // read as preview evidence. Their exact W6 loader/read chain is verified below.
+  const s31Witnesses = [
+    { consumer: "ts/src/tooling/mts-reader-review-m03.ts",
+      loader: "loadReaderM03", key: "roles", target: "ts/src/v015-formal-roles.ts",
+      arg: "path", marker: "LINK_IDENTITY_EQUALITY" },
+    { consumer: "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
+      loader: "loadReaderL01L03", key: "association_ts",
+      target: "ts/src/v015-direct-association.ts", arg: "v",
+      marker: "V015_DIRECT_ASSOCIATION_RESEARCH" },
+  ] as const;
   const verifyToolingClosure = (id: Owner): number => {
     const owner = get(id);
     const roots = sorted([...owner.entries()]
@@ -463,7 +474,11 @@ export function verifyProjectOwnership(
     const actual = sorted([...owner.entries()]
       .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "requires")
       .map(([path]) => path));
-    equalPaths(actual, expected, id + " tooling requires");
+    const readerEvidence = id === "MTS-PROJECT-PUBLICATION-01"
+      ? s31Witnesses.map(w => w.target) : [];
+    equalPaths(actual, sorted([...expected, ...readerEvidence]),
+      id + " tooling and exact physical preview-source requires");
+    // Report only import-closure modules, not evidence read as source data.
     return expected.length;
   };
 
@@ -871,15 +886,6 @@ export function verifyProjectOwnership(
   // P7-S31: the current W6 preview executes two exact scientific-review
   // readers. Their source bytes are required for non-authoritative preview,
   // not declared accepted semantic algorithms or production authority.
-  const s31Witnesses = [
-    { consumer: "ts/src/tooling/mts-reader-review-m03.ts",
-      loader: "loadReaderM03", key: "roles", target: "ts/src/v015-formal-roles.ts",
-      arg: "path", marker: "LINK_IDENTITY_EQUALITY" },
-    { consumer: "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
-      loader: "loadReaderL01L03", key: "association_ts",
-      target: "ts/src/v015-direct-association.ts", arg: "v",
-      marker: "V015_DIRECT_ASSOCIATION_RESEARCH" },
-  ] as const;
   for (const witness of s31Witnesses) {
     if (!directlyInvoked.get(witness.consumer)?.includes(witness.loader))
       fail("S31 W6 preview reader is not directly invoked");
