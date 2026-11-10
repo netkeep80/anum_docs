@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 457);
+assert.equal(p7CandidateWitness.exactRelations, 459);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -234,6 +234,42 @@ assert.throws(() => verifyProjectOwnership(s29Root, {
   [s30Paths[1]]: JSON.stringify(s30AuditResult),
 }), /S30 historical blocked audit status changed/,
 "S30 forged historical governance observation rejected");
+
+// S31: preserve exact current W6 preview source dependencies only. These
+// witnesses do not accept scientific source claims or publish the draft.
+const s31Root = resolve("..");
+const s31OwnerPath = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
+const s31Owner = readFileSync(resolve(s31Root, s31OwnerPath), "utf8");
+const s31Checks = [
+  {path: "ts/src/v015-formal-roles.ts",
+   reader: "ts/src/tooling/mts-reader-review-m03.ts", arg: "path"},
+  {path: "ts/src/v015-direct-association.ts",
+   reader: "ts/src/tooling/mts-reader-review-l01-l02-l03.ts", arg: "v"},
+] as const;
+for (const item of s31Checks) {
+  const clause = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + item.path + "\n";
+  assert.ok(s31Owner.includes(clause), "S31 source-owned W6 preview link present");
+  assert.throws(() => verifyProjectOwnership(s31Root, {
+    [s31OwnerPath]: s31Owner.replace(clause, ""),
+  }), /missing requires witness/, "S31 missing typed preview link rejected");
+  const reader = readFileSync(resolve(s31Root, item.reader), "utf8");
+  assert.ok(reader.includes('"' + item.path + '"'));
+  assert.throws(() => verifyProjectOwnership(s31Root, {
+    [item.reader]: reader.replace('"' + item.path + '"', '"' + item.path + '.forged"'),
+  }), /S31 preview evidence source path changed/,
+  "S31 forged source path rejected");
+  assert.throws(() => verifyProjectOwnership(s31Root, {
+    [item.reader]: reader.replace("read(root," + item.arg + ")",
+      "read(root," + item.arg + ' + ".forged")'),
+  }), /S31 preview evidence physical read disconnected/,
+  "S31 disconnected physical reader rejected");
+}
+const s31Research = readFileSync(resolve(s31Root, s31Checks[1].path), "utf8");
+assert.ok(s31Research.includes('status: "RESEARCH_NOT_ACCEPTED"'));
+assert.throws(() => verifyProjectOwnership(s31Root, {
+  [s31Checks[1].path]: s31Research.replace("RESEARCH_NOT_ACCEPTED", "ACCEPTED"),
+}), /S31 preview source marker or research boundary changed/,
+"S31 research-to-accepted authority promotion rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
