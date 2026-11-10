@@ -1,4 +1,4 @@
-name: P7-S35 real BASE-to-HEAD RG v6 J3 (TEMPORARY DO NOT MERGE)
+name: P7-S35 post-merge v6 + historical transition diagnosis (TEMPORARY DO NOT MERGE)
 on:
   push:
     branches: [diagnostics/p7-s35-real-j3-20261110]
@@ -24,43 +24,73 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact post-merge J1 J2 and real S35 BASE-to-HEAD J3
+      - name: Verify exact post-merge main and diagnose legacy-red-to-green transition
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate checkout --detach 9bdca48e10f9ac80e5a539495c040c425851854a
-          test "$(git -C candidate rev-parse HEAD)" = "9bdca48e10f9ac80e5a539495c040c425851854a"
+          BASE=cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9
+          HEAD=9bdca48e10f9ac80e5a539495c040c425851854a
+          GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          git -C candidate checkout --detach "$HEAD"
+          test "$(git -C candidate rev-parse HEAD)" = "$HEAD"
           test "$(git -C candidate rev-parse HEAD^{tree})" = "a80cf8c8692d7b2be1593e3eb524e664f8e14a3c"
-          test "$(git -C candidate rev-parse cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9^{tree})" = "c6cf34112d7b3f88b45cc11e27f9bff58f718792"
-          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_BASE=cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9
-          echo EXACT_HEAD=9bdca48e10f9ac80e5a539495c040c425851854a
+          test "$(git -C candidate rev-parse "$BASE^{tree}")" = "c6cf34112d7b3f88b45cc11e27f9bff58f718792"
+          test "$(git -C guard rev-parse HEAD)" = "$GUARD"
+          echo EXACT_BASE="$BASE"
+          echo EXACT_HEAD="$HEAD"
           echo EXACT_HEAD_TREE=a80cf8c8692d7b2be1593e3eb524e664f8e14a3c
-          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          echo EXACT_GUARD="$GUARD"
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9 --head 9bdca48e10f9ac80e5a539495c040c425851854a --format json > "$RUNNER_TEMP/report.json" 2>"$RUNNER_TEMP/report.err"
-          rc=$?
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "$HEAD" --head "$HEAD" --format json > "$RUNNER_TEMP/same.json" 2>"$RUNNER_TEMP/same.err"
+          same_rc=$?
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base "$BASE" --head "$HEAD" --format json > "$RUNNER_TEMP/transition.json" 2>"$RUNNER_TEMP/transition.err"
+          transition_rc=$?
           set -e
-          echo RG_V6_EXIT=$rc
+          echo SAME_HEAD_EXIT="$same_rc"
+          echo TRANSITION_EXIT="$transition_rc"
+
           python3 - <<'PY'
           import json, os
-          p=os.path.join(os.environ["RUNNER_TEMP"],"report.json")
-          o=json.load(open(p))
-          print("FORMAT",o.get("format"))
-          print("OK",o.get("ok"))
-          print("BASE",o.get("base"))
-          print("HEAD",o.get("head"))
-          print("J1_ACTUAL",o.get("j1"))
-          print("J2_ACTUAL",o.get("j2"))
-          print("J3_ACTUAL",o.get("j3"))
-          ds=o.get("diagnostics",[])
-          print("DIAGNOSTICS_COUNT",len(ds))
-          for d in ds:
-              print("DIAGNOSTIC",json.dumps(d,ensure_ascii=False,sort_keys=True))
-          assert o.get("base")=="cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9"
-          assert o.get("head")=="9bdca48e10f9ac80e5a539495c040c425851854a"
-          assert o["j1"]["tracked"]==649 and o["j1"]["justified"]==649 and o["j1"]["head"] is True
-          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True
+          d=os.environ["RUNNER_TEMP"]
+          same=json.load(open(os.path.join(d,"same.json")))
+          trans=json.load(open(os.path.join(d,"transition.json")))
+          print("SAME_HEAD_OK",same.get("ok"))
+          print("SAME_HEAD_J1",same.get("j1"))
+          print("SAME_HEAD_J2",same.get("j2"))
+          print("SAME_HEAD_J3",same.get("j3"))
+          assert same["ok"] is True
+          assert same["j1"]=={"base":True,"head":True,"tracked":649,"justified":649}
+          assert same["j2"]=={"base":True,"head":True,"rooted":54}
+          assert same["j3"]["changed"]==0 and same["j3"]["ok"] is True
+
+          print("TRANSITION_OK",trans.get("ok"))
+          print("TRANSITION_J1",trans.get("j1"))
+          print("TRANSITION_J2",trans.get("j2"))
+          print("TRANSITION_J3",trans.get("j3"))
+          ds=trans.get("diagnostics",[])
+          for x in ds:
+              print("TRANSITION_DIAGNOSTIC",json.dumps(x,ensure_ascii=False,sort_keys=True))
+          j3=[x for x in ds if x.get("code")=="j3"]
+          unjust=[x for x in ds if x.get("code")=="unjustified_resource"]
+          assert trans["ok"] is False
+          assert trans["j1"]["base"] is False and trans["j1"]["head"] is True
+          assert trans["j1"]["tracked"]==649 and trans["j1"]["justified"]==649
+          assert trans["j2"]=={"base":True,"head":True,"rooted":54}
+          assert trans["j3"]["changed"]==6 and trans["j3"]["ok"] is False
+          assert trans["j3"]["affectedRequirements"]==[
+              "MTS-PROJECT-CI-01",
+              "MTS-PROJECT-PROOF-PROVENANCE-01",
+              "MTS-PROJECT-PUBLICATION-01",
+          ]
+          assert len(j3)==1
+          assert j3[0]["subject"]=="J3:no_cause:resource_delete:theorems/v0.13/inversion/dualization-audit.json"
+          assert len(unjust)==16
+          assert all(x["subject"].startswith("cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9:") for x in unjust)
+          print("P7_S35_POSTMERGE_MAIN_GREEN=PASS")
+          print("P7_S35_HISTORICAL_TRANSITION_RED_EXACTLY_ORPHAN_DELETE=PASS")
           PY
-          test "$rc" -eq 0
+
+          test "$same_rc" -eq 0
+          test "$transition_rc" -eq 1
