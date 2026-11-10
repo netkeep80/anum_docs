@@ -127,29 +127,22 @@ export function verifyProjectOwnership(
     if (get(id).get(path) !== predicate)
       fail(id + " missing " + predicate + " witness for " + path);
   };
-  // P7-S16: exact accepted historical lineage files are already protected by the
-  // current repo-policy.json pr_immutable contract. This verifies actual retained
-  // files against the sole existing project Requirement without granting historic
-  // contracts any competing semantic authority.
-  const repoPolicy = object(JSON.parse(read("repo-policy.json")), "repository policy");
-  const immutable = array(object(repoPolicy.paths, "policy paths").pr_immutable,
-    "repository pr_immutable").map((item) => {
-    if (typeof item !== "string") fail("immutable policy path must be a string");
-    return item;
-  });
+  // P7-S37: accepted historical lineage is protected directly by the typed
+  // current Requirement. The retired legacy policy must not remain a second
+  // inventory or semantic authority.
   const acceptedLegacyPath = (path: string): boolean =>
     /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13)\.json$/.test(path) ||
     /^cutover\/typescript-c1-acceptance-v0\.[1-7]\.json$/.test(path) ||
     /^traceability\/mts-v0\.(?:11|12|13)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
-  const liveImmutableLineage = sorted(new Set(immutable.filter(acceptedLegacyPath)));
-  if (liveImmutableLineage.length !== 18)
-    fail("accepted historical immutable lineage inventory changed");
   const declaredImmutableLineage = sorted([...get("MTS-PROJECT-ACCEPTED-LINEAGE-01").entries()]
     .filter(([path]) => acceptedLegacyPath(path)).map(([path]) => path));
-  equalPaths(declaredImmutableLineage, liveImmutableLineage,
-    "accepted historical immutable lineage");
-  for (const path of liveImmutableLineage)
+  if (declaredImmutableLineage.length !== 18)
+    fail("accepted historical immutable lineage inventory changed");
+  for (const path of declaredImmutableLineage) {
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
+    if (!existsSync(resolve(root, path)))
+      fail("accepted historical immutable lineage file missing: " + path);
+  }
 
   // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
   // tests. Deleting them caused the real FULL runner to fail closed because
@@ -372,38 +365,12 @@ export function verifyProjectOwnership(
   if (!s34Gates.includes("ts/test/anum-two-memory-conformance.test.ts"))
     fail("S34 transitive anum carrier has no mandatory FULL root");
 
-  // P7-S36: RepoGuard v6 is the current blocking gate. The retained
-  // repo-policy.json still carries temporary compatibility/governance metadata,
-  // but the live gate contract is exact immutable PR BASE/HEAD plus the accepted pin.
-  const s32Enforcement = object(repoPolicy.enforcement, "S36 policy enforcement");
-  if (repoPolicy.repository_kind !== "documentation" ||
-      s32Enforcement.mode !== "blocking")
-    fail("S36 current blocking policy mode changed");
-  const s32GovernancePaths = array(object(repoPolicy.paths, "S36 policy paths").governance_paths,
-    "S36 governance paths");
-  if (!s32GovernancePaths.includes("repo-policy.json") ||
-      !s32GovernancePaths.includes(".github/workflows/repo-guard.yml"))
-    fail("S36 governance policy/workflow bindings changed");
-  const s32DocRelations = object(repoPolicy.document_relations, "S36 document relations");
-  const s32Documents = object(s32DocRelations.documents, "S36 control documents");
-  if (object(s32Documents["repo-guard-workflow"], "S36 guard document").path !==
-      ".github/workflows/repo-guard.yml")
-    fail("S36 live guard document binding changed");
-  const s32Rules = array(s32DocRelations.rules, "S36 document enforcement rules");
-  const s32Rule = (id: string) => object(
-    s32Rules.find(v => object(v, "S36 rule").id === id), "S36 guard rule " + id);
-  const s32Base = s32Rule("repo-guard-workflow-base");
-  const s32Head = s32Rule("repo-guard-workflow-head");
-  if (s32Base.kind !== "scalar_equals_literal" ||
-      s32Base.value !== "${{ github.event.pull_request.base.sha }}" ||
-      object(s32Base.source, "S36 base rule source").document !== "repo-guard-workflow" ||
-      s32Head.kind !== "scalar_equals_literal" ||
-      s32Head.value !== "${{ github.event.pull_request.head.sha }}" ||
-      object(s32Head.source, "S36 head rule source").document !== "repo-guard-workflow")
-    fail("S36 exact BASE/HEAD policy document bindings changed");
-  const s32GuardSource = read(".github/workflows/repo-guard.yml");
+  // P7-S37: RepoGuard v6 is verified directly from the live workflow. The
+  // retired legacy policy is neither an input nor a duplicate authority.
+  const s32GuardPath = ".github/workflows/repo-guard.yml";
+  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", s32GuardPath, "implemented_by");
+  const s32GuardSource = read(s32GuardPath);
   const s32GuardPin = "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114";
-  const s32PinRule = s32Rule("repo-guard-workflow-action-pin");
   const s32GuardDoc = parseDocument(s32GuardSource,
     { strict: true, uniqueKeys: true, merge: false });
   if (s32GuardDoc.errors.length || s32GuardDoc.warnings.length)
@@ -422,14 +389,12 @@ export function verifyProjectOwnership(
     fail("S36 requires exactly one repo_guard workflow step");
   const s32RepoGuardStep = s32RepoGuardSteps[0]!;
   const s32RepoGuardWith = object(s32RepoGuardStep.with, "S36 repo_guard with");
-  if (s32PinRule.value !== s32GuardPin ||
-      s32RepoGuardStep.uses !== s32GuardPin ||
+  if (s32RepoGuardStep.uses !== s32GuardPin ||
       s32RepoGuardWith.base !== "${{ github.event.pull_request.base.sha }}" ||
       s32RepoGuardWith.head !== "${{ github.event.pull_request.head.sha }}" ||
       "mode" in s32RepoGuardWith ||
       "enforcement" in s32RepoGuardWith)
     fail("S36 v6 blocking gate source/pin/exact-SHA contract changed");
-  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
 
   // P7-S33: FULL historical v0.14 acceptance replay physically reads the
   // one erratum protecting its immutable candidate-era currentAccepted block.
