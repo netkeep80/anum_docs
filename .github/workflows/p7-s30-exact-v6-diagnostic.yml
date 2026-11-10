@@ -1,0 +1,60 @@
+name: P7-S30 exact pinned v6 J1 J2 (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s30-exact-v6-20261110]
+    paths: [".github/workflows/p7-s30-exact-v6-diagnostic.yml"]
+permissions: {contents: read, pull-requests: read, issues: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact P7-S30 candidate J1/J2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s30-g1-r2-accepted-evidence-20261110
+          git -C candidate checkout --detach 032133e64a821bff9b94c73776c4ed433881d86e
+          test "$(git -C candidate rev-parse HEAD)" = "032133e64a821bff9b94c73776c4ed433881d86e"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "bc39cf47f9e03ce5a96b16b965bb11f857b5f85b"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=032133e64a821bff9b94c73776c4ed433881d86e
+          echo EXACT_TREE=bc39cf47f9e03ce5a96b16b965bb11f857b5f85b
+          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 032133e64a821bff9b94c73776c4ed433881d86e --head 032133e64a821bff9b94c73776c4ed433881d86e --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import os,json
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          paths=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(paths))
+          expected={"formal/v0.15/evidence/governance-merge-enforcement-g1.json", "formal/v0.15/evidence/readiness-audit-r2.json"}
+          print("S30_HISTORICAL_WITNESSES_STILL_UNJUSTIFIED",sorted(expected.intersection(paths)))
+          assert o["j1"]["tracked"]==650 and o["j1"]["justified"]==552 and o["j1"]["head"] is False,"unexpected J1 counts"
+          assert len(paths)==98 and not expected.intersection(paths),"unexpected remaining G1/R2 unjustified"
+          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True,"unexpected J2"
+          print("P7_S30_TWO_ACTUAL_HISTORICAL_WITNESSES=PASS")
+          for p in paths: print("J1_UNJUSTIFIED_PATH",p)
+          PY
+          test "$rc" -eq 1
