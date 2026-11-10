@@ -29,16 +29,16 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s35-last16-grouped-causal-disposition-20261110
-          git -C candidate checkout --detach e98036230ea5252bbfc4aea7fbe9e9df7a204d8b
-          test "$(git -C candidate rev-parse HEAD)" = "e98036230ea5252bbfc4aea7fbe9e9df7a204d8b"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "a317e0cfc535fb10dead69d3353074951ca3a830"
+          git -C candidate checkout --detach 2a6970b2743dca1b2847e236b97547464bda8df3
+          test "$(git -C candidate rev-parse HEAD)" = "2a6970b2743dca1b2847e236b97547464bda8df3"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "df19bbe5e3bd772d23b8f3d7c3d64244a5c752be"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=e98036230ea5252bbfc4aea7fbe9e9df7a204d8b
-          echo EXACT_TREE=a317e0cfc535fb10dead69d3353074951ca3a830
+          echo EXACT_HEAD=2a6970b2743dca1b2847e236b97547464bda8df3
+          echo EXACT_TREE=df19bbe5e3bd772d23b8f3d7c3d64244a5c752be
           echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base e98036230ea5252bbfc4aea7fbe9e9df7a204d8b --head e98036230ea5252bbfc4aea7fbe9e9df7a204d8b --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 2a6970b2743dca1b2847e236b97547464bda8df3 --head 2a6970b2743dca1b2847e236b97547464bda8df3 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -51,7 +51,7 @@ jobs:
           print("J3_ACTUAL",o.get("j3"))
           print("UNJUSTIFIED_COUNT",len(unjustified))
           for path in unjustified: print("J1_UNJUSTIFIED_PATH",path)
-          assert o["j1"]["tracked"]==645 and o["j1"]["justified"]==645 and o["j1"]["head"] is True,"unexpected S35 J1"
+          assert o["j1"]["tracked"]==649 and o["j1"]["justified"]==649 and o["j1"]["head"] is True,"unexpected S35 J1"
           assert len(unjustified)==0,"remaining J1 debt"
           assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True,"unexpected J2"
           print("P7_S35_EXACT_16_GREEN=PASS")
