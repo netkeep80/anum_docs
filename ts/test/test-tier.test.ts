@@ -572,55 +572,114 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /accepted historical immutable lineage inventory changed/,
   "S16: removing an accepted immutable legacy path from policy must fail");
 
-// S32: policy belongs to the existing change-governance owner because
-// an actual blocking RepoGuard workflow and the CURRENT S16 verifier consume it.
+// S36: the retained policy still belongs to change governance, while the live
+// blocking gate is now pinned RepoGuard v6 with exact PR BASE/HEAD inputs.
 const s32Root = resolve("..");
 const s32OwnerPath = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const s32Owner = readFileSync(resolve(s32Root, s32OwnerPath), "utf8");
 const s32Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: repo-policy.json\n";
-assert.ok(s32Owner.includes(s32Relation), "S32 exact policy relation exists");
+assert.ok(s32Owner.includes(s32Relation), "S36 exact policy relation exists");
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32OwnerPath]: s32Owner.replace(s32Relation, ""),
-}), /S32|missing requires witness/, "S32 missing exact policy ownership rejected");
+}), /S36|missing requires witness/, "S36 missing exact policy ownership rejected");
 const s32PolicyPath = "repo-policy.json";
 const s32Policy = JSON.parse(readFileSync(resolve(s32Root, s32PolicyPath), "utf8"));
 const s32Blocked = structuredClone(s32Policy);
 s32Blocked.enforcement.mode = "advisory";
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32PolicyPath]: JSON.stringify(s32Blocked),
-}), /S32 current blocking policy mode changed/, "S32 nonblocking policy rejected");
+}), /S36 current blocking policy mode changed/, "S36 nonblocking policy rejected");
 const s32Unbound = structuredClone(s32Policy);
 s32Unbound.paths.governance_paths = s32Unbound.paths.governance_paths
   .filter((path: string) => path !== "repo-policy.json");
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32PolicyPath]: JSON.stringify(s32Unbound),
-}), /S32 governance policy\/workflow bindings changed/, "S32 removed self-governance rejected");
+}), /S36 governance policy\/workflow bindings changed/, "S36 removed self-governance rejected");
 const s32ForgedPin = structuredClone(s32Policy);
 s32ForgedPin.document_relations.rules.find((v: any) =>
   v.id === "repo-guard-workflow-action-pin").value =
     "netkeep80/repo-guard@" + "0".repeat(40);
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32PolicyPath]: JSON.stringify(s32ForgedPin),
-}), /S32 temporary blocking gate source\/pin changed/, "S32 forged pinned guard rejected");
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/, "S36 forged pinned guard rejected");
 const s32Rebound = structuredClone(s32Policy);
 s32Rebound.document_relations.documents["repo-guard-workflow"].path =
   ".github/workflows/ci.yml";
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32PolicyPath]: JSON.stringify(s32Rebound),
-}), /S32 live guard document binding changed/, "S32 rerouted governance workflow rejected");
-const s32ForgedRule = structuredClone(s32Policy);
-s32ForgedRule.document_relations.rules.find((v: any) =>
-  v.id === "repo-guard-workflow-enforcement").value = "monitor";
-assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32PolicyPath]: JSON.stringify(s32ForgedRule),
-}), /S32 guard policy document enforcement changed/,
-"S32 advisory control-document rule rejected");
+}), /S36 live guard document binding changed/, "S36 rerouted governance workflow rejected");
+for (const [id, forged] of [
+  ["repo-guard-workflow-base", "${{ github.event.pull_request.head.sha }}"],
+  ["repo-guard-workflow-head", "${{ github.event.pull_request.base.sha }}"],
+] as const) {
+  const mutated = structuredClone(s32Policy);
+  mutated.document_relations.rules.find((v: any) => v.id === id).value = forged;
+  assert.throws(() => verifyProjectOwnership(s32Root, {
+    [s32PolicyPath]: JSON.stringify(mutated),
+  }), /S36 exact BASE\/HEAD policy document bindings changed/, "S36 forged exact SHA policy binding rejected");
+}
 const s32WorkflowPath = ".github/workflows/repo-guard.yml";
 const s32Workflow = readFileSync(resolve(s32Root, s32WorkflowPath), "utf8");
-assert.ok(s32Workflow.includes("enforcement: blocking"));
+assert.ok(s32Workflow.includes("uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114"));
+assert.ok(s32Workflow.includes("base: ${{ github.event.pull_request.base.sha }}"));
+assert.ok(s32Workflow.includes("head: ${{ github.event.pull_request.head.sha }}"));
+assert.ok(!s32Workflow.includes("mode: check-pr"));
+assert.ok(!s32Workflow.includes("enforcement: blocking"));
+
+const s36WrongBaseWithComment = s32Workflow.replace(
+  "          base: ${{ github.event.pull_request.base.sha }}",
+  "          base: ${{ github.event.pull_request.head.sha }}\n" +
+    "          # base: ${{ github.event.pull_request.base.sha }}",
+);
 assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32WorkflowPath]: s32Workflow.replace("enforcement: blocking", "enforcement: monitor"),
-}), /S32 temporary blocking gate source\/pin changed/, "S32 weakened actual workflow rejected");
+  [s32WorkflowPath]: s36WrongBaseWithComment,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 wrong active BASE cannot be masked by a correct YAML comment");
+
+const s36WrongHeadWithComment = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}",
+  "          head: ${{ github.event.pull_request.base.sha }}\n" +
+    "          # head: ${{ github.event.pull_request.head.sha }}",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36WrongHeadWithComment,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 wrong active HEAD cannot be masked by a correct YAML comment");
+
+const s36WrongHeadWithDecoyStep = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}",
+  "          head: ${{ github.event.pull_request.base.sha }}\n" +
+    "      - name: Decoy exact HEAD text\n" +
+    "        run: 'echo \"head: ${{ github.event.pull_request.head.sha }}\"'",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36WrongHeadWithDecoyStep,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 correct HEAD text in another step cannot mask wrong repo_guard input");
+
+const s36MissingHead = s32Workflow.replace(
+  "          head: ${{ github.event.pull_request.head.sha }}\n",
+  "",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36MissingHead,
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S36 missing active repo_guard HEAD input rejected");
+
+const s36DuplicateRepoGuard = s32Workflow.replace(
+  "      - name: Publish repo-guard summary",
+  "      - name: Duplicate repo-guard step\n" +
+    "        id: repo_guard\n" +
+    "        uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114\n" +
+    "        with:\n" +
+    "          base: ${{ github.event.pull_request.base.sha }}\n" +
+    "          head: ${{ github.event.pull_request.head.sha }}\n\n" +
+    "      - name: Publish repo-guard summary",
+);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s36DuplicateRepoGuard,
+}), /S36 requires exactly one repo_guard workflow step/,
+"S36 ambiguous duplicate repo_guard step rejected");
 
 // P7-S17: an actual documentation/source consumer must causally own each
 // current audit/profile input, not just cite the path as historical metadata.

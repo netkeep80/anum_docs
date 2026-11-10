@@ -20,15 +20,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # RepoGuard exact consumer pin: include trusted SHA-bound size-rule growth grants (#685).
+      # RepoGuard v6 exact immutable consumer pin.
       - name: Run repo-guard
         id: repo_guard
-        uses: netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2
+        uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114
         with:
-          mode: check-pr
-          enforcement: blocking
-        env:
-          GH_TOKEN: ${{ github.token }}
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
 
       - name: Publish repo-guard summary
         if: always()
