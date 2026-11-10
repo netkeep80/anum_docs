@@ -58,6 +58,7 @@ export interface ProjectOwnershipReport {
   readonly transitiveSourceDependencies: number;
   readonly proofEvidenceRecords: number;
   readonly formalReplayResources: number;
+  readonly approvedSourceIntegrityResources: number;
   readonly compiledProofSourceUnits: number;
   readonly protectedHistoricalImages: number;
   readonly currentDocumentationSurfaces: number;
@@ -485,11 +486,42 @@ export function verifyProjectOwnership(
     "formal/v0.15/regression/compact-and.recursive"]);
   if (new Set(exactReplayPaths).size !== 21)
     fail("current FORMAL replay witnesses unexpectedly overlap");
+  // P7-S26: two previously Author-approved frozen source triples are physically
+  // read and SHA-256 verified by active FULL integrity tests. Keep them distinct
+  // from S8 package/evidence replay inputs, and never infer ownership of a
+  // whole FORMAL directory or any new MTS semantic/proof authority.
+  const approvedSourcePaths = sorted([
+    ["ts/test/v015-grounded-approved-source-integrity.test.ts", "grounded-zero-role"],
+    ["ts/test/v015-two-role-approved-source-integrity.test.ts", "two-role-meta-rule"],
+  ].flatMap(([testPath, stem]) => {
+    const consumer = read(testPath!);
+    if (!consumer.includes("for (const [path, sha256] of expected)") ||
+        !consumer.includes("readFileSync(resolve(repo, path))") ||
+        !consumer.includes('createHash("sha256").update(bytes).digest("hex")'))
+      fail("S26 approved source hash-verifying consumer changed: " + testPath);
+    const pairs = [...consumer.matchAll(
+      /\["(formal\/v0\.15\/regression\/[^"]+\.(?:formal|json|recursive))", "([a-f0-9]{64})"\]/g,
+    )].map(match => ({ path: match[1]!, digest: match[2]! }));
+    const expectedPaths = sorted(["formal", "json", "recursive"]
+      .map(ext => "formal/v0.15/regression/" + stem + "." + ext));
+    equalPaths(sorted(pairs.map(pair => pair.path)), expectedPaths,
+      "S26 exact approved FORMAL source consumer " + stem);
+    for (const {path, digest} of pairs) {
+      const actual = createHash("sha256").update(readFileSync(resolve(root, path))).digest("hex");
+      if (actual !== digest) fail("S26 approved source SHA-256 drift: " + path);
+    }
+    return expectedPaths;
+  }));
+  if (approvedSourcePaths.length !== 6 || new Set(approvedSourcePaths).size !== 6)
+    fail("S26 approved source triples must be six disjoint physical artifacts");
   const declaredReplayPaths = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("formal/v0.15/regression/"))
     .map(([path]) => path));
-  equalPaths(declaredReplayPaths, exactReplayPaths, "current frozen FORMAL replay input");
+  equalPaths(declaredReplayPaths, sorted([...exactReplayPaths, ...approvedSourcePaths]),
+    "exact current FORMAL replay and approved SHA-256 source inputs");
   for (const path of exactReplayPaths)
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
+  for (const path of approvedSourcePaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
 
   // P7-S14: current theorem projection contract names exact evidence inputs.
@@ -872,6 +904,7 @@ export function verifyProjectOwnership(
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     formalReplayResources: exactReplayPaths.length,
+    approvedSourceIntegrityResources: approvedSourcePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
