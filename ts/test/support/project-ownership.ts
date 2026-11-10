@@ -195,8 +195,10 @@ export function verifyProjectOwnership(
     .find(declaration => ts.isIdentifier(declaration.name) &&
       declaration.name.text === "CURRENT_ASSURANCE_SOURCE_TESTS");
   const s34AssuranceExpression = s34AssuranceDecl?.initializer;
-  const s34AssuranceLiteral = s34AssuranceExpression && ts.isCallExpression(s34AssuranceExpression)
+  const s34AssuranceRaw = s34AssuranceExpression && ts.isCallExpression(s34AssuranceExpression)
     ? s34AssuranceExpression.arguments[0] : undefined;
+  const s34AssuranceLiteral = s34AssuranceRaw && ts.isAsExpression(s34AssuranceRaw)
+    ? s34AssuranceRaw.expression : s34AssuranceRaw;
   if (!s34AssuranceLiteral || !ts.isArrayLiteralExpression(s34AssuranceLiteral))
     fail("S34 explicit current assurance selector changed");
   const s34DeclaredAssurance = s34AssuranceLiteral.elements.map(item => {
