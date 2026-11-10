@@ -32,9 +32,9 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s28-retire-orphan-a9-research-test-20261110
-          git -C candidate checkout --detach ac954ccb44a4d41c80a61b59fcbab764bd89f5b3
-          test "$(git -C candidate rev-parse HEAD)" = "ac954ccb44a4d41c80a61b59fcbab764bd89f5b3"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "bd09b8aff1cbcc3c748176176c6acb169dc327d5"
+          git -C candidate checkout --detach db1ed6b77a74b43d08b464d8bd6cef548a8834c7
+          test "$(git -C candidate rev-parse HEAD)" = "db1ed6b77a74b43d08b464d8bd6cef548a8834c7"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "1db9a079aa9a5b76f61b85fc84ded6e5942435a4"
           test "$(git -C oldguard rev-parse HEAD)" = "c19f29da366c985e2cf162ef7e75f5594f60c3a2"
           npm ci --prefix oldguard --omit=dev --ignore-scripts --no-audit --no-fund
           curl --fail --silent --show-error -L -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/netkeep80/anum_docs/pulls/2410" > "$RUNNER_TEMP/pr.json"
@@ -44,7 +44,7 @@ jobs:
           p=json.load(open(d+"/pr.json"))
           assert p["number"]==2410
           assert p["base"]["sha"]=="fd399ce7c0fb1a77c15a3b5d290bc610fe871022"
-          assert p["head"]["sha"]=="ac954ccb44a4d41c80a61b59fcbab764bd89f5b3"
+          assert p["head"]["sha"]=="db1ed6b77a74b43d08b464d8bd6cef548a8834c7"
           assert p["state"]=="open"
           event={"repository":{"full_name":"netkeep80/anum_docs"},"pull_request":{"number":2410,"base":{"sha":p["base"]["sha"],"ref":"main"},"head":{"sha":p["head"]["sha"]},"body":p.get("body") or ""}}
           json.dump(event,open(d+"/event.json","w"))
