@@ -1,5 +1,6 @@
 // Project-scoped ownership witnesses. This is a consumer of native RepoGuard
 // Requirements, not a second Requirement authority or a new semantic MTS model.
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join, relative, resolve } from "node:path";
@@ -128,8 +129,8 @@ export function verifyProjectOwnership(
       fail(id + " missing " + predicate + " witness for " + path);
   };
   // P7-S37: accepted historical lineage is protected directly by the typed
-  // current Requirement. The retired legacy policy must not remain a second
-  // inventory or semantic authority.
+  // current Requirement and by byte identity against the exact trusted S37
+  // pre-retirement snapshot. The retired legacy policy is not a second list.
   const acceptedLegacyPath = (path: string): boolean =>
     /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13)\.json$/.test(path) ||
     /^cutover\/typescript-c1-acceptance-v0\.[1-7]\.json$/.test(path) ||
@@ -138,10 +139,23 @@ export function verifyProjectOwnership(
     .filter(([path]) => acceptedLegacyPath(path)).map(([path]) => path));
   if (declaredImmutableLineage.length !== 18)
     fail("accepted historical immutable lineage inventory changed");
+  const immutableLineageSnapshot = "705433694c2a5c3fe4a0f80d4e7b8e3fb448d82d";
   for (const path of declaredImmutableLineage) {
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
     if (!existsSync(resolve(root, path)))
       fail("accepted historical immutable lineage file missing: " + path);
+    let acceptedContent: string;
+    try {
+      acceptedContent = execFileSync("git", ["show", immutableLineageSnapshot + ":" + path], {
+        cwd: root,
+        encoding: "utf8",
+        maxBuffer: 8 * 1024 * 1024,
+      });
+    } catch {
+      fail("accepted historical immutable lineage snapshot unavailable: " + path);
+    }
+    if (read(path) !== acceptedContent)
+      fail("accepted historical immutable lineage content changed: " + path);
   }
 
   // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
