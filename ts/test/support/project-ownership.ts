@@ -942,10 +942,13 @@ export function verifyProjectOwnership(
   }));
   if (s35BooleanSourcePaths.length !== 9)
     fail("S35 approved Boolean source integrity cardinality changed");
-  const approvedAllSourcePaths = sorted([...approvedSourcePaths, ...s35BooleanSourcePaths]);
-  if (approvedAllSourcePaths.length !== 15 ||
-      new Set(approvedAllSourcePaths).size !== 15)
-    fail("S35 separately approved source triples have overlap");
+  // Six Boolean FORMAL/JSON inputs are already S8 replay inputs. Only the
+  // three additionally SHA-pinned recursive wires need new ownership links.
+  const approvedAllSourcePaths = sorted([...approvedSourcePaths,
+    ...s35BooleanSourcePaths.filter(path => path.endsWith(".recursive"))]);
+  if (approvedAllSourcePaths.length !== 9 ||
+      new Set(approvedAllSourcePaths).size !== 9)
+    fail("S35 separately approved recursive source inputs have overlap");
 
   const declaredReplayPaths = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("formal/v0.15/regression/"))
@@ -1434,7 +1437,7 @@ export function verifyProjectOwnership(
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     formalReplayResources: exactReplayPaths.length,
-    approvedSourceIntegrityResources: approvedAllSourcePaths.length,
+    approvedSourceIntegrityResources: approvedSourcePaths.length + s35BooleanSourcePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
