@@ -777,7 +777,7 @@ assert.throws(
     [proofOwnerFile]: proofOwnerText +
       "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-unsupported.recursive\n",
   }),
-  /exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
+  /missing tracked target: formal\/v0\.15\/regression\/compact-unsupported\.recursive|exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
   "S8/S35: an unobserved synthetic recursive file must not become current ownership",
 );
 const frozenTestPath = "ts/test/v015-frozen-replay-artifact-integrity.test.ts";
