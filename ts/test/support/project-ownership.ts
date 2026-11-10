@@ -150,6 +150,43 @@ export function verifyProjectOwnership(
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
 
+  // P7-S29: acceptance cutover points to one exact historical pre-Author
+  // readiness record. Preserve it as release lineage, not a new authority.
+  // The historical executable verifier must physically read the same file.
+  const s29Path = "formal/v0.15/evidence/final-readiness-r3.json";
+  const s29Cutover = object(JSON.parse(read("cutover/typescript-c1-acceptance-v0.8.json")),
+    "S29 accepted cutover");
+  if (object(s29Cutover.evidence, "S29 cutover evidence").finalReadiness !== s29Path)
+    fail("S29 accepted cutover finalReadiness pointer changed");
+  const s29Readiness = object(JSON.parse(read(s29Path)), "S29 readiness witness");
+  if (s29Readiness.status !== "RELEASE_READY_AWAITING_AUTHOR_DECISION" ||
+      object(s29Readiness.finalAuthorGate, "S29 Author gate").decision !== "PENDING" ||
+      object(s29Readiness.conclusion, "S29 readiness conclusion").accepted !== false)
+    fail("S29 historical readiness must remain pre-Author decision");
+  const s29TestPath = "ts/test/v015-final-readiness-r3.test.ts";
+  const s29Source = ts.createSourceFile(s29TestPath, read(s29TestPath),
+    ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  let s29PhysicalReader = false;
+  const s29Visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+        node.expression.text === "readFileSync" && node.arguments.length === 2) {
+      const arg = node.arguments[0];
+      if (arg && ts.isCallExpression(arg) && ts.isIdentifier(arg.expression) &&
+          arg.expression.text === "join" && arg.arguments.length === 2) {
+        const rootArg = arg.arguments[0];
+        const fileArg = arg.arguments[1];
+        if (rootArg && fileArg && ts.isIdentifier(rootArg) && rootArg.text === "root" &&
+            ts.isStringLiteral(fileArg) && fileArg.text === s29Path)
+          s29PhysicalReader = true;
+      }
+    }
+    ts.forEachChild(node, s29Visit);
+  };
+  s29Visit(s29Source);
+  if (!s29PhysicalReader)
+    fail("S29 physical historical readiness reader missing");
+  assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", s29Path, "requires");
+
   // P7-S17: attest only the actual current docs/FORMAL and theorem verifier
   // source readers. No global audits/** or profiles/** directory whitelist.
   // Using TypeScript AST call expressions rejects path mentions in comments or

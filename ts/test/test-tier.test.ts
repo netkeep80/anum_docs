@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 454);
+assert.equal(p7CandidateWitness.exactRelations, 455);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -148,6 +148,38 @@ assert.throws(() => verifyProjectOwnership(s26Root, {
     'readFileSync(resolve(repo, path + ".missing"))'),
 }), /S26 approved source hash-verifying consumer changed/,
 "S26 disconnected approved source consumer rejected");
+
+// S29: a cutover-pinned historical readiness witness has one exact lineage
+// relation; it must never be promoted into a post-Author acceptance decision.
+const s29Root = resolve("..");
+const s29OwnerPath = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.rg.yaml";
+const s29Owner = readFileSync(resolve(s29Root, s29OwnerPath), "utf8");
+const s29Path = "formal/v0.15/evidence/final-readiness-r3.json";
+const s29Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + s29Path + "\n";
+assert.ok(s29Owner.includes(s29Relation), "S29 exact cutover readiness relation exists");
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29OwnerPath]: s29Owner.replace(s29Relation, ""),
+}), /missing requires witness/, "S29 missing lineage owner relation rejected");
+const s29CutoverPath = "cutover/typescript-c1-acceptance-v0.8.json";
+const s29Cutover = JSON.parse(readFileSync(resolve(s29Root, s29CutoverPath), "utf8"));
+s29Cutover.evidence.finalReadiness = "formal/v0.15/evidence/forged-readiness.json";
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29CutoverPath]: JSON.stringify(s29Cutover),
+}), /S29 accepted cutover finalReadiness pointer changed/,
+"S29 altered acceptance pointer rejected");
+const s29ReaderPath = "ts/test/v015-final-readiness-r3.test.ts";
+const s29Reader = readFileSync(resolve(s29Root, s29ReaderPath), "utf8");
+assert.ok(s29Reader.includes('readFileSync(join(root, "' + s29Path + '"), "utf8")'));
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29ReaderPath]: s29Reader.replace('"' + s29Path + '"', '"' + s29Path + '.forged"'),
+}), /S29 physical historical readiness reader missing/,
+"S29 disconnected historical reader rejected");
+const s29Readiness = JSON.parse(readFileSync(resolve(s29Root, s29Path), "utf8"));
+s29Readiness.finalAuthorGate.decision = "ACCEPTED";
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29Path]: JSON.stringify(s29Readiness),
+}), /S29 historical readiness must remain pre-Author decision/,
+"S29 historical Author-decision escalation rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
