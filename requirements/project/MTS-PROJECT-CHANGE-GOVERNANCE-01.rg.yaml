@@ -1,6 +1,6 @@
 format: repo-guard/requirement-v1
 id: MTS-PROJECT-CHANGE-GOVERNANCE-01
-normative: "The repository must retain its declared license and contribution/change discipline, run branch hygiene, and enforce the blocking RepoGuard gate through exact immutable pull-request BASE/HEAD snapshots pinned to accepted RepoGuard v6.0.1. The legacy repo-policy.json remains a temporary compatibility/governance input pending separate bounded retirement; this Requirement is not a central path whitelist or permission to weaken platform merge protection."
+normative: "The repository must retain its declared license and contribution/change discipline, run branch hygiene, and enforce the blocking RepoGuard gate through exact immutable pull-request BASE/HEAD snapshots pinned to accepted RepoGuard v6.0.1. Governance is expressed through these typed current artifacts and executable checks, not through a central legacy path whitelist or duplicate policy file, and platform merge protection must not be weakened."
 lifecycle:
   accepted: true
   current: true
@@ -149,7 +149,3 @@ relations:
     target:
       kind: artifact
       path: profiles/mts-historical-images.json
-  - predicates: [requires]
-    target:
-      kind: artifact
-      path: repo-policy.json

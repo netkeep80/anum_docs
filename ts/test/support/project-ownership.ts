@@ -1,5 +1,6 @@
 // Project-scoped ownership witnesses. This is a consumer of native RepoGuard
 // Requirements, not a second Requirement authority or a new semantic MTS model.
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join, relative, resolve } from "node:path";
@@ -127,29 +128,24 @@ export function verifyProjectOwnership(
     if (get(id).get(path) !== predicate)
       fail(id + " missing " + predicate + " witness for " + path);
   };
-  // P7-S16: exact accepted historical lineage files are already protected by the
-  // current repo-policy.json pr_immutable contract. This verifies actual retained
-  // files against the sole existing project Requirement without granting historic
-  // contracts any competing semantic authority.
-  const repoPolicy = object(JSON.parse(read("repo-policy.json")), "repository policy");
-  const immutable = array(object(repoPolicy.paths, "policy paths").pr_immutable,
-    "repository pr_immutable").map((item) => {
-    if (typeof item !== "string") fail("immutable policy path must be a string");
-    return item;
-  });
-  const acceptedLegacyPath = (path: string): boolean =>
-    /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13)\.json$/.test(path) ||
-    /^cutover\/typescript-c1-acceptance-v0\.[1-7]\.json$/.test(path) ||
-    /^traceability\/mts-v0\.(?:11|12|13)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
-  const liveImmutableLineage = sorted(new Set(immutable.filter(acceptedLegacyPath)));
-  if (liveImmutableLineage.length !== 18)
-    fail("accepted historical immutable lineage inventory changed");
+  // P7-S37: accepted historical lineage is protected directly by the typed
+  // current Requirement and by byte identity against the exact trusted S37
+  // pre-retirement snapshot. The retired legacy policy is not a second list.
+  const acceptedImmutablePath = (path: string): boolean =>
+    /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13|14|15)\.json$/.test(path) ||
+    /^cutover\/typescript-c1-acceptance-v0\.[1-8]\.json$/.test(path) ||
+    path === "requirements/mts-v0.15.json" ||
+    /^traceability\/mts-v0\.(?:11|12|13|14|15)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
   const declaredImmutableLineage = sorted([...get("MTS-PROJECT-ACCEPTED-LINEAGE-01").entries()]
-    .filter(([path]) => acceptedLegacyPath(path)).map(([path]) => path));
-  equalPaths(declaredImmutableLineage, liveImmutableLineage,
-    "accepted historical immutable lineage");
-  for (const path of liveImmutableLineage)
+    .filter(([path]) => acceptedImmutablePath(path)).map(([path]) => path));
+  if (declaredImmutableLineage.length !== 26)
+    fail("accepted immutable lineage inventory changed");
+  const immutableLineageSnapshot = "705433694c2a5c3fe4a0f80d4e7b8e3fb448d82d";
+  for (const path of declaredImmutableLineage) {
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
+    if (!existsSync(resolve(root, path)))
+      fail("accepted immutable lineage file missing: " + path);
+  }
 
   // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
   // tests. Deleting them caused the real FULL runner to fail closed because
@@ -372,38 +368,12 @@ export function verifyProjectOwnership(
   if (!s34Gates.includes("ts/test/anum-two-memory-conformance.test.ts"))
     fail("S34 transitive anum carrier has no mandatory FULL root");
 
-  // P7-S36: RepoGuard v6 is the current blocking gate. The retained
-  // repo-policy.json still carries temporary compatibility/governance metadata,
-  // but the live gate contract is exact immutable PR BASE/HEAD plus the accepted pin.
-  const s32Enforcement = object(repoPolicy.enforcement, "S36 policy enforcement");
-  if (repoPolicy.repository_kind !== "documentation" ||
-      s32Enforcement.mode !== "blocking")
-    fail("S36 current blocking policy mode changed");
-  const s32GovernancePaths = array(object(repoPolicy.paths, "S36 policy paths").governance_paths,
-    "S36 governance paths");
-  if (!s32GovernancePaths.includes("repo-policy.json") ||
-      !s32GovernancePaths.includes(".github/workflows/repo-guard.yml"))
-    fail("S36 governance policy/workflow bindings changed");
-  const s32DocRelations = object(repoPolicy.document_relations, "S36 document relations");
-  const s32Documents = object(s32DocRelations.documents, "S36 control documents");
-  if (object(s32Documents["repo-guard-workflow"], "S36 guard document").path !==
-      ".github/workflows/repo-guard.yml")
-    fail("S36 live guard document binding changed");
-  const s32Rules = array(s32DocRelations.rules, "S36 document enforcement rules");
-  const s32Rule = (id: string) => object(
-    s32Rules.find(v => object(v, "S36 rule").id === id), "S36 guard rule " + id);
-  const s32Base = s32Rule("repo-guard-workflow-base");
-  const s32Head = s32Rule("repo-guard-workflow-head");
-  if (s32Base.kind !== "scalar_equals_literal" ||
-      s32Base.value !== "${{ github.event.pull_request.base.sha }}" ||
-      object(s32Base.source, "S36 base rule source").document !== "repo-guard-workflow" ||
-      s32Head.kind !== "scalar_equals_literal" ||
-      s32Head.value !== "${{ github.event.pull_request.head.sha }}" ||
-      object(s32Head.source, "S36 head rule source").document !== "repo-guard-workflow")
-    fail("S36 exact BASE/HEAD policy document bindings changed");
-  const s32GuardSource = read(".github/workflows/repo-guard.yml");
+  // P7-S37: RepoGuard v6 is verified directly from the live workflow. The
+  // retired legacy policy is neither an input nor a duplicate authority.
+  const s32GuardPath = ".github/workflows/repo-guard.yml";
+  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", s32GuardPath, "implemented_by");
+  const s32GuardSource = read(s32GuardPath);
   const s32GuardPin = "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114";
-  const s32PinRule = s32Rule("repo-guard-workflow-action-pin");
   const s32GuardDoc = parseDocument(s32GuardSource,
     { strict: true, uniqueKeys: true, merge: false });
   if (s32GuardDoc.errors.length || s32GuardDoc.warnings.length)
@@ -422,14 +392,12 @@ export function verifyProjectOwnership(
     fail("S36 requires exactly one repo_guard workflow step");
   const s32RepoGuardStep = s32RepoGuardSteps[0]!;
   const s32RepoGuardWith = object(s32RepoGuardStep.with, "S36 repo_guard with");
-  if (s32PinRule.value !== s32GuardPin ||
-      s32RepoGuardStep.uses !== s32GuardPin ||
+  if (s32RepoGuardStep.uses !== s32GuardPin ||
       s32RepoGuardWith.base !== "${{ github.event.pull_request.base.sha }}" ||
       s32RepoGuardWith.head !== "${{ github.event.pull_request.head.sha }}" ||
       "mode" in s32RepoGuardWith ||
       "enforcement" in s32RepoGuardWith)
     fail("S36 v6 blocking gate source/pin/exact-SHA contract changed");
-  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
 
   // P7-S33: FULL historical v0.14 acceptance replay physically reads the
   // one erratum protecting its immutable candidate-era currentAccepted block.
@@ -1445,6 +1413,45 @@ export function verifyProjectOwnership(
   equalPaths(declaredObservatoryTests, executedObservatoryTests, "Contract Observatory executed tests");
   for (const path of executedObservatoryTests)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "verified_by");
+
+  // S37: the 27th retained pr_immutable resource is authored Markdown,
+  // so it remains owned by the existing publication Requirement rather than
+  // being forced into ACCEPTED-LINEAGE-01. Preserve its exact trusted bytes
+  // independently of the ordinary current-document publication checks.
+  const immutableResearchPath = "docs/research/Новое осмысление МТС.md";
+  assertRelation("MTS-PROJECT-PUBLICATION-01", immutableResearchPath, "documents");
+  if (!existsSync(resolve(root, immutableResearchPath)))
+    fail("accepted historical publication source missing: " + immutableResearchPath);
+  let acceptedResearchContent: string;
+  try {
+    acceptedResearchContent = execFileSync(
+      "git", ["show", immutableLineageSnapshot + ":" + immutableResearchPath],
+      { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 },
+    );
+  } catch {
+    fail("accepted historical publication source snapshot unavailable: " + immutableResearchPath);
+  }
+  if (read(immutableResearchPath) !== acceptedResearchContent)
+    fail("accepted historical publication source content changed: " + immutableResearchPath);
+
+  // S37 immutable-byte verification intentionally runs after the semantic
+  // owner checks so their narrower diagnostics remain independently falsifiable.
+  // It closes the retained pr_immutable obligation over the other 26 machine
+  // resources against the same exact trusted pre-retirement snapshot.
+  for (const path of declaredImmutableLineage) {
+    let acceptedContent: string;
+    try {
+      acceptedContent = execFileSync("git", ["show", immutableLineageSnapshot + ":" + path], {
+        cwd: root,
+        encoding: "utf8",
+        maxBuffer: 8 * 1024 * 1024,
+      });
+    } catch {
+      fail("accepted immutable lineage snapshot unavailable: " + path);
+    }
+    if (read(path) !== acceptedContent)
+      fail("accepted historical immutable lineage content changed: " + path);
+  }
 
   assertRelation("MTS-PROJECT-CI-01", "ts/src/tooling/test-tier.ts", "implemented_by");
   assertRelation("MTS-PROJECT-CI-01", "ts/test/test-tier.test.ts", "verified_by");
