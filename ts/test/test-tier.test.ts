@@ -382,6 +382,19 @@ s32ForgedPin.document_relations.rules.find((v: any) =>
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32PolicyPath]: JSON.stringify(s32ForgedPin),
 }), /S32 temporary blocking gate source\/pin changed/, "S32 forged pinned guard rejected");
+const s32Rebound = structuredClone(s32Policy);
+s32Rebound.document_relations.documents["repo-guard-workflow"].path =
+  ".github/workflows/ci.yml";
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32Rebound),
+}), /S32 live guard document binding changed/, "S32 rerouted governance workflow rejected");
+const s32ForgedRule = structuredClone(s32Policy);
+s32ForgedRule.document_relations.rules.find((v: any) =>
+  v.id === "repo-guard-workflow-enforcement").value = "monitor";
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32ForgedRule),
+}), /S32 guard policy document enforcement changed/,
+"S32 advisory control-document rule rejected");
 const s32WorkflowPath = ".github/workflows/repo-guard.yml";
 const s32Workflow = readFileSync(resolve(s32Root, s32WorkflowPath), "utf8");
 assert.ok(s32Workflow.includes("enforcement: blocking"));
