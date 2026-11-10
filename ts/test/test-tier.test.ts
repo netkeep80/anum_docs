@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 460);
+assert.equal(p7CandidateWitness.exactRelations, 461);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -186,6 +186,63 @@ assert.throws(() => verifyProjectOwnership(s29Root, {
   [s29Path]: JSON.stringify(s29Readiness),
 }), /S29 historical readiness must remain pre-Author decision/,
 "S29 forged accepted conclusion rejected");
+
+// P7-S33: an actual FULL v0.14 accepted-lineage test reads the exact
+// correction to its immutable candidate-era currentAccepted snapshot.
+const s33Root = resolve("..");
+const s33Path = "traceability/mts-v0.14-errata.json";
+const s33OwnerPath = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.rg.yaml";
+const s33Owner = readFileSync(resolve(s33Root, s33OwnerPath), "utf8");
+const s33Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + s33Path + "\n";
+assert.ok(s33Owner.includes(s33Relation), "S33 one historical correction relation exists");
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33OwnerPath]: s33Owner.replace(s33Relation, ""),
+}), /missing requires witness/, "S33 missing owner link rejected");
+const s33ReaderPath = "ts/test/v014-traceability-candidate.test.ts";
+const s33Reader = readFileSync(resolve(s33Root, s33ReaderPath), "utf8");
+assert.ok(s33Reader.includes('json(join(repoRoot, "' + s33Path + '"))'));
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33ReaderPath]: s33Reader.replace('"' + s33Path + '"', '"' + s33Path + '.forged"'),
+}), /S33 physical historical errata reader missing/,
+"S33 disconnected actual FULL historical reader rejected");
+const s33Source = JSON.parse(readFileSync(resolve(s33Root, s33Path), "utf8"));
+const s33Authority = structuredClone(s33Source);
+s33Authority.selectorAuthority = true;
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Authority),
+}), /S33 historical errata authority boundary changed/,
+"S33 forged current selector authority rejected");
+const s33Classification = structuredClone(s33Source);
+s33Classification.corrections[0].classification = "CURRENT_ACCEPTED";
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Classification),
+}), /S33 stale historical selector classification changed/,
+"S33 forged historical currentAccepted classification rejected");
+const s33Observed = structuredClone(s33Source);
+s33Observed.corrections[0].observed.contract = "contracts/mts-contract-v0.14.json";
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Observed),
+}), /S33 historical immutable stale snapshot mismatch/,
+"S33 falsified immutable historical observation rejected");
+const s33Cutover = structuredClone(s33Source);
+s33Cutover.corrections[0].authoritativeCurrent.acceptance =
+  "cutover/typescript-c1-acceptance-v0.8.json";
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Cutover),
+}), /S33 historical accepted cutover pointer changed/,
+"S33 forged history-to-current cutover promotion rejected");
+const s33Mutable = structuredClone(s33Source);
+s33Mutable.sourceImmutable = false;
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Mutable),
+}), /S33 historical errata authority boundary changed/,
+"S33 false claim that historical original is mutable rejected");
+const s33Delta = structuredClone(s33Source);
+s33Delta.acceptedSemanticDelta = "REDEFINED";
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Delta),
+}), /S33 historical errata authority boundary changed/,
+"S33 illicit retroactive semantic delta rejected");
 
 // S30: exact two-source historical readiness dependency, not blanket FORMAL
 // ownership. All four negative cases must fail the existing owner verifier.

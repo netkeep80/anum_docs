@@ -185,6 +185,61 @@ export function verifyProjectOwnership(
     fail("S32 temporary blocking gate source/pin changed");
   assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
 
+  // P7-S33: FULL historical v0.14 acceptance replay physically reads the
+  // one erratum protecting its immutable candidate-era currentAccepted block.
+  // This is retained lineage evidence, never today's release selector.
+  const s33Path = "traceability/mts-v0.14-errata.json";
+  const s33ReaderPath = "ts/test/v014-traceability-candidate.test.ts";
+  const s33Ast = ts.createSourceFile(s33ReaderPath, read(s33ReaderPath),
+    ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  let s33Reader = false;
+  const s33Visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+        node.expression.text === "json" && node.arguments.length === 1) {
+      const arg = node.arguments[0];
+      if (arg && ts.isCallExpression(arg) && ts.isIdentifier(arg.expression) &&
+          arg.expression.text === "join" && arg.arguments.length === 2 &&
+          ts.isIdentifier(arg.arguments[0]!) &&
+          (arg.arguments[0] as ts.Identifier).text === "repoRoot" &&
+          ts.isStringLiteral(arg.arguments[1]!) &&
+          (arg.arguments[1] as ts.StringLiteral).text === s33Path)
+        s33Reader = true;
+    }
+    ts.forEachChild(node, s33Visit);
+  };
+  s33Visit(s33Ast);
+  if (!s33Reader) fail("S33 physical historical errata reader missing");
+  const s33Errata = object(JSON.parse(read(s33Path)), "S33 errata");
+  if (s33Errata.schema !== "mts-traceability-errata/v0.1" ||
+      s33Errata.mtsVersion !== "v0.14" ||
+      s33Errata.authority !== "historical-correction-only" ||
+      s33Errata.selectorAuthority !== false ||
+      s33Errata.acceptedSemanticDelta !== "NONE" ||
+      s33Errata.sourceImmutable !== true ||
+      s33Errata.source !== "traceability/mts-v0.14.json")
+    fail("S33 historical errata authority boundary changed");
+  const s33Corrections = array(s33Errata.corrections, "S33 corrections");
+  if (s33Corrections.length !== 1) fail("S33 historical exact correction count changed");
+  const s33Correction = object(s33Corrections[0], "S33 correction");
+  if (s33Correction.pointer !== "/currentAccepted" ||
+      s33Correction.classification !== "STALE_PRE_ACCEPTANCE_SNAPSHOT")
+    fail("S33 stale historical selector classification changed");
+  const s33Traceability = object(JSON.parse(read("traceability/mts-v0.14.json")),
+    "S33 accepted immutable v0.14 traceability");
+  if (JSON.stringify(s33Correction.observed) !==
+      JSON.stringify(s33Traceability.currentAccepted))
+    fail("S33 historical immutable stale snapshot mismatch");
+  const s33HistoricalCutover = object(JSON.parse(read("cutover/typescript-c1-acceptance-v0.7.json")),
+    "S33 accepted historical cutover");
+  const s33Current = object(s33HistoricalCutover.current, "S33 historical current");
+  const s33Authoritative = object(s33Correction.authoritativeCurrent, "S33 corrected accepted pointer");
+  if (s33Authoritative.policy !== "repo-policy.json" ||
+      s33Authoritative.acceptance !== "cutover/typescript-c1-acceptance-v0.7.json" ||
+      s33Authoritative.contract !== s33Current.contract ||
+      s33Authoritative.conformance !== s33Current.conformance)
+    fail("S33 historical accepted cutover pointer changed");
+  assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", s33Path, "requires");
+
   // P7-S29: acceptance cutover points to one exact historical pre-Author
   // readiness record. Preserve it as release lineage, not a new authority.
   // The historical executable verifier must physically read the same file.

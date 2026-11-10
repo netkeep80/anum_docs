@@ -217,3 +217,7 @@ relations:
     target:
       kind: artifact
       path: formal/v0.15/evidence/readiness-audit-r2.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: traceability/mts-v0.14-errata.json
