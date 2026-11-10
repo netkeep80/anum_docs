@@ -1,0 +1,63 @@
+name: P7-S36 exact BASE-to-HEAD J3 report (TEMPORARY DO NOT MERGE)
+
+on:
+  push:
+    branches: [diagnostics/p7-s36-exact-v6-20261110]
+    paths: [".github/workflows/p7-s36-j3.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  j3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          fetch-depth: 1
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact v6 CLI report
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=9bdca48e10f9ac80e5a539495c040c425851854a
+          HEAD=d368ccc525db95a91f3132ee801a387548ddb7a3
+          git -C candidate fetch origin migration/p7-s36-repoguard-v6-blocking-cutover-20261110
+          git -C candidate checkout --detach "$HEAD"
+          test "$(git -C candidate rev-parse HEAD)" = "$HEAD"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" \
+            --repo-root "$GITHUB_WORKSPACE/candidate" \
+            check --base "$BASE" --head "$HEAD" --format json > "$RUNNER_TEMP/report.json"
+          python3 - <<'PY'
+          import json, os
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"report.json")))
+          print("FORMAT",o.get("format"))
+          print("OK",o.get("ok"))
+          print("BASE",o.get("base"))
+          print("HEAD",o.get("head"))
+          print("J1",o.get("j1"))
+          print("J2",o.get("j2"))
+          print("J3",o.get("j3"))
+          print("DIAGNOSTICS",o.get("diagnostics"))
+          assert o["ok"] is True
+          assert o["j1"]["head"] is True and o["j1"]["tracked"]==649 and o["j1"]["justified"]==649
+          assert o["j2"]["head"] is True and o["j2"]["rooted"]==54
+          assert o["j3"]["ok"] is True
+          assert o["diagnostics"]==[]
+          print("P7_S36_EXACT_BASE_HEAD_J3=PASS")
+          PY
