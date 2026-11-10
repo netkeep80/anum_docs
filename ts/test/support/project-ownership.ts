@@ -144,19 +144,7 @@ export function verifyProjectOwnership(
   for (const path of declaredImmutableLineage) {
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
     if (!existsSync(resolve(root, path)))
-      fail("accepted historical immutable lineage file missing: " + path);
-    let acceptedContent: string;
-    try {
-      acceptedContent = execFileSync("git", ["show", immutableLineageSnapshot + ":" + path], {
-        cwd: root,
-        encoding: "utf8",
-        maxBuffer: 8 * 1024 * 1024,
-      });
-    } catch {
-      fail("accepted historical immutable lineage snapshot unavailable: " + path);
-    }
-    if (read(path) !== acceptedContent)
-      fail("accepted historical immutable lineage content changed: " + path);
+      fail("accepted immutable lineage file missing: " + path);
   }
 
   // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
@@ -1425,6 +1413,25 @@ export function verifyProjectOwnership(
   equalPaths(declaredObservatoryTests, executedObservatoryTests, "Contract Observatory executed tests");
   for (const path of executedObservatoryTests)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "verified_by");
+
+  // S37 immutable-byte verification intentionally runs after the semantic
+  // owner checks so their narrower diagnostics remain independently falsifiable.
+  // It then closes the stronger retained pr_immutable obligation over all 26
+  // surviving resources against the exact trusted pre-retirement snapshot.
+  for (const path of declaredImmutableLineage) {
+    let acceptedContent: string;
+    try {
+      acceptedContent = execFileSync("git", ["show", immutableLineageSnapshot + ":" + path], {
+        cwd: root,
+        encoding: "utf8",
+        maxBuffer: 8 * 1024 * 1024,
+      });
+    } catch {
+      fail("accepted immutable lineage snapshot unavailable: " + path);
+    }
+    if (read(path) !== acceptedContent)
+      fail("accepted historical immutable lineage content changed: " + path);
+  }
 
   assertRelation("MTS-PROJECT-CI-01", "ts/src/tooling/test-tier.ts", "implemented_by");
   assertRelation("MTS-PROJECT-CI-01", "ts/test/test-tier.test.ts", "verified_by");
