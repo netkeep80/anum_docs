@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 459);
+assert.equal(p7CandidateWitness.exactRelations, 460);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -351,6 +351,56 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s16PolicyFile]: s16PolicyText.replace(s16ProtectedPath, ""),
 }), /accepted historical immutable lineage inventory changed/,
   "S16: removing an accepted immutable legacy path from policy must fail");
+
+// S32: policy belongs to the existing change-governance owner because
+// an actual blocking RepoGuard workflow and the CURRENT S16 verifier consume it.
+const s32Root = resolve("..");
+const s32OwnerPath = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
+const s32Owner = readFileSync(resolve(s32Root, s32OwnerPath), "utf8");
+const s32Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: repo-policy.json\n";
+assert.ok(s32Owner.includes(s32Relation), "S32 exact policy relation exists");
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32OwnerPath]: s32Owner.replace(s32Relation, ""),
+}), /S32|missing requires witness/, "S32 missing exact policy ownership rejected");
+const s32PolicyPath = "repo-policy.json";
+const s32Policy = JSON.parse(readFileSync(resolve(s32Root, s32PolicyPath), "utf8"));
+const s32Blocked = structuredClone(s32Policy);
+s32Blocked.enforcement.mode = "advisory";
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32Blocked),
+}), /S32 current blocking policy mode changed/, "S32 nonblocking policy rejected");
+const s32Unbound = structuredClone(s32Policy);
+s32Unbound.paths.governance_paths = s32Unbound.paths.governance_paths
+  .filter((path: string) => path !== "repo-policy.json");
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32Unbound),
+}), /S32 governance policy\/workflow bindings changed/, "S32 removed self-governance rejected");
+const s32ForgedPin = structuredClone(s32Policy);
+s32ForgedPin.document_relations.rules.find((v: any) =>
+  v.id === "repo-guard-workflow-action-pin").value =
+    "netkeep80/repo-guard@" + "0".repeat(40);
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32ForgedPin),
+}), /S32 temporary blocking gate source\/pin changed/, "S32 forged pinned guard rejected");
+const s32Rebound = structuredClone(s32Policy);
+s32Rebound.document_relations.documents["repo-guard-workflow"].path =
+  ".github/workflows/ci.yml";
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32Rebound),
+}), /S32 live guard document binding changed/, "S32 rerouted governance workflow rejected");
+const s32ForgedRule = structuredClone(s32Policy);
+s32ForgedRule.document_relations.rules.find((v: any) =>
+  v.id === "repo-guard-workflow-enforcement").value = "monitor";
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32PolicyPath]: JSON.stringify(s32ForgedRule),
+}), /S32 guard policy document enforcement changed/,
+"S32 advisory control-document rule rejected");
+const s32WorkflowPath = ".github/workflows/repo-guard.yml";
+const s32Workflow = readFileSync(resolve(s32Root, s32WorkflowPath), "utf8");
+assert.ok(s32Workflow.includes("enforcement: blocking"));
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s32Workflow.replace("enforcement: blocking", "enforcement: monitor"),
+}), /S32 temporary blocking gate source\/pin changed/, "S32 weakened actual workflow rejected");
 
 // P7-S17: an actual documentation/source consumer must causally own each
 // current audit/profile input, not just cite the path as historical metadata.

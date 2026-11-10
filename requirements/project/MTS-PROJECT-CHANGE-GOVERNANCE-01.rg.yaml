@@ -149,3 +149,7 @@ relations:
     target:
       kind: artifact
       path: profiles/mts-historical-images.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: repo-policy.json
