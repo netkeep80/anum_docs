@@ -56,13 +56,13 @@ assert.equal(p7CandidateWitness.candidates, 6);
 assert.equal(p7CandidateWitness.publicExportModules, 39);
 assert.equal(p7CandidateWitness.proofEvidenceRecords, 43);
 assert.equal(p7CandidateWitness.formalReplayResources, 21);
-assert.equal(p7CandidateWitness.approvedSourceIntegrityResources, 6);
+assert.equal(p7CandidateWitness.approvedSourceIntegrityResources, 15);
 assert.equal(p7CandidateWitness.compiledProofSourceUnits, 16);
 assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 539);
+assert.equal(p7CandidateWitness.exactRelations, 554);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -311,6 +311,101 @@ assert.throws(() => verifyProjectOwnership(s34Root, {
     "tier === \"current\" ? plan.currentSourceTests : plan.currentSourceTests"),
 }), /S34 FULL tier execution binding changed/,
 "S34 silently narrowed mandatory FULL runner rejected");
+
+// P7-S35 final bounded disposition: exactly 11 present-tense retained
+// resources (4 operational/publication, 4 FULL proof tests, 3 pinned wire inputs).
+const s35Root = resolve("..");
+const s35CIPath = "requirements/project/MTS-PROJECT-CI-01.rg.yaml";
+const s35CIText = readFileSync(resolve(s35Root, s35CIPath), "utf8");
+const s35ProofPath = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const s35ProofText = readFileSync(resolve(s35Root, s35ProofPath), "utf8");
+const s35PubPath = "requirements/project/MTS-PROJECT-PUBLICATION-01.rg.yaml";
+const s35PubText = readFileSync(resolve(s35Root, s35PubPath), "utf8");
+const s35Typed = (predicate: string, path: string): string =>
+  "  - predicates: [" + predicate + "]\n    target:\n      kind: artifact\n      path: " + path + "\n";
+for (const [ownerPath, ownerText, predicate, path] of [
+  [s35CIPath,s35CIText,"requires",".gitignore"],
+  [s35CIPath,s35CIText,"implemented_by",".github/workflows/mathlib-m0-export.yml"],
+  [s35PubPath,s35PubText,"requires","profiles/amemory-execution-profile.json"],
+  [s35PubPath,s35PubText,"verified_by","ts/test/mts-source-requirement.test.ts"],
+  [s35ProofPath,s35ProofText,"verified_by","ts/test/proof-explicit-model.test.ts"],
+  [s35ProofPath,s35ProofText,"verified_by","ts/test/derived-nat-addition-proof.test.ts"],
+  [s35ProofPath,s35ProofText,"verified_by","ts/test/derived-nat0-induction-closure.test.ts"],
+  [s35ProofPath,s35ProofText,"verified_by","ts/test/v015-compact-and-role-bundle-a1.test.ts"],
+  ...["not","or","xor"].map(op => [s35ProofPath,s35ProofText,
+    "requires","formal/v0.15/regression/compact-" + op + ".recursive"]),
+] as readonly (readonly string[])[]) {
+  const relation = s35Typed(predicate!, path!);
+  assert.ok(ownerText!.includes(relation), "S35 exact retained relation " + path);
+  assert.throws(() => verifyProjectOwnership(s35Root, {
+    [ownerPath!]: ownerText!.replace(relation, ""),
+  }), /missing (?:requires|verified_by|implemented_by) witness|exact current FORMAL replay and approved SHA-256 source inputs/,
+  "S35 unowned real current input rejected: " + path);
+}
+const s35Profile = JSON.parse(readFileSync(resolve(s35Root,
+  "profiles/amemory-execution-profile.json"), "utf8"));
+s35Profile.authority.machineReadableProjectionIsCompetingSemanticOwner = true;
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  "profiles/amemory-execution-profile.json": JSON.stringify(s35Profile),
+}), /S35 historical A-memory projection falsely promoted/,
+"S35 false semantic elevation of v0.13 profile rejected");
+const s35PublicationPath = "docs/specs/Апамять и управление сетью связей.md";
+const s35PublicationText = readFileSync(resolve(s35Root, s35PublicationPath), "utf8");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35PublicationPath]: s35PublicationText.replace(
+    "](../../profiles/amemory-execution-profile.json)",
+    "](../../profiles/obsolete-profile.json)"),
+}), /S35 current publication historical profile link or authority boundary changed/,
+"S35 broken live historical profile link rejected");
+const s35IgnorePath = ".gitignore";
+const s35Ignore = readFileSync(resolve(s35Root, s35IgnorePath), "utf8");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35IgnorePath]: s35Ignore.replace("node_modules/", "node_modules_DO_NOT_IGNORE/"),
+}), /S35 active generated-artifact Git exclusion missing/,
+"S35 executable build outputs can no longer escape Git hygiene");
+const s35WorkflowPath = ".github/workflows/mathlib-m0-export.yml";
+const s35Workflow = readFileSync(resolve(s35Root, s35WorkflowPath), "utf8");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35WorkflowPath]: s35Workflow.replace("workflow_dispatch:", "never_dispatch:"),
+}), /S35 pinned untrusted manual Mathlib workflow obligation changed/,
+"S35 manually triggered pinned reproducibility is no longer executable");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35WorkflowPath]: s35Workflow.replace("untrusted-export-evidence",
+    "approved-semantic-proof"),
+}), /S35 pinned untrusted manual Mathlib workflow obligation changed/,
+"S35 optional Mathlib export cannot promote itself to accepted proof evidence");
+const s35PinnedTestPath = "ts/test/v015-compact-not-approved-source-integrity.test.ts";
+const s35PinnedTest = readFileSync(resolve(s35Root, s35PinnedTestPath), "utf8");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35PinnedTestPath]: s35PinnedTest.replace(
+    "1728cf457b3d1cc6db132bb7d9e2b312d16999023002f73c3529cf622938c692",
+    "0".repeat(64)),
+}), /S35 approved Boolean source SHA-256 drift/,
+"S35 tampered approved NOT wire SHA-256 rejected");
+
+// S35-R: current generated theorem index still routes these four test files.
+// The FULL tier rejects missing physical evidence; ownership must not be faked.
+const s35CurrentIndexPath = "theorems/current-v0.15.json";
+const s35Index = JSON.parse(readFileSync(resolve(s35Root, s35CurrentIndexPath), "utf8"));
+for (const path of [
+  "ts/test/codec-capability-model.test.ts",
+  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  "ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
+  "ts/test/v013-dual-encoding-boundary.test.ts",
+]) {
+  const clause = s35Typed("verified_by", path);
+  assert.ok(s35ProofText.includes(clause), "S35 restored exact machine evidence " + path);
+  assert.throws(() => verifyProjectOwnership(s35Root, {
+    [s35ProofPath]: s35ProofText.replace(clause, ""),
+  }), /missing verified_by witness/, "S35 current theorem-index evidence owner removal rejected");
+}
+const s35ForgedIndex = JSON.stringify(s35Index).replaceAll(
+  "ts/test/codec-capability-model.test.ts",
+  "ts/test/codec-capability-model.forged.test.ts");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35CurrentIndexPath]: s35ForgedIndex,
+}), /S35 current theorem-index exact machine test link missing/,
+"S35 current theorem evidence path rewrite rejected");
 
 // S30: exact two-source historical readiness dependency, not blanket FORMAL
 // ownership. All four negative cases must fail the existing owner verifier.
@@ -680,10 +775,10 @@ assert.throws(
 assert.throws(
   () => verifyProjectOwnership(resolve(".."), {
     [proofOwnerFile]: proofOwnerText +
-      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-not.recursive\n",
+      "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: formal/v0.15/regression/compact-unsupported.recursive\n",
   }),
-  /exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
-  "S8: existing but unread optional recursive file must not become current ownership",
+  /missing tracked target: formal\/v0\.15\/regression\/compact-unsupported\.recursive|exact current FORMAL replay and approved SHA-256 source inputs relation coverage mismatches/,
+  "S8/S35: an unobserved synthetic recursive file must not become current ownership",
 );
 const frozenTestPath = "ts/test/v015-frozen-replay-artifact-integrity.test.ts";
 assert.throws(

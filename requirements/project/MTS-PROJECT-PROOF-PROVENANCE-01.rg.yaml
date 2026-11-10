@@ -605,3 +605,47 @@ relations:
     target:
       kind: artifact
       path: ts/test/v013-cyclic-grounding-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/derived-nat-addition-proof.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/derived-nat0-induction-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/proof-explicit-model.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v015-compact-and-role-bundle-a1.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-not.recursive
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-or.recursive
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/regression/compact-xor.recursive
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/codec-capability-model.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-explicit-zero-image-a72y.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-recursive-link-inversion-a75a.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-dual-encoding-boundary.test.ts

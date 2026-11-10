@@ -425,3 +425,11 @@ relations:
     target:
       kind: artifact
       path: ts/src/v013-grounded-execution.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: .gitignore
+  - predicates: [implemented_by]
+    target:
+      kind: artifact
+      path: .github/workflows/mathlib-m0-export.yml

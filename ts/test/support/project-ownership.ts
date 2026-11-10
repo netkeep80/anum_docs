@@ -151,6 +151,132 @@ export function verifyProjectOwnership(
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
 
+  // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
+  // tests. Deleting them caused the real FULL runner to fail closed because
+  // the current generated theorem index still requires their physical files.
+  // This is operational evidence provenance, NOT native semantic authority.
+  const s35Provers = object(JSON.parse(read("proofs/provers.json")), "S35 theorem infrastructure");
+  const s35IndexPath = s35Provers.currentTheoremIndex;
+  if (s35IndexPath !== "theorems/current-v0.15.json")
+    fail("S35 current theorem source index identity changed");
+  const s35Index = object(JSON.parse(read(s35IndexPath)), "S35 current theorem index");
+  if (s35Index.schema !== "mts-current-theorem-index/v0.1" ||
+      s35Index.authority !== "generated-index-only")
+    fail("S35 theorem evidence index cannot gain normative authority");
+  const s35IndexRefs = new Set<string>();
+  const s35CollectIndexRefs = (value: unknown): void => {
+    if (typeof value === "string" && /^ts\/test\/[^/]+\.test\.ts$/.test(value))
+      s35IndexRefs.add(value);
+    else if (Array.isArray(value)) value.forEach(s35CollectIndexRefs);
+    else if (value !== null && typeof value === "object")
+      Object.values(value).forEach(s35CollectIndexRefs);
+  };
+  s35CollectIndexRefs(s35Index);
+  const s35RequiredTheoremTests = [
+    ["ts/test/codec-capability-model.test.ts", "SEMANTIC_DELTA=NONE"],
+    ["ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+      "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED"],
+    ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
+      "FULL_MTS_AUTOMORPHISM=NOT_YET_CLASSIFIED"],
+    ["ts/test/v013-dual-encoding-boundary.test.ts",
+      "dual encoding witness: GREEN"],
+  ] as const;
+  const s35TierConsumer = read("ts/src/tooling/test-tier.ts");
+  if (!s35TierConsumer.includes("collectExactTestReferences(surface, references)") ||
+      !s35TierConsumer.includes("for (const surface of [contract, conformance, traceability, currentTheoremIndex])") ||
+      !s35TierConsumer.includes("machine-readable evidence references missing test"))
+    fail("S35 current theorem index physical test consumer disconnected");
+  for (const [path, boundary] of s35RequiredTheoremTests) {
+    if (!s35IndexRefs.has(path))
+      fail("S35 current theorem-index exact machine test link missing: " + path);
+    if (!read(path).includes(boundary))
+      fail("S35 required theorem evidence test boundary changed: " + path);
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "verified_by");
+  }
+
+  // P7-S35: disposition of exact operational, publication and proof
+  // witnesses. Historical research not backed by a present-tense obligation
+  // is retired in Git history; these remaining paths have real consumers.
+  const s35Ignore = read(".gitignore").split(/\r?\n/);
+  const s35IgnoreRules = ["dist/", "build/", "node_modules/", ".env"];
+  for (const rule of s35IgnoreRules)
+    if (!s35Ignore.includes(rule))
+      fail("S35 active generated-artifact Git exclusion missing: " + rule);
+  const s35TsConfig = object(JSON.parse(read("ts/tsconfig.json")), "S35 TS compiler config");
+  if (object(s35TsConfig.compilerOptions, "S35 TS compiler options").outDir !== "dist" ||
+      !read(".github/workflows/ci.yml").includes("npm ci --prefix ts"))
+    fail("S35 active CI build-to-ignore dependency changed");
+  assertRelation("MTS-PROJECT-CI-01", ".gitignore", "requires");
+  const s35MathlibPath = ".github/workflows/mathlib-m0-export.yml";
+  const s35Mathlib = read(s35MathlibPath);
+  if (!s35Mathlib.includes("workflow_dispatch:") ||
+      !s35Mathlib.includes("research/mathlib-m0/lean/**") ||
+      !s35Mathlib.includes("Mathlib M0 pinned export") ||
+      !s35Mathlib.includes("netkeep80/anum_docs") && !s35Mathlib.includes("anum_docs-research") ||
+      !s35Mathlib.includes("untrusted-export-evidence") ||
+      !s35Mathlib.includes("cmp \"$artifact_dir/corpus-export-1.json\"") ||
+      !s35Mathlib.includes("leanprover-community/mathlib4") ||
+      !s35Mathlib.includes("mathlibSha"))
+    fail("S35 pinned untrusted manual Mathlib workflow obligation changed");
+  assertRelation("MTS-PROJECT-CI-01", s35MathlibPath, "implemented_by");
+
+  const s35ProfilePath = "profiles/amemory-execution-profile.json";
+  const s35Docs = read("docs/specs/Апамять и управление сетью связей.md");
+  if (!s35Docs.includes("](../../" + s35ProfilePath + ")") ||
+      !s35Docs.includes("Текущая семантика исполнения МТС v0.15 определяется исключительно"))
+    fail("S35 current publication historical profile link or authority boundary changed");
+  const s35Profile = object(JSON.parse(read(s35ProfilePath)), "S35 A-memory historical profile");
+  if (s35Profile.schema !== "mts-amemory-execution-profile/v0.1" ||
+      object(s35Profile.foundation, "S35 old profile foundation").mtsVersion !== "v0.13" ||
+      object(s35Profile.authority, "S35 old profile authority")
+        .machineReadableProjectionIsCompetingSemanticOwner !== false)
+    fail("S35 historical A-memory projection falsely promoted");
+  const s35Design = object(JSON.parse(read("profiles/mts-v015-generalized-reaction-candidate.json")),
+    "S35 historical design provenance");
+  if (object(s35Design.acceptedBase, "S35 design acceptedBase").acceptedProfile !== s35ProfilePath ||
+      object(s35Design.integrationBoundary, "S35 design boundary").soleAcceptanceAuthority !== false)
+    fail("S35 historical profile's nonauthoritative design pointer changed");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", s35ProfilePath, "requires");
+
+  const s35SourceTest = "ts/test/mts-source-requirement.test.ts";
+  const s35TestText = read(s35SourceTest);
+  const s35TestAst = ts.createSourceFile(s35SourceTest, s35TestText,
+    ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  if (!s35TestAst.statements.some(statement => ts.isImportDeclaration(statement) &&
+        ts.isStringLiteral(statement.moduleSpecifier) &&
+        statement.moduleSpecifier.text === "../src/tooling/mts-source-requirement.js") ||
+      !s35TestText.includes('assert.equal(model.modelStatus, "proposed")') ||
+      !s35TestText.includes("assert.equal(model.semanticChange, false)") ||
+      !s35TestText.includes('assert.equal(model.id, "MTS-FND-V14-L1")'))
+    fail("S35 nonauthoritative source-review test consumer changed");
+  assertRelation("MTS-PROJECT-PUBLICATION-01", s35SourceTest, "verified_by");
+
+  // Four executable FULL proof/approved source guards have exact source
+  // bindings and reject actual regressions, not just historical names.
+  const s35ProofTests = [
+    ["ts/test/derived-nat-addition-proof.test.ts", "../src/derivation.js",
+      "replayStructuralDerivationWithTheorems"],
+    ["ts/test/derived-nat0-induction-closure.test.ts", "../src/derived-derivation-closure.js",
+      "replayStructuralClosureApplication"],
+    ["ts/test/proof-explicit-model.test.ts", "node:fs", "MtsExplicitModel.lean"],
+    ["ts/test/v015-compact-and-role-bundle-a1.test.ts", "node:fs", "compact-and.formal"],
+  ] as const;
+  const s35Runner = read("ts/src/tooling/test-runner.ts");
+  if (!s35Runner.includes("const selectedBuiltTests = selectedSourcePaths.map") ||
+      !s35Runner.includes("const selectedBuiltSet = new Set(selectedBuiltTests)") ||
+      !s35Runner.includes("spawnSync(process.execPath"))
+    fail("S35 FULL proof regression runner no longer executes selected paths");
+  for (const [path, specifier, required] of s35ProofTests) {
+    const body = read(path);
+    const source = ts.createSourceFile(path, body, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    if (!source.statements.some(statement => ts.isImportDeclaration(statement) &&
+          ts.isStringLiteral(statement.moduleSpecifier) &&
+          statement.moduleSpecifier.text === specifier) ||
+        !body.includes(required))
+      fail("S35 accepted FULL proof/compatibility source witness changed: " + path);
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "verified_by");
+  }
+
   // P7-S34 BULK: retain only presently invoked FULL compatibility gates and
   // explicit CURRENT assurance, never all historical test files. This is
   // execution/evidence ownership, NOT retroactive native semantic authority.
@@ -789,14 +915,49 @@ export function verifyProjectOwnership(
   }));
   if (approvedSourcePaths.length !== 6 || new Set(approvedSourcePaths).size !== 6)
     fail("S26 approved source triples must be six disjoint physical artifacts");
+  // S35: compact NOT/OR/XOR are separately Author-approved SHA-256
+  // checked source triples. S8's previous optional-file negative predated
+  // their current physical FULL integrity readers. No recursive glob.
+  const s35BooleanSourcePaths = sorted(["not", "or", "xor"].flatMap(operator => {
+    const path = "ts/test/v015-compact-" + operator + "-approved-source-integrity.test.ts";
+    const consumer = read(path);
+    if (!consumer.includes("for (const [path, sha256] of expected)") ||
+        !consumer.includes("readFileSync(resolve(repo, path))") ||
+        !consumer.includes('createHash("sha256").update(bytes).digest("hex")') ||
+        !consumer.includes("AUTHOR_DECISION=APPROVE_ALL_EXISTING"))
+      fail("S35 approved compact Boolean hash consumer changed: " + path);
+    const pairs = [...consumer.matchAll(
+      /\["(formal\/v0\.15\/regression\/compact-[^"]+\.(?:formal|json|recursive))", "([a-f0-9]{64})"\]/g,
+    )].map(m => ({ path: m[1]!, digest: m[2]! }));
+    const expected = sorted(["formal", "json", "recursive"].map(ext =>
+      "formal/v0.15/regression/compact-" + operator + "." + ext));
+    equalPaths(sorted(pairs.map(p => p.path)), expected,
+      "S35 exact approved Boolean source triple: " + operator);
+    for (const {path: input, digest} of pairs) {
+      const actual = createHash("sha256").update(readFileSync(resolve(root, input)))
+        .digest("hex");
+      if (actual !== digest) fail("S35 approved Boolean source SHA-256 drift: " + input);
+    }
+    return expected;
+  }));
+  if (s35BooleanSourcePaths.length !== 9)
+    fail("S35 approved Boolean source integrity cardinality changed");
+  // Six Boolean FORMAL/JSON inputs are already S8 replay inputs. Only the
+  // three additionally SHA-pinned recursive wires need new ownership links.
+  const approvedAllSourcePaths = sorted([...approvedSourcePaths,
+    ...s35BooleanSourcePaths.filter(path => path.endsWith(".recursive"))]);
+  if (approvedAllSourcePaths.length !== 9 ||
+      new Set(approvedAllSourcePaths).size !== 9)
+    fail("S35 separately approved recursive source inputs have overlap");
+
   const declaredReplayPaths = sorted([...proofOwner.entries()]
     .filter(([path]) => path.startsWith("formal/v0.15/regression/"))
     .map(([path]) => path));
-  equalPaths(declaredReplayPaths, sorted([...exactReplayPaths, ...approvedSourcePaths]),
+  equalPaths(declaredReplayPaths, sorted([...exactReplayPaths, ...approvedAllSourcePaths]),
     "exact current FORMAL replay and approved SHA-256 source inputs");
   for (const path of exactReplayPaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
-  for (const path of approvedSourcePaths)
+  for (const path of approvedAllSourcePaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
 
   // P7-S14: current theorem projection contract names exact evidence inputs.
@@ -1276,7 +1437,7 @@ export function verifyProjectOwnership(
     transitiveSourceDependencies: transitiveRequired.length,
     proofEvidenceRecords: evidencePaths.length,
     formalReplayResources: exactReplayPaths.length,
-    approvedSourceIntegrityResources: approvedSourcePaths.length,
+    approvedSourceIntegrityResources: approvedSourcePaths.length + s35BooleanSourcePaths.length,
     compiledProofSourceUnits: compiledProofPaths.length,
     protectedHistoricalImages: protectedAssets.length,
     currentDocumentationSurfaces: currentDocuments.length,
