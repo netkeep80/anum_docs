@@ -222,6 +222,18 @@ assert.throws(() => verifyProjectOwnership(s29Root, {
   [s30Paths[1]]: JSON.stringify(s30Audit),
 }), /S30 historical blocked audit status changed/,
 "S30 forged historical readiness status rejected");
+const s30GovResult = JSON.parse(readFileSync(resolve(s29Root, s30Paths[0]), "utf8"));
+s30GovResult.acceptance.governanceSatisfied = false;
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s30Paths[0]]: JSON.stringify(s30GovResult),
+}), /S30 governance witness falsely accepts v0.15/,
+"S30 false historical governance-green claim rejected");
+const s30AuditResult = JSON.parse(readFileSync(resolve(s29Root, s30Paths[1]), "utf8"));
+s30AuditResult.conclusion.operationalMergeGovernance = "GREEN";
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s30Paths[1]]: JSON.stringify(s30AuditResult),
+}), /S30 historical blocked audit status changed/,
+"S30 forged historical governance observation rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
