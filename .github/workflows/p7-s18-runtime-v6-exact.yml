@@ -1,4 +1,4 @@
-name: P7-S27 candidate exact v6 J1 J2 (TEMPORARY)
+name: P7-S28 candidate exact v6 J1 J2 (TEMPORARY)
 on:
   push:
     branches: [chore/p7-s18-runtime-v6-20261109]
@@ -24,20 +24,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - name: Exact P7-S27 candidate J1 and J2
+      - name: Exact P7-S28 candidate J1 and J2
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin cleanup/p7-s27-native-fnd02-fnd13-witness-pins-20261110
-          git -C candidate checkout --detach 2e1c4362ef91b732ef7572133367c249de71853c
-          test "$(git -C candidate rev-parse HEAD)" = "2e1c4362ef91b732ef7572133367c249de71853c"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "59a5f1ea90d8e815d202db01fc2fb02bdf06aaf4"
+          git -C candidate fetch origin cleanup/p7-s28-retire-orphan-a9-research-test-20261110
+          git -C candidate checkout --detach ac954ccb44a4d41c80a61b59fcbab764bd89f5b3
+          test "$(git -C candidate rev-parse HEAD)" = "ac954ccb44a4d41c80a61b59fcbab764bd89f5b3"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "bd09b8aff1cbcc3c748176176c6acb169dc327d5"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=2e1c4362ef91b732ef7572133367c249de71853c
-          echo EXACT_TREE=59a5f1ea90d8e815d202db01fc2fb02bdf06aaf4
+          echo EXACT_HEAD=ac954ccb44a4d41c80a61b59fcbab764bd89f5b3
+          echo EXACT_TREE=bd09b8aff1cbcc3c748176176c6acb169dc327d5
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 2e1c4362ef91b732ef7572133367c249de71853c --head 2e1c4362ef91b732ef7572133367c249de71853c --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base ac954ccb44a4d41c80a61b59fcbab764bd89f5b3 --head ac954ccb44a4d41c80a61b59fcbab764bd89f5b3 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
@@ -48,13 +48,74 @@ jobs:
           print("J1_ACTUAL",o.get("j1"))
           print("J2_ACTUAL",o.get("j2"))
           print("UNJUSTIFIED_COUNT",len(paths))
-          expected={'ts/test/recursive-link-identity-proof.test.ts','ts/test/v013-aspect-foundation-theorem.test.ts','ts/test/v013-cyclic-grounding-boundary.test.ts'}
-          print("EXPECTED_S27_NATIVE_WITNESSES",sorted(expected))
-          assert o['j1']['tracked']==651 and o['j1']['justified']==549, "unexpected J1 counts"
-          assert len(paths)==102 and not expected.intersection(paths), "unexpected three FND-02/FND-13 source witnesses"
+          expected={'ts/test/research-v013-semantic-dependency-projection-a9.test.ts'}
+          print("RETIRED_S28_RESOURCE",sorted(expected))
+          assert o['j1']['tracked']==650 and o['j1']['justified']==549, "unexpected J1 counts"
+          assert len(paths)==101 and not expected.intersection(paths), "unexpected A9 historical source retirement"
           assert o['j2']['rooted']==54 and o['j2']['head'] is True, "unexpected J2"
-          print("P7_S27_THREE_NATIVE_SOURCE_PINS=PASS")
+          print("P7_S28_ONE_A9_RESOURCE_RETIREMENT=PASS")
           print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
           for p in paths: print("J1_UNJUSTIFIED_PATH",p)
           PY
           test "$rc" -eq 1
+
+  behavior:
+    name: Exact S28 CURRENT / FULL / Observatory falsification
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Pin actual trial HEAD and immutable tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s28-retire-orphan-a9-research-test-20261110
+          git -C candidate checkout --detach ac954ccb44a4d41c80a61b59fcbab764bd89f5b3
+          test "$(git -C candidate rev-parse HEAD)" = "ac954ccb44a4d41c80a61b59fcbab764bd89f5b3"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "bd09b8aff1cbcc3c748176176c6acb169dc327d5"
+          test ! -e candidate/ts/test/research-v013-semantic-dependency-projection-a9.test.ts
+          node -e 'const fs=require("node:fs");const p=fs.readFileSync("candidate/repo-policy.json","utf8"),l=fs.readFileSync("candidate/requirements/mts-source/MTS-FND-V14-L1.yaml","utf8");JSON.parse(p);if(p.includes("science-shared-research-classification-test")||p.includes("research-v013-semantic-dependency-projection-a9.test.ts")||l.includes("research-v013-semantic-dependency-projection-a9.test.ts"))process.exit(3)'
+          echo S28_EXACT_HEAD=ac954ccb44a4d41c80a61b59fcbab764bd89f5b3
+          echo S28_EXACT_TREE=bd09b8aff1cbcc3c748176176c6acb169dc327d5
+      - name: Install exact candidate dependencies
+        shell: bash
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          npm ci --prefix vendor/repo-guard --omit=dev --ignore-scripts --no-audit --no-fund
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+      - name: Exact CURRENT 43 and FULL 155
+        shell: bash
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          npm --prefix ts run check:current
+          npm --prefix ts run check:full
+          (
+            cd ts
+            node --input-type=module -e 'import {buildTestTierPlan} from "./dist/src/tooling/test-tier.js";import {resolve} from "node:path";const p=buildTestTierPlan(resolve(".."));console.log("S28_CURRENT_FULL_COUNTS",p.currentSourceTests.length,p.allSourceTests.length);if(p.currentSourceTests.length!==43||p.allSourceTests.length!==155||p.allSourceTests.includes("ts/test/research-v013-semantic-dependency-projection-a9.test.ts"))process.exit(4)'
+          )
+          echo S28_EXACT_CURRENT_FULL=PASS
+      - name: Exact generated documentation and Observatory
+        shell: bash
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          npm --prefix ts run docs:check
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+          echo S28_EXACT_OBSERVATORY=PASS
