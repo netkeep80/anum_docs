@@ -1,0 +1,48 @@
+name: P7-S30 exact FULL and Observatory (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s30-exact-v6-20261110]
+    paths: [".github/workflows/p7-s30-full-observatory-diagnostic.yml"]
+permissions: {contents: read}
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact S30 FULL 155 + Pages verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s30-g1-r2-accepted-evidence-20261110
+          git -C candidate checkout --detach 032133e64a821bff9b94c73776c4ed433881d86e
+          test "$(git -C candidate rev-parse HEAD)" = "032133e64a821bff9b94c73776c4ed433881d86e"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "bc39cf47f9e03ce5a96b16b965bb11f857b5f85b"
+          echo EXACT_HEAD=032133e64a821bff9b94c73776c4ed433881d86e
+          echo EXACT_TREE=bc39cf47f9e03ce5a96b16b965bb11f857b5f85b
+          cd candidate
+          test "$(git -C vendor/repo-guard rev-parse HEAD)" = "b8aaf22b11d8f045bc47b78f0a2a0808ae208b71"
+          npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+          npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+          npm --prefix ts test
+          npm --prefix ts run docs:check
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:sync
+          git diff --exit-code -- README.md PORTFOLIO.md docs
+          npm --prefix ts run docs:coverage
+          ./ts/node_modules/.bin/tsc -p web/contract-observatory/tsconfig.json
+          node web/contract-observatory/dist/test/contract-index.test.js
+          node web/contract-observatory/dist/test/site.test.js
+          node web/contract-observatory/dist/src/build-site.js . _site
+          test -s _site/index.html
+          test -f _site/.nojekyll
+          echo P7_S30_EXACT_FULL_OBSERVATORY=PASS
