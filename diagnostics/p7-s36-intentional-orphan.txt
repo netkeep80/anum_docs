@@ -1,0 +1,1 @@
+P7-S36 intentional RED probe. This file has no Requirement owner and must be rejected by RepoGuard v6.
