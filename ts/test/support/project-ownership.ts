@@ -150,6 +150,41 @@ export function verifyProjectOwnership(
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
 
+  // P7-S32: the current RepoGuard configuration is an operational
+  // governance input, already consumed by the running blocking workflow and
+  // by S16's immutable-lineage verifier. This is not a new policy authority.
+  const s32Enforcement = object(repoPolicy.enforcement, "S32 policy enforcement");
+  if (repoPolicy.repository_kind !== "documentation" ||
+      s32Enforcement.mode !== "blocking")
+    fail("S32 current blocking policy mode changed");
+  const s32GovernancePaths = array(object(repoPolicy.paths, "S32 policy paths").governance_paths,
+    "S32 governance paths");
+  if (!s32GovernancePaths.includes("repo-policy.json") ||
+      !s32GovernancePaths.includes(".github/workflows/repo-guard.yml"))
+    fail("S32 governance policy/workflow bindings changed");
+  const s32DocRelations = object(repoPolicy.document_relations, "S32 document relations");
+  const s32Documents = object(s32DocRelations.documents, "S32 control documents");
+  if (object(s32Documents["repo-guard-workflow"], "S32 guard document").path !==
+      ".github/workflows/repo-guard.yml")
+    fail("S32 live guard document binding changed");
+  const s32Rules = array(s32DocRelations.rules, "S32 document enforcement rules");
+  const s32Rule = object(s32Rules.find(v => object(v, "S32 rule").id ===
+    "repo-guard-workflow-enforcement"), "S32 guard enforcement rule");
+  if (s32Rule.kind !== "scalar_equals_literal" || s32Rule.value !== "blocking" ||
+      object(s32Rule.source, "S32 rule source").document !== "repo-guard-workflow")
+    fail("S32 guard policy document enforcement changed");
+  const s32GuardSource = read(".github/workflows/repo-guard.yml");
+  const s32GuardPin = "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2";
+  const s32PinRule = object(s32Rules.find(v => object(v, "S32 rule").id ===
+    "repo-guard-workflow-action-pin"), "S32 guard action pin rule");
+  if (s32PinRule.value !== s32GuardPin ||
+      !s32GuardSource.includes("uses: " + s32GuardPin) ||
+      !s32GuardSource.includes("mode: check-pr") ||
+      !s32GuardSource.includes("enforcement: blocking") ||
+      !s32GuardSource.includes("name: repo-guard blocking check"))
+    fail("S32 temporary blocking gate source/pin changed");
+  assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
+
   // P7-S29: acceptance cutover points to one exact historical pre-Author
   // readiness record. Preserve it as release lineage, not a new authority.
   // The historical executable verifier must physically read the same file.
