@@ -563,6 +563,17 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s16LineageFile]: s16LineageText.replace(s16LineageRelation, ""),
 }), /accepted historical immutable lineage inventory changed/,
   "S37: exact immutable historic contract cannot lose typed ownership");
+const s37FrozenProfilePath = "traceability/mts-v0.13-self-proof-authority-profile.json";
+const s37FrozenProfile = readFileSync(resolve("..", s37FrozenProfilePath), "utf8");
+assert.ok(s37FrozenProfile.includes('"proofAcceptanceAuthority": true'),
+  "S37 frozen verifier profile baseline must expose proofAcceptanceAuthority=true");
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s37FrozenProfilePath]: s37FrozenProfile.replace(
+    '"proofAcceptanceAuthority": true',
+    '"proofAcceptanceAuthority": false',
+  ),
+}), /accepted historical immutable lineage content changed: traceability\/mts-v0\.13-self-proof-authority-profile\.json/,
+"S37 frozen historical evidence content mutation rejected even when path and relation remain intact");
 
 // S37: the live blocking gate belongs directly to change governance. No
 // repo-policy.json is needed to restate the workflow contract.
