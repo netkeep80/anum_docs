@@ -1414,10 +1414,30 @@ export function verifyProjectOwnership(
   for (const path of executedObservatoryTests)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "verified_by");
 
+  // S37: the 27th retained pr_immutable resource is authored Markdown,
+  // so it remains owned by the existing publication Requirement rather than
+  // being forced into ACCEPTED-LINEAGE-01. Preserve its exact trusted bytes
+  // independently of the ordinary current-document publication checks.
+  const immutableResearchPath = "docs/research/Новое осмысление МТС.md";
+  assertRelation("MTS-PROJECT-PUBLICATION-01", immutableResearchPath, "documents");
+  if (!existsSync(resolve(root, immutableResearchPath)))
+    fail("accepted historical publication source missing: " + immutableResearchPath);
+  let acceptedResearchContent: string;
+  try {
+    acceptedResearchContent = execFileSync(
+      "git", ["show", immutableLineageSnapshot + ":" + immutableResearchPath],
+      { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 },
+    );
+  } catch {
+    fail("accepted historical publication source snapshot unavailable: " + immutableResearchPath);
+  }
+  if (read(immutableResearchPath) !== acceptedResearchContent)
+    fail("accepted historical publication source content changed: " + immutableResearchPath);
+
   // S37 immutable-byte verification intentionally runs after the semantic
   // owner checks so their narrower diagnostics remain independently falsifiable.
-  // It then closes the stronger retained pr_immutable obligation over all 26
-  // surviving resources against the exact trusted pre-retirement snapshot.
+  // It closes the retained pr_immutable obligation over the other 26 machine
+  // resources against the same exact trusted pre-retirement snapshot.
   for (const path of declaredImmutableLineage) {
     let acceptedContent: string;
     try {
