@@ -1,0 +1,59 @@
+name: P7-S35 final 16 exact pinned RG v6 (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s35-final16-exact-v6-20261110]
+    paths: [".github/workflows/p7-s35-final16-exact-v6.yml"]
+permissions: {contents: read, issues: read, pull-requests: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact S35 J1 J2 and J3 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s35-last16-grouped-causal-disposition-20261110
+          git -C candidate checkout --detach e98036230ea5252bbfc4aea7fbe9e9df7a204d8b
+          test "$(git -C candidate rev-parse HEAD)" = "e98036230ea5252bbfc4aea7fbe9e9df7a204d8b"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "a317e0cfc535fb10dead69d3353074951ca3a830"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=e98036230ea5252bbfc4aea7fbe9e9df7a204d8b
+          echo EXACT_TREE=a317e0cfc535fb10dead69d3353074951ca3a830
+          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base e98036230ea5252bbfc4aea7fbe9e9df7a204d8b --head e98036230ea5252bbfc4aea7fbe9e9df7a204d8b --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import json,os
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          unjustified=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("J3_ACTUAL",o.get("j3"))
+          print("UNJUSTIFIED_COUNT",len(unjustified))
+          for path in unjustified: print("J1_UNJUSTIFIED_PATH",path)
+          assert o["j1"]["tracked"]==645 and o["j1"]["justified"]==645 and o["j1"]["head"] is True,"unexpected S35 J1"
+          assert len(unjustified)==0,"remaining J1 debt"
+          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True,"unexpected J2"
+          print("P7_S35_EXACT_16_GREEN=PASS")
+          PY
+          test "$rc" -eq 0
