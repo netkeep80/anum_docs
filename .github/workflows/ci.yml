@@ -550,7 +550,7 @@ jobs:
         shell: bash
         run: |
           echo "Checking root directory..."
-          allowed='README.md|LICENSE|PORTFOLIO.md|repo-policy.json|.gitignore|.gitkeep|.gitmodules'
+          allowed='README.md|LICENSE|PORTFOLIO.md|.gitignore|.gitkeep|.gitmodules'
           unexpected=0
           while IFS= read -r file; do
             if ! grep -Eq "^(${allowed})$" <<< "$file"; then
