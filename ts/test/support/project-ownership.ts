@@ -131,14 +131,15 @@ export function verifyProjectOwnership(
   // P7-S37: accepted historical lineage is protected directly by the typed
   // current Requirement and by byte identity against the exact trusted S37
   // pre-retirement snapshot. The retired legacy policy is not a second list.
-  const acceptedLegacyPath = (path: string): boolean =>
-    /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13)\.json$/.test(path) ||
-    /^cutover\/typescript-c1-acceptance-v0\.[1-7]\.json$/.test(path) ||
-    /^traceability\/mts-v0\.(?:11|12|13)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
+  const acceptedImmutablePath = (path: string): boolean =>
+    /^contracts\/mts-(?:contract|conformance)-v0\.(?:11|12|13|14|15)\.json$/.test(path) ||
+    /^cutover\/typescript-c1-acceptance-v0\.[1-8]\.json$/.test(path) ||
+    path === "requirements/mts-v0.15.json" ||
+    /^traceability\/mts-v0\.(?:11|12|13|14|15)(?:-self-proof-authority-profile|-semantic-dependency-projection)?\.json$/.test(path);
   const declaredImmutableLineage = sorted([...get("MTS-PROJECT-ACCEPTED-LINEAGE-01").entries()]
-    .filter(([path]) => acceptedLegacyPath(path)).map(([path]) => path));
-  if (declaredImmutableLineage.length !== 18)
-    fail("accepted historical immutable lineage inventory changed");
+    .filter(([path]) => acceptedImmutablePath(path)).map(([path]) => path));
+  if (declaredImmutableLineage.length !== 26)
+    fail("accepted immutable lineage inventory changed");
   const immutableLineageSnapshot = "705433694c2a5c3fe4a0f80d4e7b8e3fb448d82d";
   for (const path of declaredImmutableLineage) {
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
