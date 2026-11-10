@@ -1,0 +1,77 @@
+name: P7-S36 exact candidate verification (TEMPORARY DO NOT MERGE)
+
+on:
+  push:
+    branches: [diagnostics/p7-s36-exact-v6-20261110]
+    paths: [".github/workflows/p7-s36-exact-v6.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  exact-v6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - name: Pin exact S36 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate checkout --detach 9bef60197565e2608fc56b7c6f00463a8b476248
+          test "$(git -C candidate rev-parse HEAD)" = "9bef60197565e2608fc56b7c6f00463a8b476248"
+          test "$(git -C candidate rev-parse 9bdca48e10f9ac80e5a539495c040c425851854a)" = "9bdca48e10f9ac80e5a539495c040c425851854a"
+      - name: Run pinned RepoGuard v6 Action on exact BASE to HEAD
+        id: guard
+        uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114
+        with:
+          repo-root: ${{ github.workspace }}/candidate
+          base: 9bdca48e10f9ac80e5a539495c040c425851854a
+          head: 9bef60197565e2608fc56b7c6f00463a8b476248
+      - name: Assert exact v6 result
+        shell: bash
+        run: |
+          test "${{ steps.guard.outputs.result }}" = "passed"
+          echo "${{ steps.guard.outputs.summary }}"
+          echo P7_S36_EXACT_V6_ACTION=PASS
+
+  current:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 9bef60197565e2608fc56b7c6f00463a8b476248
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+      - run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+      - run: npm --prefix ts run check:current
+
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 9bef60197565e2608fc56b7c6f00463a8b476248
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+      - run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+      - run: npm --prefix ts run check:full
