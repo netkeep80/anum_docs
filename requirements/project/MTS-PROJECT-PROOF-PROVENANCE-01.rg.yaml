@@ -633,3 +633,19 @@ relations:
     target:
       kind: artifact
       path: formal/v0.15/regression/compact-xor.recursive
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/codec-capability-model.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-explicit-zero-image-a72y.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-recursive-link-inversion-a75a.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-dual-encoding-boundary.test.ts

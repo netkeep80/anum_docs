@@ -151,6 +151,49 @@ export function verifyProjectOwnership(
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
 
+  // P7-S35-R: FOUR exact currently machine-referenced theorem evidence
+  // tests. Deleting them caused the real FULL runner to fail closed because
+  // the current generated theorem index still requires their physical files.
+  // This is operational evidence provenance, NOT native semantic authority.
+  const s35Provers = object(JSON.parse(read("proofs/provers.json")), "S35 theorem infrastructure");
+  const s35IndexPath = s35Provers.currentTheoremIndex;
+  if (s35IndexPath !== "theorems/current-v0.15.json")
+    fail("S35 current theorem source index identity changed");
+  const s35Index = object(JSON.parse(read(s35IndexPath)), "S35 current theorem index");
+  if (s35Index.schema !== "mts-current-theorem-index/v0.1" ||
+      s35Index.authority !== "generated-index-only")
+    fail("S35 theorem evidence index cannot gain normative authority");
+  const s35IndexRefs = new Set<string>();
+  const s35CollectIndexRefs = (value: unknown): void => {
+    if (typeof value === "string" && /^ts\/test\/[^/]+\.test\.ts$/.test(value))
+      s35IndexRefs.add(value);
+    else if (Array.isArray(value)) value.forEach(s35CollectIndexRefs);
+    else if (value !== null && typeof value === "object")
+      Object.values(value).forEach(s35CollectIndexRefs);
+  };
+  s35CollectIndexRefs(s35Index);
+  const s35RequiredTheoremTests = [
+    ["ts/test/codec-capability-model.test.ts", "SEMANTIC_DELTA=NONE"],
+    ["ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+      "V013_NOT_ACCEPTED PRODUCTION_UNCHANGED"],
+    ["ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
+      "FULL_MTS_AUTOMORPHISM=NOT_YET_CLASSIFIED"],
+    ["ts/test/v013-dual-encoding-boundary.test.ts",
+      "dual encoding witness: GREEN"],
+  ] as const;
+  const s35TierConsumer = read("ts/src/tooling/test-tier.ts");
+  if (!s35TierConsumer.includes("collectExactTestReferences(surface, references)") ||
+      !s35TierConsumer.includes("for (const surface of [contract, conformance, traceability, currentTheoremIndex])") ||
+      !s35TierConsumer.includes("machine-readable evidence references missing test"))
+    fail("S35 current theorem index physical test consumer disconnected");
+  for (const [path, boundary] of s35RequiredTheoremTests) {
+    if (!s35IndexRefs.has(path))
+      fail("S35 current theorem-index exact machine test link missing: " + path);
+    if (!read(path).includes(boundary))
+      fail("S35 required theorem evidence test boundary changed: " + path);
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "verified_by");
+  }
+
   // P7-S35: disposition of exact operational, publication and proof
   // witnesses. Historical research not backed by a present-tense obligation
   // is retired in Git history; these remaining paths have real consumers.

@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 550);
+assert.equal(p7CandidateWitness.exactRelations, 554);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -382,6 +382,30 @@ assert.throws(() => verifyProjectOwnership(s35Root, {
     "0".repeat(64)),
 }), /S35 approved Boolean source SHA-256 drift/,
 "S35 tampered approved NOT wire SHA-256 rejected");
+
+// S35-R: current generated theorem index still routes these four test files.
+// The FULL tier rejects missing physical evidence; ownership must not be faked.
+const s35CurrentIndexPath = "theorems/current-v0.15.json";
+const s35Index = JSON.parse(readFileSync(resolve(s35Root, s35CurrentIndexPath), "utf8"));
+for (const path of [
+  "ts/test/codec-capability-model.test.ts",
+  "ts/test/research-v013-explicit-zero-image-a72y.test.ts",
+  "ts/test/research-v013-recursive-link-inversion-a75a.test.ts",
+  "ts/test/v013-dual-encoding-boundary.test.ts",
+]) {
+  const clause = s35Typed("verified_by", path);
+  assert.ok(s35ProofText.includes(clause), "S35 restored exact machine evidence " + path);
+  assert.throws(() => verifyProjectOwnership(s35Root, {
+    [s35ProofPath]: s35ProofText.replace(clause, ""),
+  }), /missing verified_by witness/, "S35 current theorem-index evidence owner removal rejected");
+}
+const s35ForgedIndex = JSON.stringify(s35Index).replace(
+  "ts/test/codec-capability-model.test.ts",
+  "ts/test/codec-capability-model.forged.test.ts");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35CurrentIndexPath]: s35ForgedIndex,
+}), /S35 current theorem-index exact machine test link missing/,
+"S35 current theorem evidence path rewrite rejected");
 
 // S30: exact two-source historical readiness dependency, not blanket FORMAL
 // ownership. All four negative cases must fail the existing owner verifier.
