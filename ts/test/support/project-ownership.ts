@@ -404,13 +404,30 @@ export function verifyProjectOwnership(
   const s32GuardSource = read(".github/workflows/repo-guard.yml");
   const s32GuardPin = "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114";
   const s32PinRule = s32Rule("repo-guard-workflow-action-pin");
+  const s32GuardDoc = parseDocument(s32GuardSource,
+    { strict: true, uniqueKeys: true, merge: false });
+  if (s32GuardDoc.errors.length || s32GuardDoc.warnings.length)
+    fail("S36 blocking workflow must be strict unambiguous YAML");
+  const s32GuardWorkflow = object(s32GuardDoc.toJS({ maxAliasCount: 0 }),
+    "S36 blocking workflow");
+  const s32GuardJobs = object(s32GuardWorkflow.jobs, "S36 blocking workflow jobs");
+  const s32PolicyCheck = object(s32GuardJobs["policy-check"], "S36 policy-check job");
+  if (s32PolicyCheck.name !== "repo-guard blocking check")
+    fail("S36 required-check identity changed");
+  const s32GuardSteps = array(s32PolicyCheck.steps, "S36 policy-check steps");
+  const s32RepoGuardSteps = s32GuardSteps
+    .map((value, index) => object(value, "S36 policy-check step " + index))
+    .filter(step => step.id === "repo_guard");
+  if (s32RepoGuardSteps.length !== 1)
+    fail("S36 requires exactly one repo_guard workflow step");
+  const s32RepoGuardStep = s32RepoGuardSteps[0]!;
+  const s32RepoGuardWith = object(s32RepoGuardStep.with, "S36 repo_guard with");
   if (s32PinRule.value !== s32GuardPin ||
-      !s32GuardSource.includes("uses: " + s32GuardPin) ||
-      !s32GuardSource.includes("base: ${{ github.event.pull_request.base.sha }}") ||
-      !s32GuardSource.includes("head: ${{ github.event.pull_request.head.sha }}") ||
-      !s32GuardSource.includes("name: repo-guard blocking check") ||
-      s32GuardSource.includes("mode: check-pr") ||
-      s32GuardSource.includes("enforcement: blocking"))
+      s32RepoGuardStep.uses !== s32GuardPin ||
+      s32RepoGuardWith.base !== "${{ github.event.pull_request.base.sha }}" ||
+      s32RepoGuardWith.head !== "${{ github.event.pull_request.head.sha }}" ||
+      "mode" in s32RepoGuardWith ||
+      "enforcement" in s32RepoGuardWith)
     fail("S36 v6 blocking gate source/pin/exact-SHA contract changed");
   assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
 
