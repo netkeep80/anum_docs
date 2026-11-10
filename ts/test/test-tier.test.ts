@@ -270,6 +270,12 @@ assert.throws(() => verifyProjectOwnership(s31Root, {
   [s31Checks[1].path]: s31Research.replace("RESEARCH_NOT_ACCEPTED", "ACCEPTED"),
 }), /S31 preview source marker or research boundary changed/,
 "S31 research-to-accepted authority promotion rejected");
+const s31Roles = readFileSync(resolve(s31Root, s31Checks[0].path), "utf8");
+assert.ok(s31Roles.includes("LINK_IDENTITY_EQUALITY"));
+assert.throws(() => verifyProjectOwnership(s31Root, {
+  [s31Checks[0].path]: s31Roles.replace("LINK_IDENTITY_EQUALITY", "FORGED_ROLE"),
+}), /S31 preview source marker or research boundary changed/,
+"S31 corrupted notation role source rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
