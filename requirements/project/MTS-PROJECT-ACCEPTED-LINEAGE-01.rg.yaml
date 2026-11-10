@@ -205,3 +205,7 @@ relations:
     target:
       kind: artifact
       path: requirements/mts-v0.13.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/evidence/final-readiness-r3.json
