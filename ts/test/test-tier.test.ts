@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 554);
+assert.equal(p7CandidateWitness.exactRelations, 553);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -552,79 +552,57 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /S25 tier synthetic evidence source probe was removed/,
 "S25 no self-referential CURRENT evidence source witness");
 
-// P7-S16: protected historical lineage is an actual policy obligation, not
-// a discretionary bulk J1 relation. Test both missing typed ownership and
-// silent policy removal independently from exact real source files.
+// P7-S37: protected historical lineage is a direct typed current Requirement
+// obligation. The legacy policy inventory is retired rather than kept as a
+// second list.
 const s16LineageFile = "requirements/project/MTS-PROJECT-ACCEPTED-LINEAGE-01.rg.yaml";
 const s16LineageText = readFileSync(resolve("..", s16LineageFile), "utf8");
 const s16LineageRelation = "  - predicates: [requires]\\n    target:\\n      kind: artifact\\n      path: contracts/mts-conformance-v0.11.json\\n".replaceAll("\\n", "\n");
 assert.ok(s16LineageText.includes(s16LineageRelation));
 assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s16LineageFile]: s16LineageText.replace(s16LineageRelation, ""),
-}), /accepted historical immutable lineage relation coverage mismatches/,
-  "S16: exact immutable historic contract cannot lose requires");
-const s16PolicyFile = "repo-policy.json";
-const s16PolicyText = readFileSync(resolve("..", s16PolicyFile), "utf8");
-const s16ProtectedPath = '    "cutover/typescript-c1-acceptance-v0.1.json",\\n'.replaceAll("\\n", "\n");
-assert.ok(s16PolicyText.includes(s16ProtectedPath));
-assert.throws(() => verifyProjectOwnership(resolve(".."), {
-  [s16PolicyFile]: s16PolicyText.replace(s16ProtectedPath, ""),
 }), /accepted historical immutable lineage inventory changed/,
-  "S16: removing an accepted immutable legacy path from policy must fail");
+  "S37: exact immutable historic contract cannot lose typed ownership");
 
-// S36: the retained policy still belongs to change governance, while the live
-// blocking gate is now pinned RepoGuard v6 with exact PR BASE/HEAD inputs.
+// S37: the live blocking gate belongs directly to change governance. No
+// repo-policy.json is needed to restate the workflow contract.
 const s32Root = resolve("..");
 const s32OwnerPath = "requirements/project/MTS-PROJECT-CHANGE-GOVERNANCE-01.rg.yaml";
 const s32Owner = readFileSync(resolve(s32Root, s32OwnerPath), "utf8");
-const s32Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: repo-policy.json\n";
-assert.ok(s32Owner.includes(s32Relation), "S36 exact policy relation exists");
+const s32WorkflowPath = ".github/workflows/repo-guard.yml";
+const s32Relation = "  - predicates: [implemented_by]\n    target:\n      kind: artifact\n      path: " + s32WorkflowPath + "\n";
+assert.ok(s32Owner.includes(s32Relation), "S37 direct RepoGuard workflow relation exists");
 assert.throws(() => verifyProjectOwnership(s32Root, {
   [s32OwnerPath]: s32Owner.replace(s32Relation, ""),
-}), /S36|missing requires witness/, "S36 missing exact policy ownership rejected");
-const s32PolicyPath = "repo-policy.json";
-const s32Policy = JSON.parse(readFileSync(resolve(s32Root, s32PolicyPath), "utf8"));
-const s32Blocked = structuredClone(s32Policy);
-s32Blocked.enforcement.mode = "advisory";
-assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32PolicyPath]: JSON.stringify(s32Blocked),
-}), /S36 current blocking policy mode changed/, "S36 nonblocking policy rejected");
-const s32Unbound = structuredClone(s32Policy);
-s32Unbound.paths.governance_paths = s32Unbound.paths.governance_paths
-  .filter((path: string) => path !== "repo-policy.json");
-assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32PolicyPath]: JSON.stringify(s32Unbound),
-}), /S36 governance policy\/workflow bindings changed/, "S36 removed self-governance rejected");
-const s32ForgedPin = structuredClone(s32Policy);
-s32ForgedPin.document_relations.rules.find((v: any) =>
-  v.id === "repo-guard-workflow-action-pin").value =
-    "netkeep80/repo-guard@" + "0".repeat(40);
-assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32PolicyPath]: JSON.stringify(s32ForgedPin),
-}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/, "S36 forged pinned guard rejected");
-const s32Rebound = structuredClone(s32Policy);
-s32Rebound.document_relations.documents["repo-guard-workflow"].path =
-  ".github/workflows/ci.yml";
-assert.throws(() => verifyProjectOwnership(s32Root, {
-  [s32PolicyPath]: JSON.stringify(s32Rebound),
-}), /S36 live guard document binding changed/, "S36 rerouted governance workflow rejected");
-for (const [id, forged] of [
-  ["repo-guard-workflow-base", "${{ github.event.pull_request.head.sha }}"],
-  ["repo-guard-workflow-head", "${{ github.event.pull_request.base.sha }}"],
-] as const) {
-  const mutated = structuredClone(s32Policy);
-  mutated.document_relations.rules.find((v: any) => v.id === id).value = forged;
-  assert.throws(() => verifyProjectOwnership(s32Root, {
-    [s32PolicyPath]: JSON.stringify(mutated),
-  }), /S36 exact BASE\/HEAD policy document bindings changed/, "S36 forged exact SHA policy binding rejected");
-}
-const s32WorkflowPath = ".github/workflows/repo-guard.yml";
+}), /missing implemented_by witness/, "S37 missing direct RepoGuard workflow ownership rejected");
 const s32Workflow = readFileSync(resolve(s32Root, s32WorkflowPath), "utf8");
 assert.ok(s32Workflow.includes("uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114"));
 assert.ok(s32Workflow.includes("base: ${{ github.event.pull_request.base.sha }}"));
 assert.ok(s32Workflow.includes("head: ${{ github.event.pull_request.head.sha }}"));
 assert.ok(!s32Workflow.includes("mode: check-pr"));
 assert.ok(!s32Workflow.includes("enforcement: blocking"));
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s32Workflow.replace(
+    "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114",
+    "netkeep80/repo-guard@" + "0".repeat(40),
+  ),
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S37 forged active RepoGuard pin rejected");
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s32Workflow.replace("        id: repo_guard", "        id: repo_guard_disabled"),
+}), /S36 requires exactly one repo_guard workflow step/,
+"S37 missing active repo_guard id rejected");
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s32Workflow.replace("    name: repo-guard blocking check", "    name: repo-guard advisory check"),
+}), /S36 required-check identity changed/,
+"S37 required check identity drift rejected");
+assert.throws(() => verifyProjectOwnership(s32Root, {
+  [s32WorkflowPath]: s32Workflow.replace(
+    "          head: ${{ github.event.pull_request.head.sha }}",
+    "          head: ${{ github.event.pull_request.head.sha }}\n          mode: check-pr",
+  ),
+}), /S36 v6 blocking gate source\/pin\/exact-SHA contract changed/,
+"S37 legacy Action input cannot return");
 
 const s36WrongBaseWithComment = s32Workflow.replace(
   "          base: ${{ github.event.pull_request.base.sha }}",
