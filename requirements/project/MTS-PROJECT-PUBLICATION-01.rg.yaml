@@ -517,3 +517,11 @@ relations:
     target:
       kind: artifact
       path: ts/src/v015-formal-roles.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/mts-source-requirement.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: profiles/amemory-execution-profile.json
