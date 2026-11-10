@@ -573,6 +573,56 @@ export function verifyProjectOwnership(
   for (const path of compiledProofPaths)
     assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
 
+  // P7-S27: the active theorem catalog loader consumes pinned native proof
+  // evidence for FND-02/FND-13. Their kernel realizations are not independent
+  // external proofs. Preserve exactly the three physical executable sources.
+  const projectionLoader = read("ts/src/tooling/theorem-projection-model.ts");
+  const projectionCaller = read("ts/src/tooling/docs-sync.ts");
+  if (!projectionLoader.includes('readJson(root, "proofs/native-proof-assurance.json")') ||
+      !projectionLoader.includes("for (const targetValue of native.targets)") ||
+      !projectionLoader.includes('paths.add(text(evidence.path, "native assurance evidence.path"))') ||
+      !projectionCaller.includes("loadRepositoryTheoremProjectionSources("))
+    fail("S27 current theorem projection native provenance consumer changed");
+  const nativeAssurance = object(JSON.parse(read("proofs/native-proof-assurance.json")),
+    "S27 native assurance");
+  if (nativeAssurance.status !== "active" ||
+      nativeAssurance.authority !== "native-proof-assurance-classification-only")
+    fail("S27 native provenance classification changed");
+  const pinned = new Map<string, string>();
+  const pinnedTargets = array(nativeAssurance.targets, "S27 native targets");
+  for (const theoremId of ["FND-02", "FND-13"]) {
+    const target = pinnedTargets.map((v) => object(v, "S27 native target"))
+      .find(v => v.id === theoremId);
+    if (!target || target.classification !== "KERNEL_REALIZED_NOT_INDEPENDENT" ||
+        target.independent !== false)
+      fail("S27 FND-02/FND-13 non-independent classification changed");
+    for (const rawArtifact of array(target.evidence, "S27 native evidence")) {
+      const item = object(rawArtifact, "S27 native item");
+      const path = item.path;
+      const digest = item.gitBlobSha;
+      if (typeof path !== "string" || typeof digest !== "string" ||
+          !/^[a-f0-9]{40}$/.test(digest))
+        fail("S27 native evidence path/hash malformed");
+      if (!path.startsWith("ts/test/") || !path.endsWith(".test.ts")) continue;
+      if (pinned.has(path) && pinned.get(path) !== digest)
+        fail("S27 inconsistent shared native source pin: " + path);
+      pinned.set(path, digest);
+    }
+  }
+  const nativeSourceWitnesses = sorted(pinned.keys());
+  equalPaths(nativeSourceWitnesses, sorted([
+    "ts/test/recursive-link-identity-proof.test.ts",
+    "ts/test/v013-aspect-foundation-theorem.test.ts",
+    "ts/test/v013-cyclic-grounding-boundary.test.ts",
+  ]), "S27 exact active native FND-02/FND-13 witnesses");
+  for (const path of nativeSourceWitnesses) {
+    const bytes = readFileSync(resolve(root, path));
+    const sha = createHash("sha1")
+      .update("blob " + bytes.length + "\0").update(bytes).digest("hex");
+    if (sha !== pinned.get(path)) fail("S27 native proof source blob drift: " + path);
+    assertRelation("MTS-PROJECT-PROOF-PROVENANCE-01", path, "requires");
+  }
+
   const nativeRecord = object(JSON.parse(read("proofs/evidence/FND-07/mtsNative.json")), "FND-07");
   if (nativeRecord.lane !== "mtsNative") fail("FND-07 lane is not native");
   for (const rawArtifact of array(nativeRecord.artifacts, "FND-07.artifacts")) {
