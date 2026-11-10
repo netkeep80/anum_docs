@@ -1,4 +1,5 @@
 name: repo-guard policy check
+# P7-S36 P1 live probe: active HEAD is intentionally wrong; comment below is the masked literal.
 
 on:
   pull_request:
