@@ -561,8 +561,8 @@ const s16LineageRelation = "  - predicates: [requires]\\n    target:\\n      kin
 assert.ok(s16LineageText.includes(s16LineageRelation));
 assert.throws(() => verifyProjectOwnership(resolve(".."), {
   [s16LineageFile]: s16LineageText.replace(s16LineageRelation, ""),
-}), /accepted historical immutable lineage inventory changed/,
-  "S37: exact immutable historic contract cannot lose typed ownership");
+}), /accepted immutable lineage inventory changed/,
+  "S37: exact immutable resource cannot lose typed ownership");
 const s37FrozenProfilePath = "traceability/mts-v0.13-self-proof-authority-profile.json";
 const s37FrozenProfile = readFileSync(resolve("..", s37FrozenProfilePath), "utf8");
 assert.ok(s37FrozenProfile.includes('"proofAcceptanceAuthority": true'),
