@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 455);
+assert.equal(p7CandidateWitness.exactRelations, 457);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -186,6 +186,42 @@ assert.throws(() => verifyProjectOwnership(s29Root, {
   [s29Path]: JSON.stringify(s29Readiness),
 }), /S29 historical readiness must remain pre-Author decision/,
 "S29 forged accepted conclusion rejected");
+
+// S30: exact two-source historical readiness dependency, not blanket FORMAL
+// ownership. All four negative cases must fail the existing owner verifier.
+const s30Paths = [
+  "formal/v0.15/evidence/governance-merge-enforcement-g1.json",
+  "formal/v0.15/evidence/readiness-audit-r2.json",
+] as const;
+for (const path of s30Paths) {
+  const clause = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + path + "\n";
+  assert.ok(s29Owner.includes(clause), "S30 exact historical witness linked: " + path);
+  assert.throws(() => verifyProjectOwnership(s29Root, {
+    [s29OwnerPath]: s29Owner.replace(clause, ""),
+  }), /missing requires witness/, "S30 missing owner link rejected: " + path);
+  assert.ok(s29Reader.includes('readFileSync(join(root, "' + path + '"), "utf8")'));
+  assert.throws(() => verifyProjectOwnership(s29Root, {
+    [s29ReaderPath]: s29Reader.replace('"' + path + '"', '"' + path + '.forged"'),
+  }), /S30 physical historical evidence reads/, "S30 disconnected reader rejected: " + path);
+}
+const s30R3 = JSON.parse(readFileSync(resolve(s29Root, s29Path), "utf8"));
+s30R3.governance.evidence = "formal/v0.15/evidence/forged-governance.json";
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29Path]: JSON.stringify(s30R3),
+}), /S30 R3 governance evidence pointer changed/,
+"S30 forged governance source pointer rejected");
+const s30Gov = JSON.parse(readFileSync(resolve(s29Root, s30Paths[0]), "utf8"));
+s30Gov.acceptance.mtsV015Accepted = true;
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s30Paths[0]]: JSON.stringify(s30Gov),
+}), /S30 governance witness falsely accepts v0.15/,
+"S30 retrospective governance acceptance rejected");
+const s30Audit = JSON.parse(readFileSync(resolve(s29Root, s30Paths[1]), "utf8"));
+s30Audit.status = "RELEASE_READY";
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s30Paths[1]]: JSON.stringify(s30Audit),
+}), /S30 historical blocked audit status changed/,
+"S30 forged historical readiness status rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
