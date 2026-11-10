@@ -180,6 +180,12 @@ assert.throws(() => verifyProjectOwnership(s29Root, {
   [s29Path]: JSON.stringify(s29Readiness),
 }), /S29 historical readiness must remain pre-Author decision/,
 "S29 historical Author-decision escalation rejected");
+s29Readiness.finalAuthorGate.decision = "PENDING";
+s29Readiness.conclusion.accepted = true;
+assert.throws(() => verifyProjectOwnership(s29Root, {
+  [s29Path]: JSON.stringify(s29Readiness),
+}), /S29 historical readiness must remain pre-Author decision/,
+"S29 forged accepted conclusion rejected");
 
 // S26 second independent approved source cohort: negative digest mutation.
 const s26TwoRolePath = "ts/test/v015-two-role-approved-source-integrity.test.ts";
