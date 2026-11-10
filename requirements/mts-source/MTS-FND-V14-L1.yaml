@@ -356,5 +356,3 @@ artifacts:
     relations: [requires, implements]
   - path: ts/test/mts-source-requirement.test.ts
     relations: [requires, verifies]
-  - path: ts/test/research-v013-semantic-dependency-projection-a9.test.ts
-    relations: [requires, verifies]
