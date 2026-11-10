@@ -231,6 +231,18 @@ assert.throws(() => verifyProjectOwnership(s33Root, {
   [s33Path]: JSON.stringify(s33Cutover),
 }), /S33 historical accepted cutover pointer changed/,
 "S33 forged history-to-current cutover promotion rejected");
+const s33Mutable = structuredClone(s33Source);
+s33Mutable.sourceImmutable = false;
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Mutable),
+}), /S33 historical errata authority boundary changed/,
+"S33 false claim that historical original is mutable rejected");
+const s33Delta = structuredClone(s33Source);
+s33Delta.acceptedSemanticDelta = "REDEFINED";
+assert.throws(() => verifyProjectOwnership(s33Root, {
+  [s33Path]: JSON.stringify(s33Delta),
+}), /S33 historical errata authority boundary changed/,
+"S33 illicit retroactive semantic delta rejected");
 
 // S30: exact two-source historical readiness dependency, not blanket FORMAL
 // ownership. All four negative cases must fail the existing owner verifier.
