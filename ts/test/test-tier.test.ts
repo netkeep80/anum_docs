@@ -575,6 +575,13 @@ assert.throws(() => verifyProjectOwnership(resolve(".."), {
 }), /accepted historical immutable lineage content changed: traceability\/mts-v0\.13-self-proof-authority-profile\.json/,
 "S37 frozen historical evidence content mutation rejected even when path and relation remain intact");
 
+const s37ResearchPath = "docs/research/Новое осмысление МТС.md";
+const s37ResearchSource = readFileSync(resolve("..", s37ResearchPath), "utf8");
+assert.throws(() => verifyProjectOwnership(resolve(".."), {
+  [s37ResearchPath]: s37ResearchSource + "\nАУДИТОРСКАЯ МУТАЦИЯ HISTORICAL SOURCE.\n",
+}), /accepted historical publication source content changed: docs\/research\/Новое осмысление МТС\.md/,
+"S37 retained historical research source content mutation rejected through publication owner");
+
 // S37: the live blocking gate belongs directly to change governance. No
 // repo-policy.json is needed to restate the workflow contract.
 const s32Root = resolve("..");
