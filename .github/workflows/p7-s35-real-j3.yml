@@ -1,0 +1,66 @@
+name: P7-S35 real BASE-to-HEAD RG v6 J3 (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s35-real-j3-20261110]
+    paths: [".github/workflows/p7-s35-real-j3.yml"]
+permissions: {contents: read, issues: read, pull-requests: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact post-merge J1 J2 and real S35 BASE-to-HEAD J3
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate checkout --detach 9bdca48e10f9ac80e5a539495c040c425851854a
+          test "$(git -C candidate rev-parse HEAD)" = "9bdca48e10f9ac80e5a539495c040c425851854a"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "a80cf8c8692d7b2be1593e3eb524e664f8e14a3c"
+          test "$(git -C candidate rev-parse cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9^{tree})" = "c6cf34112d7b3f88b45cc11e27f9bff58f718792"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_BASE=cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9
+          echo EXACT_HEAD=9bdca48e10f9ac80e5a539495c040c425851854a
+          echo EXACT_HEAD_TREE=a80cf8c8692d7b2be1593e3eb524e664f8e14a3c
+          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9 --head 9bdca48e10f9ac80e5a539495c040c425851854a --format json > "$RUNNER_TEMP/report.json" 2>"$RUNNER_TEMP/report.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import json, os
+          p=os.path.join(os.environ["RUNNER_TEMP"],"report.json")
+          o=json.load(open(p))
+          print("FORMAT",o.get("format"))
+          print("OK",o.get("ok"))
+          print("BASE",o.get("base"))
+          print("HEAD",o.get("head"))
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("J3_ACTUAL",o.get("j3"))
+          ds=o.get("diagnostics",[])
+          print("DIAGNOSTICS_COUNT",len(ds))
+          for d in ds:
+              print("DIAGNOSTIC",json.dumps(d,ensure_ascii=False,sort_keys=True))
+          assert o.get("base")=="cee4625a4d9a9f0f7df3aefdd22a1ce360e5a3f9"
+          assert o.get("head")=="9bdca48e10f9ac80e5a539495c040c425851854a"
+          assert o["j1"]["tracked"]==649 and o["j1"]["justified"]==649 and o["j1"]["head"] is True
+          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True
+          PY
+          test "$rc" -eq 0
