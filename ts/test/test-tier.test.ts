@@ -265,6 +265,10 @@ for (const path of [
   assert.throws(() => verifyProjectOwnership(s34Root, {
     [s34OwnerFile]: s34Owner.replace(relation, ""),
   }), /missing verified_by witness/, "S34 deleted FULL gate ownership rejected: " + path);
+  assert.throws(() => verifyProjectOwnership(s34Root, {
+    [s34OwnerFile]: s34Owner.replace(relation,
+      s34Relation("requires", path)),
+  }), /missing verified_by witness/, "S34 wrong FULL gate predicate rejected: " + path);
 }
 for (const path of [
   "ts/test/portable-derivation-digest.test.ts",
