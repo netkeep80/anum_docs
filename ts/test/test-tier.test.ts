@@ -399,7 +399,7 @@ for (const path of [
     [s35ProofPath]: s35ProofText.replace(clause, ""),
   }), /missing verified_by witness/, "S35 current theorem-index evidence owner removal rejected");
 }
-const s35ForgedIndex = JSON.stringify(s35Index).replace(
+const s35ForgedIndex = JSON.stringify(s35Index).replaceAll(
   "ts/test/codec-capability-model.test.ts",
   "ts/test/codec-capability-model.forged.test.ts");
 assert.throws(() => verifyProjectOwnership(s35Root, {
