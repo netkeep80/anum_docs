@@ -5,6 +5,26 @@ on:
     paths: [".github/workflows/p7-s35-real-j3.yml"]
 permissions: {contents: read, issues: read, pull-requests: read}
 jobs:
+  action-wrapper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 9bdca48e10f9ac80e5a539495c040c425851854a
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run exact pinned RepoGuard v6 Action wrapper on merged main
+        id: guard
+        uses: netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114
+        with:
+          base: 9bdca48e10f9ac80e5a539495c040c425851854a
+          head: 9bdca48e10f9ac80e5a539495c040c425851854a
+      - name: Assert wrapper result
+        shell: bash
+        run: |
+          test "${{ steps.guard.outputs.result }}" = "passed"
+          echo "${{ steps.guard.outputs.summary }}"
   exact:
     runs-on: ubuntu-latest
     timeout-minutes: 25
