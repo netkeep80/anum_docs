@@ -283,7 +283,7 @@ DELETE
 ```text
 новый путь
 + все входящие ссылки
-+ repo-policy canonical path
++ typed owner relation paths
 + docs checks
 + тестовые path assumptions
 - старый путь
