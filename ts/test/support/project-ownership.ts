@@ -390,7 +390,7 @@ export function verifyProjectOwnership(
       ".github/workflows/repo-guard.yml")
     fail("S36 live guard document binding changed");
   const s32Rules = array(s32DocRelations.rules, "S36 document enforcement rules");
-  const s32Rule = (id: string): Obj => object(
+  const s32Rule = (id: string) => object(
     s32Rules.find(v => object(v, "S36 rule").id === id), "S36 guard rule " + id);
   const s32Base = s32Rule("repo-guard-workflow-base");
   const s32Head = s32Rule("repo-guard-workflow-head");
