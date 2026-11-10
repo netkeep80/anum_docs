@@ -369,6 +369,11 @@ assert.throws(() => verifyProjectOwnership(s35Root, {
   [s35WorkflowPath]: s35Workflow.replace("workflow_dispatch:", "never_dispatch:"),
 }), /S35 pinned untrusted manual Mathlib workflow obligation changed/,
 "S35 manually triggered pinned reproducibility is no longer executable");
+assert.throws(() => verifyProjectOwnership(s35Root, {
+  [s35WorkflowPath]: s35Workflow.replace("untrusted-export-evidence",
+    "approved-semantic-proof"),
+}), /S35 pinned untrusted manual Mathlib workflow obligation changed/,
+"S35 optional Mathlib export cannot promote itself to accepted proof evidence");
 const s35PinnedTestPath = "ts/test/v015-compact-not-approved-source-integrity.test.ts";
 const s35PinnedTest = readFileSync(resolve(s35Root, s35PinnedTestPath), "utf8");
 assert.throws(() => verifyProjectOwnership(s35Root, {
