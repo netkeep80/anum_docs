@@ -251,7 +251,7 @@ for (const item of s31Checks) {
   assert.ok(s31Owner.includes(clause), "S31 source-owned W6 preview link present");
   assert.throws(() => verifyProjectOwnership(s31Root, {
     [s31OwnerPath]: s31Owner.replace(clause, ""),
-  }), /missing requires witness/, "S31 missing typed preview link rejected");
+  }), /tooling and exact physical preview-source requires relation coverage mismatches/, "S31 missing typed preview link rejected");
   const reader = readFileSync(resolve(s31Root, item.reader), "utf8");
   assert.ok(reader.includes('"' + item.path + '"'));
   assert.throws(() => verifyProjectOwnership(s31Root, {
