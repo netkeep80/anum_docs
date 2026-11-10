@@ -23,8 +23,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate checkout --detach 9bef60197565e2608fc56b7c6f00463a8b476248
-          test "$(git -C candidate rev-parse HEAD)" = "9bef60197565e2608fc56b7c6f00463a8b476248"
+          git -C candidate fetch origin migration/p7-s36-repoguard-v6-blocking-cutover-20261110\n          git -C candidate checkout --detach d368ccc525db95a91f3132ee801a387548ddb7a3
+          test "$(git -C candidate rev-parse HEAD)" = "d368ccc525db95a91f3132ee801a387548ddb7a3"
           test "$(git -C candidate rev-parse 9bdca48e10f9ac80e5a539495c040c425851854a)" = "9bdca48e10f9ac80e5a539495c040c425851854a"
       - name: Run pinned RepoGuard v6 Action on exact BASE to HEAD
         id: guard
@@ -32,7 +32,7 @@ jobs:
         with:
           repo-root: ${{ github.workspace }}/candidate
           base: 9bdca48e10f9ac80e5a539495c040c425851854a
-          head: 9bef60197565e2608fc56b7c6f00463a8b476248
+          head: d368ccc525db95a91f3132ee801a387548ddb7a3
       - name: Assert exact v6 result
         shell: bash
         run: |
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: 9bef60197565e2608fc56b7c6f00463a8b476248
+          ref: d368ccc525db95a91f3132ee801a387548ddb7a3
           fetch-depth: 0
           submodules: true
           persist-credentials: false
@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: 9bef60197565e2608fc56b7c6f00463a8b476248
+          ref: d368ccc525db95a91f3132ee801a387548ddb7a3
           fetch-depth: 0
           submodules: true
           persist-credentials: false
