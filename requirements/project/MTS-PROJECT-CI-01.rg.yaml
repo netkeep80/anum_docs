@@ -1,6 +1,6 @@
 format: repo-guard/requirement-v1
 id: MTS-PROJECT-CI-01
-normative: "Current and merged repository revisions must execute distinct reproducible current/FULL checks with pinned tools, exact test-tier membership and browser smoke verification. The CI workflow must reject missing current tests, non-deterministic documentation, and unintended widening of the externally consumable package surface; the obsolete RepoGuard 3.2.4 blocking check is retained until a separately verified migration."
+normative: "Current and merged repository revisions must execute distinct reproducible current/FULL checks with pinned tools, exact test-tier membership and browser smoke verification. The CI workflow must reject missing current tests, non-deterministic documentation, and unintended widening of the externally consumable package surface; the blocking RepoGuard gate is pinned to accepted v6.0.1 and evaluates exact pull-request BASE/HEAD snapshots."
 lifecycle:
   accepted: true
   current: true
