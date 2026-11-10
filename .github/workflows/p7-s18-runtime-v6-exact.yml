@@ -29,15 +29,15 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s27-native-fnd02-fnd13-witness-pins-20261110
-          git -C candidate checkout --detach 3b9bcdb1390a16d30c11ba08b7864bdb42129279
-          test "$(git -C candidate rev-parse HEAD)" = "3b9bcdb1390a16d30c11ba08b7864bdb42129279"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "7c903a3ed8ec324903cf2c46bf066a856cae461d"
+          git -C candidate checkout --detach 2e1c4362ef91b732ef7572133367c249de71853c
+          test "$(git -C candidate rev-parse HEAD)" = "2e1c4362ef91b732ef7572133367c249de71853c"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "59a5f1ea90d8e815d202db01fc2fb02bdf06aaf4"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=3b9bcdb1390a16d30c11ba08b7864bdb42129279
-          echo EXACT_TREE=7c903a3ed8ec324903cf2c46bf066a856cae461d
+          echo EXACT_HEAD=2e1c4362ef91b732ef7572133367c249de71853c
+          echo EXACT_TREE=59a5f1ea90d8e815d202db01fc2fb02bdf06aaf4
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 3b9bcdb1390a16d30c11ba08b7864bdb42129279 --head 3b9bcdb1390a16d30c11ba08b7864bdb42129279 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 2e1c4362ef91b732ef7572133367c249de71853c --head 2e1c4362ef91b732ef7572133367c249de71853c --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
