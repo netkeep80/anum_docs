@@ -93,24 +93,24 @@
     },
     "rules": [
       {
-        "id": "repo-guard-workflow-mode",
+        "id": "repo-guard-workflow-base",
         "kind": "scalar_equals_literal",
         "source": {
           "document": "repo-guard-workflow",
-          "pointer": "/jobs/policy-check/steps/1/with/mode",
+          "pointer": "/jobs/policy-check/steps/1/with/base",
           "type": "string"
         },
-        "value": "check-pr"
+        "value": "${{ github.event.pull_request.base.sha }}"
       },
       {
-        "id": "repo-guard-workflow-enforcement",
+        "id": "repo-guard-workflow-head",
         "kind": "scalar_equals_literal",
         "source": {
           "document": "repo-guard-workflow",
-          "pointer": "/jobs/policy-check/steps/1/with/enforcement",
+          "pointer": "/jobs/policy-check/steps/1/with/head",
           "type": "string"
         },
-        "value": "blocking"
+        "value": "${{ github.event.pull_request.head.sha }}"
       },
       {
         "id": "repo-guard-workflow-permission-contents",
@@ -150,7 +150,7 @@
           "pointer": "/jobs/policy-check/steps/1/uses",
           "type": "string"
         },
-        "value": "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2"
+        "value": "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114"
       },
       {
         "id": "branch-hygiene-permission-contents-write",
