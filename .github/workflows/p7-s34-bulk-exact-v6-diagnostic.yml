@@ -29,16 +29,16 @@ jobs:
         run: |
           set -euo pipefail
           git -C candidate fetch origin cleanup/p7-s34-bulk-current-conformance-and-source-closure-20261110
-          git -C candidate checkout --detach fe0961d24369e09a68ffc49a1841ddc8a67cb1f4
-          test "$(git -C candidate rev-parse HEAD)" = "fe0961d24369e09a68ffc49a1841ddc8a67cb1f4"
-          test "$(git -C candidate rev-parse HEAD^{tree})" = "9120f3392a32d31668963252ec3356ac5e13c4e9"
+          git -C candidate checkout --detach 9f3803c317cc0db3c6e41e3226f8f370ada1ca25
+          test "$(git -C candidate rev-parse HEAD)" = "9f3803c317cc0db3c6e41e3226f8f370ada1ca25"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "c6cf34112d7b3f88b45cc11e27f9bff58f718792"
           test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
-          echo EXACT_HEAD=fe0961d24369e09a68ffc49a1841ddc8a67cb1f4
-          echo EXACT_TREE=9120f3392a32d31668963252ec3356ac5e13c4e9
+          echo EXACT_HEAD=9f3803c317cc0db3c6e41e3226f8f370ada1ca25
+          echo EXACT_TREE=c6cf34112d7b3f88b45cc11e27f9bff58f718792
           echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
           npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
           set +e
-          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base fe0961d24369e09a68ffc49a1841ddc8a67cb1f4 --head fe0961d24369e09a68ffc49a1841ddc8a67cb1f4 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 9f3803c317cc0db3c6e41e3226f8f370ada1ca25 --head 9f3803c317cc0db3c6e41e3226f8f370ada1ca25 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
           rc=$?
           set -e
           echo RG_V6_EXIT=$rc
