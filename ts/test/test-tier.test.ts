@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 451);
+assert.equal(p7CandidateWitness.exactRelations, 454);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -71,6 +71,56 @@ assert.equal(p7CandidateWitness.observatorySources, 9);
 assert.equal(p7CandidateWitness.observatoryExecutedTests, 11);
 assert.equal(p7CandidateWitness.protectedHistoricalImages, 29);
 assert.equal(p7CandidateWitness.currentDocumentationSurfaces, 12);
+
+// S27: native source preservation is not a new independent proof claim.
+// Reject missing project ownership, a forged active source pin and a broken
+// present-tense theorem-catalog consumer without editing any frozen evidence.
+const s27Root = resolve("..");
+const s27OwnerPath = "requirements/project/MTS-PROJECT-PROOF-PROVENANCE-01.rg.yaml";
+const s27Owner = readFileSync(resolve(s27Root, s27OwnerPath), "utf8");
+const s27Witness = "ts/test/recursive-link-identity-proof.test.ts";
+const s27Relation = "  - predicates: [requires]\n    target:\n      kind: artifact\n      path: " + s27Witness + "\n";
+assert.ok(s27Owner.includes(s27Relation), "S27 exact typed witness is present");
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27OwnerPath]: s27Owner.replace(s27Relation, ""),
+}), /S27|missing requires witness/, "S27 missing project ownership rejected");
+
+const s27RecordPath = "proofs/native-proof-assurance.json";
+const s27Record = readFileSync(resolve(s27Root, s27RecordPath), "utf8");
+const s27PinnedSha = "e104f05033b4d46230b4f3f1d22d3773f2d0bd0f";
+assert.ok(s27Record.includes(s27PinnedSha), "S27 FND-02/FND-13 exact pin present");
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27RecordPath]: s27Record.replaceAll(s27PinnedSha, "0".repeat(40)),
+}), /S27 native proof source blob drift/,
+"S27 altered native evidence source identity rejected");
+
+const s27Fnd13Record = JSON.parse(s27Record) as any;
+const s27Fnd13 = s27Fnd13Record.targets.find((v: any) => v.id === "FND-13");
+assert.ok(s27Fnd13 && s27Fnd13.independent === false);
+const s27Fnd13Evidence = s27Fnd13.evidence.find((v: any) =>
+  v.path === "ts/test/v013-cyclic-grounding-boundary.test.ts");
+assert.ok(s27Fnd13Evidence && /^[a-f0-9]{40}$/.test(s27Fnd13Evidence.gitBlobSha));
+s27Fnd13Evidence.gitBlobSha = "0".repeat(40);
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27RecordPath]: JSON.stringify(s27Fnd13Record),
+}), /S27 native proof source blob drift/,
+"S27 forged FND-13 pin rejected");
+
+const s27Escalated = JSON.parse(s27Record) as any;
+s27Escalated.targets.find((v: any) => v.id === "FND-02").independent = true;
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27RecordPath]: JSON.stringify(s27Escalated),
+}), /S27 FND-02\/FND-13 non-independent classification changed/,
+"S27 independent proof authority escalation rejected");
+
+const s27LoaderPath = "ts/src/tooling/theorem-projection-model.ts";
+const s27Loader = readFileSync(resolve(s27Root, s27LoaderPath), "utf8");
+assert.ok(s27Loader.includes('readJson(root, "proofs/native-proof-assurance.json")'));
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27LoaderPath]: s27Loader.replace('readJson(root, "proofs/native-proof-assurance.json")',
+    'readJson(root, "proofs/native-proof-assurance.retired.json")'),
+}), /S27 current theorem projection native provenance consumer changed/,
+"S27 stale native source without present-tense consumer rejected");
 
 // P7-S26: approved physical inputs require both an exact rooted Resource
 // relation and an active integrity consumer with byte-exact SHA-256 evidence.

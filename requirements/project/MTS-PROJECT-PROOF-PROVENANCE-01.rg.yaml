@@ -593,3 +593,15 @@ relations:
     target:
       kind: artifact
       path: formal/v0.15/regression/two-role-meta-rule.recursive
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/recursive-link-identity-proof.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v013-aspect-foundation-theorem.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/test/v013-cyclic-grounding-boundary.test.ts
