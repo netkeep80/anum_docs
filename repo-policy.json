@@ -565,9 +565,6 @@
     "historical-pics-test": [
       "ts/test/historical-images-protection.test.ts"
     ],
-    "science-shared-research-classification-test": [
-      "ts/test/research-v013-semantic-dependency-projection-a9.test.ts"
-    ],
     "science-shared-reader-coverage-files": [
       "ts/src/tooling/mts-reader-coverage.ts",
       "ts/test/mts-reader-coverage.test.ts"
@@ -708,12 +705,10 @@
     "post-v015-science-source-corpus-technical-merge": {
       "allow_surfaces": [
         "science-corpus-pr2153-files",
-        "science-shared-research-classification-test",
         "science-shared-reader-coverage-files"
       ],
       "require_surfaces": [
         "science-corpus-pr2153-files",
-        "science-shared-research-classification-test",
         "science-shared-reader-coverage-files"
       ],
       "allow_unclassified_surfaces": false,
@@ -725,12 +720,10 @@
     },
     "post-v015-science-source-foundation-technical-merge": {
       "allow_surfaces": [
-        "science-foundation-pr2138-files",
-        "science-shared-research-classification-test"
+        "science-foundation-pr2138-files"
       ],
       "require_surfaces": [
-        "science-foundation-pr2138-files",
-        "science-shared-research-classification-test"
+        "science-foundation-pr2138-files"
       ],
       "allow_unclassified_surfaces": false,
       "budgets": {
@@ -802,13 +795,11 @@
     "post-v015-science-source-reader-evidence-technical-merge": {
       "allow_surfaces": [
         "science-corpus-pr2173-exact-files",
-        "science-shared-reader-coverage-files",
-        "science-shared-research-classification-test"
+        "science-shared-reader-coverage-files"
       ],
       "require_surfaces": [
         "science-corpus-pr2173-exact-files",
-        "science-shared-reader-coverage-files",
-        "science-shared-research-classification-test"
+        "science-shared-reader-coverage-files"
       ],
       "allow_unclassified_surfaces": false,
       "budgets": {
