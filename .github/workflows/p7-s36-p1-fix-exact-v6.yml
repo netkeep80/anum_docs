@@ -63,3 +63,23 @@ jobs:
           assert o["diagnostics"]==[]
           print("P7_S36_P1_FIX_EXACT_V6=PASS")
           PY
+
+
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 8fde98e0231bfdff1ca1cee6314653fa017ce444
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+      - run: npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
+      - run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
+      - run: npm --prefix ts run check:full
