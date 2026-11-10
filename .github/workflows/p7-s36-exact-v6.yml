@@ -23,7 +23,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C candidate fetch origin migration/p7-s36-repoguard-v6-blocking-cutover-20261110\n          git -C candidate checkout --detach d368ccc525db95a91f3132ee801a387548ddb7a3
+          git -C candidate fetch origin migration/p7-s36-repoguard-v6-blocking-cutover-20261110
+          git -C candidate checkout --detach d368ccc525db95a91f3132ee801a387548ddb7a3
           test "$(git -C candidate rev-parse HEAD)" = "d368ccc525db95a91f3132ee801a387548ddb7a3"
           test "$(git -C candidate rev-parse 9bdca48e10f9ac80e5a539495c040c425851854a)" = "9bdca48e10f9ac80e5a539495c040c425851854a"
       - name: Run pinned RepoGuard v6 Action on exact BASE to HEAD
@@ -55,6 +56,7 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: ts/package-lock.json
+      - run: npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
       - run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
       - run: npm --prefix ts run check:current
 
@@ -73,5 +75,6 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: ts/package-lock.json
+      - run: npm ci --prefix vendor/repo-guard --ignore-scripts --no-audit --no-fund --omit=dev
       - run: npm ci --prefix ts --ignore-scripts --no-audit --no-fund
       - run: npm --prefix ts run check:full
