@@ -1,0 +1,62 @@
+name: P7-S29 exact pinned v6 J1 J2 (TEMPORARY, DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s29-exact-v6-20261110]
+    paths: [".github/workflows/p7-s29-exact-v6-diagnostic.yml"]
+permissions: {contents: read, pull-requests: read, issues: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact P7-S29 candidate J1 and J2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s29-exact-r3-readiness-lineage-20261110
+          git -C candidate checkout --detach 8064febb1353856ce3c4cd3cc5309e7a1c9a55b0
+          test "$(git -C candidate rev-parse HEAD)" = "8064febb1353856ce3c4cd3cc5309e7a1c9a55b0"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "2f6c2db8dfc0e40162507e6dd1e34935486402bb"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=8064febb1353856ce3c4cd3cc5309e7a1c9a55b0
+          echo EXACT_TREE=2f6c2db8dfc0e40162507e6dd1e34935486402bb
+          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 8064febb1353856ce3c4cd3cc5309e7a1c9a55b0 --head 8064febb1353856ce3c4cd3cc5309e7a1c9a55b0 --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import os,json,collections
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          paths=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(paths))
+          target="formal/v0.15/evidence/final-readiness-r3.json"
+          print("S29_CUTOVER_READINESS_IN_J1_UNJUSTIFIED", target in paths)
+          assert o["j1"]["tracked"]==650 and o["j1"]["justified"]==550, "unexpected J1 counts"
+          assert len(paths)==100 and target not in paths, "R3 resource still unjustified or wrong count"
+          assert o["j1"]["head"] is False, "J1 must remain honest RED"
+          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True, "unexpected J2"
+          print("P7_S29_ONE_ACCEPTED_LINEAGE_WITNESS=PASS")
+          print("UNJUSTIFIED_GROUPS",dict(collections.Counter(p.split("/")[0] for p in paths)))
+          for p in paths: print("J1_UNJUSTIFIED_PATH",p)
+          PY
+          test "$rc" -eq 1
