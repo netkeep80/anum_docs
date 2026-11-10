@@ -94,6 +94,25 @@ assert.throws(() => verifyProjectOwnership(s27Root, {
 }), /S27 native proof source blob drift/,
 "S27 altered native evidence source identity rejected");
 
+const s27Fnd13Record = JSON.parse(s27Record) as any;
+const s27Fnd13 = s27Fnd13Record.targets.find((v: any) => v.id === "FND-13");
+assert.ok(s27Fnd13 && s27Fnd13.independent === false);
+const s27Fnd13Evidence = s27Fnd13.evidence.find((v: any) =>
+  v.path === "ts/test/v013-cyclic-grounding-boundary.test.ts");
+assert.ok(s27Fnd13Evidence && /^[a-f0-9]{40}$/.test(s27Fnd13Evidence.gitBlobSha));
+s27Fnd13Evidence.gitBlobSha = "0".repeat(40);
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27RecordPath]: JSON.stringify(s27Fnd13Record),
+}), /S27 native proof source blob drift/,
+"S27 forged FND-13 pin rejected");
+
+const s27Escalated = JSON.parse(s27Record) as any;
+s27Escalated.targets.find((v: any) => v.id === "FND-02").independent = true;
+assert.throws(() => verifyProjectOwnership(s27Root, {
+  [s27RecordPath]: JSON.stringify(s27Escalated),
+}), /S27 FND-02\/FND-13 non-independent classification changed/,
+"S27 independent proof authority escalation rejected");
+
 const s27LoaderPath = "ts/src/tooling/theorem-projection-model.ts";
 const s27Loader = readFileSync(resolve(s27Root, s27LoaderPath), "utf8");
 assert.ok(s27Loader.includes('readJson(root, "proofs/native-proof-assurance.json")'));
