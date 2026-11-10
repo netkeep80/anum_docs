@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           BASE=705433694c2a5c3fe4a0f80d4e7b8e3fb448d82d
-          HEAD=e65877f060b38c2dc14d0a13aacf7b1fac5e3c84
+          HEAD=1b951f916cd079ddec3036f87889f05269b7d191
           git -C candidate fetch origin migration/p7-s37-repo-policy-retirement-20261110
           git -C candidate checkout --detach "$HEAD"
           test "$(git -C candidate rev-parse HEAD)" = "$HEAD"
@@ -55,7 +55,7 @@ jobs:
           print("DIAGNOSTICS",o.get("diagnostics"))
           assert o["ok"] is True
           assert o["base"]=="705433694c2a5c3fe4a0f80d4e7b8e3fb448d82d"
-          assert o["head"]=="e65877f060b38c2dc14d0a13aacf7b1fac5e3c84"
+          assert o["head"]=="1b951f916cd079ddec3036f87889f05269b7d191"
           assert o["j1"]["base"] is True and o["j1"]["head"] is True
           assert o["j2"]["base"] is True and o["j2"]["head"] is True
           assert o["j3"]["ok"] is True
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: e65877f060b38c2dc14d0a13aacf7b1fac5e3c84
+          ref: 1b951f916cd079ddec3036f87889f05269b7d191
           fetch-depth: 0
           submodules: true
           persist-credentials: false
