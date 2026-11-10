@@ -209,3 +209,11 @@ relations:
     target:
       kind: artifact
       path: formal/v0.15/evidence/final-readiness-r3.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/evidence/governance-merge-enforcement-g1.json
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: formal/v0.15/evidence/readiness-audit-r2.json

@@ -187,6 +187,43 @@ export function verifyProjectOwnership(
     fail("S29 physical historical readiness reader missing");
   assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", s29Path, "requires");
 
+  // P7-S30: two earlier release-readiness evidence records are physically
+  // verified by the historical R3 gate. Neither record independently accepts v0.15.
+  const s30Paths = [
+    "formal/v0.15/evidence/governance-merge-enforcement-g1.json",
+    "formal/v0.15/evidence/readiness-audit-r2.json",
+  ] as const;
+  if (object(s29Readiness.governance, "S30 R3 governance").evidence !== s30Paths[0])
+    fail("S30 R3 governance evidence pointer changed");
+  const s30Readers = new Set<string>();
+  const s30Visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+        node.expression.text === "readFileSync" && node.arguments.length === 2) {
+      const arg = node.arguments[0];
+      if (arg && ts.isCallExpression(arg) && ts.isIdentifier(arg.expression) &&
+          arg.expression.text === "join" && arg.arguments.length === 2) {
+        const a = arg.arguments[0], b = arg.arguments[1];
+        if (a && b && ts.isIdentifier(a) && a.text === "root" &&
+            ts.isStringLiteral(b) && s30Paths.some(path => path === b.text))
+          s30Readers.add(b.text);
+      }
+    }
+    ts.forEachChild(node, s30Visit);
+  };
+  s30Visit(s29Source);
+  equalPaths(sorted(s30Readers), sorted(s30Paths), "S30 physical historical evidence reads");
+  const s30Governance = object(JSON.parse(read(s30Paths[0])), "S30 governance witness");
+  const s30GovAcceptance = object(s30Governance.acceptance, "S30 governance acceptance");
+  if (s30GovAcceptance.governanceSatisfied !== true ||
+      s30GovAcceptance.mtsV015Accepted !== false)
+    fail("S30 governance witness falsely accepts v0.15");
+  const s30Audit = object(JSON.parse(read(s30Paths[1])), "S30 historical audit");
+  if (s30Audit.status !== "AUDIT_COMPLETE_BLOCKED_BY_GOVERNANCE" ||
+      object(s30Audit.conclusion, "S30 historical conclusion").operationalMergeGovernance !== "BLOCKED")
+    fail("S30 historical blocked audit status changed");
+  for (const path of s30Paths)
+    assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
+
   // P7-S17: attest only the actual current docs/FORMAL and theorem verifier
   // source readers. No global audits/** or profiles/** directory whitelist.
   // Using TypeScript AST call expressions rejects path mentions in comments or
