@@ -113,3 +113,315 @@ relations:
     target:
       kind: artifact
       path: ts/test/research-v013-static-fixity-a7.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/anum-two-memory-conformance.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/quaternary-anum-hierarchical-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v012-interpreter-delta-c2.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-application-closed-frontier-a17.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-contextual-truth-dynamic-duality-a16.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-flat-generalized-modus-ponens-a72w.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v013-root-asymmetry-chirality-a14.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-a4-operational-equivalence.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-a4prime-chiral-torsor-bootstrap.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-add-constructor-authority-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-add-dependent-witness-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-add-general-functionality.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-add-general-proof-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-constructor-inversion.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-constructor-scoped-proof.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-context-relative-a4prime.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-count-nat-degree-separation.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-dependent-witness-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-foundation-orientation-witness.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-immutable-link-chiral-rewrite.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-minimal-chiral-foundation-extension.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-nat-add-bounded-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-nat-add-left-zero-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-nat-least-closed-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-order-replay-mul-scope.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-orientation-gauge-view.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-ostensive-formal-grammar.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-parametric-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-preacceptance-closure.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/research-v014-reaction-result-basis.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/string-anum-two-memory-conformance.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-formal-context-reading-c6.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-formal-source-result-witness.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-formal-square-rule-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-formal-square-string-child-c4.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-ostensive-self-incidence-matching.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-public-facade-c7.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-q-compatibility-representation-c5.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-quaternary-root-basis-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-source-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-string-anum-protocol-c3a.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-string-q-byte-bridge.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v012-string-utf8-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-binary-link-materialization-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-file-wire-conformance.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-form-result-rule-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-formal-quaternary-grounding.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-generic-semantic-carrier-shared-dag.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-hierarchical-carrier-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-hierarchical-link-carrier.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-link-native-abit-basis.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-memory-cycle-boundary.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-prefix-result-rule-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-public-facade.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-quaternary-canonicality.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-relative-form-materialization-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-relative-form-quartet.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-relative-form-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-relative-pole-context.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-relative-pole-source-authority.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-root-aspect-formal-composition.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-root-origin-law.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-string-anum-acceptance.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-symmetric-nonroot.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v013-unknown-whole-two-memory.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v014-independent-readiness-audit.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v014-post-n20c-independent-readiness-audit.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v014-q14-versioned-interpreter.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/v014-traceability-candidate.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/portable-derivation-digest.test.ts
+  - predicates: [verified_by]
+    target:
+      kind: artifact
+      path: ts/test/portable-derivation.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/quaternary-serialization.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/anum-carrier.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/context-integration.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-closure.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/derived-derivation-schema.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v012-formal-execution.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v013-grounded-execution.ts

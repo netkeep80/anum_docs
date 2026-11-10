@@ -62,7 +62,7 @@ assert.equal(p7CandidateWitness.packageToolingEntrypoints, 4);
 assert.equal(p7CandidateWitness.lineageToolingDependencies, 13);
 assert.equal(p7CandidateWitness.publicationToolingDependencies, 28);
 assert.equal(p7CandidateWitness.transitiveSourceDependencies, 16);
-assert.equal(p7CandidateWitness.exactRelations, 461);
+assert.equal(p7CandidateWitness.exactRelations, 539);
 assert.equal(p7CandidateWitness.readerPreviewRuntimeYamlInputs, 43);
 assert.equal(p7CandidateWitness.readerPreviewPinnedTranscriptions, 2);
 assert.equal(p7CandidateWitness.readerPreviewLoaderModules, 23);
@@ -243,6 +243,74 @@ assert.throws(() => verifyProjectOwnership(s33Root, {
   [s33Path]: JSON.stringify(s33Delta),
 }), /S33 historical errata authority boundary changed/,
 "S33 illicit retroactive semantic delta rejected");
+
+// P7-S34 BULK — exact current accepted FULL+CURRENT execution inventory.
+// Do not turn the 30 unrelated historical research tests into CURRENT owners.
+const s34Root = resolve("..");
+const s34OwnerFile = "requirements/project/MTS-PROJECT-CI-01.rg.yaml";
+const s34Owner = readFileSync(resolve(s34Root, s34OwnerFile), "utf8");
+const s34Relation = (predicate: string, path: string): string =>
+  "  - predicates: [" + predicate + "]\n    target:\n      kind: artifact\n      path: " + path + "\n";
+const s34Required = JSON.parse(readFileSync(
+  resolve(s34Root, "contracts/mts-conformance-v0.15.json"), "utf8"));
+const s34BulkGate = "ts/test/research-v014-parametric-closure.test.ts";
+assert.ok(s34Required.requiredExecutableGates.includes(s34BulkGate));
+for (const path of [
+  s34BulkGate,
+  "ts/test/anum-two-memory-conformance.test.ts",
+  "ts/test/v014-post-n20c-independent-readiness-audit.test.ts",
+]) {
+  const relation = s34Relation("verified_by", path);
+  assert.ok(s34Owner.includes(relation), "S34 accepted FULL evidence declared " + path);
+  assert.throws(() => verifyProjectOwnership(s34Root, {
+    [s34OwnerFile]: s34Owner.replace(relation, ""),
+  }), /missing verified_by witness/, "S34 deleted FULL gate ownership rejected: " + path);
+  assert.throws(() => verifyProjectOwnership(s34Root, {
+    [s34OwnerFile]: s34Owner.replace(relation,
+      s34Relation("requires", path)),
+  }), /missing verified_by witness/, "S34 wrong FULL gate predicate rejected: " + path);
+}
+for (const path of [
+  "ts/test/portable-derivation-digest.test.ts",
+  "ts/test/portable-derivation.test.ts",
+]) {
+  const relation = s34Relation("verified_by", path);
+  assert.ok(s34Owner.includes(relation), "S34 explicit current assurance declared " + path);
+  assert.throws(() => verifyProjectOwnership(s34Root, {
+    [s34OwnerFile]: s34Owner.replace(relation, ""),
+  }), /missing verified_by witness/, "S34 CURRENT assurance owner removal rejected: " + path);
+}
+const s34SourceModule = "ts/src/anum-carrier.ts";
+assert.ok(s34Owner.includes(s34Relation("requires", s34SourceModule)));
+assert.throws(() => verifyProjectOwnership(s34Root, {
+  [s34OwnerFile]: s34Owner.replace(s34Relation("requires", s34SourceModule), ""),
+}), /missing requires witness/, "S34 missing indirect import source rejected");
+const s34CarrierReaderPath = "ts/src/quaternary-serialization.ts";
+const s34CarrierReader = readFileSync(resolve(s34Root, s34CarrierReaderPath), "utf8");
+assert.throws(() => verifyProjectOwnership(s34Root, {
+  [s34CarrierReaderPath]: s34CarrierReader.replace('"./anum-carrier.js"',
+    '"./anum-carrier.forged.js"'),
+}), /S34 exact gate-to-source import edge missing/,
+"S34 severed transitive dependency rejected");
+const s34GateCandidate = structuredClone(s34Required);
+s34GateCandidate.requiredExecutableGates = s34GateCandidate.requiredExecutableGates
+  .filter((path: string) => path !== s34BulkGate);
+assert.throws(() => verifyProjectOwnership(s34Root, {
+  "contracts/mts-conformance-v0.15.json": JSON.stringify(s34GateCandidate),
+}), /S34 current FULL conformance gate inventory changed/,
+"S34 forged accepted current conformance gate count rejected");
+const s34TierPath = "ts/src/tooling/test-tier.ts";
+const s34Tier = readFileSync(resolve(s34Root, s34TierPath), "utf8");
+assert.throws(() => verifyProjectOwnership(s34Root, {
+  [s34TierPath]: s34Tier.replace('"ts/test/portable-derivation.test.ts"',
+    '"ts/test/portable-derivation.forged.test.ts"'),
+}), /S34 exact nonnative CURRENT assurance obligation changed/,
+"S34 disconnected CURRENT assurance rejected");
+assert.throws(() => verifyProjectOwnership(s34Root, {
+  [s34TierPath]: s34Tier.replace("tier === \"current\" ? plan.currentSourceTests : plan.allSourceTests",
+    "tier === \"current\" ? plan.currentSourceTests : plan.currentSourceTests"),
+}), /S34 FULL tier execution binding changed/,
+"S34 silently narrowed mandatory FULL runner rejected");
 
 // S30: exact two-source historical readiness dependency, not blanket FORMAL
 // ownership. All four negative cases must fail the existing owner verifier.

@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { dirname, join, relative, resolve } from "node:path";
 import * as ts from "typescript";
 import { parseDocument } from "yaml";
+import { loadCurrentNativeVerificationProjection } from "../../src/tooling/mts-compiler.js";
 import { listRepositoryMarkdownSurface } from "../../src/tooling/markdown-section-adapter.js";
 import { THEOREM_CATALOG_PATH } from "../../src/tooling/theorem-catalog-markdown.js";
 
@@ -149,6 +150,101 @@ export function verifyProjectOwnership(
     "accepted historical immutable lineage");
   for (const path of liveImmutableLineage)
     assertRelation("MTS-PROJECT-ACCEPTED-LINEAGE-01", path, "requires");
+
+  // P7-S34 BULK: retain only presently invoked FULL compatibility gates and
+  // explicit CURRENT assurance, never all historical test files. This is
+  // execution/evidence ownership, NOT retroactive native semantic authority.
+  const s34Contract = object(JSON.parse(read("contracts/mts-conformance-v0.15.json")),
+    "S34 accepted current conformance");
+  if (s34Contract.schema !== "mts-conformance/v0.15" ||
+      s34Contract.accepted !== true || s34Contract.status !== "accepted")
+    fail("S34 current accepted conformance identity changed");
+  const s34Gates = sorted(array(s34Contract.requiredExecutableGates, "S34 required gates")
+    .map(path => {
+      if (typeof path !== "string" || !/^ts\/test\/[^/]+\.test\.ts$/.test(path))
+        fail("S34 current FULL gate path invalid");
+      if (!existsSync(resolve(root, path))) fail("S34 current FULL gate file missing: " + path);
+      return path;
+    }));
+  if (s34Gates.length !== 90 || new Set(s34Gates).size !== s34Gates.length)
+    fail("S34 current FULL conformance gate inventory changed");
+  const s34NativeVerified = new Set(loadCurrentNativeVerificationProjection(root).verifiedByTestPaths);
+  const s34ClaimedOutsideCI = new Set([...relations.entries()]
+    .filter(([id]) => id !== "MTS-PROJECT-CI-01")
+    .flatMap(([, relation]) => [...relation.keys()]));
+  const s34Unclaimed = sorted(s34Gates.filter(path =>
+    !s34NativeVerified.has(path) && !s34ClaimedOutsideCI.has(path)));
+  if (s34Unclaimed.length !== 69)
+    fail("S34 exact current FULL nonnative gate cohort changed");
+  for (const path of s34Unclaimed)
+    assertRelation("MTS-PROJECT-CI-01", path, "verified_by");
+  // Exact v0.15 gates are required by the accepted current conformance
+  // document. CURRENT membership remains controlled solely by native .rg
+  // verified_by + explicit assurance, never inferred from legacy gates.
+  const s34TierPath = "ts/src/tooling/test-tier.ts";
+  const s34TierBytes = read(s34TierPath);
+  const s34RunnerBytes = read("ts/src/tooling/test-runner.ts");
+  if (!s34TierBytes.includes('return tier === "current" ? plan.currentSourceTests : plan.allSourceTests;') ||
+      !s34RunnerBytes.includes("const selectedSourcePaths = selectTestTier(plan, tier);") ||
+      !s34RunnerBytes.includes("for (const test of builtTests)"))
+    fail("S34 FULL tier execution binding changed");
+  const s34TierAst = ts.createSourceFile(s34TierPath, s34TierBytes,
+    ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const s34AssuranceDecl = s34TierAst.statements.filter(ts.isVariableStatement)
+    .flatMap(statement => statement.declarationList.declarations)
+    .find(declaration => ts.isIdentifier(declaration.name) &&
+      declaration.name.text === "CURRENT_ASSURANCE_SOURCE_TESTS");
+  const s34AssuranceExpression = s34AssuranceDecl?.initializer;
+  const s34AssuranceRaw = s34AssuranceExpression && ts.isCallExpression(s34AssuranceExpression)
+    ? s34AssuranceExpression.arguments[0] : undefined;
+  const s34AssuranceLiteral = s34AssuranceRaw && ts.isAsExpression(s34AssuranceRaw)
+    ? s34AssuranceRaw.expression : s34AssuranceRaw;
+  if (!s34AssuranceLiteral || !ts.isArrayLiteralExpression(s34AssuranceLiteral))
+    fail("S34 explicit current assurance selector changed");
+  const s34DeclaredAssurance = s34AssuranceLiteral.elements.map(item => {
+    if (!ts.isStringLiteral(item)) fail("S34 assurance must be literal exact paths");
+    return item.text;
+  });
+  const s34RequiredAssurance = [
+    "ts/test/portable-derivation-digest.test.ts",
+    "ts/test/portable-derivation.test.ts",
+  ] as const;
+  for (const path of s34RequiredAssurance) {
+    if (!s34DeclaredAssurance.includes(path) || s34NativeVerified.has(path) ||
+        s34Gates.includes(path) || s34ClaimedOutsideCI.has(path))
+      fail("S34 exact nonnative CURRENT assurance obligation changed");
+    assertRelation("MTS-PROJECT-CI-01", path, "verified_by");
+  }
+  // Seven private source modules are physically imported by the accepted
+  // FULL conformance gates; anum-carrier is a transitive source dependency.
+  // Prove each exact source edge with AST, not comments/filename matching.
+  const s34SourceEdges = [
+    ["ts/test/anum-two-memory-conformance.test.ts", "../src/quaternary-serialization.js", "ts/src/quaternary-serialization.ts"],
+    ["ts/src/quaternary-serialization.ts", "./anum-carrier.js", "ts/src/anum-carrier.ts"],
+    ["ts/test/string-anum-two-memory-conformance.test.ts", "../src/context-integration.js", "ts/src/context-integration.ts"],
+    ["ts/test/research-v014-parametric-closure.test.ts", "../src/derived-derivation-closure.js", "ts/src/derived-derivation-closure.ts"],
+    ["ts/test/research-v014-nat-add-bounded-closure.test.ts", "../src/derived-derivation-schema.js", "ts/src/derived-derivation-schema.ts"],
+    ["ts/test/v012-formal-square-rule-authority.test.ts", "../src/v012-formal-execution.js", "ts/src/v012-formal-execution.ts"],
+    ["ts/test/research-v014-reaction-result-basis.test.ts", "../src/v013-grounded-execution.js", "ts/src/v013-grounded-execution.ts"],
+  ] as const;
+  for (const [consumer, specifier, target] of s34SourceEdges) {
+    if (consumer.startsWith("ts/test/") && !s34Gates.includes(consumer))
+      fail("S34 source dependency has no accepted FULL consumer: " + consumer);
+    const source = ts.createSourceFile(consumer, read(consumer),
+      ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    if (!source.statements.some(statement => ts.isImportDeclaration(statement) &&
+        ts.isStringLiteral(statement.moduleSpecifier) &&
+        statement.moduleSpecifier.text === specifier))
+      fail("S34 exact gate-to-source import edge missing: " + consumer + " -> " + target);
+    const modulePath = relative(root,
+      resolve(dirname(resolve(root, consumer)), specifier.slice(0, -3) + ".ts"))
+      .replaceAll("\\", "/");
+    if (modulePath !== target)
+      fail("S34 source import resolution changed: " + consumer + " -> " + target);
+    assertRelation("MTS-PROJECT-CI-01", target, "requires");
+  }
+  if (!s34Gates.includes("ts/test/anum-two-memory-conformance.test.ts"))
+    fail("S34 transitive anum carrier has no mandatory FULL root");
 
   // P7-S32: the current RepoGuard configuration is an operational
   // governance input, already consumed by the running blocking workflow and
