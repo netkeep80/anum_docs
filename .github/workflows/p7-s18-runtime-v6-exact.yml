@@ -46,7 +46,7 @@ jobs:
           assert p["base"]["sha"]=="fd399ce7c0fb1a77c15a3b5d290bc610fe871022"
           assert p["head"]["sha"]=="ac954ccb44a4d41c80a61b59fcbab764bd89f5b3"
           assert p["state"]=="open"
-          event={"repository":{"full_name":"netkeep80/anum_docs"},"pull_request":{"number":2410,"base":{"sha":p["base"]["sha"],"ref":"main"},"head":{"sha":p["head"]["sha"]},"body":p.get("body") or ""}
+          event={"repository":{"full_name":"netkeep80/anum_docs"},"pull_request":{"number":2410,"base":{"sha":p["base"]["sha"],"ref":"main"},"head":{"sha":p["head"]["sha"]},"body":p.get("body") or ""}}
           json.dump(event,open(d+"/event.json","w"))
           print("S28_EXACT_LEGACY_PR_EVENT=PASS")
           PY
