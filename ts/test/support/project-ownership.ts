@@ -438,6 +438,17 @@ export function verifyProjectOwnership(
   // by their project obligations, not by whichever CI executable imports them.
   // Require exactly the source-reachable, unclaimed private implementation
   // dependencies of each owner. Other owners' files cannot be claimed twice.
+  // S31: unlike private imported modules, these two source-file inputs are
+  // read as preview evidence. Their exact W6 loader/read chain is verified below.
+  const s31Witnesses = [
+    { consumer: "ts/src/tooling/mts-reader-review-m03.ts",
+      loader: "loadReaderM03", key: "roles", target: "ts/src/v015-formal-roles.ts",
+      arg: "path", marker: "LINK_IDENTITY_EQUALITY" },
+    { consumer: "ts/src/tooling/mts-reader-review-l01-l02-l03.ts",
+      loader: "loadReaderL01L03", key: "association_ts",
+      target: "ts/src/v015-direct-association.ts", arg: "v",
+      marker: "V015_DIRECT_ASSOCIATION_RESEARCH" },
+  ] as const;
   const verifyToolingClosure = (id: Owner): number => {
     const owner = get(id);
     const roots = sorted([...owner.entries()]
@@ -463,7 +474,11 @@ export function verifyProjectOwnership(
     const actual = sorted([...owner.entries()]
       .filter(([path, predicate]) => path.startsWith("ts/src/") && predicate === "requires")
       .map(([path]) => path));
-    equalPaths(actual, expected, id + " tooling requires");
+    const readerEvidence = id === "MTS-PROJECT-PUBLICATION-01"
+      ? s31Witnesses.map(w => w.target) : [];
+    equalPaths(actual, sorted([...expected, ...readerEvidence]),
+      id + " tooling requires");
+    // Report only import-closure modules, not evidence read as source data.
     return expected.length;
   };
 
@@ -867,6 +882,53 @@ export function verifyProjectOwnership(
   equalPaths(declaredDirectPreviewPaths, exactPreviewPaths, "Reader W6 directly invoked YAML inputs");
   for (const path of exactPreviewPaths)
     assertRelation("MTS-PROJECT-PUBLICATION-01", path, "requires");
+
+  // P7-S31: the current W6 preview executes two exact scientific-review
+  // readers. Their source bytes are required for non-authoritative preview,
+  // not declared accepted semantic algorithms or production authority.
+  for (const witness of s31Witnesses) {
+    if (!directlyInvoked.get(witness.consumer)?.includes(witness.loader))
+      fail("S31 W6 preview reader is not directly invoked");
+    const source = ts.createSourceFile(witness.consumer, read(witness.consumer),
+      ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const sourcesDecl = source.statements
+      .filter(ts.isVariableStatement)
+      .flatMap(s => s.declarationList.declarations)
+      .find(d => ts.isIdentifier(d.name) && d.name.text === "sources");
+    const expr = sourcesDecl?.initializer;
+    const sourceMap = expr && ts.isAsExpression(expr) ? expr.expression : expr;
+    if (!sourceMap || !ts.isObjectLiteralExpression(sourceMap))
+      fail("S31 preview sources declaration changed");
+    const property = sourceMap.properties.find(p =>
+      ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === witness.key);
+    if (!property || !ts.isPropertyAssignment(property) ||
+        !ts.isStringLiteral(property.initializer) ||
+        property.initializer.text !== witness.target)
+      fail("S31 preview evidence source path changed");
+    let sourceReader = false;
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === "read" && node.arguments.length === 2 &&
+          ts.isIdentifier(node.arguments[0]!) &&
+          (node.arguments[0] as ts.Identifier).text === "root" &&
+          ts.isIdentifier(node.arguments[1]!) &&
+          (node.arguments[1] as ts.Identifier).text === witness.arg)
+        sourceReader = true;
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    const readerDecl = source.statements.find(s => ts.isFunctionDeclaration(s) &&
+      s.name?.text === "read");
+    if (!sourceReader || !readerDecl ||
+        !readerDecl.getText(source).includes('return readFileSync(resolve(root,path),"utf8")'))
+      fail("S31 preview evidence physical read disconnected");
+    const witnessBytes = read(witness.target);
+    if (!witnessBytes.includes(witness.marker) ||
+        (witness.key === "association_ts" &&
+         !witnessBytes.includes('status: "RESEARCH_NOT_ACCEPTED"')))
+      fail("S31 preview source marker or research boundary changed");
+    assertRelation("MTS-PROJECT-PUBLICATION-01", witness.target, "requires");
+  }
 
   // S11: the actual W6 renderer was instrumented with node:fs
   // syncBuiltinESMExports and exercised against the exact candidate tree.

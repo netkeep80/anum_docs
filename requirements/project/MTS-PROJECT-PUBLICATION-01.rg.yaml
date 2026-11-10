@@ -509,3 +509,11 @@ relations:
     target:
       kind: artifact
       path: ts/test/research-physical-dot-bootstrap.test.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v015-direct-association.ts
+  - predicates: [requires]
+    target:
+      kind: artifact
+      path: ts/src/v015-formal-roles.ts
