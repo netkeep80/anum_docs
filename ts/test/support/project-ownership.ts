@@ -477,7 +477,7 @@ export function verifyProjectOwnership(
     const readerEvidence = id === "MTS-PROJECT-PUBLICATION-01"
       ? s31Witnesses.map(w => w.target) : [];
     equalPaths(actual, sorted([...expected, ...readerEvidence]),
-      id + " tooling and exact physical preview-source requires");
+      id + " tooling requires");
     // Report only import-closure modules, not evidence read as source data.
     return expected.length;
   };
