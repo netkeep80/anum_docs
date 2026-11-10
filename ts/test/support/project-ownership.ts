@@ -372,39 +372,46 @@ export function verifyProjectOwnership(
   if (!s34Gates.includes("ts/test/anum-two-memory-conformance.test.ts"))
     fail("S34 transitive anum carrier has no mandatory FULL root");
 
-  // P7-S32: the current RepoGuard configuration is an operational
-  // governance input, already consumed by the running blocking workflow and
-  // by S16's immutable-lineage verifier. This is not a new policy authority.
-  const s32Enforcement = object(repoPolicy.enforcement, "S32 policy enforcement");
+  // P7-S36: RepoGuard v6 is the current blocking gate. The retained
+  // repo-policy.json still carries temporary compatibility/governance metadata,
+  // but the live gate contract is exact immutable PR BASE/HEAD plus the accepted pin.
+  const s32Enforcement = object(repoPolicy.enforcement, "S36 policy enforcement");
   if (repoPolicy.repository_kind !== "documentation" ||
       s32Enforcement.mode !== "blocking")
-    fail("S32 current blocking policy mode changed");
-  const s32GovernancePaths = array(object(repoPolicy.paths, "S32 policy paths").governance_paths,
-    "S32 governance paths");
+    fail("S36 current blocking policy mode changed");
+  const s32GovernancePaths = array(object(repoPolicy.paths, "S36 policy paths").governance_paths,
+    "S36 governance paths");
   if (!s32GovernancePaths.includes("repo-policy.json") ||
       !s32GovernancePaths.includes(".github/workflows/repo-guard.yml"))
-    fail("S32 governance policy/workflow bindings changed");
-  const s32DocRelations = object(repoPolicy.document_relations, "S32 document relations");
-  const s32Documents = object(s32DocRelations.documents, "S32 control documents");
-  if (object(s32Documents["repo-guard-workflow"], "S32 guard document").path !==
+    fail("S36 governance policy/workflow bindings changed");
+  const s32DocRelations = object(repoPolicy.document_relations, "S36 document relations");
+  const s32Documents = object(s32DocRelations.documents, "S36 control documents");
+  if (object(s32Documents["repo-guard-workflow"], "S36 guard document").path !==
       ".github/workflows/repo-guard.yml")
-    fail("S32 live guard document binding changed");
-  const s32Rules = array(s32DocRelations.rules, "S32 document enforcement rules");
-  const s32Rule = object(s32Rules.find(v => object(v, "S32 rule").id ===
-    "repo-guard-workflow-enforcement"), "S32 guard enforcement rule");
-  if (s32Rule.kind !== "scalar_equals_literal" || s32Rule.value !== "blocking" ||
-      object(s32Rule.source, "S32 rule source").document !== "repo-guard-workflow")
-    fail("S32 guard policy document enforcement changed");
+    fail("S36 live guard document binding changed");
+  const s32Rules = array(s32DocRelations.rules, "S36 document enforcement rules");
+  const s32Rule = (id: string): Obj => object(
+    s32Rules.find(v => object(v, "S36 rule").id === id), "S36 guard rule " + id);
+  const s32Base = s32Rule("repo-guard-workflow-base");
+  const s32Head = s32Rule("repo-guard-workflow-head");
+  if (s32Base.kind !== "scalar_equals_literal" ||
+      s32Base.value !== "${{ github.event.pull_request.base.sha }}" ||
+      object(s32Base.source, "S36 base rule source").document !== "repo-guard-workflow" ||
+      s32Head.kind !== "scalar_equals_literal" ||
+      s32Head.value !== "${{ github.event.pull_request.head.sha }}" ||
+      object(s32Head.source, "S36 head rule source").document !== "repo-guard-workflow")
+    fail("S36 exact BASE/HEAD policy document bindings changed");
   const s32GuardSource = read(".github/workflows/repo-guard.yml");
-  const s32GuardPin = "netkeep80/repo-guard@c19f29da366c985e2cf162ef7e75f5594f60c3a2";
-  const s32PinRule = object(s32Rules.find(v => object(v, "S32 rule").id ===
-    "repo-guard-workflow-action-pin"), "S32 guard action pin rule");
+  const s32GuardPin = "netkeep80/repo-guard@74db97791e6da8a75287164f0d0b41579108f114";
+  const s32PinRule = s32Rule("repo-guard-workflow-action-pin");
   if (s32PinRule.value !== s32GuardPin ||
       !s32GuardSource.includes("uses: " + s32GuardPin) ||
-      !s32GuardSource.includes("mode: check-pr") ||
-      !s32GuardSource.includes("enforcement: blocking") ||
-      !s32GuardSource.includes("name: repo-guard blocking check"))
-    fail("S32 temporary blocking gate source/pin changed");
+      !s32GuardSource.includes("base: ${{ github.event.pull_request.base.sha }}") ||
+      !s32GuardSource.includes("head: ${{ github.event.pull_request.head.sha }}") ||
+      !s32GuardSource.includes("name: repo-guard blocking check") ||
+      s32GuardSource.includes("mode: check-pr") ||
+      s32GuardSource.includes("enforcement: blocking"))
+    fail("S36 v6 blocking gate source/pin/exact-SHA contract changed");
   assertRelation("MTS-PROJECT-CHANGE-GOVERNANCE-01", "repo-policy.json", "requires");
 
   // P7-S33: FULL historical v0.14 acceptance replay physically reads the
