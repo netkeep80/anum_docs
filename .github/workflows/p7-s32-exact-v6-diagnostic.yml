@@ -1,0 +1,59 @@
+name: P7-S32 exact pinned v6 J1 J2 (TEMPORARY DO NOT MERGE)
+on:
+  push:
+    branches: [diagnostics/p7-s32-exact-v6-20261110]
+    paths: [".github/workflows/p7-s32-exact-v6-diagnostic.yml"]
+permissions: {contents: read, pull-requests: read, issues: read}
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          repository: netkeep80/repo-guard
+          ref: 74db97791e6da8a75287164f0d0b41579108f114
+          persist-credentials: false
+          path: guard
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Exact S32 J1 J2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C candidate fetch origin cleanup/p7-s32-current-policy-ownership-20261110
+          git -C candidate checkout --detach 38104f4ba8ae47ed10096d875760bcea3cbff98f
+          test "$(git -C candidate rev-parse HEAD)" = "38104f4ba8ae47ed10096d875760bcea3cbff98f"
+          test "$(git -C candidate rev-parse HEAD^{tree})" = "d25f08bcf46ca7cf02984c5a694fd34386d0479e"
+          test "$(git -C guard rev-parse HEAD)" = "74db97791e6da8a75287164f0d0b41579108f114"
+          echo EXACT_HEAD=38104f4ba8ae47ed10096d875760bcea3cbff98f
+          echo EXACT_TREE=d25f08bcf46ca7cf02984c5a694fd34386d0479e
+          echo EXACT_GUARD=74db97791e6da8a75287164f0d0b41579108f114
+          npm ci --prefix guard --omit=dev --ignore-scripts --no-audit --no-fund
+          set +e
+          node "$GITHUB_WORKSPACE/guard/dist/repo-guard.mjs" --repo-root "$GITHUB_WORKSPACE/candidate" check --base 38104f4ba8ae47ed10096d875760bcea3cbff98f --head 38104f4ba8ae47ed10096d875760bcea3cbff98f --format json > "$RUNNER_TEMP/j1.json" 2>"$RUNNER_TEMP/j1.err"
+          rc=$?
+          set -e
+          echo RG_V6_EXIT=$rc
+          python3 - <<'PY'
+          import os,json
+          o=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"j1.json")))
+          unjustified=sorted(d["subject"].split(":",1)[1] for d in o.get("diagnostics",[]) if d.get("code")=="unjustified_resource")
+          print("J1_ACTUAL",o.get("j1"))
+          print("J2_ACTUAL",o.get("j2"))
+          print("UNJUSTIFIED_COUNT",len(unjustified))
+          print("S32_OPERATIONAL_REPO_POLICY_STILL_UNJUSTIFIED","repo-policy.json" in unjustified)
+          assert o["j1"]["tracked"]==650 and o["j1"]["justified"]==555 and o["j1"]["head"] is False,"unexpected J1"
+          assert len(unjustified)==95 and "repo-policy.json" not in unjustified,"unexpected remaining policy J1"
+          assert o["j2"]["rooted"]==54 and o["j2"]["head"] is True,"unexpected J2"
+          print("P7_S32_EXACT_BLOCKING_POLICY=PASS")
+          for path in unjustified: print("J1_UNJUSTIFIED_PATH",path)
+          PY
+          test "$rc" -eq 1
