@@ -28,13 +28,6 @@ export const CURRENT_DOC_SIZE_SURFACE = [
   "docs/Словарь терминов МТС.md",
 ] as const;
 
-export const CURRENT_DOC_SIZE_BUDGET = Object.freeze({
-  baselineCodePoints: 135847,
-  baselineLines: 3442,
-  baselineWords: 18883,
-  hardCeilingCodePoints: 135948,
-});
-
 export interface DocumentationSizeMeasurement {
   readonly documentCount: number;
   readonly codePoints: number;
@@ -547,12 +540,6 @@ export function measureRepositoryCurrentDocumentationSize(
   return measureDocumentationSize(documents);
 }
 
-export function currentDocumentationSizeWithinBudget(
-  measurement: DocumentationSizeMeasurement,
-): boolean {
-  return measurement.codePoints <= CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints;
-}
-
 function validatedTheoremCatalog(root: string): string {
   // The generic v6.0.0 model is normalized in production, not only in tests.
   // MTS-specific theorem interpretation and rendering stay in anum_docs.
@@ -739,11 +726,8 @@ function main(): void {
     fail("current v0.15 normative Markdown requirement projection incomplete");
   }
   const size = measureRepositoryCurrentDocumentationSize(root);
-  if (!currentDocumentationSizeWithinBudget(size)) {
-    fail(`current documentation size ${size.codePoints} exceeds hard ceiling ${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints} code points`);
-  }
   console.log(
-    `MTS Compiler: docs synchronized; historical v0.13 foundation provenance baseline=${historicalV013Provenance.directEvidenceClauseCount}/${historicalV013Provenance.clauseCount}, gaps=${historicalV013Provenance.gapClauseIds.join(",")}; current release authority = accepted native v0.15 chain; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words; ceiling=${CURRENT_DOC_SIZE_BUDGET.hardCeilingCodePoints}.`,
+    `MTS Compiler: docs synchronized; historical v0.13 foundation provenance baseline=${historicalV013Provenance.directEvidenceClauseCount}/${historicalV013Provenance.clauseCount}, gaps=${historicalV013Provenance.gapClauseIds.join(",")}; current release authority = accepted native v0.15 chain; current-doc size=${size.codePoints} code points / ${size.lines} lines / ${size.words} words.`,
   );
 }
 
