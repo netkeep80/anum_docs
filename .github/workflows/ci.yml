@@ -535,11 +535,17 @@ jobs:
           PROTECTED_FILE="docs/research/Исходные мысли МТС.md"
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
           HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -Fxq "$PROTECTED_FILE"; then
-            echo "::error::The file '$PROTECTED_FILE' is protected and may not be modified in a pull request. Only the repository owner may edit this file directly."
-            exit 1
+          if git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- "$PROTECTED_FILE"; then
+            echo "Protected file check passed."
+          else
+            diff_status=$?
+            if [ "$diff_status" -eq 1 ]; then
+              echo "::error::The file '$PROTECTED_FILE' is protected and may not be modified in a pull request. Only the repository owner may edit this file directly."
+            else
+              echo "::error::Git diff failed while checking protected file '$PROTECTED_FILE' (Git exit code: $diff_status)."
+            fi
+            exit "$diff_status"
           fi
-          echo "Protected file check passed."
 
   validate-structure:
     runs-on: ubuntu-latest
