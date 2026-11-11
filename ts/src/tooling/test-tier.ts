@@ -11,13 +11,6 @@ export type TestTier = "current" | "full";
 
 type JsonObject = Record<string, unknown>;
 
-export interface BoundedCurrentizationTest {
-  readonly path: string;
-  readonly sunset:
-    | "UNTIL_G14_PORTABLE_COMPATIBILITY_WITNESS_ACCEPTED"
-    | "UNTIL_G14_THEOREM_PROOF_INFRASTRUCTURE_WITNESS_ACCEPTED";
-}
-
 export interface TestTierPlan {
   readonly allSourceTests: readonly string[];
   readonly currentSourceTests: readonly string[];
@@ -27,8 +20,6 @@ export interface TestTierPlan {
   readonly machineReferencedSourceTests: readonly string[];
   readonly nativeVerifiedByCurrentSourceTests: readonly string[];
   readonly currentAssuranceSourceTests: readonly string[];
-  readonly boundedCurrentizationSourceTests: readonly string[];
-  readonly boundedCurrentizationTests: readonly BoundedCurrentizationTest[];
   readonly evidenceRoutingSources: readonly string[];
 }
 
@@ -52,12 +43,6 @@ const CURRENT_ASSURANCE_SOURCE_TESTS = Object.freeze([
   "ts/test/v015-documentation-acceptance.test.ts",
   "ts/test/v015-semantic-metamodel-evidence-verifier-v02.test.ts",
 ] as const);
-
-// Keep the metadata-bearing bounded-currentization owner class explicit even
-// though G14 closes its current membership. Future bounded obligations require
-// a new explicit architecture decision and an inspectable sunset.
-const BOUNDED_CURRENTIZATION_TESTS: readonly BoundedCurrentizationTest[] =
-  Object.freeze([]);
 
 function fail(message: string): never {
   throw new Error(`test-tier: ${message}`);
@@ -219,15 +204,6 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
   const nativeVerifiedByCurrentSourceTests = sortedUnique(nativeVerification.verifiedByTestPaths);
   const currentAssuranceSourceTests = sortedUnique(CURRENT_ASSURANCE_SOURCE_TESTS);
 
-  const boundedCurrentizationTests = Object.freeze(
-    BOUNDED_CURRENTIZATION_TESTS.map((item) => Object.freeze({ ...item })),
-  );
-  const boundedPathList = boundedCurrentizationTests.map((item) => item.path);
-  if (new Set(boundedPathList).size !== boundedPathList.length) {
-    fail("bounded currentization metadata contains duplicate test paths");
-  }
-  const boundedCurrentizationSourceTests = sortedUnique(boundedPathList);
-
   const explicitCurrentSourceTests = combineExecutionOwnerSets(allSet, [
     Object.freeze({
       name: "native verified_by",
@@ -236,10 +212,6 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     Object.freeze({
       name: "current assurance",
       paths: currentAssuranceSourceTests,
-    }),
-    Object.freeze({
-      name: "bounded currentization",
-      paths: boundedCurrentizationSourceTests,
     }),
   ]);
 
@@ -303,8 +275,6 @@ export function buildTestTierPlan(repositoryRoot: string): TestTierPlan {
     ...classified,
     nativeVerifiedByCurrentSourceTests,
     currentAssuranceSourceTests,
-    boundedCurrentizationSourceTests,
-    boundedCurrentizationTests,
     evidenceRoutingSources: Object.freeze([
       acceptancePath,
       contractPath,
