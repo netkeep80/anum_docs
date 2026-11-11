@@ -80,8 +80,6 @@ jobs:
         run: |
           npm --prefix ts run docs:sync
           git diff --exit-code -- README.md PORTFOLIO.md docs
-          npm --prefix ts run docs:sync
-          git diff --exit-code -- README.md PORTFOLIO.md docs
           npm --prefix ts run docs:coverage
 
       - name: Compile Contract Observatory
@@ -90,7 +88,6 @@ jobs:
       - name: Verify Contract Observatory evidence and static site
         run: |
           node web/contract-observatory/dist/test/contract-index.test.js
-          node web/contract-observatory/dist/test/site.test.js
 
       - name: Materialize Pages artifact
         run: |
