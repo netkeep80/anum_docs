@@ -37,6 +37,9 @@ on:
       - "ts/src/tooling/theorem-projection-contract.ts"
       - "web/contract-observatory/**"
       - ".github/workflows/pages.yml"
+      - "README.md"
+      - "PORTFOLIO.md"
+      - "docs/**/*.md"
   workflow_dispatch:
 
 permissions:
